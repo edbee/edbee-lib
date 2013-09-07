@@ -3,14 +3,13 @@
  * Author Rick Blommers
  */
 
+#include "textcodecdetector.h"
+
 #include <QTextCodec>
 #include <QByteArray>
 
 #include "textcodec.h"
-#include "textcodecdetector.h"
-
 #include "edbee/edbee.h"
-
 #include "debug.h"
 
 namespace edbee {
@@ -41,7 +40,7 @@ void TextCodecDetector::setGlobalPreferedCodec(TextCodec *codec)
 
 
 
-TextCodecDetector::TextCodecDetector::TextCodecDetector(const QByteArray* buffer, TextCodec *preferedCodec)
+TextCodecDetector::TextCodecDetector(const QByteArray* buffer, TextCodec *preferedCodec)
     : bufferRef_(buffer->constData())
     , bufferLength_(buffer->size())
     , preferedCodecRef_(0)

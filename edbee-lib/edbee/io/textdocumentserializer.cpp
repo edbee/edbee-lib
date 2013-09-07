@@ -44,7 +44,7 @@ bool TextDocumentSerializer::load( QIODevice* ioDevice )
 
     // read the file in blocks of 4096 bytes
     TextCodec* detectedCodec = 0;
-    const LineEnding::LineEnding* detectedLineEnding = 0;
+    const LineEnding* detectedLineEnding = 0;
 
     QTextDecoder* textDecoder=0;
 
@@ -93,7 +93,7 @@ bool TextDocumentSerializer::load( QIODevice* ioDevice )
     ioDevice->close();
 
     // When no line ending could be detected, take the unix line ending
-    if( !detectedLineEnding ) detectedLineEnding = LineEnding::LineEnding::get(LineEnding::Unix); // fallback to unix
+    if( !detectedLineEnding ) detectedLineEnding = LineEnding::get(LineEnding::Unix); // fallback to unix
     if( !detectedCodec ) {  detectedCodec = TextCodecDetector::globalPreferedCodec();  }
 
     // set the detected items
@@ -149,7 +149,7 @@ bool TextDocumentSerializer::save(QIODevice* ioDevice)
 
         // flush the bufer
         if( buffer.size() >= blockSize_ ) {
-            if( !ioDevice->write(buffer) < 0 ) {
+            if( ioDevice->write(buffer) < 0 ) {
                 errorString_ = ioDevice->errorString();
                 buffer.clear();
                 break;

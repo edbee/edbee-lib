@@ -38,7 +38,7 @@ public:
 
 
     explicit TextCodecDetector( const QByteArray* buffer=0,  TextCodec* preferedCodec=0 );
-    explicit TextCodecDetector( const char* buffer=0, int length=0, TextCodec* preferedCodec=0 );
+    explicit TextCodecDetector( const char* buffer, int length=0, TextCodec* preferedCodec=0 );
     virtual ~TextCodecDetector();
 
 

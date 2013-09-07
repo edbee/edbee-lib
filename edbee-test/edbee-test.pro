@@ -7,7 +7,11 @@ TARGET = edbee-test
 TEMPLATE = app
 
 
-INCLUDEPATH += $$PWD/../config
+# This seems to be required for Windows
+INCLUDEPATH += $$PWD
+DEPENDPATH += $$PWD
+DEFINES += QT_NODLL
+
 
 # The test sources
 SOURCES += \

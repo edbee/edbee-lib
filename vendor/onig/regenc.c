@@ -29,11 +29,12 @@
 
 #include "regint.h"
 
-OnigEncoding OnigEncDefaultCharEncoding = ONIG_ENCODING_INIT_DEFAULT;
+OnigEncoding OnigEncDefaultCharEncoding = 0; //ONIG_ENCODING_INIT_DEFAULT;  (moved it to onigenc_init, the win compiler doesn't like this)
 
 extern int
 onigenc_init(void)
 {
+  OnigEncDefaultCharEncoding = ONIG_ENCODING_INIT_DEFAULT;
   return 0;
 }
 

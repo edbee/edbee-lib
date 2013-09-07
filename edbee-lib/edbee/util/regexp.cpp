@@ -5,7 +5,8 @@
 
 #include <QRegExp>
 
-
+// This is required for windows, to prevent linkage errors (somehow the sources of oniguruma assumes we're linking with a dll)
+#define ONIG_EXTERN extern
 #include "oniguruma.h"
 #include "regexp.h"
 #include "debug.h"
@@ -245,6 +246,7 @@ public:
 //    }
 
 };
+
 
 //====================================================================================================================
 

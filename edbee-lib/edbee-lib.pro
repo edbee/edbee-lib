@@ -10,7 +10,11 @@ TARGET = edbee-lib
 TEMPLATE = lib
 CONFIG += staticlib
 
-INCLUDEPATH += $$PWD/../config
+# This seems to be required for Windows
+INCLUDEPATH += $$PWD
+DEPENDPATH += $$PWD
+DEFINES += QT_NODLL
+
 
 SOURCES += \
 	util/mem/debug_new.cpp \
@@ -73,7 +77,8 @@ SOURCES += \
     edbee/commands/findcommand.cpp \
     edbee/io/keymapparser.cpp \
     edbee/commands/tabcommand.cpp \
-    edbee/edbee.cpp
+    edbee/edbee.cpp \
+    edbee/models/textdocumentfilter.cpp
 
 HEADERS += \
     util/logging.h \
@@ -140,6 +145,7 @@ HEADERS += \
     edbee/commands/tabcommand.h \
     edbee/edbee.h
     
+message($$INCLUDEPATH)
 
 ## Extra dependencies
 ##====================

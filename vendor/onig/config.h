@@ -1,4 +1,4 @@
-/* config.h.  Generated from config.h.in by configure.  */
+/* ONIG_EXTERN.  Generated from config.h.in by configure.  */
 /* config.h.in.  Generated from configure.in by autoheader.  */
 
 /* Define to one of `_getb67', `GETB67', `getb67' for Cray-2 and Cray-YMP
@@ -9,12 +9,26 @@
 /* Define to 1 if using `alloca.c'. */
 /* #undef C_ALLOCA */
 
+#ifdef _WIN32
+
+    #include "win32/config.h"
+
+    // Rick: added to make it compile on windows
+    #define ONIG_EXTERN extern
+
+    // Rick: added to decrease the numberr of warnings for onig
+    #define _CRT_SECURE_NO_WARNINGS
+
+#else
+
 /* Define to 1 if you have `alloca', as a function or macro. */
 #define HAVE_ALLOCA 1
 
 /* Define to 1 if you have <alloca.h> and it should be used (not on Ultrix).
    */
-#define HAVE_ALLOCA_H 1
+
+#define HAVE_ALLOCA_H  1
+
 
 /* Define to 1 if you have the <dlfcn.h> header file. */
 #define HAVE_DLFCN_H 1
@@ -117,3 +131,5 @@
 
 /* Define to empty if `const' does not conform to ANSI C. */
 /* #undef const */
+
+#endif

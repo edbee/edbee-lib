@@ -5,6 +5,8 @@
 
 #pragma once
 
+class QString;
+
 namespace edbee {
 
 class MultiTextChange;
@@ -31,13 +33,7 @@ public:
     /// @param doc the textdocument
     /// @param rangeSet the rangeSet that's replaced
     /// @param str the string that's going to placed at the given ranges
-    virtual void filterReplaceRangeSet( TextDocument* doc, TextRangeSet& rangeSet, QString& str  )
-    {
-        Q_UNUSED(doc);
-        Q_UNUSED(rangeSet);
-        Q_UNUSED(str);
-
-    }
+    virtual void filterReplaceRangeSet( TextDocument* doc, TextRangeSet& rangeSet, QString& str  );
 
 
     /// This method is called for any other change
