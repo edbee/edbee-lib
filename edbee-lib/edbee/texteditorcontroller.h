@@ -99,6 +99,7 @@ public slots:
     // updates the status text
     virtual void updateStatusText( const QString& extraText="" );
 
+    virtual void update();
 
     // scrolling
     virtual void scrollPositionVisible( int xPos, int yPos );

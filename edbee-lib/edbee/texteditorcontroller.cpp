@@ -138,6 +138,9 @@ void TextEditorController::setTextDocument(TextDocument* doc)
         connect( textDocumentRef_, SIGNAL(textChanged(edbee::TextBufferChange)), this, SLOT(onTextChanged(edbee::TextBufferChange)));
         connect( textDocumentRef_->lineDataManager(), SIGNAL(lineDataChanged(int,int,int)), this, SLOT(onLineDataChanged(int,int,int)) );
 
+        // force an repaint when the grammar is changed
+        connect( textDocumentRef_, &TextDocument::languageGrammarChanged, this, &TextEditorController::update );
+
         // create the new document
         emit textDocumentChanged( oldDocumentRef, textDocumentRef_ );
 
@@ -289,6 +292,14 @@ void TextEditorController::updateStatusText( const QString& extraText )
         text.append(extraText);
     }   
     emit updateStatusTextSignal( text );
+}
+
+/// updates the main widget
+void TextEditorController::update()
+{
+    if( widgetRef_ ) {
+        widgetRef_->fullUpdate();
+    }
 }
 
 
