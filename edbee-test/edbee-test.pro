@@ -28,7 +28,8 @@ SOURCES += \
     edbee/io/tmlanguageparsertest.cpp \
     edbee/util/regexptest.cpp \
     edbee/models/textdocumentscopestest.cpp \
-    edbee/models/textundostacktest.cpp
+    edbee/models/textundostacktest.cpp \
+    edbee/util/cascadingqvariantmaptest.cpp
 
 HEADERS += \
 	edbee/commands/replaceselectioncommandtest.h \
@@ -43,7 +44,8 @@ HEADERS += \
     edbee/io/tmlanguageparsertest.h \
     edbee/util/regexptest.h \
     edbee/models/textdocumentscopestest.h \
-    edbee/models/textundostacktest.h
+    edbee/models/textundostacktest.h \
+    edbee/util/cascadingqvariantmaptest.h
 
 
 INCLUDEPATH += $$PWD/../edbee-lib
