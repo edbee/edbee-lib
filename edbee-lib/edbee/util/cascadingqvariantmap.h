@@ -18,8 +18,9 @@ class CascadingQVariantMap
 public:
     explicit CascadingQVariantMap( CascadingQVariantMap* parent = 0);
     
-    CascadingQVariantMap* parent() const;
+    void setQVariantMap( const QVariantMap& map );
 
+    CascadingQVariantMap* parent() const;
     void insert( const QString& key, const QVariant& value );
 
     const QVariant value( const QString& key, const QVariant& defValue = QVariant() ) const;

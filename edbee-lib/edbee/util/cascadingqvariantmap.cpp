@@ -15,6 +15,12 @@ CascadingQVariantMap::CascadingQVariantMap(edbee::CascadingQVariantMap* parent)
 {
 }
 
+/// Sets the variant mapt to the given map
+void CascadingQVariantMap::setQVariantMap(const QVariantMap& map)
+{
+    map_ = map;
+}
+
 
 /// Returns the parent of this map
 CascadingQVariantMap* CascadingQVariantMap::parent() const

@@ -12,47 +12,49 @@
 namespace edbee {
 
 /// General configuration settings of the text editor
-/// Currently hardcoded but, by supplying an interface it will be posible to make it adjustable later
 class TextEditorConfig
 {
 public:
     TextEditorConfig();
 
-    /// Returns the caret width in pixels
-    int caretWidth() const { return caretWidth_; }
+    int caretWidth() const;
+    void setCaretWidth( int width );
 
-    /// Returns the caret blinking rate (the delay, how lower how faster)
-    int caretBlinkingRate() const { return  caretBlinkingRate_; }
+    int caretBlinkingRate() const;
+    void setCaretBlinkRate( int rate );
 
-    /// Returns the indent size
-    int indentSize() const { return indentSize_; }
+    int indentSize() const;
+    void setIndentSize( int size );
 
-    /// Should the tab-character be used?
-    bool useTabChar() { return useTabChar_; }
+    bool useTabChar();
+    void setUseTabChar( bool enable );
 
-    /// Returns the word seperator character
-    const QStringList& charGroups() const { return charGroups_; }
+    const QStringList& charGroups() const;
+    void setCharGroups( const QStringList& items );
 
-    /// Returns all 'white-spaces'
-    const QString& whitespaces() const { return whitespaces_; }
+    const QString& whitespaces() const;
+    void setWhitespaces( const QString& value );
 
-    /// Retuns the whitespace character without newlines
-    const QString& whitespaceWithoutNewline() const { return whitespaceWithoutNewline_; }
+    const QString& whitespaceWithoutNewline() const;
+    void setWhitespaceWithoutNewline( const QString& );
 
-    /// Returns the extra line spacing in pixels
-    int extraLineSpacing() const { return extraLineSpacing_; }
+    int extraLineSpacing() const;
+    void setExtraLineSpacing( int value );
 
-    /// should we use a line seperator color
-    bool useLineSeparator() const { return useLineSeparator_; }
+    bool useLineSeparator() const;
+    void setUseLineSeparator( bool value );
 
-    /// The line sperator pen to use
-    const QPen& lineSeparatorPen() const { return lineSeparatorPen_; }
+    const QPen& lineSeparatorPen() const;
+    void setLineSeperatorPen( const QPen& pen );
 
-    bool undoGroupPerSpace() const { return undoGroupPerSpace_; }
+    bool undoGroupPerSpace() const;
+    void setUndoGroupPerSpace( bool enable );
 
-    bool showCaretOffset() const { return showCaretOffset_;}
+    bool showCaretOffset() const;
+    void setShowCaretOffset( bool enable );
 
-    QString themeName() { return themeName_; }
+    QString themeName();
+    void setThemeName( const QString& name );
 
 private:
 

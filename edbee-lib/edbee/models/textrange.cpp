@@ -254,7 +254,7 @@ void TextRange::expandToWord(TextDocument *doc, const QString& whitespace, const
     int& min = minVar();
     int& max = maxVar();
 
-    // first check wihch character is undet the caret to find the character grouop
+    // first check which character is under the caret to find the character grouop
     if( min > 0 ) {
         QString group = findCharGroup( doc->charAt(min-1), whitespace, characterGroups );
         if( group.isEmpty() ) {
