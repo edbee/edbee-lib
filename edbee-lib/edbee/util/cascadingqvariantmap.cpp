@@ -15,6 +15,17 @@ CascadingQVariantMap::CascadingQVariantMap(edbee::CascadingQVariantMap* parent)
 {
 }
 
+/// This helper method deletes all containing parents recursively
+/// Tough this doesnt' feel quite correct (it uses references to parent) it makes
+/// managing the map a bit easier.
+void CascadingQVariantMap::deleteParents()
+{
+    if( parentRef_ ) {
+        parentRef_->deleteParents();
+        delete parentRef_;
+    }
+}
+
 /// Sets the variant mapt to the given map
 void CascadingQVariantMap::setQVariantMap(const QVariantMap& map)
 {
