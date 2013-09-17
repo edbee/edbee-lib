@@ -32,6 +32,14 @@ void CascadingQVariantMap::setQVariantMap(const QVariantMap& map)
     map_ = map;
 }
 
+/// This method finds the 'root variant map
+CascadingQVariantMap* CascadingQVariantMap::root()
+{
+    CascadingQVariantMap* result = this;
+    while( result->parent() ) { result = result->parent(); }
+    return result;
+}
+
 
 /// Returns the parent of this map
 CascadingQVariantMap* CascadingQVariantMap::parent() const
@@ -81,6 +89,12 @@ int CascadingQVariantMap::intValue(const QString &key, int defValue) const
 double CascadingQVariantMap::doubleValue(const QString &key, double defValue) const
 {
     return value( key, defValue ).toDouble();
+}
+
+/// Returns the default boolean value
+bool CascadingQVariantMap::boolValue(const QString& key, bool defValue) const
+{
+    return value( key, defValue ).toBool();
 }
 
 

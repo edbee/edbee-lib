@@ -26,6 +26,17 @@ void CascadingQVariantMapTest::testValue()
     destroyFixture(map);
 }
 
+/// test the retrieval of the root value
+void CascadingQVariantMapTest::testRoot()
+{
+    CascadingQVariantMap* map = createFixture();
+    CascadingQVariantMap* root = map->parent()->parent();
+    testTrue( root->parent() == 0 );
+    testTrue( root->root() == root );
+    testTrue( map->root() == root );
+    destroyFixture(map);
+}
+
 /// Creates a general fixture for testing this class
 CascadingQVariantMap* CascadingQVariantMapTest::createFixture()
 {

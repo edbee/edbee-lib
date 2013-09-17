@@ -21,13 +21,16 @@ public:
 
     void setQVariantMap( const QVariantMap& map );
 
+    CascadingQVariantMap* root();
     CascadingQVariantMap* parent() const;
     void insert( const QString& key, const QVariant& value );
+
 
     const QVariant value( const QString& key, const QVariant& defValue = QVariant() ) const;
     const QString stringValue( const QString& key, const QString& defValue = QString() ) const;
     int intValue( const QString& key, int defValue = 0 ) const;
     double doubleValue( const QString& key, double defValue = 0.0 ) const;
+    bool boolValue( const QString& key, bool defValue = false ) const;
 
 private:
 

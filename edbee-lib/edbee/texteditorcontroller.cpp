@@ -241,6 +241,15 @@ void TextEditorController::onLineDataChanged(int line, int length, int newLength
     }
 }
 
+/// This method is used to update the component when the configuration has been changed.
+/// This is a temporary solution, perhaps we should make TextConfig signal changes
+/// A lot of changes don't require an updates, but some do
+void TextEditorController::updateAfterConfigChange()
+{
+    textRenderer()->setThemeName( textDocument()->config()->themeName() );
+    widget()->fullUpdate();
+}
+
 /// This method updates the status text. This is the text as displayed in the lower status bar
 void TextEditorController::updateStatusText( const QString& extraText )
 {
@@ -459,6 +468,7 @@ void TextEditorController::endUndoGroup(int coalesceId, bool flatten )
 {    
     textDocument()->endUndoGroup(coalesceId,flatten);
 }
+
 
 
 } // edbee

@@ -86,13 +86,13 @@ signals:
     void commandToBeExecuted( edbee::TextEditorCommand* command );
     void commandExecuted( edbee::TextEditorCommand* command );
 
-
 public slots:
 
     void onTextChanged( edbee::TextBufferChange change );
     void onSelectionChanged( edbee::TextRangeSet *oldRangeSet );
     void onLineDataChanged( int line, int length, int newLength );
 
+    void updateAfterConfigChange();
     
 public slots:
 

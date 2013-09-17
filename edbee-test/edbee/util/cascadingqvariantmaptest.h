@@ -19,6 +19,7 @@ Q_OBJECT
 private slots:
 
     void testValue();
+    void testRoot();
 
 
 private:
