@@ -201,5 +201,18 @@ void TextEditorConfig::setThemeName(const QString& name)
     themeName_ = name;
 }
 
+/// returns the current font to use
+QFont TextEditorConfig::font() const
+{
+    return font_;
+}
+
+void TextEditorConfig::setFont(const QFont& font)
+{
+    font_ = font;
+}
+
+
+
 
 } // edbee

@@ -28,6 +28,7 @@
 #include "edbee/edbee.h"
 #include "edbee/texteditorwidget.h"
 #include "edbee/views/components/texteditorcomponent.h"
+#include "edbee/views/components/textmargincomponent.h"
 #include "edbee/views/textrenderer.h"
 #include "edbee/views/textcaretcache.h"
 #include "edbee/views/textselection.h"
@@ -247,6 +248,13 @@ void TextEditorController::onLineDataChanged(int line, int length, int newLength
 void TextEditorController::updateAfterConfigChange()
 {
     textRenderer()->setThemeName( textDocument()->config()->themeName() );
+    qlog_info() << " FONT: " << textDocument()->config()->font().toString();
+
+    // we need to figure out a betrer way to do this
+    QFont font = textDocument()->config()->font();
+    widget()->setFont( font );
+    widget()->textEditorComponent()->setFont( font );
+    widget()->textMarginComponent()->setFont( font );
     widget()->fullUpdate();
 }
 

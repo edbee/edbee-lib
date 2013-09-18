@@ -5,9 +5,10 @@
 
 #pragma once
 
+#include <QFont>
+#include <QPen>
 #include <QString>
 #include <QStringList>
-#include <QPen>
 
 namespace edbee {
 
@@ -56,6 +57,10 @@ public:
     QString themeName();
     void setThemeName( const QString& name );
 
+    QFont font() const ;
+    void setFont( const QFont& font );
+
+
 private:
 
     int caretWidth_;                    ///< The caretWith in pixels
@@ -71,6 +76,7 @@ private:
     bool undoGroupPerSpace_;            ///< An undogroup per space?
     bool showCaretOffset_;              ///< Show the caret offset?
     QString themeName_;                 ///< The active theme name
+    QFont font_;                        ///< The font to used
 };
 
 } // edbee
