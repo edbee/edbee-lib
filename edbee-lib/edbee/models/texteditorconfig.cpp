@@ -9,8 +9,11 @@
 
 namespace edbee {
 
-TextEditorConfig::TextEditorConfig()
-    : caretWidth_(2)
+TextEditorConfig::TextEditorConfig( QObject* parent )
+    : QObject(parent)
+    , changeInProgressLevel_(0)
+    , changeCount_(0)
+    , caretWidth_(2)
     , caretBlinkingRate_(700)   // 0 means no blinking (default = 700)
     , indentSize_(4)
     , useTabChar_(true)
@@ -27,6 +30,31 @@ TextEditorConfig::TextEditorConfig()
     charGroups_.append( QString("./\\()\"'-:,.;<>~!@#$%^&*|+=[]{}`~?"));
 }
 
+/// empty constructor :)
+TextEditorConfig::~TextEditorConfig()
+{
+}
+
+/// use this method to start a group of changes.
+/// Default behaviour is to emit a configChanged signal if a setting is changed
+/// When you call beginChanges this method will make sure the config surpresses the signals
+/// and only a signal is fired after the last endChange.
+/// You can nest multiple beginChanges, only the last endChanges fires a signal
+void TextEditorConfig::beginChanges()
+{
+    ++changeInProgressLevel_;
+}
+
+/// use this
+void TextEditorConfig::endChanges()
+{
+    Q_ASSERT(changeInProgressLevel_ > 0 );
+    --changeInProgressLevel_;
+    if( changeInProgressLevel_ == 0 && changeCount_ > 0 ) {
+        notifyChange();
+    }
+}
+
 /// Returns the caret width in pixels
 int TextEditorConfig::caretWidth() const
 {
@@ -36,7 +64,10 @@ int TextEditorConfig::caretWidth() const
 /// Sets the caret redner width in pixels
 void TextEditorConfig::setCaretWidth(int width)
 {
-    caretWidth_ = width;
+    if( caretWidth_ != width ) {
+        caretWidth_ = width;
+        notifyChange();
+    }
 }
 
 /// Returns the caret blinking rate (delay) (lower means faster )
@@ -50,7 +81,10 @@ int TextEditorConfig::caretBlinkingRate() const
 /// The blinking delay is in milliseconds
 void TextEditorConfig::setCaretBlinkRate(int rate)
 {
-    caretBlinkingRate_ = rate;
+    if( caretBlinkingRate_ != rate ) {
+        caretBlinkingRate_ = rate;
+        notifyChange();
+    }
 }
 
 /// Returns the indent size in the number of characters
@@ -62,7 +96,10 @@ int TextEditorConfig::indentSize() const
 /// Sets the indentsize in characters
 void TextEditorConfig::setIndentSize(int size)
 {
-    indentSize_ = size;
+    if( indentSize_ != size ) {
+        indentSize_ = size;
+        notifyChange();
+    }
 }
 
 /// Should the tab-character be used?
@@ -74,7 +111,10 @@ bool TextEditorConfig::useTabChar()
 /// Should the tab-character be used?
 void TextEditorConfig::setUseTabChar(bool enable)
 {
-    useTabChar_ = enable;
+    if( useTabChar_ != enable ) {
+        useTabChar_ = enable;
+        notifyChange();
+    }
 }
 
 /// Returns the characters groups
@@ -90,7 +130,10 @@ const QStringList& TextEditorConfig::charGroups() const
 /// @see TextEditorConfig::charGroups
 void TextEditorConfig::setCharGroups(const QStringList &items)
 {
-    charGroups_ = items;
+    if( charGroups_ != items ) {
+        charGroups_ = items;
+        notifyChange();
+    }
 }
 
 /// Returns all white-space characters
@@ -102,7 +145,10 @@ const QString& TextEditorConfig::whitespaces() const
 /// Sets the whitespace characters
 void TextEditorConfig::setWhitespaces(const QString& value)
 {
-    whitespaces_ = value;
+    if( whitespaces_ != value ) {
+        whitespaces_ = value;
+        notifyChange();
+    }
 }
 
 /// Retuns the whitespace character without newlines
@@ -113,7 +159,10 @@ const QString& TextEditorConfig::whitespaceWithoutNewline() const
 
 void TextEditorConfig::setWhitespaceWithoutNewline(const QString& value)
 {
-    whitespaceWithoutNewline_ = value;
+    if( whitespaceWithoutNewline_ != value ) {
+        whitespaceWithoutNewline_ = value;
+        notifyChange();
+    }
 }
 
 /// Returns the extra line spacing in pixels
@@ -125,7 +174,10 @@ int TextEditorConfig::extraLineSpacing() const
 /// Sets the extra line spacing between lines in pixels
 void TextEditorConfig::setExtraLineSpacing(int value)
 {
-    extraLineSpacing_ = value;
+    if( useLineSeparator_ != value ) {
+        extraLineSpacing_ = value;
+        notifyChange();
+    }
 }
 
 /// Should we use a line seperator pen
@@ -139,7 +191,10 @@ bool TextEditorConfig::useLineSeparator() const
 /// @see TextEditorConfig::lineSeparatorPen
 void TextEditorConfig::setUseLineSeparator(bool value)
 {
-    useLineSeparator_ = value;
+    if( useLineSeparator_ != value ) {
+        useLineSeparator_ = value;
+        notifyChange();
+    }
 }
 
 /// The line sperator pen to use.When the setting useLineSeparator is set
@@ -155,7 +210,10 @@ const QPen& TextEditorConfig::lineSeparatorPen() const
 /// @see TextEditorConfig::useLineSeparator
 void TextEditorConfig::setLineSeperatorPen(const QPen& pen)
 {
-    lineSeparatorPen_ = pen;
+    if( lineSeparatorPen_ != pen ) {
+        lineSeparatorPen_ = pen;
+        notifyChange();
+    }
 }
 
 /// Should a space result in a new 'undo-group'
@@ -170,7 +228,10 @@ bool TextEditorConfig::undoGroupPerSpace() const
 /// @see TextEditorConfig::undoGroupPerSpace
 void TextEditorConfig::setUndoGroupPerSpace(bool enable)
 {
-    undoGroupPerSpace_ = enable;
+    if( undoGroupPerSpace_ != enable ) {
+        undoGroupPerSpace_ = enable;
+        notifyChange();
+    }
 }
 
 /// should the caret-offset been shown. The texteditor can signal a
@@ -185,7 +246,10 @@ bool TextEditorConfig::showCaretOffset() const
 /// @see TextEditorConfig::showCaretOffset
 void TextEditorConfig::setShowCaretOffset(bool enable)
 {
-    showCaretOffset_ = enable;
+    if( showCaretOffset_ != enable ) {
+        showCaretOffset_ = enable;
+        notifyChange();
+    }
 }
 
 /// returns the active theme name
@@ -198,7 +262,10 @@ QString TextEditorConfig::themeName()
 /// This method sets the active theme name
 void TextEditorConfig::setThemeName(const QString& name)
 {
-    themeName_ = name;
+    if( themeName_ != name ) {
+        themeName_ = name;
+        notifyChange();
+    }
 }
 
 /// returns the current font to use
@@ -207,9 +274,24 @@ QFont TextEditorConfig::font() const
     return font_;
 }
 
+/// Changes the font that's used by the editor
 void TextEditorConfig::setFont(const QFont& font)
 {
-    font_ = font;
+    if( font_ != font ) {
+        font_ = font;
+        notifyChange();
+    }
+}
+
+/// This internal method is used to notify the listener that a change has happend
+/// Thi smethod only emits a signal if there's no config group change busy
+void TextEditorConfig::notifyChange()
+{
+    ++changeCount_;
+    if( changeInProgressLevel_ == 0 ) {
+        emit configChanged();
+        changeCount_= 0;
+    }
 }
 
 

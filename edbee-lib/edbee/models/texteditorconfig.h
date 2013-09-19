@@ -6,6 +6,7 @@
 #pragma once
 
 #include <QFont>
+#include <QObject>
 #include <QPen>
 #include <QString>
 #include <QStringList>
@@ -13,10 +14,16 @@
 namespace edbee {
 
 /// General configuration settings of the text editor
-class TextEditorConfig
+class TextEditorConfig : public QObject
 {
+Q_OBJECT
+
 public:
-    TextEditorConfig();
+    TextEditorConfig( QObject* parent=0 );
+    virtual ~TextEditorConfig();
+
+    void beginChanges();
+    void endChanges();
 
     int caretWidth() const;
     void setCaretWidth( int width );
@@ -60,8 +67,21 @@ public:
     QFont font() const ;
     void setFont( const QFont& font );
 
+public slots:
+
+
+signals:
+
+    void configChanged();
+
+
+protected:
+    void notifyChange();
 
 private:
+
+    int changeInProgressLevel_;         ///< The change in progress level
+    int changeCount_;                   ///< A flag that counts the number of changes
 
     int caretWidth_;                    ///< The caretWith in pixels
     int caretBlinkingRate_;             ///< The caret blinking rate
@@ -77,6 +97,8 @@ private:
     bool showCaretOffset_;              ///< Show the caret offset?
     QString themeName_;                 ///< The active theme name
     QFont font_;                        ///< The font to used
+
+
 };
 
 } // edbee

@@ -142,6 +142,9 @@ void TextEditorController::setTextDocument(TextDocument* doc)
         // force an repaint when the grammar is changed
         connect( textDocumentRef_, &TextDocument::languageGrammarChanged, this, &TextEditorController::update );
 
+        // connect the configuration changes to the controller
+        connect( textDocumentRef_->config(), &TextEditorConfig::configChanged, this, &TextEditorController::updateAfterConfigChange );
+
         // create the new document
         emit textDocumentChanged( oldDocumentRef, textDocumentRef_ );
 
