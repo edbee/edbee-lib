@@ -11,8 +11,10 @@
     #include "util/mem/debug_new.h"
     /// This assert requires the inclusion of QApplication an QThread
     #define Q_ASSERT_GUI_THREAD Q_ASSERT(  qApp->thread() == QThread::currentThread( ) )
+    #define Q_ASSERT_NOT_GUI_THREAD Q_ASSERT(  qApp->thread() != QThread::currentThread( ) )
 #else
     #define Q_ASSERT_GUI_THREAD
+    #define Q_ASSERT_NOT_GUI_THREAD
 #endif
 
 

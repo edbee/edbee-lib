@@ -60,6 +60,11 @@ void TextThemeRule::fillFormat(QTextCharFormat* format)
 TextTheme::TextTheme()
     : name_("Default Theme")
     , uuid_("")
+    , backgroundColor_( 0xffeeeeee )
+    , caretColor_( 0xff000000  )
+    , foregroundColor_( 0xff222222 )
+    , lineHighlightColor_(0xff999999 )
+    , selectionColor_( 0xff9999ff)
 
     // thTheme settings
 //    , backgroundColor_(0xff272822)
@@ -82,6 +87,7 @@ TextTheme::TextTheme()
 //    , tagsOptions_("stippled_underline")
 
 {
+
 //    giveThemeRule( new TextThemeRule("Comment","comment", QColor("#75715E") ));
 //    giveThemeRule( new TextThemeRule("String","string", QColor("#E6DB74") ));
 }
