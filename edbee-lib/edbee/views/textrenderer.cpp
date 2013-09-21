@@ -69,7 +69,7 @@ int TextRenderer::lineHeight()
 
 /// TODO: cache the height :-)
     QFontMetrics fm = textWidget()->fontMetrics();
-    return fm.ascent() + fm.descent() + fm.leading() + 1 + config()->extraLineSpacing(); // (the 1 is for the base line).
+    return fm.ascent() + fm.descent() + fm.leading() + config()->extraLineSpacing(); // (the 1 is for the base line).
 }
 
 /// This method converts the give y position to a line index
