@@ -270,7 +270,6 @@ void TextKeyMapManager::loadKeyMap(const QString& file)
     QString name = fileInfo.baseName();
     if( name == "default" ) { name = ""; }
 
-qlog_info() << " READ KEYMAP: '"  << name << "': " << file;
     KeyMapParser parser;
     if( !parser.parse( file, findOrCreate(name) ) ) {
         qlog_warn() << QObject::tr("Error parsing %1: %2 ").arg(file).arg(parser.errorMessage());
