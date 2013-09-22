@@ -62,6 +62,7 @@ public:
     ~TextKeyMapManager();
 
     void loadAllKeyMaps( const QString& path );
+    void loadKeyMap( const QString& file );
 
     TextEditorKeyMap* get( const QString& name="" );
     TextEditorKeyMap* findOrCreate( const QString& name );

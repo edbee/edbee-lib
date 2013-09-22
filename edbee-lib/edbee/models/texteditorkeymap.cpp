@@ -250,20 +250,30 @@ TextKeyMapManager::~TextKeyMapManager()
     qDeleteAll( keyMapHash_);
 }
 
-/// load all keymaps
+/// This method loads all keymaps.
+///
 void TextKeyMapManager::loadAllKeyMaps(const QString& path)
-{
-//    qlog_info() << "readAllKeyMaps(" << path << ")";
+{    
     QDir dir(path);
     QStringList filters("*.json");
-    KeyMapParser parser;
     foreach( QFileInfo fileInfo, dir.entryInfoList( filters, QDir::Files, QDir::Name ) ) {
-//        qlog_info() << "- parse" << fileInfo.fileName() << ".";
+        loadKeyMap( fileInfo.absoluteFilePath() );
+    }
+}
 
-        // read the file
-        if( !parser.parse( fileInfo.absoluteFilePath(), this ) ) {
-            qlog_warn() << QObject::tr("Error parsing %1: %2 ").arg(fileInfo.fileName()).arg(parser.errorMessage());
-        }
+
+/// This method loads a single keymap
+void TextKeyMapManager::loadKeyMap(const QString& file)
+{
+    // parse the given file
+    QFileInfo fileInfo( file );
+    QString name = fileInfo.baseName();
+    if( name == "default" ) { name = ""; }
+
+qlog_info() << " READ KEYMAP: '"  << name << "': " << file;
+    KeyMapParser parser;
+    if( !parser.parse( file, findOrCreate(name) ) ) {
+        qlog_warn() << QObject::tr("Error parsing %1: %2 ").arg(file).arg(parser.errorMessage());
     }
 }
 

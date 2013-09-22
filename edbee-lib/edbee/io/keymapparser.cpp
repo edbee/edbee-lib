@@ -13,7 +13,6 @@
 
 #include "edbee/io/jsonparser.h"
 #include "edbee/models/texteditorkeymap.h"
-#include "edbee/edbee.h"
 
 #include "debug.h"
 
@@ -31,28 +30,28 @@ KeyMapParser::~KeyMapParser()
 }
 
 /// loads the given keymap file returns true on  success
-bool KeyMapParser::parse(const QString& filename , TextKeyMapManager* manager)
+bool KeyMapParser::parse(const QString& filename , TextEditorKeyMap* keyMap)
 {
     if( parser_->parse( filename ) ) {
-        return parse( parser_->result(), manager );
+        return parse( parser_->result(), keyMap );
     }
     buildErrorMessageFromParser();
     return false;
 }
 
-bool KeyMapParser::parse(QIODevice* device, TextKeyMapManager* manager)
+bool KeyMapParser::parse(QIODevice* device, TextEditorKeyMap* keyMap)
 {
     if( parser_->parse( device ) ) {
-        return parse( parser_->result(), manager );
+        return parse( parser_->result(), keyMap );
     }
     buildErrorMessageFromParser();
     return false;
 }
 
-bool KeyMapParser::parse(const QByteArray& bytes, TextKeyMapManager* manager)
+bool KeyMapParser::parse(const QByteArray& bytes, TextEditorKeyMap* keyMap)
 {
     if( parser_->parse( bytes) ) {
-        return parse( parser_->result(), manager );
+        return parse( parser_->result(), keyMap );
     }
     buildErrorMessageFromParser();
     return false;
@@ -62,7 +61,7 @@ bool KeyMapParser::parse(const QByteArray& bytes, TextKeyMapManager* manager)
 /// @param variant the variant to parse
 /// @param manager the manager to parse
 /// @param manager the keymap manager
-bool KeyMapParser::parse(const QVariant& variant, TextKeyMapManager* manager)
+bool KeyMapParser::parse(const QVariant& variant, TextEditorKeyMap* keyMap)
 {
     errorMessage_.clear();
 
@@ -78,7 +77,7 @@ bool KeyMapParser::parse(const QVariant& variant, TextKeyMapManager* manager)
         if( obj.isEmpty() ) {
             errorMessage_ = QObject::tr( "Expected object in keymap" );
         } else {
-            parseBindingBlock(obj,manager);
+            parseBindingBlock(obj,keyMap);
         }
     }
     return true;
@@ -94,13 +93,10 @@ void KeyMapParser::buildErrorMessageFromParser()
 
 
 /// parses the given block
-bool KeyMapParser::parseBindingBlock(const QVariantMap& valueObject, TextKeyMapManager* manager)
+bool KeyMapParser::parseBindingBlock(const QVariantMap& valueObject, TextEditorKeyMap* keyMap )
 {
     QVariantMap context = valueObject.value("context").toMap();
     QVariantList bindings = valueObject.value("bindings").toList();
-
-    // find or create the correct keymap
-    TextEditorKeyMap* keyMap = manager->findOrCreate( context.value("name").toString() );
 
     // add all bindings
     foreach( QVariant bindingItem, bindings ) {

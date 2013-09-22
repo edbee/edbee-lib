@@ -240,7 +240,7 @@ void TextEditorComponent::keyPressEvent(QKeyEvent* event)
         return;
     }
 
-    // we've foudn the command
+    // we've found the command
     if( match == QKeySequence::ExactMatch ) {
 //        qlog_info() << "[[[ found command:" << command << "]]";
         controller()->executeCommand( command );

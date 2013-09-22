@@ -13,7 +13,6 @@ namespace edbee {
 
 class JsonParser;
 class TextEditorKeyMap;
-class TextKeyMapManager;
 
 /// This emthod method can be used to load text-editor keymaps
 ///
@@ -48,10 +47,10 @@ public:
     KeyMapParser();
     virtual ~KeyMapParser();
 
-    bool parse(const QString& filename, TextKeyMapManager* manager );
-    bool parse( QIODevice* device, TextKeyMapManager* manager);
-    bool parse( const QByteArray& bytes, TextKeyMapManager* manager );
-    bool parse( const QVariant& variant, TextKeyMapManager* manager );
+    bool parse(const QString& filename, TextEditorKeyMap* keyMap );
+    bool parse( QIODevice* device, TextEditorKeyMap* keyMap );
+    bool parse( const QByteArray& bytes, TextEditorKeyMap* keyMap );
+    bool parse( const QVariant& variant, TextEditorKeyMap* keyMap );
 
     QString errorMessage() { return errorMessage_; }
 
@@ -60,7 +59,7 @@ private:
 
     void buildErrorMessageFromParser();
 
-    bool parseBindingBlock(const QVariantMap &valueObject, TextKeyMapManager* manager );
+    bool parseBindingBlock(const QVariantMap &valueObject, TextEditorKeyMap* keyMap );
 
     QString errorMessage_;                         ///< The current error message
     JsonParser* parser_;                           ///< The json parser
