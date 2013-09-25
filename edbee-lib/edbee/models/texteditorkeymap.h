@@ -21,6 +21,7 @@ class TextEditorKey
 {
 public:
     TextEditorKey( const QKeySequence& seq );
+    TextEditorKey* clone() const;
 
     const QKeySequence& sequence();
 

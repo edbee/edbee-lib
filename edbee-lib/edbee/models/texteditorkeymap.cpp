@@ -25,6 +25,12 @@ TextEditorKey::TextEditorKey(const QKeySequence& seq)
 {
 }
 
+/// Clones the text editor key
+TextEditorKey* TextEditorKey::clone() const
+{
+    return new TextEditorKey( sequence_ );
+}
+
 /// returns the keysequence
 const QKeySequence& TextEditorKey::sequence()
 {
@@ -63,7 +69,7 @@ TextEditorKeyMap::~TextEditorKeyMap()
 void TextEditorKeyMap::copyKeysTo(TextEditorKeyMap* keyMap)
 {
     for( QHash<QString,TextEditorKey*>::const_iterator itr = keyMap_.constBegin(); itr != keyMap_.constEnd(); ++itr ) {
-        keyMap->keyMap_.insert( itr.key(), itr.value() );
+        keyMap->keyMap_.insert( itr.key(), itr.value()->clone() );
     }
 }
 
