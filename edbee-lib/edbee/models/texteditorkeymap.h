@@ -15,6 +15,24 @@ class TextEditorCommand;
 class TextEditorController;
 
 
+/// A contexted keysequence
+/// This contains a keysequence and optionally a given context
+class TextEditorKey
+{
+public:
+    TextEditorKey( const QKeySequence& seq );
+
+    const QKeySequence& sequence();
+
+private:
+    QKeySequence sequence_;             ///< The key sequence
+
+};
+
+
+//------------------------------------------------------------
+
+
 /// A text editor key map
 /// This key map, maps key-sequences to action-names.
 class TextEditorKeyMap
@@ -22,18 +40,19 @@ class TextEditorKeyMap
 public:
 
     TextEditorKeyMap( TextEditorKeyMap* parentKeyMap=0 );
-//    TextEditorKeyMap( const TextEditorKeyMap& keyMap );
     virtual ~TextEditorKeyMap();
 
     void copyKeysTo( TextEditorKeyMap* keyMap );
 
-    QKeySequence get( const QString& name ) const;
-    QList<QKeySequence> getAll( const QString& name  ) const;
+    TextEditorKey* get( const QString& name ) const;
+    QKeySequence getSequence( const QString& name ) const;
+    QList<TextEditorKey*> getAll( const QString& name  ) const;
     bool has( const QString& name ) const;
 
-    void set( const QString& name, const QKeySequence& sequence );
-    void set( const QString& name, const QKeySequence::StandardKey key );
-    void replace( const QString& name, const QKeySequence& sequence );
+    void set(const QString& name, TextEditorKey *sequence );
+    void set(const QString& name, const QKeySequence& seq );
+//    void set( const QString& name, const QKeySequence::StandardKey key );
+    void replace(const QString& name, TextEditorKey *sequence );
 
     QString findBySequence( QKeySequence sequence, QKeySequence::SequenceMatch& match );
 
@@ -46,11 +65,13 @@ public:
 
 private:
 
-    TextEditorKeyMap* parentRef_;           ///< a reference to a parent keymap
-    QHash<QString,QKeySequence> keys_;      ///< a map to convert a name to a
+    TextEditorKeyMap* parentRef_;                       ///< a reference to a parent keymap
+    QHash<QString,TextEditorKey*> keyMap_;      ///< a map to convert a name to a
 };
 
+
 //-------------------------------------------------------------------
+
 
 /// There can be different keymaps for different file-types/
 /// The keymap manager manages all the available keymaps

@@ -108,9 +108,9 @@ bool KeyMapParser::parseBindingBlock(const QVariantMap& valueObject, TextEditorK
             // when the given keys-string is a 'standard-key' name we use the standard key
             QKeySequence::StandardKey standardKey = TextEditorKeyMap::standardKeyFromString(keys);
             if( standardKey != QKeySequence::UnknownKey) {
-                keyMap->set( command, QKeySequence(standardKey ) );
+                keyMap->set( command, new TextEditorKey( QKeySequence(standardKey) ) );
             } else {
-                keyMap->set( command, QKeySequence(keys) );
+                keyMap->set( command, new TextEditorKey( QKeySequence(keys) ) );
             }
         }
     }

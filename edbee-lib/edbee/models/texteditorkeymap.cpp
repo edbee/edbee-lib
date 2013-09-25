@@ -19,6 +19,22 @@
 
 namespace edbee {
 
+/// Constructs the texteditor key sequence
+TextEditorKey::TextEditorKey(const QKeySequence& seq)
+    : sequence_(seq)
+{
+}
+
+/// returns the keysequence
+const QKeySequence& TextEditorKey::sequence()
+{
+    return sequence_;
+}
+
+
+
+//----------------------------------------------------
+
 
 TextEditorKeyMap::TextEditorKeyMap(TextEditorKeyMap *parentKeyMap)
     : parentRef_(parentKeyMap)
@@ -40,35 +56,48 @@ TextEditorKeyMap::TextEditorKeyMap(TextEditorKeyMap *parentKeyMap)
 /// empty the keymap
 TextEditorKeyMap::~TextEditorKeyMap()
 {
+    qDeleteAll( keyMap_ );
 }
 
 /// copies the given keys to the other keymap
 void TextEditorKeyMap::copyKeysTo(TextEditorKeyMap* keyMap)
 {
-    for( QHash<QString,QKeySequence>::const_iterator itr = keys_.constBegin(); itr != keys_.constEnd(); ++itr ) {
-        keyMap->keys_.insert( itr.key(), itr.value() );
+    for( QHash<QString,TextEditorKey*>::const_iterator itr = keyMap_.constBegin(); itr != keyMap_.constEnd(); ++itr ) {
+        keyMap->keyMap_.insert( itr.key(), itr.value() );
     }
 }
 
 /// Returns the last inserted keysequence for the given command
 /// It also tries to search the parent keymap if it's available
-QKeySequence TextEditorKeyMap::get(const QString& name) const
+/// @param name the name of the given command
+/// @return the keysequence or 0 if not found
+TextEditorKey* TextEditorKeyMap::get(const QString& name) const
 {
-    QHash<QString,QKeySequence>::const_iterator itr = keys_.find(name);
-    if( itr != keys_.end() ) { return itr.value(); }
+    QHash<QString,TextEditorKey*>::const_iterator itr = keyMap_.find(name);
+    if( itr != keyMap_.end() ) { return itr.value(); }
     if( parentRef_ ) { return parentRef_->get(name); }
-    return QKeySequence();
+    return 0;
+}
+
+/// Returns the key sequence for the given name
+/// @param name the name of the key sequence
+/// @return a QKeySequence
+QKeySequence TextEditorKeyMap::getSequence(const QString& name) const
+{
+    TextEditorKey* key = get(name);
+    if( !key ){ return QKeySequence(); }
+    return key->sequence();
 }
 
 /// Returns al list of all keysequences for the given command
-/// This method will also search the parent for the given keysequences
-QList<QKeySequence> TextEditorKeyMap::getAll(const QString& name) const
+/// This method will also search the parents for the given keysequences
+QList<TextEditorKey*> TextEditorKeyMap::getAll(const QString& name) const
 {
-    QList<QKeySequence> result = keys_.values(name);
+    QList<TextEditorKey*> result = keyMap_.values(name);
     // also add the references of the parent
     if( parentRef_ ) {
-        QList<QKeySequence> parentResult = parentRef_->getAll(name);
-        foreach( QKeySequence seq, parentResult ) {
+        QList<TextEditorKey*> parentResult = parentRef_->getAll(name);
+        foreach( TextEditorKey* seq, parentResult ) {
             if( !result.contains(seq) ) {
                 result.append(seq);
             }
@@ -81,28 +110,36 @@ QList<QKeySequence> TextEditorKeyMap::getAll(const QString& name) const
 /// It will also search the parent key map
 bool TextEditorKeyMap::has(const QString& name) const
 {
-    bool result = !(keys_.find(name) == keys_.end());
+    bool result = !(keyMap_.find(name) == keyMap_.end());
     if( !result && parentRef_ ) {
         result = parentRef_->has(name);
     }
     return result;
 }
 
-void TextEditorKeyMap::set(const QString& name, const QKeySequence& sequence)
+/// Sets the given key sequence to the keymap
+void TextEditorKeyMap::set(const QString& name, TextEditorKey* sequence)
 {
-    keys_.insertMulti(name,sequence);
+    keyMap_.insertMulti(name,sequence);
 }
 
-void TextEditorKeyMap::set(const QString& name, const QKeySequence::StandardKey key)
+
+void TextEditorKeyMap::set(const QString &name, const QKeySequence& seq)
 {
-    keys_.insertMulti(name, QKeySequence(key));
+    keyMap_.insertMulti(name, new TextEditorKey(seq) );
 }
+
+//void TextEditorKeyMap::set(const QString& name, const QKeySequence::StandardKey key)
+//{
+//    keyMap_.insertMulti(name, QKeySequence(key));
+//}
 
 /// replace the given command with the given key sequence
-/// all other keysequences (on this level) are ignores
-void TextEditorKeyMap::replace(const QString& name, const QKeySequence &sequence)
+/// all other keysequences (on this level) are ignored
+void TextEditorKeyMap::replace(const QString& name, TextEditorKey* sequence)
 {
-    keys_.insert(name,sequence);
+    qDeleteAll( keyMap_.values(name) );
+    keyMap_.insert(name,sequence);
 }
 
 
@@ -116,9 +153,9 @@ void TextEditorKeyMap::replace(const QString& name, const QKeySequence &sequence
 QString TextEditorKeyMap::findBySequence(QKeySequence sequence, QKeySequence::SequenceMatch& match)
 {
     // find the current map
-    QHash<QString,QKeySequence>::iterator itr = keys_.begin();
-    while (itr != keys_.end()) {
-        match =  sequence.matches( itr.value() );
+    QHash<QString,TextEditorKey*>::iterator itr = keyMap_.begin();
+    while (itr != keyMap_.end()) {
+        match =  sequence.matches( itr.value()->sequence() );
         if( match != QKeySequence::NoMatch ) {
             return itr.key();
         }
@@ -231,12 +268,15 @@ QKeySequence::StandardKey TextEditorKeyMap::standardKeyFromString( const QString
 QString TextEditorKeyMap::toString() const
 {
     QString str;
-    for( QHash<QString,QKeySequence>::const_iterator itr = keys_.constBegin(); itr != keys_.constEnd(); ++itr ) {
+    for( QHash<QString,TextEditorKey*>::const_iterator itr = keyMap_.constBegin(); itr != keyMap_.constEnd(); ++itr ) {
         if( !str.isEmpty()) str.append(",");
-        str.append( QString("%1:%2").arg(itr.key()).arg(itr.value().toString()) );
+        str.append( QString("%1:%2").arg(itr.key()).arg(itr.value()->sequence().toString()) );
     }
     return str;
 }
+
+
+//----------------------------------------------------
 
 
 /// destructs all keymaps
@@ -292,6 +332,7 @@ TextEditorKeyMap* TextKeyMapManager::findOrCreate(const QString& name)
     }
     return keyMap;
 }
+
 
 
 } // edbee
