@@ -251,7 +251,6 @@ void TextEditorController::onLineDataChanged(int line, int length, int newLength
 void TextEditorController::updateAfterConfigChange()
 {
     textRenderer()->setThemeName( textDocument()->config()->themeName() );
-    qlog_info() << " FONT: " << textDocument()->config()->font().toString();
 
     // we need to figure out a betrer way to do this
     QFont font = textDocument()->config()->font();
