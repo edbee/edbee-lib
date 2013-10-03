@@ -101,6 +101,7 @@ TextEditorCommandMap::TextEditorCommandMap(QObject *parent)
     give( "sel_prev_match", new FindCommand( FindCommand::SelectPreviousMatch));
     give( "sel_all_matches", new FindCommand( FindCommand::SelectAllMatches ));
 
+    give( "find_under_expand", new FindCommand( FindCommand::FindUnderExpand ));
 }
 
 TextEditorCommandMap::~TextEditorCommandMap()

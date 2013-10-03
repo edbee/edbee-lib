@@ -32,24 +32,31 @@ TextSearcher::~TextSearcher()
     delete regExp_;
 }
 
+/// Sets the current search term
 void TextSearcher::setSearchTerm(const QString &term)
 {
     searchTerm_ = term;
     setDirty();
 }
 
+/// Sets the syntax mode of the searcher
+/// @parm syntax the SyntaxType to use (SyntaxPlainString, SyntaxRegExp)
 void TextSearcher::setSyntax(TextSearcher::SyntaxType syntax)
 {
     syntax_ = syntax;
     setDirty();
 }
 
+
+/// Toggles the case sensitivity of the search operation
 void TextSearcher::setCaseSensitive(bool sensitive)
 {
     caseSensitive_ = sensitive;
     setDirty();
 }
 
+
+/// For changing the wrap around mode of the TextSearcher
 void TextSearcher::setWrapAround(bool on)
 {
     wrapAround_ = on;

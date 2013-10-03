@@ -15,7 +15,10 @@ namespace edbee {
 class RegExp;
 class TextEditorWidget;
 
-/// Search options for the text
+/// The text searcher is a class to remember the current search operation
+/// It remembers the current searchTerm that is used for searching
+/// The textsearcher component has got several option. Like case sensitivity
+/// regular expressions etc.
 class TextSearcher : public QObject
 {
     Q_OBJECT

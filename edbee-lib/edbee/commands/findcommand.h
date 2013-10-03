@@ -14,12 +14,15 @@ class FindCommand : public TextEditorCommand
 public:
 
     enum FindType {
-        UseSelectionForFind,
-        FindNextMatch,
-        FindPreviousMatch,
-        SelectNextMatch,
-        SelectPreviousMatch,
-        SelectAllMatches
+        UseSelectionForFind,        //< uses the current selection for find
+        FindNextMatch,              //< finds the next match
+        FindPreviousMatch,          //< finds the previous match
+        SelectNextMatch,            //< adds the next match to the selection
+        SelectPreviousMatch,        //< adds the previous match to the selection
+        SelectAllMatches,           //< select all matches
+
+        FindUnderExpand             ///< A smart selection: when there's no selection the current word is used
+
     };
 
 
@@ -29,6 +32,9 @@ public:
     virtual QString toString();
 
 private:
+
+
+
     FindType findType_;     ///< the current find-type
 
 };
