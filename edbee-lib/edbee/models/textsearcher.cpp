@@ -5,6 +5,8 @@
 
 #include "textsearcher.h"
 
+#include "edbee/models/texteditorconfig.h"
+#include "edbee/models/textrange.h"
 #include "edbee/models/textbuffer.h"
 #include "edbee/models/textdocument.h"
 #include "edbee/texteditorwidget.h"
@@ -27,10 +29,18 @@ TextSearcher::TextSearcher( QObject* parent )
 {
 }
 
+/// destroys the textsearcher
 TextSearcher::~TextSearcher()
 {
     delete regExp_;
 }
+
+/// Returns the current active searchterm
+QString TextSearcher::searchTerm() const
+{
+    return searchTerm_;
+}
+
 
 /// Sets the current search term
 void TextSearcher::setSearchTerm(const QString &term)
@@ -38,6 +48,13 @@ void TextSearcher::setSearchTerm(const QString &term)
     searchTerm_ = term;
     setDirty();
 }
+
+/// Returns the syntax type of the current search operation
+TextSearcher::SyntaxType TextSearcher::syntax() const
+{
+    return syntax_;
+}
+
 
 /// Sets the syntax mode of the searcher
 /// @parm syntax the SyntaxType to use (SyntaxPlainString, SyntaxRegExp)
@@ -48,11 +65,25 @@ void TextSearcher::setSyntax(TextSearcher::SyntaxType syntax)
 }
 
 
-/// Toggles the case sensitivity of the search operation
+/// Returns the case sensitivity of the textsearcher
+bool TextSearcher::isCaseSensitive() const
+{
+    return caseSensitive_;
+}
+
+
+/// sets the case sensitivity of the search operation
 void TextSearcher::setCaseSensitive(bool sensitive)
 {
     caseSensitive_ = sensitive;
     setDirty();
+}
+
+
+/// Should the search wrap around the contents of the document
+bool TextSearcher::isWrapAroundEnabled() const
+{
+     return wrapAround_;
 }
 
 
@@ -63,23 +94,38 @@ void TextSearcher::setWrapAround(bool on)
     setDirty();
 }
 
-/// Finds the next matching textrange
-/// @param widget the widget to search in
-/// @return the textRange with the found text.  TextRange::isEmpty() can be called to check if nothing has been found
-TextRange TextSearcher::findNextRange(TextEditorWidget* widget)
-{
-    TextDocument* document = widget->textDocument();
-    QChar* buffer          = document->buffer()->rawDataPointer();
 
+/// Checks the reverse mode
+bool TextSearcher::isReverse() const
+{
+    return reverse_;
+}
+
+
+/// Sets the search reverse mode.
+void TextSearcher::setReverse(bool on)
+{
+    reverse_ = on;
+}
+
+
+/// Finds the next matching textrange
+/// This method does not alter the textrange selection. It only returns the range of the next match
+/// @param selection the text-selection to use
+/// @return the textRange with the found text.  TextRange::isEmpty() can be called to check if nothing has been found
+TextRange TextSearcher::findNextRange(TextRangeSet* selection)
+{
+    TextDocument* document = selection->textDocument();
+    QChar* buffer = document->buffer()->rawDataPointer();
 
     if( !regExp_ ) { regExp_ = createRegExp(); }
 
     int caretPos= 0;
-    if( widget->textSelection()->rangeCount() > 0 ) {
+    if( selection->rangeCount() > 0 ) {
         if( isReverse() ) {
-            caretPos = widget->textSelection()->firstRange().min();
+            caretPos = selection->firstRange().min();
         } else {
-            caretPos = widget->textSelection()->lastRange().max();
+            caretPos = selection->lastRange().max();
         }
     }
 
@@ -105,72 +151,193 @@ TextRange TextSearcher::findNextRange(TextEditorWidget* widget)
     return TextRange();
 }
 
-/// Finds the next item based on the current caret position
-void TextSearcher::findNext(TextEditorWidget* widget)
-{
-    TextRange range = findNextRange(widget);
 
+/// Finds the next item based on the given caret position in the selection
+/// @param selection the selection to use for searching
+/// @return true if the next selection has been foudn
+bool TextSearcher::findNext( TextRangeSet* selection )
+{
+    TextRange range = findNextRange(selection);
     if( !range.isEmpty()) {
-        TextDocument* document = widget->textDocument();
-        TextRangeSet* ranges = new TextRangeSet( document );
-        ranges->addRange(range.anchor(),range.caret());
-        widget->controller()->changeAndGiveTextSelection( ranges );
+        selection->clear();
+        selection->addRange(range.anchor(),range.caret());
+        return true;
     }
+    return false;
 }
 
-void TextSearcher::findPrev(TextEditorWidget* widget)
+
+/// Finds the previous item based on the given caret position in the selection
+/// @param selection the selection to use and alter
+/// @return true if the previous item has been found false if not found
+bool TextSearcher::findPrev( TextRangeSet* selection )
 {
     reverse_ = !reverse_;
-    findNext(widget);
+    bool result = findNext( selection );
     reverse_ = !reverse_;
+    return result;
 }
 
-/// Selects the next word that matches the given critaria (Adds an extra selection range )
-void TextSearcher::selectNext(TextEditorWidget* widget)
-{
-    TextRange range = findNextRange(widget);
 
+/// Selects the next item that matches the given critaria (Adds an extra selection range )
+/// @param widget the widget to search in
+/// @param selection the selection to use
+/// @return true if the next item has been found false if it hasn't been.
+bool TextSearcher::selectNext( TextRangeSet* selection )
+{
+    TextRange range = findNextRange(selection);
     if( !range.isEmpty()) {
-        TextSelection* sel = widget->controller()->textSelection();
-// TODO: make it undoable?!??
-        sel->addRange( range.anchor(), range.caret() );
-        widget->updateComponents();
+
+        // edge case, when currently ony 1 caret is available and doesn't have a selection
+        // we need to remove this range
+        if( selection->rangeCount() == 1 && selection->range(0).isEmpty() ) {
+            selection->removeRange(0);
+        }
+        selection->addRange( range.anchor(), range.caret() );
+        return true;
     }
+    return false;
 }
 
-void TextSearcher::selectPrev(TextEditorWidget* widget)
+
+/// Selects the previous item based on the given caret position in the selection
+/// @param selection the selection to use
+/// @return true if the selection has been found false if it hasn't been found
+bool TextSearcher::selectPrev( TextRangeSet* selection )
 {
     reverse_ = !reverse_;
-    selectNext(widget);
+    bool result = selectNext( selection );
     reverse_ = !reverse_;
+    return result;
 }
 
-/// Selects all matches
-void TextSearcher::selectAll(TextEditorWidget *widget)
+
+/// Select all matching items in the document
+/// @param selection the selection to search for
+/// @return true if one ore more items are selected false if not found
+bool TextSearcher::selectAll( TextRangeSet* selection )
 {
-    TextSelection* sel = widget->controller()->textSelection();
-    TextRange oldRange = sel->range(0);
+    TextRange oldRange = selection->range(0);
 
     // clear the selection and add all matches
     bool oldReverse = reverse_;     // we must NOT reverse find
     bool oldWrapAround = wrapAround_;
     reverse_ = false;
     wrapAround_ = false;
-    sel->clear();
-    TextRange range = findNextRange(widget);
+    selection->clear();
+    TextRange range = findNextRange(selection);
     while( !range.isEmpty() )
     {
-        sel->addRange(range.anchor(), range.caret());
-        range = findNextRange(widget);
+        selection->addRange(range.anchor(), range.caret());
+        range = findNextRange( selection );
     }
     wrapAround_ = oldWrapAround;
     reverse_ = oldReverse;
+
     // no selection, we MUST place a caret
-    if( sel->rangeCount() == 0 ) {
-        sel->addRange(oldRange.caret(), oldRange.caret());
+    if( selection->rangeCount() == 0 ) {
+        selection->addRange(oldRange.caret(), oldRange.caret());
+        return false;
     }
-    widget->updateComponents();
+    return true;
 }
+
+
+/// Finds the next item based on the given caret position in the selection
+/// @param widget the widget to find the next item
+void TextSearcher::findNext(TextEditorWidget* widget )
+{
+    QScopedPointer<TextRangeSet> newRangeSet( new TextRangeSet( widget->textSelection() ) );
+    if( findNext( newRangeSet.data() ) ) {
+        widget->controller()->changeAndGiveTextSelection( newRangeSet.take() );
+    }
+}
+
+
+/// Finds the previous item based on the given caret position in the selection
+/// @param widget the widget to search in
+void TextSearcher::findPrev( TextEditorWidget* widget)
+{
+    QScopedPointer<TextRangeSet> newRangeSet( new TextRangeSet( widget->textSelection() ) );
+    if( findPrev( newRangeSet.data() ) ) {
+        widget->controller()->changeAndGiveTextSelection( newRangeSet.take() );
+    }
+}
+
+
+/// Selects the next item that matches the given critaria (Adds an extra selection range )
+/// @param widget the widget to search in
+void TextSearcher::selectNext( TextEditorWidget* widget )
+{
+    QScopedPointer<TextRangeSet> newRangeSet( new TextRangeSet( widget->textSelection() ) );
+    if( selectNext( newRangeSet.data() ) ) {
+        widget->controller()->changeAndGiveTextSelection( newRangeSet.take() );
+    }
+}
+
+
+/// Selects the previous item based on the given caret position in the selection
+/// @param widget the widget to to search in
+void TextSearcher::selectPrev( TextEditorWidget* widget )
+{
+    QScopedPointer<TextRangeSet> newRangeSet( new TextRangeSet( widget->textSelection() ) );
+    if( selectPrev( newRangeSet.data() ) ) {
+        widget->controller()->changeAndGiveTextSelection( newRangeSet.take() );
+    }
+}
+
+
+/// Selects all matches of the current item
+/// @param widget the widget to search in
+/// @param selection the selection to change
+void TextSearcher::selectAll( TextEditorWidget* widget )
+{
+    QScopedPointer<TextRangeSet> newRangeSet( new TextRangeSet( widget->textSelection() ) );
+    if( selectAll( newRangeSet.data() ) ) {
+        widget->controller()->changeAndGiveTextSelection( newRangeSet.take() );
+    }
+}
+
+/// A smart selection: when there's no selection the current word is used and selected.
+/// The next word will be selected, if all is specified all words are selected
+/// @param widget the widget to select
+/// @param selectAllTexts if true then all occurences are selected
+void TextSearcher::selectUnderExpand( TextEditorWidget* widget, bool selectAllTexts )
+{
+    QScopedPointer<TextRangeSet> newRangeSet( new TextRangeSet( widget->textSelection() ) );
+    bool runSelect = true;  // should the select be called
+
+    // when no selection is used select it
+    if( !newRangeSet->hasSelection() || newRangeSet->rangeCount() == 1 ) {
+        TextRange& range = newRangeSet->lastRange();
+        TextDocument* doc = widget->textDocument();
+
+        // make sure there's a selection
+        if( !newRangeSet->hasSelection() ) {
+            if( range.isEmpty() ) {
+                range.expandToWord( doc, doc->config()->whitespaces(), doc->config()->charGroups());
+                runSelect = selectAllTexts;  // only run select when we need to select all
+            }
+        }
+        // next set the search term to the given word
+        setSearchTerm( doc->textPart( range.min(), range.length() ) );
+    }
+
+    // next select the next word
+    if( runSelect) {
+        if( selectAllTexts ) {
+            selectAll( newRangeSet.data() );
+        } else {
+            selectNext( newRangeSet.data() );
+        }
+    }
+
+    // set the new rangeset
+    widget->controller()->changeAndGiveTextSelection( newRangeSet.take() );
+
+}
+
+
 
 /// Marks the regexp as dirty (and deletes it)
 void TextSearcher::setDirty()
@@ -179,7 +346,9 @@ void TextSearcher::setDirty()
     regExp_ = 0;
 }
 
-/// Creates a regular expression for the current opions
+
+/// Creates a regular expression for the current selected options
+/// @return the new regular expression
 RegExp *TextSearcher::createRegExp()
 {
     RegExp::Syntax regExpSyntax = RegExp::SyntaxFixedString;

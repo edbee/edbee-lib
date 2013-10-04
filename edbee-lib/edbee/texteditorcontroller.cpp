@@ -161,7 +161,8 @@ bool TextEditorController::hasFocus()
 }
 
 
-/// sets a keymap
+/// sets the keymap. It will replace (and if owned, delete) the previous keymap
+/// @param keyMap the new keyMap to use
 void TextEditorController::setKeyMap(TextEditorKeyMap* keyMap)
 {
     delete keyMap_;

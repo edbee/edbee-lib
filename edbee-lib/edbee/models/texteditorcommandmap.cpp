@@ -81,7 +81,7 @@ TextEditorCommandMap::TextEditorCommandMap(QObject *parent)
     give( "undo", new UndoCommand() );
     give( "redo", new RedoCommand() );
     give( "soft_undo", new UndoCommand(true) );
-    give( "sort_redo", new RedoCommand(true) );
+    give( "soft_redo", new RedoCommand(true) );
 
     // clipboard operations
     give( "copy", new CopyCommand( ) );
@@ -101,7 +101,8 @@ TextEditorCommandMap::TextEditorCommandMap(QObject *parent)
     give( "sel_prev_match", new FindCommand( FindCommand::SelectPreviousMatch));
     give( "sel_all_matches", new FindCommand( FindCommand::SelectAllMatches ));
 
-    give( "find_under_expand", new FindCommand( FindCommand::FindUnderExpand ));
+    give( "select_under_expand", new FindCommand( FindCommand::SelectUnderExpand ));
+    give( "select_all_under", new FindCommand( FindCommand::SelectAllUnder ));
 }
 
 TextEditorCommandMap::~TextEditorCommandMap()

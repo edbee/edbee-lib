@@ -18,14 +18,18 @@ bool TextRange::lessThan(TextRange &r1, TextRange &r2)
 }
 
 
-
-void TextRange::setAnchorBounded(TextDocument *doc, int anchor)
+/// Sets the anchor to the given location, and forces the anchor to say between the document bounds
+/// @param doc document to set the anchor for
+/// @param anchor the anchor location to set
+void TextRange::setAnchorBounded(TextDocument* doc, int anchor)
 {
     setAnchor( qBound( 0,  anchor, doc->length() ) );
 }
 
-/// sets the caret between bounds
-void TextRange::setCaretBounded(TextDocument *doc, int caret)
+/// Sets the caret to the given location, and forces the caret to say between the document bounds
+/// @param doc the document (used for checking the document bounds)
+/// @param caret the caret position to set
+void TextRange::setCaretBounded(TextDocument* doc, int caret)
 {
     setCaret( qBound( 0,  caret, doc->length() ) );
 }
@@ -292,7 +296,8 @@ void TextRange::forceBounds(TextDocument *doc)
 }
 
 /// This method checks if the two ranges are equal
-bool TextRange::equals( TextRange& range)
+/// @param range the range to compare it to
+bool TextRange::equals( const TextRange& range)
 {
     return range.caret_ == caret_ && range.anchor_ == anchor_;
 }
@@ -798,12 +803,21 @@ void TextRangeSetBase::changeSpatial(int pos, int length, int newLength)
 
 
 /// the copy constructor for copying a selection
-
+/// @param sel the ranges to copy
 TextRangeSet::TextRangeSet( const TextRangeSet& sel )
     : TextRangeSetBase( sel.textDocument() )
 {
     selectionRanges_ = sel.selectionRanges_;
 }
+
+// An operation to copy the selection with a pointer
+TextRangeSet::TextRangeSet( const TextRangeSet* sel )
+    : TextRangeSetBase( sel->textDocument() )
+{
+    selectionRanges_ = sel->selectionRanges_;
+}
+
+
 
 
 /// copy the values

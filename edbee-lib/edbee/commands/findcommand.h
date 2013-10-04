@@ -21,7 +21,8 @@ public:
         SelectPreviousMatch,        //< adds the previous match to the selection
         SelectAllMatches,           //< select all matches
 
-        FindUnderExpand             ///< A smart selection: when there's no selection the current word is used
+        SelectUnderExpand,          ///< A smart selection: when there's no selection the current word is used and selected, else the next word is selected
+        SelectAllUnder              ///< A smart selection: when there's no selection the current word is used, and all occurences in the document are selected
 
     };
 

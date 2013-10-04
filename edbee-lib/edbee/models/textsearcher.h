@@ -13,6 +13,7 @@ namespace edbee {
 
 
 class RegExp;
+class TextDocument;
 class TextEditorWidget;
 
 /// The text searcher is a class to remember the current search operation
@@ -32,22 +33,28 @@ public:
     explicit TextSearcher(QObject *parent = 0);
     virtual ~TextSearcher();
 
-    QString searchTerm() { return searchTerm_; }
+    QString searchTerm() const;
     void setSearchTerm( const QString& term );
 
-    SyntaxType syntax() { return syntax_; }
+    SyntaxType syntax() const;
     void setSyntax( SyntaxType syntax);
 
-    bool isCaseSensitive() { return caseSensitive_; }
+    bool isCaseSensitive() const;
     void setCaseSensitive( bool sensitive );
 
-    bool isWrapAroundEnabled() { return wrapAround_; }
+    bool isWrapAroundEnabled() const;
     void setWrapAround( bool on );
 
-    bool isReverse() { return reverse_; }
-    void setReverse( bool on ) { reverse_ = on; }
+    bool isReverse() const;
+    void setReverse( bool on );
 
-    TextRange findNextRange( TextEditorWidget* widget );
+    TextRange findNextRange( TextRangeSet* selection );
+
+    bool findNext( TextRangeSet* selection );
+    bool findPrev( TextRangeSet* selection );
+    bool selectNext( TextRangeSet* selection );
+    bool selectPrev( TextRangeSet* selection );
+    bool selectAll( TextRangeSet* selection );
 
 public slots:
 
@@ -56,6 +63,8 @@ public slots:
     void selectNext( TextEditorWidget* widget );
     void selectPrev( TextEditorWidget* widget );
     void selectAll( TextEditorWidget* widget );
+
+    void selectUnderExpand(TextEditorWidget* widget, bool selectAllTexts );
 
 protected:
 

@@ -43,10 +43,6 @@ void FindCommand::execute(TextEditorController* controller)
         return;
     }
 
-    // save the current selection
-
-    TextRangeSet* sel = currentSelection; // temporary direct changing
-//    TextRangeSet* sel = new TextRangeSet(*currentSelection);  // start with the current selection
 
     // next process the operation and move the caret/selection
     switch( findType_ ) {
@@ -81,39 +77,23 @@ void FindCommand::execute(TextEditorController* controller)
             break;
 
         // use the current-selection for find or selects the current word
-        case FindUnderExpand:
-            // when no selection is used select it
-            if( !sel->hasSelection() ) {
-                TextRange& range = sel->range(0); // Note: No reference we're changing TextRange copy!
-                if( range.isEmpty() ) {
-                    range.expandToWord( doc, doc->config()->whitespaces(), doc->config()->charGroups());
-                }
-                searcher->setSearchTerm( doc->textPart( range.min(), range.length() ) );
-            // next select the next word
-            } else {
-                searcher->setReverse(false);
-                searcher->selectNext( controller->widget() );
-            }
+        case SelectUnderExpand:
+            searcher->selectUnderExpand( controller->widget(), false );
             break;
+
+        // select all words under the given word/selection
+        case SelectAllUnder:
+            searcher->selectUnderExpand( controller->widget(), true );
+            break;
+
+
 
         default:
             qlog_warn() << "Warning, invalid FindCommand supplied!";
             Q_ASSERT(false);
     }
 
-
-    // no change?
-    /* Temporary disabled
-    if( currentSelection->equals( *sel ) ) {
-        delete sel;
-        return; // 0
-    }
-
-
-    controller->changeAndGiveTextSelection( sel, 0 );
-    */
     controller->update();
-
 }
 
 
@@ -129,7 +109,7 @@ QString FindCommand::toString()
         case SelectNextMatch: str = "SelectNextMatch"; break;
         case SelectPreviousMatch: str = "SelectPreviousMatch"; break;
         case SelectAllMatches: str =  "SelectAllMatches"; break;
-        case FindUnderExpand: str = "FindUnderExpand"; break;
+        case SelectUnderExpand: str = "FindUnderExpand"; break;
     }
     return QString("FindCommand(%1)").arg(str);
 }

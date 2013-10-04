@@ -16,11 +16,14 @@
 
 namespace edbee {
 
+/// Constructs the textextselection object
+/// @param controller the controller this selection is for
 TextSelection::TextSelection( TextEditorController* controller )
     : TextRangeSet( controller->textDocument() )
     , textControllerRef_( controller )
 {
 }
+
 
 /// A copy constructor for copying a text-selection
 TextSelection::TextSelection(const TextSelection& selection)
@@ -30,6 +33,7 @@ TextSelection::TextSelection(const TextSelection& selection)
 
 }
 
+/// The text selection destructor
 TextSelection::~TextSelection()
 {
 }
@@ -157,6 +161,13 @@ void TextSelection::addRangesByLine( TextEditorController* controller, TextRange
 }
 
 
+/// Returns the controller for this selection
+TextEditorController* TextSelection::textEditorController() const
+{
+    return textControllerRef_;
+}
+
+
 /// This method process the changes if required
 void TextSelection::processChangesIfRequired( bool joinBorders )
 {
@@ -165,6 +176,7 @@ void TextSelection::processChangesIfRequired( bool joinBorders )
         textEditorController()->textCaretCache()->clear();
     }
 }
+
 
 /// This method process the changes if required
 void TextSelection::processChangesIfRequiredKeepCaretCache( bool joinBorders)

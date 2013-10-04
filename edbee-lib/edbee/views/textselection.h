@@ -33,8 +33,10 @@ public:
     static void addRangesByLine( TextEditorController* controller, TextRangeSet* rangeSet, int amount );
 
 
+    virtual
+
   // getters
-    TextEditorController* textEditorController() { return textControllerRef_; }
+    TextEditorController* textEditorController() const;
 
 protected:
     virtual void processChangesIfRequired( bool joinBorders=false );

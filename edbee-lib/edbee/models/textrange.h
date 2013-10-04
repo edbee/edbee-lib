@@ -76,7 +76,7 @@ public:
 
     void forceBounds( TextDocument* doc );
 
-    bool equals( TextRange& range );
+    bool equals(const TextRange &range );
     bool touches( TextRange& range );
 
     static bool lessThan( TextRange& r1, TextRange& r2 );
@@ -86,7 +86,9 @@ private:
     int caret_;         ///< The position of the caret
 };
 
+
 //======================================================================
+
 
 /// This class represents a set of textranges
 /// The ranges are kept ordered and will not contain overlapping regions.
@@ -182,7 +184,9 @@ protected:
     int changing_;                       ///< A (integer) boolean for handling changes between beginChagnes and endChanges
 };
 
+
 //======================================================================
+
 
 /// The basic textrange class. A simple class of textrange with a simple vector implementation
 class TextRangeSet : public TextRangeSetBase
@@ -190,6 +194,7 @@ class TextRangeSet : public TextRangeSetBase
 public:
     TextRangeSet( TextDocument* doc ) : TextRangeSetBase( doc ) {}
     TextRangeSet( const TextRangeSet& sel );
+    TextRangeSet( const TextRangeSet* sel );
     virtual ~TextRangeSet() {}
 
     TextRangeSet& operator=(const TextRangeSet& sel);
