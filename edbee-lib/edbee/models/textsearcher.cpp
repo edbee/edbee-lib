@@ -349,12 +349,12 @@ void TextSearcher::setDirty()
 
 /// Creates a regular expression for the current selected options
 /// @return the new regular expression
-RegExp *TextSearcher::createRegExp()
+RegExp* TextSearcher::createRegExp()
 {
     RegExp::Syntax regExpSyntax = RegExp::SyntaxFixedString;
     if( syntax() == SyntaxRegExp ) regExpSyntax = RegExp::SyntaxDefault;
 
-    RegExp* regExp = new RegExp( searchTerm(), RegExp::EngineOniguruma, regExpSyntax );
+    RegExp* regExp = new RegExp( searchTerm(), caseSensitive_, regExpSyntax, RegExp::EngineOniguruma );
     return regExp;
 }
 
