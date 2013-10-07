@@ -40,6 +40,12 @@ QList<Item*> itemRefList_;
 ~~~
 
 
+Method definitions
+------------------
+
+Seperate methods from eachother with 2 blank lines.  This improves the visible separation of method bodies.
+
+
 Ownership
 ---------
 

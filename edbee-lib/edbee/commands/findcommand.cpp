@@ -109,7 +109,8 @@ QString FindCommand::toString()
         case SelectNextMatch: str = "SelectNextMatch"; break;
         case SelectPreviousMatch: str = "SelectPreviousMatch"; break;
         case SelectAllMatches: str =  "SelectAllMatches"; break;
-        case SelectUnderExpand: str = "FindUnderExpand"; break;
+        case SelectUnderExpand: str = "SelectUnderExpand"; break;
+        case SelectAllUnder: str = "SelectAllUnder"; break;
     }
     return QString("FindCommand(%1)").arg(str);
 }
