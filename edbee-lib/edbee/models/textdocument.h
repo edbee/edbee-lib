@@ -98,6 +98,7 @@ public:
 
 
     void replaceRangeSet(TextRangeSet& rangeSet, const QString& text, int coalesceId, TextEditorController* controller=0);
+    void replaceRangeSet(TextRangeSet& rangeSet, const QStringList& texts, int coalesceId, TextEditorController* controller=0);
 
     /*
     void replace(int offset, int length, const QString& newText , bool merge=false );

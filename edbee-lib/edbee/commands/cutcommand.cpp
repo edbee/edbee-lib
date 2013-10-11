@@ -44,7 +44,7 @@ void CutCommand::execute(TextEditorController* controller)
 
         QMimeData* mimeData = new QMimeData();
         mimeData->setText( str );
-        mimeData->setData( CopyCommand::VARBIT_TEXT_TYPE, "line" );
+        mimeData->setData( CopyCommand::EDBEE_TEXT_TYPE, "line" );
         clipboard->setMimeData( mimeData );
         delete mimeData;
 

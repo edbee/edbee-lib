@@ -8,6 +8,7 @@
 #include <QApplication>
 #include <QClipboard>
 #include <QMimeData>
+#include <QStringList>
 
 #include "edbee/commands/copycommand.h"
 #include "edbee/models/textbuffer.h"
@@ -21,10 +22,22 @@
 
 namespace edbee {
 
+
+/// Default (blank) constructor
 PasteCommand::PasteCommand()
 {
 }
 
+
+/// Returns the command id for coalescing this operation
+int PasteCommand::commandId()
+{
+    return CoalesceId_Paste;
+}
+
+
+/// Execute the paste command
+/// @param controller the controller context this operation is executed for
 void PasteCommand::execute(TextEditorController* controller)
 {
 
@@ -35,8 +48,9 @@ void PasteCommand::execute(TextEditorController* controller)
     TextDocument* doc    = controller->textDocument();
     TextRangeSet* sel    = controller->textSelection();
 
+
     // a line-based paste
-    if( mimeData->hasFormat( CopyCommand::VARBIT_TEXT_TYPE ) ) {
+    if( mimeData->hasFormat( CopyCommand::EDBEE_TEXT_TYPE ) ) {
         TextRangeSet newRanges(doc);
         for( int i=0,cnt=sel->rangeCount(); i<cnt; ++i ) {
             TextRange& range = sel->range(i);
@@ -51,16 +65,29 @@ void PasteCommand::execute(TextEditorController* controller)
     // normal paste
     } else {
         if( !text.isEmpty() ) {
-            controller->replaceSelection(text,commandId());
+            int lineCount = text.count("\n") + 1;
+            int rangeCount = controller->textSelection()->rangeCount();
+
+            // multi-line/caret copy paste
+            if( lineCount == rangeCount ) {
+                QStringList texts = text.split("\n");
+                controller->replaceRangeSet( *controller->textSelection(), texts, commandId() );
+
+            // this the normal operation
+            } else {
+                controller->replaceSelection(text,commandId());
+            }
         }
         return;
     }
-
 }
 
+
+/// Converst the command to a string (for fetching the commandname)
 QString PasteCommand::toString()
 {
     return "PasteCommand";
 }
+
 
 } // edbee

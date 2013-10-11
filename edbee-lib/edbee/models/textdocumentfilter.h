@@ -6,6 +6,7 @@
 #pragma once
 
 class QString;
+class QStringList;
 
 namespace edbee {
 
@@ -19,7 +20,7 @@ class TextRangeSet;
 class TextDocumentFilter
 {
 public:
-    virtual ~TextDocumentFilter() {}
+    virtual ~TextDocumentFilter();
 
 /*
     /// this method is called when a group is added to the undo-stack
@@ -34,6 +35,14 @@ public:
     /// @param rangeSet the rangeSet that's replaced
     /// @param str the string that's going to placed at the given ranges
     virtual void filterReplaceRangeSet( TextDocument* doc, TextRangeSet& rangeSet, QString& str  );
+
+
+
+    /// makes it possible to modify the range-set string that's passed to the document
+    /// @param doc the textdocument
+    /// @param rangeSet the rangeSet that's replaced
+    /// @param str the stringsets that's going to placed at the given ranges
+    virtual void filterReplaceRangeSet( TextDocument* doc, TextRangeSet& rangeSet, QStringList& str  );
 
 
     /// This method is called for any other change

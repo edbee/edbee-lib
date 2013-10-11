@@ -11,7 +11,13 @@
 
 namespace edbee {
 
-void TextDocumentFilter::filterReplaceRangeSet(TextDocument *doc, TextRangeSet &rangeSet, QString &str)
+/// The default virtual constructor
+TextDocumentFilter::~TextDocumentFilter()
+{
+}
+
+/// A filter for single string replacements
+void TextDocumentFilter::filterReplaceRangeSet(TextDocument *doc, TextRangeSet &rangeSet, QString& str)
 {
     Q_UNUSED(doc);
     Q_UNUSED(rangeSet);
@@ -19,4 +25,12 @@ void TextDocumentFilter::filterReplaceRangeSet(TextDocument *doc, TextRangeSet &
 
 }
 
+/// A filter for stringlist replacements {}
+void TextDocumentFilter::filterReplaceRangeSet(TextDocument* doc, TextRangeSet& rangeSet, QStringList& str)
+{
+    Q_UNUSED(doc);
+    Q_UNUSED(rangeSet);
+    Q_UNUSED(str);
 }
+
+}// edbee

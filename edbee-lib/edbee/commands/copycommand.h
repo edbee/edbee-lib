@@ -13,16 +13,18 @@ namespace edbee {
 
 class TextEditorController;
 
+
+/// This command is used for copying data to the clipboard
 class CopyCommand : public TextEditorCommand
 {
 public:
-    static const QString VARBIT_TEXT_TYPE;
+    static const QString EDBEE_TEXT_TYPE;
 
 public:
     CopyCommand();
 
     /// This method should return the command identifier
-    virtual int commandId() { return CoalesceId_None; }
+    virtual int commandId();
 
 
     virtual void execute( TextEditorController* controller );

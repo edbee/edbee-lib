@@ -11,13 +11,18 @@ namespace edbee {
 
 class TextEditorController;
 
+/// Executes a paste command
+/// This usually simply pastes the text at the given location.
+/// There are two special cases:
+/// - there's a line cutting/pasing mode to copy complete lines
+/// - when the number of carets is equal to the number of lines, every line is pasted at a caret
 class PasteCommand : public TextEditorCommand
 {
 public:
     PasteCommand();
 
     /// This method should return the command identifier
-    virtual int commandId() { return CoalesceId_Paste; }
+    virtual int commandId();
 
     virtual void execute( TextEditorController* controller );
     virtual QString toString();

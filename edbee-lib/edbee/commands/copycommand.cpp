@@ -17,12 +17,21 @@
 
 namespace edbee {
 
-const QString CopyCommand::VARBIT_TEXT_TYPE("application/vnd.blommersit.text-type");
+/// An internal mime-type, used for identifying special copy/paste operations of edbee
+const QString CopyCommand::EDBEE_TEXT_TYPE("application/vnd.edbee.text-type");
 
 
 CopyCommand::CopyCommand()
 {
 }
+
+
+/// Returns the coalescing-command id
+int CopyCommand::commandId()
+{
+     return CoalesceId_None;
+}
+
 
 /// Copies the current selection to the clipboard
 void CopyCommand::execute(TextEditorController* controller)
@@ -41,12 +50,14 @@ void CopyCommand::execute(TextEditorController* controller)
         str = sel->getSelectedTextExpandedToFullLines();
         QMimeData* mimeData = new QMimeData();
         mimeData->setText( str );
-        mimeData->setData( VARBIT_TEXT_TYPE, "line" );
+        mimeData->setData( EDBEE_TEXT_TYPE, "line" );
         clipboard->setMimeData( mimeData );
         delete mimeData;
     }
 }
 
+
+/// Convers this command to string
 QString CopyCommand::toString()
 {
     return "CopyCommand";
