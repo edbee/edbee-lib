@@ -188,46 +188,7 @@ TextDocumentFilter* TextDocument::documentFilter()
 /// @param coalesceId the coalesceid
 void TextDocument::replaceRangeSet(TextRangeSet& rangeSet, const QString& textIn, int coalesceId, TextEditorController* controller)
 {
-    beginUndoGroup( new ComplexTextChange( controller) );
-
-    QString text = textIn;
-    if( documentFilter() ) {
-        documentFilter()->filterReplaceRangeSet( this, rangeSet, text );
-    }
-
-    rangeSet.beginChanges();
-
-    int idx = 0, oldRangeCount = 0;
-    while( idx < (oldRangeCount = rangeSet.rangeCount())  ) {
-        TextRange& range = rangeSet.range(idx);
-
-        SingleTextChangeWithCaret* change = new SingleTextChangeWithCaret(range.min(),range.length(),text,-1);
-
-        // this can be filtered
-        executeAndGiveChange( change, false );
-
-        // so we need to adjust the caret with the (possible) adjusted change
-        if( change->caret() < 0 ) {
-            range.setCaret( change->offset() + change->length() );
-        } else {
-            range.setCaret( change->caret() );
-        }
-        range.reset();
-
-        // next range.
-        if( rangeSet.rangeCount() < oldRangeCount ) {
-qlog_info() <<  "TEST TO SEE IF THIS REALLY HAPPENS!! I think it cannot happen. (but I'm not sure)";
-Q_ASSERT(false);
-
-        // else we stay at the same location
-        } else {
-            ++idx;
-        }
-    }
-
-    rangeSet.endChanges();
-
-    endUndoGroup(coalesceId,true);
+    return replaceRangeSet( rangeSet, QStringList(textIn), coalesceId, controller );
 }
 
 
