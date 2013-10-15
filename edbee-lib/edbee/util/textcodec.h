@@ -12,6 +12,9 @@ namespace edbee {
 
 class TextCodec;
 
+/// The codec manager is used for managing codecs
+/// You shouldnt' instantiatie this class, it's better to access the
+/// codec manager instantiated via the edbee::Edbee
 class TextCodecManager
 {
 public:
@@ -19,29 +22,24 @@ public:
     ~TextCodecManager();
 
 public:
-    void registerTextCodec( TextCodec* codec );
-    QList<TextCodec*> codecList() { return codecList_; }
+    void giveTextCodec( TextCodec* codec );
+    QList<TextCodec*> codecList();
     TextCodec* codecForName( const QString& name );
-
 
 private:
     QList<TextCodec*> codecList_;
     QHash<QString,TextCodec*> codecRefMap_;
-
-    friend class TextEditorManager;
 };
 
 
-
+/// This class represents a single text codec
+/// The codec has a name and contains methods to create encoders and decoders
 class TextCodec
 {
 public:
-    static QList<TextCodec*> all();
-    static void registerTextCodec( TextCodec* codec );
-
     TextCodec( const QString& name, const QTextCodec* codec, QTextCodec::ConversionFlags flags );
     const QTextCodec* codec();
-    QTextEncoder *makeEncoder();
+    QTextEncoder* makeEncoder();
     QTextDecoder* makeDecoder();
 
     QString name() { return name_; }

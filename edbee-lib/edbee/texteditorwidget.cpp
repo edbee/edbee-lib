@@ -44,6 +44,7 @@
 namespace edbee {
 
 
+/// The default TextEditor widget constructor
 TextEditorWidget::TextEditorWidget( QWidget* parent)
     : QWidget( parent )
     , controller_(0)
@@ -75,8 +76,6 @@ TextEditorWidget::TextEditorWidget( QWidget* parent)
     setLayout(layout);
     setFocusProxy( editCompRef_ );
 
-
-
     marginCompRef_->init();
     connectHorizontalScrollBar();
     connectVerticalScrollBar();
@@ -94,6 +93,7 @@ TextEditorWidget::~TextEditorWidget()
     delete controller_;
 }
 
+
 /// This method makes sure the given position is visible
 /// @param xposIn the position in text-editor 'coordinates'
 /// @param yPosIn the position in text-editor 'coordinates'
@@ -102,48 +102,65 @@ void TextEditorWidget::scrollPositionVisible(int xPosIn, int yPosIn)
     scrollAreaRef_->ensureVisible( xPosIn, yPosIn );
 }
 
+
 /// this method scrolls the top position to the given line
+/// @param line the line to scroll to
 void TextEditorWidget::scrollTopToLine(int line)
 {
     int yPos = line * textRenderer()->lineHeight();
-    scrollAreaRef_->ensureVisible( 0,  qMax(0,yPos) );
+    scrollAreaRef_->verticalScrollBar()->setValue( qMax(0,yPos) );
+//    scrollAreaRef_->ensureVisible( 0,  qMax(0,yPos) );
 }
 
+
+/// Returns the confirguation object for this widget
 TextEditorConfig* TextEditorWidget::config()
 {
     return textDocument()->config();
 }
 
+
+/// Return the associated commandmap
 TextEditorCommandMap* TextEditorWidget::commandMap()
 {
     return controller_->commandMap();
 }
 
+
+/// return the associated keymap
 TextEditorKeyMap* TextEditorWidget::keyMap()
 {
     return controller_->keyMap();
 }
 
+
+/// Returns the textdocument for this widget
 TextDocument* TextEditorWidget::textDocument()
 {
     return controller_->textDocument();
 }
 
+
+/// Returns the text-renderer
 TextRenderer* TextEditorWidget::textRenderer()
 {
     return controller_->textRenderer();
 }
 
+
+/// Return the textselection
 TextSelection* TextEditorWidget::textSelection()
 {
     return controller_->textSelection();
 }
+
 
 /// This method resets the caret time
 void TextEditorWidget::resetCaretTime()
 {
     editCompRef_->resetCaretTime();
 }
+
 
 /// This method performs a full update. Which means it callibirates the scrollbars
 /// invalidates all caches, redraws the screen and updates the scrollbars
@@ -153,12 +170,14 @@ void TextEditorWidget::fullUpdate()
     marginCompRef_->fullUpdate();
 }
 
-QScrollBar *TextEditorWidget::horizontalScrollBar()
+
+/// Return the horizontal scrollbar
+QScrollBar* TextEditorWidget::horizontalScrollBar()
 {
     return scrollAreaRef_->horizontalScrollBar();
 }
 
-QScrollBar *TextEditorWidget::verticalScrollBar()
+QScrollBar* TextEditorWidget::verticalScrollBar()
 {
     return scrollAreaRef_->verticalScrollBar();
 }
@@ -171,6 +190,7 @@ void TextEditorWidget::setVerticalScrollBar(QScrollBar* scrollBar)
     emit verticalScrollBarChanged( scrollBar );
 }
 
+/// Use this method to change the horizontal scrollar
 void TextEditorWidget::setHorizontalScrollBar(QScrollBar *scrollBar)
 {
     scrollAreaRef_->setHorizontalScrollBar(scrollBar);

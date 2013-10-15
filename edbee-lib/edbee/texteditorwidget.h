@@ -37,7 +37,6 @@ public:
     virtual ~TextEditorWidget();
 
     void scrollPositionVisible( int xPosIn, int yPosIn );
-    void scrollTopToLine( int line );
 
 
     inline TextEditorController* controller() { return controller_; }
@@ -79,6 +78,7 @@ protected slots:
 
 public slots:
 
+    void scrollTopToLine( int line );
     virtual void updateLineAtOffset(int offset);
     virtual void updateAreaAroundOffset(int offset, int width=8);
     virtual void updateLine( int line, int length=1 );
