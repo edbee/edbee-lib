@@ -26,7 +26,6 @@ class TextRenderer;
 class TextSelection;
 
 
-
 /// Warning the text-editor widget needs a fix-width font
 class TextEditorWidget : public QWidget
 {
@@ -38,24 +37,24 @@ public:
 
     void scrollPositionVisible( int xPosIn, int yPosIn );
 
-
-    inline TextEditorController* controller() { return controller_; }
-    TextEditorConfig* config();
-    TextEditorCommandMap* commandMap();
-    TextEditorKeyMap* keyMap();
-    TextDocument* textDocument();
-    TextRenderer* textRenderer();
-    TextSelection* textSelection();
-    TextEditorComponent* textEditorComponent() { return editCompRef_; }
-    TextMarginComponent* textMarginComponent() { return marginCompRef_; }
-    TextEditorScrollArea* textScrollArea() { return scrollAreaRef_; }
+    // a whole bunch of getters
+    inline TextEditorController* controller() const;
+    TextEditorConfig* config() const;
+    TextEditorCommandMap* commandMap() const;
+    TextEditorKeyMap* keyMap() const;
+    TextDocument* textDocument() const;
+    TextRenderer* textRenderer() const;
+    TextSelection* textSelection() const;
+    TextEditorComponent* textEditorComponent() const;
+    TextMarginComponent* textMarginComponent() const;
+    TextEditorScrollArea* textScrollArea() const;
 
     void resetCaretTime();
     void fullUpdate();
 
 
-    QScrollBar* horizontalScrollBar();
-    QScrollBar* verticalScrollBar();
+    QScrollBar* horizontalScrollBar() const;
+    QScrollBar* verticalScrollBar() const;
     void setVerticalScrollBar( QScrollBar* scrollBar );
     void setHorizontalScrollBar( QScrollBar* scrollBar );
 

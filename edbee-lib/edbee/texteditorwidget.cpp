@@ -103,6 +103,14 @@ void TextEditorWidget::scrollPositionVisible(int xPosIn, int yPosIn)
 }
 
 
+/// returns the controller for this editor
+/// @return the active TextEditorController
+TextEditorController* TextEditorWidget::controller() const
+{
+    return controller_;
+}
+
+
 /// this method scrolls the top position to the given line
 /// @param line the line to scroll to
 void TextEditorWidget::scrollTopToLine(int line)
@@ -114,44 +122,65 @@ void TextEditorWidget::scrollTopToLine(int line)
 
 
 /// Returns the confirguation object for this widget
-TextEditorConfig* TextEditorWidget::config()
+TextEditorConfig* TextEditorWidget::config() const
 {
     return textDocument()->config();
 }
 
 
 /// Return the associated commandmap
-TextEditorCommandMap* TextEditorWidget::commandMap()
+TextEditorCommandMap* TextEditorWidget::commandMap() const
 {
     return controller_->commandMap();
 }
 
 
 /// return the associated keymap
-TextEditorKeyMap* TextEditorWidget::keyMap()
+TextEditorKeyMap* TextEditorWidget::keyMap() const
 {
     return controller_->keyMap();
 }
 
 
 /// Returns the textdocument for this widget
-TextDocument* TextEditorWidget::textDocument()
+TextDocument* TextEditorWidget::textDocument() const
 {
     return controller_->textDocument();
 }
 
 
 /// Returns the text-renderer
-TextRenderer* TextEditorWidget::textRenderer()
+TextRenderer* TextEditorWidget::textRenderer() const
 {
     return controller_->textRenderer();
 }
 
 
 /// Return the textselection
-TextSelection* TextEditorWidget::textSelection()
+TextSelection* TextEditorWidget::textSelection() const
 {
     return controller_->textSelection();
+}
+
+
+/// Returns the editor component-part of the editor
+TextEditorComponent* TextEditorWidget::textEditorComponent() const
+{
+    return editCompRef_;
+}
+
+
+/// Returns the active margin component
+TextMarginComponent* TextEditorWidget::textMarginComponent() const
+{
+    return marginCompRef_;
+}
+
+
+/// Returns the active scroll area
+TextEditorScrollArea* TextEditorWidget::textScrollArea() const
+{
+    return scrollAreaRef_;
 }
 
 
@@ -172,12 +201,12 @@ void TextEditorWidget::fullUpdate()
 
 
 /// Return the horizontal scrollbar
-QScrollBar* TextEditorWidget::horizontalScrollBar()
+QScrollBar* TextEditorWidget::horizontalScrollBar() const
 {
     return scrollAreaRef_->horizontalScrollBar();
 }
 
-QScrollBar* TextEditorWidget::verticalScrollBar()
+QScrollBar* TextEditorWidget::verticalScrollBar() const
 {
     return scrollAreaRef_->verticalScrollBar();
 }
