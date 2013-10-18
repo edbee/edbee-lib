@@ -195,7 +195,14 @@ QAction* TextEditorController::createUnconnectedAction(const QString& command, c
 {
     // create the action
     QAction* action = new QAction( icon, text, 0 );
-    action->setShortcut( keyMap()->get( command )->sequence() );
+
+    // set the key if there's an assigned keyboard command
+    TextEditorKey* key = keyMap()->get(command);
+    if( keyMap()->get( command ) ) {
+        action->setShortcut( key->sequence() );
+    }
+
+    // set the data
     action->setData( command );
     return action;
 }
