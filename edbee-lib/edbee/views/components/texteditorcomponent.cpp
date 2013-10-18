@@ -433,11 +433,11 @@ void TextEditorComponent::contextMenuEvent(QContextMenuEvent* event)
     Q_UNUSED(event);
 
     QMenu* menu = new QMenu();
-    menu->addAction( controller()->createEditorAction("cut", tr("Cut") ) );
-    menu->addAction( controller()->createEditorAction("copy", tr("Copy") ) );
-    menu->addAction( controller()->createEditorAction("paste", tr("Paste") ) );
+    menu->addAction( controller()->createAction("cut", tr("Cut") ) );
+    menu->addAction( controller()->createAction("copy", tr("Copy") ) );
+    menu->addAction( controller()->createAction("paste", tr("Paste") ) );
     menu->addSeparator();
-    menu->addAction( controller()->createEditorAction("sel_all", tr("Select All") ) );
+    menu->addAction( controller()->createAction("sel_all", tr("Select All") ) );
 
     // contextmenu can always be placed under the current cursosr
     menu->exec( QCursor::pos() );

@@ -88,7 +88,6 @@ TextEditorController::~TextEditorController()
 }
 
 
-
 /// This method is called to reset the caret timer and update the ui
 void TextEditorController::notifyStateChange()
 {
@@ -187,19 +186,31 @@ bool TextEditorController::hasFocus()
 }
 
 
+/// This method creates an editor action that is
+/// @param command the command that needs to be executed.
+/// @param text description of the command
+/// @param icon the optional icon of the command
+/// @return the newly created QAction
+QAction* TextEditorController::createUnconnectedAction(const QString& command, const QString& text, const QIcon& icon )
+{
+    // create the action
+    QAction* action = new QAction( icon, text, 0 );
+    action->setShortcut( keyMap()->get( command )->sequence() );
+    action->setData( command );
+    return action;
+}
+
+
 /// Creates a QAction object that performs the given editor action
 /// The shortcut of the given editor-command is retrieved from the keymap
 /// @param command the command that needs to be executed.
 /// @param text description of the command
 /// @param icon the optional icon of the command
 /// @return the newly created QAction
-QAction* TextEditorController::createEditorAction(const QString& command, const QString& text, const QIcon& icon )
+QAction* TextEditorController::createAction(const QString& command, const QString& text, const QIcon& icon )
 {
     // create the action
-    QAction* action = new QAction( icon, text, 0 );
-    action->setShortcut( keyMap()->get( command )->sequence() );
-    action->setData( command );
-
+    QAction* action = createUnconnectedAction( command, text, icon );
     /// connect the signal to executeCommand
     connect( action, SIGNAL(triggered()), SLOT(executeCommand()) );
     return action;

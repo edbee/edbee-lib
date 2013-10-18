@@ -58,7 +58,8 @@ public:
     virtual AutoScrollToCaret autoScrollToCaret() const;
 
     bool hasFocus();
-    QAction* createEditorAction(const QString& command, const QString& text , const QIcon& icon=QIcon());
+    QAction* createUnconnectedAction(const QString& command, const QString& text, const QIcon& icon=QIcon() );
+    QAction* createAction(const QString& command, const QString& text , const QIcon& icon=QIcon());
 
 
 // getters

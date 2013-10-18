@@ -22,10 +22,12 @@
 
 namespace edbee {
 
-TextEditorCommandMap::TextEditorCommandMap(QObject *parent)
+/// Constructs the editor commandmap
+/// This constructors also initializes the map with the default editor actions
+/// @param parent a reference to the parent object
+TextEditorCommandMap::TextEditorCommandMap(QObject* parent)
     : QObject(parent)
 {
-
     give( "goto_next_char", new SelectionCommand( SelectionCommand::MoveCaretByCharacter, 1 ) );
     give( "goto_prev_char", new SelectionCommand( SelectionCommand::MoveCaretByCharacter, -1 ) );
     give( "goto_next_word", new SelectionCommand( SelectionCommand::MoveCaretByWord, 1 ) );
@@ -105,23 +107,31 @@ TextEditorCommandMap::TextEditorCommandMap(QObject *parent)
     give( "select_all_under", new FindCommand( FindCommand::SelectAllUnder ));
 }
 
+
+/// Destructs the command map
 TextEditorCommandMap::~TextEditorCommandMap()
 {
     qDeleteAll( commandMap_ );
     commandMap_.clear();
 }
 
-/// gives the command
+
+/// gives the command to this command map
+/// @param key the unique identifier for this command
+/// @param command the command to give
 void TextEditorCommandMap::give(const QString& key, TextEditorCommand* command)
 {
     delete commandMap_.value(key);
     commandMap_.insert(key,command);
 }
 
-/// returns the given command or 0
-TextEditorCommand *TextEditorCommandMap::get(const QString& key)
+
+/// Returns the command identified with the given key
+/// @return the command assigned to this identifier or 0 if the command doesn't exeist
+TextEditorCommand* TextEditorCommandMap::get(const QString& key)
 {
     return commandMap_.value(key);
 }
+
 
 } // edbee
