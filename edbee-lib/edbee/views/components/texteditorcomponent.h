@@ -21,6 +21,7 @@ class TextSelection;
 
 
 /// This is the main texteditor-component (which is the true editor)
+/// This is the QWidget that recieves the keypresses, mouse presses etc.
 class TextEditorComponent : public QWidget
 {
     Q_OBJECT
@@ -55,10 +56,8 @@ protected:
     virtual void mouseMoveEvent( QMouseEvent* event );
     virtual void focusInEvent( QFocusEvent* event );
     virtual void focusOutEvent( QFocusEvent* event );
+    virtual void contextMenuEvent(QContextMenuEvent* event);
 
-
-signals:
-    
 public slots:
     
     void repaintCarets();

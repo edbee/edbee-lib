@@ -6,6 +6,7 @@
 #include "texteditorcontroller.h"
 
 #include <QApplication>
+#include <QAction>
 #include <QThread>
 
 #include "edbee/commands/selectioncommand.h"
@@ -161,10 +162,68 @@ void TextEditorController::setTextDocument(TextDocument* doc)
 }
 
 
+/// Changes the autoScrollToCaret setting
+/// @param autoScroll the new autoscroll to caret setting. This can be one of the following values:
+///  - AutoScrollAlways => Always scroll the view so the caret is visible
+//   - AutoScrollWhenFocus => Only scroll the view when the editor has got the focus
+//   - AutoScrollNever => Never perform automatic scolling
+void TextEditorController::setAutoScrollToCaret(TextEditorController::AutoScrollToCaret autoScroll)
+{
+     autoScrollToCaret_ = autoScroll;
+}
+
+
+/// Returns the autoScrollToCaret setting
+TextEditorController::AutoScrollToCaret TextEditorController::autoScrollToCaret() const
+{
+     return autoScrollToCaret_;
+}
+
+
 /// This method return true if the text-editor has focus
 bool TextEditorController::hasFocus()
 {
     return widget()->hasFocus();
+}
+
+
+/// Creates a QAction object that performs the given editor action
+/// The shortcut of the given editor-command is retrieved from the keymap
+/// @param command the command that needs to be executed.
+/// @param text description of the command
+/// @param icon the optional icon of the command
+/// @return the newly created QAction
+QAction* TextEditorController::createEditorAction(const QString& command, const QString& text, const QIcon& icon )
+{
+    // create the action
+    QAction* action = new QAction( icon, text, 0 );
+    action->setShortcut( keyMap()->get( command )->sequence() );
+    action->setData( command );
+
+    /// connect the signal to executeCommand
+    connect( action, SIGNAL(triggered()), SLOT(executeCommand()) );
+    return action;
+}
+
+
+/// Returns a reference to the textdocument
+TextDocument*TextEditorController::textDocument() const
+{
+    return textDocumentRef_;
+}
+
+
+/// Returns the textselection
+TextSelection* TextEditorController::textSelection() const
+{
+    return textSelection_;
+}
+
+
+/// Returns the current text renderer
+TextRenderer*TextEditorController::textRenderer() const
+{
+     return textRenderer_;
 }
 
 
@@ -188,6 +247,13 @@ void TextEditorController::giveKeyMap(TextEditorKeyMap* keyMap)
 }
 
 
+/// Returns the current keymap
+TextEditorKeyMap*TextEditorController::keyMap() const
+{
+    return keyMapRef_;
+}
+
+
 /// set a commandmap
 /// the ownership is NOT transfered to this object. The old owned command-map is deleted
 /// @parm commandMap the new commandMap of this object
@@ -207,6 +273,27 @@ void TextEditorController::giveCommandMap(TextEditorCommandMap* commandMap)
     delete commandMap_;
     commandMap_ = commandMap;
     commandMapRef_ = commandMap;
+}
+
+
+/// Returns the current commandmap
+TextEditorCommandMap*TextEditorController::commandMap() const
+{
+    return commandMapRef_;
+}
+
+
+/// Returns the active widget
+TextEditorWidget*TextEditorController::widget() const
+{
+    return widgetRef_;
+}
+
+
+/// Returns the textCaretCache
+TextCaretCache*TextEditorController::textCaretCache() const
+{
+     return textCaretCache_;
 }
 
 
@@ -399,11 +486,29 @@ void TextEditorController::executeCommand( TextEditorCommand* textCommand )
 
 
 /// Executes a command with the given name
+///
+/// When the name hasn't been supplied. This functiona assumes the command is triggered by a QAction
+/// and it will retrieve the command-name from the QAction data method
+///
 /// @param name of the command to execute
 /// @return true if the command exists
 bool TextEditorController::executeCommand(const QString& name)
 {
-    TextEditorCommand* command = commandMap()->get(name);
+    // check if an empty command name has been supplied
+    QString commandName = name;
+    if( commandName.isEmpty() ) {
+
+        // when the command name is blank  try to get the data of the QAction command
+        QAction* action= qobject_cast<QAction*>(sender());
+        if( !action ) {
+            qlog_warn() << "executeCommand was triggered without argument and without QAction data attribute!";
+            return false;
+        }
+        commandName = action->data().toString();
+    }
+
+    // try to retrieve the command
+    TextEditorCommand* command = commandMap()->get(commandName);
     if( command ) { executeCommand( command ); }
     return command != 0;
 }

@@ -6,9 +6,11 @@
 #pragma once
 
 #include <QObject>
+#include <QIcon>
 
 #include "edbee/models/textbuffer.h"
 
+class QAction;
 
 namespace edbee {
 
@@ -52,25 +54,26 @@ public:
     void giveTextDocument( TextDocument* doc );
     void setTextDocument( TextDocument* doc );
 
-    void setAutoScrollToCaret( AutoScrollToCaret autoScroll ) { autoScrollToCaret_ = autoScroll; }
-    virtual AutoScrollToCaret autoScrollToCaret() { return autoScrollToCaret_; }
-
+    void setAutoScrollToCaret( AutoScrollToCaret autoScroll );
+    virtual AutoScrollToCaret autoScrollToCaret() const;
 
     bool hasFocus();
+    QAction* createEditorAction(const QString& command, const QString& text , const QIcon& icon=QIcon());
+
 
 // getters
 //    TextBuffer* textBuffer() const;
-    TextDocument* textDocument() const  { return textDocumentRef_; }
-    TextSelection* textSelection() const { return textSelection_; }
-    TextRenderer* textRenderer() const { return textRenderer_; }
+    TextDocument* textDocument() const;
+    TextSelection* textSelection() const;
+    TextRenderer* textRenderer() const;
     void setKeyMap( TextEditorKeyMap* keyMap );
     void giveKeyMap( TextEditorKeyMap* keyMap );
-    TextEditorKeyMap* keyMap() const { return keyMapRef_; }
+    TextEditorKeyMap* keyMap() const;
     void setCommandMap( TextEditorCommandMap* commandMap );
     void giveCommandMap( TextEditorCommandMap* commandMap );
-    TextEditorCommandMap* commandMap() const { return commandMapRef_; }
-    TextEditorWidget* widget() const { return widgetRef_; }
-    TextCaretCache* textCaretCache() const { return textCaretCache_; }
+    TextEditorCommandMap* commandMap() const;
+    TextEditorWidget* widget() const;
+    TextCaretCache* textCaretCache() const;
     void giveTextSearcher( TextSearcher* searcher );
     TextSearcher* textSearcher();
 
@@ -121,7 +124,6 @@ public slots:
     virtual void addCaretAtOffset( int offset );
     virtual void changeAndGiveTextSelection(TextRangeSet* rangeSet , int coalesceId = 0);
 
-
     // perform an undo
     virtual void undo(bool soft=false);
     virtual void redo(bool soft=false);
@@ -132,8 +134,7 @@ public slots:
 
     // low level command execution
     virtual void executeCommand( TextEditorCommand* textCommand );
-    virtual bool executeCommand( const QString& name );
-
+    virtual bool executeCommand( const QString& name=QString() );
 
 private:
 

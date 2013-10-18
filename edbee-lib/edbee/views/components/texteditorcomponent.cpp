@@ -5,6 +5,7 @@
 
 #include "texteditorcomponent.h"
 
+#include <QMenu>
 #include <QPainter>
 #include <QPaintEvent>
 #include <QTimer>
@@ -25,6 +26,9 @@
 
 namespace edbee {
 
+/// The default texteditor compenent constructor
+/// @param controller the active controller for this editor
+/// @param parent the parent QObject
 TextEditorComponent::TextEditorComponent(TextEditorController* controller, QWidget* parent)
     : QWidget(parent)
     , caretTimer_(0)
@@ -33,14 +37,11 @@ TextEditorComponent::TextEditorComponent(TextEditorController* controller, QWidg
 {
     textEditorRenderer_ = new TextEditorRenderer( controller->textRenderer());
 
-
 //    setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     setSizePolicy( QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding );
 
-
-    // temporary disabled
+    // disabled autofilling of backgrounds
     setAutoFillBackground(false);
-
 
     //  editCompRef_->setAutoFillBackground(false);
     //  setAutoFillBackground(true);
@@ -55,9 +56,8 @@ TextEditorComponent::TextEditorComponent(TextEditorController* controller, QWidg
     setAttribute(Qt::WA_KeyCompression);
     setAttribute(Qt::WA_InputMethodEnabled);
 
-
+    // set the cursor type
     setCursor(Qt::IBeamCursor);
-
 
     // set the timer for the carets
     caretTimer_ = new QTimer();
@@ -65,41 +65,53 @@ TextEditorComponent::TextEditorComponent(TextEditorController* controller, QWidg
     if( config()->caretBlinkingRate() > 0 ) {
         caretTimer_->start( config()->caretBlinkingRate() >> 1 );
     }
-
 }
 
+
+/// The destructor of the the component
 TextEditorComponent::~TextEditorComponent()
 {
     delete caretTimer_;
     delete textEditorRenderer_;
 }
 
+
+/// Returns the active commandmap
 TextEditorCommandMap* TextEditorComponent::commandMap()
 {
     return controllerRef_->commandMap();
 }
 
+
+/// Returns the active configuration
 TextEditorConfig* TextEditorComponent::config()
 {
     return textDocument()->config();
 }
 
+
+/// Returns the active textdocument
 TextDocument* TextEditorComponent::textDocument()
 {
     return controllerRef_->textDocument();
 }
 
 
+/// Returns the current keymap
 TextEditorKeyMap* TextEditorComponent::keyMap()
 {
     return controllerRef_->keyMap();
 }
 
+
+/// Returns the active texteditor controller
 TextEditorController* TextEditorComponent::controller()
 {
     return controllerRef_;
 }
 
+
+/// Returns the texselection range
 TextSelection *TextEditorComponent::textSelection()
 {
     return controllerRef_->textSelection();
@@ -111,14 +123,18 @@ void TextEditorComponent::giveTextEditorRenderer(TextEditorRenderer *renderer)
     textEditorRenderer_ = renderer;
 }
 
-/// returns the size hint
+
+/// returns the size hint. This is the total size of the editor-area
 QSize TextEditorComponent::sizeHint() const
 {
     TextRenderer* ren = textRenderer();
     return QSize( ren->totalWidth(), ren->totalHeight() );
 }
 
-/// This method resets the caret time
+
+/// This method resets the caret timer
+/// The caret time is used for blinking carets
+/// When resetting the timer the caret is displayed directly
 void TextEditorComponent::resetCaretTime()
 {
     // restart the timer
@@ -141,6 +157,7 @@ void TextEditorComponent::fullUpdate()
 
 
 /// paint the editor
+/// @param paintEvent the paint event that occured
 void TextEditorComponent::paintEvent(QPaintEvent* paintEvent)
 {
     QWidget::paintEvent(paintEvent);
@@ -160,7 +177,6 @@ void TextEditorComponent::paintEvent(QPaintEvent* paintEvent)
     textRenderer()->renderBegin(translatedRect);
     textEditorRenderer_->render(&p);
     textRenderer()->renderEnd(translatedRect);
-
 
 #if DEBUG_DRAW_RENDER_CLIPPING_RECTANGLE
     // draw the untralated clipping rectangle
@@ -182,6 +198,7 @@ void TextEditorComponent::paintEvent(QPaintEvent* paintEvent)
 
 
 /// This method is used to FORCE the interception of tab events
+/// @param event the event filter
 bool TextEditorComponent::event(QEvent* event)
 {
     // keypress event
@@ -204,7 +221,6 @@ bool TextEditorComponent::event(QEvent* event)
 /// handle keypresses
 void TextEditorComponent::keyPressEvent(QKeyEvent* event)
 {
-
     int key = event->key();
 
     // unkown key return or control key
@@ -270,6 +286,7 @@ void TextEditorComponent::keyPressEvent(QKeyEvent* event)
 
 }
 
+
 /// the key release event
 void TextEditorComponent::keyReleaseEvent(QKeyEvent *event)
 {
@@ -317,14 +334,23 @@ void TextEditorComponent::inputMethodEvent( QInputMethodEvent* m )
 
 }
 
+
+/// currently unused ?!
 QVariant TextEditorComponent::inputMethodQuery( Qt::InputMethodQuery p ) const
 {
     Q_UNUSED(p);
-//    qlog_info() << "inputMethodQuery";
     return QVariant();
 }
 
+
 /// A mouse press happens
+///
+/// The normal operation is to move the caret to the character under the given mouse position.
+/// When shift is pressed, the selection is extended to the given position
+///
+/// If the controller modifier is used a new caret is added to character at the given position
+///
+/// @param event the mouse event
 void TextEditorComponent::mousePressEvent(QMouseEvent* event)
 {
     if( event->button() == Qt::LeftButton ) {
@@ -347,7 +373,9 @@ void TextEditorComponent::mousePressEvent(QMouseEvent* event)
     QWidget::mousePressEvent(event);
 }
 
+
 /// A mouse double click happens
+/// @param event the mouse double click that occured
 void TextEditorComponent::mouseDoubleClickEvent( QMouseEvent* event )
 {
     static SelectionCommand selectWord( SelectionCommand::SelectWord );
@@ -360,7 +388,8 @@ void TextEditorComponent::mouseDoubleClickEvent( QMouseEvent* event )
 
 
 /// A mouse move event
-void TextEditorComponent::mouseMoveEvent(QMouseEvent *event )
+/// @param event the mouse event
+void TextEditorComponent::mouseMoveEvent(QMouseEvent* event )
 {
     if( event->buttons() & Qt::LeftButton ) {
         TextRenderer* renderer = textRenderer();
@@ -380,17 +409,40 @@ void TextEditorComponent::mouseMoveEvent(QMouseEvent *event )
     QWidget::mouseMoveEvent(event);
 }
 
+
+/// A focus in event occured
 void TextEditorComponent::focusInEvent(QFocusEvent *event)
 {
     Q_UNUSED(event);
 }
 
-/// The focus is lost, we must STOP coalescing!
+
+/// The focus is lost, we must STOP coalescing of undo-events!
 void TextEditorComponent::focusOutEvent(QFocusEvent *event)
 {
     Q_UNUSED(event);
     // no merging for new changes!!
     textDocument()->textUndoStack()->resetAllLastCoalesceIds();
+}
+
+
+/// The default context menu is requested
+/// Add the default menu actions
+void TextEditorComponent::contextMenuEvent(QContextMenuEvent* event)
+{
+    Q_UNUSED(event);
+
+    QMenu* menu = new QMenu();
+    menu->addAction( controller()->createEditorAction("cut", tr("Cut") ) );
+    menu->addAction( controller()->createEditorAction("copy", tr("Copy") ) );
+    menu->addAction( controller()->createEditorAction("paste", tr("Paste") ) );
+    menu->addSeparator();
+    menu->addAction( controller()->createEditorAction("sel_all", tr("Select All") ) );
+
+    // contextmenu can always be placed under the current cursosr
+    menu->exec( QCursor::pos() );
+    qDeleteAll(menu->actions());
+    delete menu;
 }
 
 
@@ -451,7 +503,10 @@ void TextEditorComponent::updateAreaAroundOffset(int offset, int width )
 */
 }
 
+
 /// This method invalidates the given lines
+/// @param line the first line to update
+/// @param length the number of lines to update
 void TextEditorComponent::updateLine(int line, int length)
 {
     TextRenderer* ren = textRenderer();
@@ -461,12 +516,11 @@ void TextEditorComponent::updateLine(int line, int length)
 }
 
 
-
+/// Returns the current textrenderer
 TextRenderer *TextEditorComponent::textRenderer() const
 {
     return controllerRef_->textRenderer();
 }
-
 
 
 } // edbee
