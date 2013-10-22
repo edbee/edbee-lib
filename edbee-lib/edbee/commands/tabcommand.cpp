@@ -15,13 +15,19 @@
 
 namespace edbee {
 
+
+/// Constructs the tabcommand
+/// @param direction the direction of the tab (Forward or Backward)
+/// @param insertTab should we use a tab character?
 TabCommand::TabCommand(TabCommand::Direction direction, bool insertTab)
     : dir_( direction )
     , insertTab_( insertTab )
 {
 }
 
-/// indents or outdents the given controller
+
+/// indents or outdents in the given controller
+/// @parma controller the controller
 void TabCommand::indent( TextEditorController* controller )
 {
     TextDocument* doc  = controller->textDocument();
@@ -71,13 +77,6 @@ void TabCommand::indent( TextEditorController* controller )
 }
 
 
-/// inserts a tab
-void TabCommand::insertTab()
-{
-}
-
-
-
 /// TODO: Refactor :)
 void TabCommand::execute(TextEditorController* controller)
 {
@@ -85,7 +84,6 @@ void TabCommand::execute(TextEditorController* controller)
         indent(controller);
         return;
     }
-
 
     // retrieve the settings
     TextDocument* doc  = controller->textDocument();
@@ -135,25 +133,29 @@ void TabCommand::execute(TextEditorController* controller)
                 controller->replaceSelection("\t");
             } else {
 
-                controller->beginUndoGroup( new ComplexTextChange( controller ) );
-
-                // we need to 'calculate' the number of spaces to add
+                // we need to 'calculate' the number of spaces to add (per caret)
+                QStringList texts;
                 for( int i=0, cnt = sel->rangeCount(); i<cnt; ++i ) {
                     TextRange& range = sel->range(i);
                     int offset = range.min();
                     int col = doc->columnFromOffsetAndLine(offset);
+
+                    // calculate the number of spaces depending on the column
                     int spaces = tabSize - col%tabSize;
                     if( !spaces ) spaces = tabSize;
-                    doc->replace( offset, range.length(), QString(" ").repeated(spaces) );
+
+                    // append the text
+                    texts.push_back( QString(" ").repeated(spaces) );
                 }
 
-                controller->endUndoGroup(0,true);
-
+                controller->replaceSelection( texts );
             }
         }
     }
 }
 
+
+/// Returs the name of this command
 QString TabCommand::toString()
 {
     if( dir_ == Backward ) return "TabCommand(back)";

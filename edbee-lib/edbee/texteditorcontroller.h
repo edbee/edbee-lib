@@ -115,6 +115,7 @@ public slots:
     // replace the given selection
     virtual void replace( int offset, int length, const QString& text, int coalesceId );
     virtual void replaceSelection( const QString& text, int coalesceId=0 );
+    virtual void replaceSelection( const QStringList& texts, int coalesceId=0 );
     virtual void replaceRangeSet(TextRangeSet& rangeSet, const QString& text, int coalesceId=0 );
     virtual void replaceRangeSet(TextRangeSet& rangeSet, const QStringList& texts, int coalesceId=0 );
 

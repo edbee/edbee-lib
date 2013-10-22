@@ -555,6 +555,15 @@ void TextEditorController::replaceSelection(const QString& text, int coalesceId 
 }
 
 
+/// This method replaces the given selection with the given texts
+/// @param texts the list of texts that need to be replaced
+/// @param coalesceID the identifier for grouping undo operation
+void TextEditorController::replaceSelection(const QStringList& texts, int coalesceId)
+{
+    replaceRangeSet( *dynamic_cast<TextRangeSet*>( textSelection() ), texts, coalesceId );
+}
+
+
 ///  Replaces the given rangeset with the given text
 /// @param reangeSet hte ranges to replace
 /// @param text the text to replace the selection with
@@ -674,7 +683,6 @@ void TextEditorController::endUndoGroup(int coalesceId, bool flatten )
 {    
     textDocument()->endUndoGroup(coalesceId,flatten);
 }
-
 
 
 } // edbee

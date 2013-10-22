@@ -9,26 +9,21 @@
 
 namespace edbee {
 
+/// For inserting/executing forward and backwards tabs
 class TabCommand : public TextEditorCommand
 {
 public:
+    /// The possible directions of the tab command
     enum Direction{
         Forward,
         Backward
     };
 
-
     TabCommand( Direction direction, bool insertTab );
 
-
     virtual void indent( TextEditorController* controller );
-    virtual void insertTab();
-
-
     virtual void execute( TextEditorController* controller );
     virtual QString toString();
-
-
 
 private:
     Direction dir_;                 ///< The tab direction
