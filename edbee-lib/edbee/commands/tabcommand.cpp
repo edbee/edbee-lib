@@ -41,10 +41,20 @@ void TabCommand::indent( TextEditorController* controller )
     int lastLine = -1;
     for( int i=0, cnt = sel->rangeCount(); i<cnt; ++i ) {
         TextRange& range = sel->range(i);
+
+        // calculate the start and endline
         int startLine = doc->lineFromOffset( range.min() );
         int endLine   = doc->lineFromOffset( range.max() );
+
+        // when the last line is blank, we do NOT want to indent it (fixes #61)
+        if( startLine!=endLine && doc->columnFromOffsetAndLine(range.max(),endLine) == 0 ) {
+            --endLine;
+        }
+
+        // make sure we at least indent one line
         if( startLine <= lastLine ) startLine = lastLine + 1;
 
+        // now indent all lines
         for( int line=startLine; line<=endLine; ++line ) {
             int offset = doc->offsetFromLine(line);
 
@@ -91,7 +101,6 @@ void TabCommand::execute(TextEditorController* controller)
     int tabSize = doc->config()->indentSize();
     bool useTab = doc->config()->useTabChar();
     QString ws  = doc->config()->whitespaces();
-    QString tab = useTab ? "\t" : QString(" ").repeated(tabSize);
 
     // check if the changes are multi-line
     bool multiLine = false;
