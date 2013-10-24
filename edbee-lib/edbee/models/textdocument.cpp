@@ -208,7 +208,6 @@ void TextDocument::replaceRangeSet(TextRangeSet& rangeSet, const QStringList& te
     if( documentFilter() ) {
         documentFilter()->filterReplaceRangeSet( this, rangeSet, texts );
     }
-
     rangeSet.beginChanges();
 
     int idx = 0, oldRangeCount = 0;
@@ -217,6 +216,7 @@ void TextDocument::replaceRangeSet(TextRangeSet& rangeSet, const QStringList& te
         QString text = texts.at(idx%texts.size());  // rotating text-fetching
 
         SingleTextChangeWithCaret* change = new SingleTextChangeWithCaret(range.min(),range.length(),text,-1);
+
 
         // this can be filtered
         executeAndGiveChange( change, false );
@@ -229,7 +229,7 @@ void TextDocument::replaceRangeSet(TextRangeSet& rangeSet, const QStringList& te
         }
         range.reset();
 
-        // next range.
+        // next range
         if( rangeSet.rangeCount() < oldRangeCount ) {
 qlog_info() <<  "TEST TO SEE IF THIS REALLY HAPPENS!! I think it cannot happen. (but I'm not sure)";
 Q_ASSERT(false);

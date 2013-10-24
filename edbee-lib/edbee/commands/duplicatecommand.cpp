@@ -36,11 +36,12 @@ void DuplicateCommand::execute(TextEditorController* controller)
 
         // when the range is empty we need to use the complete line line (inclusive the newline)
         if( range.isEmpty() ) {
+
             // get the complete line
             int line = doc->lineFromOffset( range.caret() );
             range.setCaret( doc->offsetFromLine(line) );
             range.setAnchor( range.caret() );
-            newTexts.append( doc->textPart( range.caret(), doc->lineLength(line) ) );
+            newTexts.append( QString("%1\n").arg(doc->lineWithoutNewline(line)) );
 
         } else {
 
