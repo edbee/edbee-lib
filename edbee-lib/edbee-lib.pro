@@ -79,7 +79,8 @@ SOURCES += \
     edbee/commands/tabcommand.cpp \
     edbee/edbee.cpp \
     edbee/models/textdocumentfilter.cpp \
-    edbee/util/cascadingqvariantmap.cpp
+    edbee/util/cascadingqvariantmap.cpp \
+    edbee/commands/duplicatecommand.cpp
 
 HEADERS += \
     util/logging.h \
@@ -145,7 +146,8 @@ HEADERS += \
     edbee/io/keymapparser.h \
     edbee/commands/tabcommand.h \
     edbee/edbee.h \
-    edbee/util/cascadingqvariantmap.h
+    edbee/util/cascadingqvariantmap.h \
+    edbee/commands/duplicatecommand.h
     
 message($$INCLUDEPATH)
 

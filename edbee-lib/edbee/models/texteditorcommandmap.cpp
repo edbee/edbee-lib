@@ -8,6 +8,7 @@
 #include "edbee/commands/copycommand.h"
 #include "edbee/commands/cutcommand.h"
 #include "edbee/commands/debugcommand.h"
+#include "edbee/commands/duplicatecommand.h"
 #include "edbee/commands/findcommand.h"
 #include "edbee/commands/pastecommand.h"
 #include "edbee/commands/redocommand.h"
@@ -68,6 +69,9 @@ TextEditorCommandMap::TextEditorCommandMap(QObject* parent)
 
     give( "del_left", new RemoveSelectionCommand(-1) );
     give( "del_right", new RemoveSelectionCommand(1) );
+
+    // special text entry commands
+    give( "duplicate", new DuplicateCommand() );
 
     // tab entry
     //give( "tab", new ReplaceSelectionCommand( "\t", CoalesceId_InsertTab ));

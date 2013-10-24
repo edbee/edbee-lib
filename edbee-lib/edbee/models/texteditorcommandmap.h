@@ -15,6 +15,7 @@ namespace edbee {
 class TextEditorCommand;
 
 /// This is a texteditor map. This is used to map Command-Names to commands
+/// This class is the owner of the the given commands
 class TextEditorCommandMap : public QObject
 {
     Q_OBJECT
@@ -25,10 +26,6 @@ public:
     void give( const QString& key, TextEditorCommand* command );
     TextEditorCommand* get( const QString& key );
 
-signals:
-    
-public slots:
-    
 private:
     QMap<QString,TextEditorCommand*> commandMap_;       ///< The command map
 };
