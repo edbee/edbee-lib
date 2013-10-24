@@ -129,15 +129,14 @@ public:
 
     void giveMainRule( TextGrammarRule* mainRule );
 
-    QString name() { return name_; }
-    QString displayName() { return displayName_; }
-    TextGrammarRule* mainRule() { return mainRule_; }
-    QStringList fileExtensions() { return fileExtensions_; }
+    QString name() const;
+    QString displayName() const;
+    TextGrammarRule* mainRule() const;
+    QStringList fileExtensions() const;
 
     void giveToRepos( const QString& name, TextGrammarRule* rule);
     TextGrammarRule* findFromRepos( const QString& name, TextGrammarRule* defValue = 0  );
     void addFileExtension( const QString& ext );
-
 
 private:
     QString name_;                               ///< the display name of this
@@ -167,6 +166,7 @@ public:
 
     QList<QString> grammarNames();
     QList<TextGrammar*> grammars();
+    QList<TextGrammar*> grammarsSortedByDisplayName();
 
     TextGrammar* defaultGrammar() { return defaultGrammarRef_; }
     TextGrammar* detectGrammarWithFilename( const QString& fileName );

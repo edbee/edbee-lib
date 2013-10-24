@@ -209,6 +209,35 @@ void TextGrammar::giveMainRule(TextGrammarRule* mainRule)
 }
 
 
+/// return the name of the textgrammar
+QString TextGrammar::name() const
+{
+    return name_;
+}
+
+
+/// Returns the displayname of this grammar
+QString TextGrammar::displayName() const
+{
+    return displayName_;
+}
+
+
+/// Returns the main grammar rule for this textgrammar
+TextGrammarRule* TextGrammar::mainRule() const
+{
+    return mainRule_;
+}
+
+
+/// Returns all file extensions that are used by this grammar
+/// @return a stringlist with all extension (without the '.')
+QStringList TextGrammar::fileExtensions() const
+{
+    return fileExtensions_;
+}
+
+
 /// This method adds the given grammar rule to the repos
 void TextGrammar::giveToRepos(const QString& name, TextGrammarRule* rule)
 {
@@ -243,7 +272,7 @@ TextGrammarManager::TextGrammarManager()
 {
 
     // always make sure there's a default grammar
-    defaultGrammarRef_ = new TextGrammar( "", "Plain Text" );
+    defaultGrammarRef_ = new TextGrammar( "text.plain", "Plain Text" );
     defaultGrammarRef_->giveMainRule( TextGrammarRule::createMainRule(defaultGrammarRef_,"text.plain") );
     giveGrammar( defaultGrammarRef_ );
 }
@@ -272,7 +301,7 @@ void TextGrammarManager::readAllGrammarFilesInPath(const QString& path )
         // read the file
         TextGrammar* grammar = 0;
         if( file.open( QIODevice::ReadOnly) ) {
-            grammar = parser.readContent( &file );
+            grammar = parser.readContent( &file );           
             file.close();
             if( grammar ) {
                 giveGrammar( grammar );
@@ -298,7 +327,19 @@ TextGrammar* TextGrammarManager::get(const QString &name)
 void TextGrammarManager::giveGrammar(TextGrammar* grammar)
 {
     const QString name = grammar->name();
-    if( grammarMap_.contains(name)) { delete grammarMap_.take(name); }
+
+    // when the grammar already exists delete it
+    if( grammarMap_.contains(name)) {
+        TextGrammar* oldGrammar = grammarMap_.take(name);
+
+        // when the old grammar was the default, replace the default (feels pretty dirty)
+        if( defaultGrammarRef_ == oldGrammar ) {
+            defaultGrammarRef_ = grammar;
+        }
+
+        // clearup the old one
+        delete oldGrammar;
+    }
     grammarMap_.insert(name,grammar);
 }
 
@@ -314,6 +355,26 @@ QList<QString> TextGrammarManager::grammarNames()
 QList<TextGrammar*> TextGrammarManager::grammars()
 {
     return grammarMap_.values();
+}
+
+
+/// This method is used to compare the grammarnames of textgrammars
+/// @param g1 the first grammar
+/// @param g2 the second grammar to compare
+static bool grammarsDisplayNameSorterLessThen( const TextGrammar* g1, const TextGrammar* g2 )
+{
+    return g1->displayName().toLower() < g2->displayName().toLower();
+}
+
+
+/// This utility function returns all grammars sorted on displayname
+/// Warning, this method sorts the grammars so calling this method multiple times is not what you want to do
+/// @return the list of grammars sorted on displayname
+QList<TextGrammar*> TextGrammarManager::grammarsSortedByDisplayName()
+{
+    QList<TextGrammar*> results = grammarMap_.values();
+    qSort( results.begin(), results.end(), grammarsDisplayNameSorterLessThen );
+    return results;
 }
 
 
