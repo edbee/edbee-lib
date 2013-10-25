@@ -344,7 +344,7 @@ void TextEditorController::onTextChanged( edbee::TextBufferChange change )
     Q_UNUSED(change);
 
     /// update the selection
-    textSelection()->changeSpatial( change.offset(), change.length(), change.newTextLength() );
+//    textSelection()->changeSpatial( change.offset(), change.length(), change.newTextLength() );
 
     /// TODO: improve this:
     if( widgetRef_) {

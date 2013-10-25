@@ -9,8 +9,18 @@
 
 namespace edbee {
 
+
+/// The default constructor
 TextEditorCommand::TextEditorCommand()
 {
 }
+
+
+/// A blank virtual destructor
+TextEditorCommand::~TextEditorCommand()
+{
+
+}
+
 
 } // edbee

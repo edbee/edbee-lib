@@ -16,6 +16,10 @@ class TextDocumentTest : public edbee::test::TestCase
 private slots:
 
     void testLineData();
+    void testReplaceRangeSet_simple();
+    void testReplaceRangeSet_sizeDiff();
+    void testReplaceRangeSet_simpleInsert();
+    void testReplaceRangeSet_delete();
 
 };
 

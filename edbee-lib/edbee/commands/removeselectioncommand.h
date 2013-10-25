@@ -11,18 +11,18 @@ namespace edbee {
 
 class TextEditorController;
 
+/// Removes the current selection
 class RemoveSelectionCommand : public TextEditorCommand
 {
 public:
     RemoveSelectionCommand(int direction);
-
     virtual int commandId();
-
     virtual void execute( TextEditorController* controller );
     virtual QString toString();
 
 private:
     int direction_;             ///< The direction
 };
+
 
 } // edbee

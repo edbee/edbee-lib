@@ -17,6 +17,8 @@
 
 namespace edbee {
 
+
+/// The default complex textchange constructor
 ComplexTextChange::ComplexTextChange(TextEditorController* controller)
     : TextChangeGroup(controller)
     , previousSelection_(0)
@@ -27,11 +29,14 @@ ComplexTextChange::ComplexTextChange(TextEditorController* controller)
     }
 }
 
+
+/// The default destructor
 ComplexTextChange::~ComplexTextChange()
 {
     delete newSelection_;
     delete previousSelection_;
 }
+
 
 /// the group is closed, we must 'store' the selection
 void ComplexTextChange::groupClosed()
@@ -41,7 +46,10 @@ void ComplexTextChange::groupClosed()
     }
 }
 
-void ComplexTextChange::execute(TextDocument *document)
+
+/// Executes this textchange
+/// @param document the document to execute this operation for
+void ComplexTextChange::execute(TextDocument* document)
 {
     TextChangeGroup::execute( document );
     if( newSelection_ ) {
@@ -50,7 +58,10 @@ void ComplexTextChange::execute(TextDocument *document)
     }
 }
 
-/// this method is called to rever the operation
+
+
+/// this method is called to revert the operation
+/// reverts the given operation
 void ComplexTextChange::revert( TextDocument* document )
 {
     TextChangeGroup::revert(document);
@@ -68,6 +79,9 @@ void ComplexTextChange::revert( TextDocument* document )
 bool ComplexTextChange::mergeTextChange( TextDocument* document, SingleTextChange* gTextChange, int& nextTextChangeMergeIndex )
 {
     bool result = false;
+//qlog_info() << "MERGE=============";
+//qlog_info() << "A> " << toString();
+//qlog_info() << "B> " << gTextChange->toString();
 
     // find the location to MERGE it with in the list
     for( int i=nextTextChangeMergeIndex, cnt=size(); i<cnt; ++i ) {
@@ -157,6 +171,7 @@ public:
 /// this method tries to merge the textchange with this text change
 bool ComplexTextChange::merge(TextDocument* document, TextChange* textChange)
 {
+    // when the new change isn't a group change return
     ComplexTextChange* groupChange = dynamic_cast<ComplexTextChange*>( textChange );
     if( !groupChange ) return false;
 
@@ -231,6 +246,7 @@ bool ComplexTextChange::merge(TextDocument* document, TextChange* textChange)
 
 
     } // for group
+
 
     // add a end marker
     if( appendMergeEndMarker ) {        

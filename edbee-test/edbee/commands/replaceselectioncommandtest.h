@@ -12,7 +12,6 @@ class TextEditorController;
 class TextEditorWidget;
 class TextEditorController;
 
-
 class ReplaceSelectionCommandTest : public edbee::test::TestCase
 {
     Q_OBJECT
@@ -27,6 +26,7 @@ private slots:
 
 
     void testUndo();
+
 #if 0
 
     void testCoalesce_normalEntry();

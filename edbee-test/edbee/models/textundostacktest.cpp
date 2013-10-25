@@ -31,6 +31,7 @@ namespace edbee {
 
 void TextUndoStackTest::testMultiCaretUndoIssue196()
 {
+
     TextEditorWidget widget;
     TextDocument* doc = widget.textDocument();
     TextEditorController* controller = widget.controller();
@@ -68,6 +69,7 @@ void TextUndoStackTest::testMultiCaretUndoIssue196()
 
     testEqual( doc->text(), "1a2b3c4d" );
     testEqual( controller->textSelection()->rangesAsString(), "2>2,4>4");
+
 
 /*
 

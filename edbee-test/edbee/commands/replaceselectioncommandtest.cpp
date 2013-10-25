@@ -122,6 +122,9 @@ void ReplaceSelectionCommandTest::testUndo()
         delete widget;
 }
 
+
+/// BIG FIXME, we need to get back these unit test. The tests below are for the older implementation
+
 #if 0
 
 /// Asserts the documents.

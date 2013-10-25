@@ -758,13 +758,18 @@ void TextRangeSetBase::processChangesIfRequired(bool joinBorders )
     }
 }
 
+
 /// This method adds (or removes) the given spatial length at the given location.
 ///
 /// It adjusts all locations, anchors with the given locations. It automaticly moves carets,
 /// 'removes' selection etc.
+///
+/// @param pos the position to add the spatial length to
+/// @param length the length of the text that's changed
+/// @param newLength the new length of the text
 void TextRangeSetBase::changeSpatial(int pos, int length, int newLength)
 {
-    // chagne the ranges
+    // change the ranges
     int endPos = pos + length;
     int delta = newLength - length;
     int newEndPos = endPos + delta;
@@ -781,14 +786,14 @@ void TextRangeSetBase::changeSpatial(int pos, int length, int newLength)
         // anchor
         if( pos < anchor && anchor < endPos ) {
             anchor = newEndPos;
-        } else if( anchor > pos ) {
+        } else if( anchor >= pos ) {
             anchor  += delta;
         }
 
         // caret
         if( pos < caret && caret < endPos ) {
             caret  = newEndPos;
-        } else if( caret > pos ) {
+        } else if( caret >= pos ) {
             caret  += delta;
         }
 
@@ -801,6 +806,13 @@ void TextRangeSetBase::changeSpatial(int pos, int length, int newLength)
 // =====================================
 
 
+/// Constructs a textrange set
+/// @param doc the document for this rangeset
+TextRangeSet::TextRangeSet(TextDocument* doc)
+    : TextRangeSetBase( doc )
+{
+}
+
 
 /// the copy constructor for copying a selection
 /// @param sel the ranges to copy
@@ -810,6 +822,7 @@ TextRangeSet::TextRangeSet( const TextRangeSet& sel )
     selectionRanges_ = sel.selectionRanges_;
 }
 
+
 // An operation to copy the selection with a pointer
 TextRangeSet::TextRangeSet( const TextRangeSet* sel )
     : TextRangeSetBase( sel->textDocument() )
@@ -818,9 +831,7 @@ TextRangeSet::TextRangeSet( const TextRangeSet* sel )
 }
 
 
-
-
-/// copy the values
+/// copy the value from the rangeset
 TextRangeSet& TextRangeSet::operator=(const TextRangeSet& sel)
 {
     textDocumentRef_ = sel.textDocumentRef_;
@@ -835,6 +846,7 @@ TextRangeSet *TextRangeSet::clone() const
     return new TextRangeSet( *this );
 }
 
+
 /// returns the selection range
 TextRange& TextRangeSet::range(int idx)
 {
@@ -843,6 +855,7 @@ TextRange& TextRangeSet::range(int idx)
     return selectionRanges_[idx];
 }
 
+
 /// Returns a const reference from the
 const TextRange &TextRangeSet::constRange(int idx) const
 {
@@ -850,6 +863,7 @@ const TextRange &TextRangeSet::constRange(int idx) const
     Q_ASSERT( idx < selectionRanges_.size() );
     return selectionRanges_.at(idx);
 }
+
 
 /// Adds a text range
 void TextRangeSet::addRange(int anchor, int caret)
@@ -866,6 +880,7 @@ void TextRangeSet::removeRange(int idx)
     processChangesIfRequired();
 }
 
+
 /// This method removes ALL carets except the 'global' selection
 void TextRangeSet::clear()
 {
@@ -874,12 +889,15 @@ void TextRangeSet::clear()
     selectionRanges_.clear();
 }
 
+
 /// Converts the range to a single range selection
 void TextRangeSet::toSingleRange()
 {
     selectionRanges_.remove(1,selectionRanges_.size()-1);
 }
 
+
+/// Sorts the ranges
 void TextRangeSet::sortRanges()
 {
     qSort(selectionRanges_.begin(), selectionRanges_.end(), TextRange::lessThan );

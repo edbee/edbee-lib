@@ -37,8 +37,11 @@ private:
 };
 
 
+
+/// Tests the line data manager
 void TextLineDataTest::testLineDataManager()
 {
+
     TextLineDataManager ldm;
     testEqual( filledTestString(ldm ), "-");
 

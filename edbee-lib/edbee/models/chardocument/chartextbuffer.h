@@ -5,13 +5,14 @@
 
 #pragma once
 
-
 #include "edbee/models/textbuffer.h"
 #include "edbee/util/gapvector.h"
 #include "edbee/util/lineoffsetvector.h"
 
 namespace edbee {
 
+
+/// This textbuffer implementation uses QChars for storing the data.
 class CharTextBuffer : public TextBuffer
 {
 public:
@@ -28,14 +29,12 @@ public:
     virtual int lineFromOffset( int offset );
     virtual int offsetFromLine( int line );
 
-
     virtual void rawAppendBegin();
     virtual void rawAppend( QChar c );
     virtual void rawAppend( const QChar* data, int dataLength );
     virtual void rawAppendEnd();
 
     virtual QChar* rawDataPointer();
-
 
     /// TODO: Temporary debug method. REMOVE!!
     LineOffsetVector& lineOffsetList() { return lineOffsetList_; }

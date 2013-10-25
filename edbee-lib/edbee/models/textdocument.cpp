@@ -198,9 +198,10 @@ void TextDocument::replaceRangeSet(TextRangeSet& rangeSet, const QString& textIn
 /// @param rangeSet the range to replace
 /// @param texts the list of texts to paste in the rangeset.
 /// @param coalesceId the coalesceId of the operation
-/// @param controller the controller of the opration
+/// @param controller the controller of the operation
 void TextDocument::replaceRangeSet(TextRangeSet& rangeSet, const QStringList& textsIn, int coalesceId, TextEditorController* controller)
 {
+//qlog_info() << "replaceRangeSet: " << rangeSet.rangesAsString() << ", " << textsIn.join(".");
 
     beginUndoGroup( new ComplexTextChange( controller) );
 
@@ -210,16 +211,32 @@ void TextDocument::replaceRangeSet(TextRangeSet& rangeSet, const QStringList& te
     }
     rangeSet.beginChanges();
 
+int delta = 0;
+
     int idx = 0, oldRangeCount = 0;
     while( idx < (oldRangeCount = rangeSet.rangeCount())  ) {
         TextRange& range = rangeSet.range(idx);
         QString text = texts.at(idx%texts.size());  // rotating text-fetching
 
-        SingleTextChangeWithCaret* change = new SingleTextChangeWithCaret(range.min(),range.length(),text,-1);
+//qlog_info() << " ["<<  idx << "] - " <<  range.toString() << " : " << text << " (" << rangeSet.rangesAsString() << ")";
 
+//qlog_info() << idx << ">> " << text << " : delta="<<delta<<", " << range.toString();
+range.setCaret( range.caret() + delta );
+range.setAnchor( range.anchor() + delta );
+//qlog_info() << "  => " << range.toString();
+delta += (text.length() - range.length());
+
+//qlog_info() << "      - " <<  range.toString() << " : " << text << " (" << rangeSet.rangesAsString() << ")";
+
+
+
+SingleTextChangeWithCaret* change = new SingleTextChangeWithCaret(range.min(),range.length(),text,-1);
 
         // this can be filtered
         executeAndGiveChange( change, false );
+
+//qlog_info() << "      => " <<  rangeSet.rangesAsString();
+
 
         // so we need to adjust the caret with the (possible) adjusted change
         if( change->caret() < 0 ) {
@@ -238,6 +255,7 @@ Q_ASSERT(false);
         } else {
             ++idx;
         }
+
     }
 
     rangeSet.endChanges();

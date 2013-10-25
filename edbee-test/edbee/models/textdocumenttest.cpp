@@ -8,9 +8,10 @@
 #include <QStringList>
 #include <QDebug>
 
-#include "edbee/models/textbuffer.h"
 #include "edbee/models/chardocument/chartextdocument.h"
+#include "edbee/models/textbuffer.h"
 #include "edbee/models/textlinedata.h"
+#include "edbee/models/textrange.h"
 
 #include "debug.h"
 
@@ -26,9 +27,9 @@ do { \
 } while(false)
 
 
+/// Test the line data handling of line data
 void TextDocumentTest::testLineData()
 {
-
     CharTextDocument doc;
     TextBuffer* buf = doc.buffer();
     buf->appendText("aaa\nbbb\nccc");
@@ -77,7 +78,88 @@ void TextDocumentTest::testLineData()
     buf->replaceText(0,100,"");
     testBuffer( buf, "","0");
     testTrue( doc.getLineData( 0, 0 ) == 0 );
+}
 
+
+/// adds a simple replacement
+/// a) "a[b]cd" => "aX[]cd"
+/// b) "a[X]c[d] => "aR[]cS[]"
+void TextDocumentTest::testReplaceRangeSet_simple()
+{
+    CharTextDocument doc;
+    doc.append("abcd");
+
+    // create the ranges
+    TextRangeSet ranges(&doc);
+    ranges.addRange(1,2);
+
+    // execute the replace, this should also move the ranges
+    doc.replaceRangeSet( ranges, "X", 0 );
+    testEqual( doc.text(), "aXcd");
+    testEqual( ranges.rangesAsString(), "2>2");
+
+    // next test multiple carets
+    /// b) "a[X]b[c]d => "aR[]bSd
+    ranges.setRange(1,2);
+    ranges.addRange(3,4);
+    doc.replaceRangeSet( ranges, QString("R,S").split(","), 0 );
+    testEqual( doc.text(), "aRcS");
+    testEqual( ranges.rangesAsString(), "2>2,4>4");
+}
+
+
+/// Test the replace rangeset operation
+/// test =>  "a[bc]de[fg]h" => "aX|deY|h
+void TextDocumentTest::testReplaceRangeSet_sizeDiff()
+{
+    CharTextDocument doc;
+    doc.append("abcdefgh");
+
+    // create the ranges
+    TextRangeSet ranges(&doc);
+    ranges.addRange(1,3);
+    ranges.addRange(5,7);
+
+    // execute the replace, this should move the ranges
+    doc.replaceRangeSet( ranges, QString("X,Y").split(","), 0 );
+    testEqual( doc.text(), "aXdeYh");
+}
+
+
+/// Implements a simple text insert with multiple ranges
+/// a|b|cd => aX|bY|cd
+void TextDocumentTest::testReplaceRangeSet_simpleInsert()
+{
+    CharTextDocument doc;
+    doc.append("abcd");
+
+    // create the ranges
+    TextRangeSet ranges(&doc);
+    ranges.addRange(1,1);
+    ranges.addRange(2,2);
+
+    doc.replaceRangeSet( ranges, QString("X,Y").split(","), 0 );
+    testEqual( doc.text(), "aXbYcd");
+    testEqual( ranges.rangesAsString(), "2>2,4>4" );
+
+}
+
+
+/// Tests a delete operation
+/// a[1]b2c[3]d4 =>  a|b2c|d4
+void TextDocumentTest::testReplaceRangeSet_delete()
+{
+    CharTextDocument doc;
+    doc.append("a1b2c3d4");
+
+    // create the ranges
+    TextRangeSet ranges(&doc);
+    ranges.addRange(1,2);
+    ranges.addRange(5,6);
+
+    doc.replaceRangeSet( ranges, "", 0 );
+    testEqual( doc.text(), "ab2cd4" );
+    testEqual( ranges.rangesAsString(), "1>1,4>4" );
 }
 
 

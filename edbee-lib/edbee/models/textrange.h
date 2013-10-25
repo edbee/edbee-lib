@@ -192,7 +192,7 @@ protected:
 class TextRangeSet : public TextRangeSetBase
 {
 public:
-    TextRangeSet( TextDocument* doc ) : TextRangeSetBase( doc ) {}
+    TextRangeSet( TextDocument* doc );
     TextRangeSet( const TextRangeSet& sel );
     TextRangeSet( const TextRangeSet* sel );
     virtual ~TextRangeSet() {}
@@ -208,7 +208,6 @@ public:
     virtual void clear();
     virtual void toSingleRange();
     virtual void sortRanges();
-
 
 private:
 

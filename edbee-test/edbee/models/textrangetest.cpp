@@ -366,23 +366,23 @@ void TextRangeSetTest::testMoveCarets()
 /// This method test that changing of the spatial information
 void TextRangeSetTest::testChangeSpatial()
 {
-    //                #..|.[ ]| [   | ]..
-    //===============[012|3456|78901|2345|]
+
     bufRef_->appendText("a1\nbb2\nccc3\n...\n");
+
+
     selRef_->addRange(0,0);
     // range (0,0)
     selRef_->addRange(4,6);
     selRef_->addRange(8,13);
     testRanges("0>0,4>6,8>13");
 
-    // insert a single character at (0)
+    // "|a1#b[b2]#c[cc3#.]..#" => "|Xa1#b[b2]#c[cc3#.]..#"
     selRef_->changeSpatial(0,0,1);
-    testRanges("0>0,5>7,9>14");
+    testRanges("1>1,5>7,9>14");
 
-    // The 'document' now is this: "?a1|bb2|ccc3|...\n");
+    // "|Xa1#b[b2]#c[cc3#.]..#" => "Xa1#[b2]#c[cc3#.]..#" );
     selRef_->changeSpatial(4,2,0);
-    testRanges("0>0,4>5,7>12");
-
+    testRanges("1>1,4>5,7>12");
 
 //    sel_->addRange(0,0);
 //    sel_->changeSpatial(0, 1);

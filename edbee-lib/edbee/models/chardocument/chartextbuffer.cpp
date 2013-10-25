@@ -12,6 +12,9 @@
 
 namespace edbee {
 
+
+/// The constructor of the textbuffer
+/// @param a reference to the parent
 CharTextBuffer::CharTextBuffer(QObject *parent)
     : TextBuffer( parent )
     , rawAppendStart_(-1)
@@ -20,11 +23,17 @@ CharTextBuffer::CharTextBuffer(QObject *parent)
 }
 
 
+/// Returns the length of the buffer
+/// @return the length of the given text
 int CharTextBuffer::length() const
 {
     return buf_.length();
 }
 
+
+/// Returns the character at the given character
+/// @param offset the offset of the given character
+/// @return the character at the given offset
 QChar CharTextBuffer::charAt(int offset) const
 {
     Q_ASSERT(offset >= 0);
@@ -32,6 +41,11 @@ QChar CharTextBuffer::charAt(int offset) const
     return buf_.at(offset);
 }
 
+
+/// Returns the text part
+/// @param pos the position of the given text
+/// @param length the length of the text to get
+/// @return returns a part of the text
 QString CharTextBuffer::textPart(int pos, int length) const
 {
     // do NOT use data here. Data moves the gap!
@@ -43,6 +57,12 @@ QString CharTextBuffer::textPart(int pos, int length) const
     return result;
 }
 
+
+/// replaces the given text
+/// @param offset the offset of the text to replace
+/// @param length the length of the text to replace
+/// @param buffer a pointer to a buffer with data
+/// @param bufferLenth the length of the buffer
 void CharTextBuffer::replaceText(int offset, int length, const QChar* buffer, int bufferLength )
 {
 
@@ -74,12 +94,10 @@ void CharTextBuffer::replaceText(int offset, int length, const QChar* buffer, in
 
 }
 
-//void CharTextBuffer::replaceText(int pos, int length, const QString& text)
-//{
-//}
 
-
-/// Because tha editor requests the same offset MANY times results are cached
+/// Returns the line position at the given offset
+/// @param offset the offset to retreive the line from
+/// @return the line from the given offset
 int CharTextBuffer::lineFromOffset(int offset )
 {
 //    int result = lineFromOffsetSearch(offset);
@@ -87,7 +105,10 @@ int CharTextBuffer::lineFromOffset(int offset )
     return result;
 }
 
+
 /// This method returns the offset of the given line
+/// @param lin the line to retrieve the offset from
+/// @return the offset of the given line
 int CharTextBuffer::offsetFromLine(int line)
 {
 //    const QList<int>& lofs = lineOffsets_;
@@ -99,6 +120,8 @@ int CharTextBuffer::offsetFromLine(int line)
 
 }
 
+
+/// Starts raw data appending to the buffer
 void CharTextBuffer::rawAppendBegin()
 {
     Q_ASSERT(rawAppendStart_ == -1 );
@@ -107,22 +130,29 @@ void CharTextBuffer::rawAppendBegin()
     rawAppendLineStart_ = lineCount();
 }
 
+
+/// Appends a buffer of text to the document
+/// @param data the data to append
+/// @param dataLength the number of bytes availble by the data pointer
 void CharTextBuffer::rawAppend(const QChar* data, int dataLength)
 {
     buf_.append( data, dataLength );
 }
 
+
+/// Append a single character to the buffer in raw mode
+/// @param c the character to append
 void CharTextBuffer::rawAppend(QChar c)
 {
     buf_.append( c );
 }
+
 
 /// Ends the 'raw' appending of data
 void CharTextBuffer::rawAppendEnd()
 {
     Q_ASSERT(rawAppendStart_ >= 0 );
     Q_ASSERT(rawAppendLineStart_ >= 0 );
-
 
     // append all the newlines to the vector
     /*
@@ -143,6 +173,7 @@ void CharTextBuffer::rawAppendEnd()
     rawAppendLineStart_ = -1;
     rawAppendStart_     = -1;
 }
+
 
 /// This method returns the raw data pointer
 /// WARNING calling this method moves the gap of the gapvector to the end. Which could involve a lot of data moving
