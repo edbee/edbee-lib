@@ -38,6 +38,8 @@ void TabCommand::indent( TextEditorController* controller )
 
     controller->beginUndoGroup( new ComplexTextChange( controller ) );
 
+    sel->beginChanges();
+
     int lastLine = -1;
     for( int i=0, cnt = sel->rangeCount(); i<cnt; ++i ) {
         TextRange& range = sel->range(i);
@@ -61,6 +63,7 @@ void TabCommand::indent( TextEditorController* controller )
             // insert-tab
             if( dir_ == Forward ) {
                 doc->replace(offset,0, tab );
+                sel->changeSpatial( offset, 0, tab.length(), true );
 
             // remove tab
             } else {
@@ -77,13 +80,17 @@ void TabCommand::indent( TextEditorController* controller )
                 }
                 if( offset != (endOffset-offset)) {
                     doc->replace( offset, endOffset-offset, "" );
+                    sel->changeSpatial( offset, endOffset-offset, 0, true );
                 }
             }
 
         }
         lastLine = endLine;
     }
-    controller->endUndoGroup(0,true);
+
+    sel->endChanges();
+
+    controller->endUndoGroup( CoalesceId_Indent + dir_, true );
 }
 
 
@@ -139,7 +146,7 @@ void TabCommand::execute(TextEditorController* controller)
     } else {
         if( dir_ == Forward) {
             if( useTab ) {
-                controller->replaceSelection("\t");
+                controller->replaceSelection("\t", CoalesceId_Indent + SubCoalesceId_Indent_InsertTab );
             } else {
 
                 // we need to 'calculate' the number of spaces to add (per caret)
@@ -157,7 +164,7 @@ void TabCommand::execute(TextEditorController* controller)
                     texts.push_back( QString(" ").repeated(spaces) );
                 }
 
-                controller->replaceSelection( texts );
+                controller->replaceSelection( texts, CoalesceId_Indent + SubCoalesceId_Indent_InsertSpaces  );
             }
         }
     }

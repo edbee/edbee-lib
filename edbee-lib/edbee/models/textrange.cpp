@@ -738,9 +738,12 @@ void TextRangeSetBase::setRange(int anchor, int caret, int index)
     range(index).set( anchor, caret );
 }
 
-/// Sets the range
+
+/// Sets the range at the given index.
+/// Make sure the given index exists!!
 /// @param the range to use
-void TextRangeSetBase::setRange(const TextRange &range, int index )
+/// @param index the index of the range to change (when not given index 0 is assumed)
+void TextRangeSetBase::setRange(const TextRange& range, int index )
 {
     setRange( range.anchor(), range.caret(), index );
 }
@@ -767,8 +770,11 @@ void TextRangeSetBase::processChangesIfRequired(bool joinBorders )
 /// @param pos the position to add the spatial length to
 /// @param length the length of the text that's changed
 /// @param newLength the new length of the text
-void TextRangeSetBase::changeSpatial(int pos, int length, int newLength)
+/// @param sticky, when sticky the caret/anchor is sticky and isn't moved if the change happens at the same location
+void TextRangeSetBase::changeSpatial(int pos, int length, int newLength, bool sticky )
 {
+    int stickyDelta = sticky ? 0 : -1;
+
     // change the ranges
     int endPos = pos + length;
     int delta = newLength - length;
@@ -786,14 +792,14 @@ void TextRangeSetBase::changeSpatial(int pos, int length, int newLength)
         // anchor
         if( pos < anchor && anchor < endPos ) {
             anchor = newEndPos;
-        } else if( anchor >= pos ) {
+        } else if( anchor > (pos+stickyDelta) ) {
             anchor  += delta;
         }
 
         // caret
         if( pos < caret && caret < endPos ) {
             caret  = newEndPos;
-        } else if( caret >= pos ) {
+        } else if( caret > (pos+stickyDelta) ) {
             caret  += delta;
         }
 

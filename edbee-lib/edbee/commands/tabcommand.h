@@ -19,6 +19,15 @@ public:
         Backward
     };
 
+    /// Extra possible coalesce (sub-ids)
+    enum {
+        SubCoalesceId_Indent_Forward = Forward,
+        SubCoalesceId_Indent_Backward = Backward,
+        SubCoalesceId_Indent_InsertTab,
+        SubCoalesceId_Indent_InsertSpaces
+    };
+
+
     TabCommand( Direction direction, bool insertTab );
 
     virtual void indent( TextEditorController* controller );

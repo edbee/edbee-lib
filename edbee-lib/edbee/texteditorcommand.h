@@ -27,7 +27,7 @@ enum CoalesceId {
     CoalesceId_Backspace     = 4 << 16,
     CoalesceId_Delete        = 5 << 16,
     CoalesceId_InsertNewLine = 6 << 16,
-    CoalesceId_InsertTab     = 7 << 16,
+    CoalesceId_Indent        = 7 << 16,
     CoalesceId_CutLine       = 8 << 16,
     CoalesceId_Paste         = 9 << 16,
     CoalesceId_Duplicate     = 10 << 16,

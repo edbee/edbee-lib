@@ -162,7 +162,7 @@ public:
 
   // changing
     //    void growSelectionAtBegin( int amount );
-    void changeSpatial(int pos, int length, int newLength );
+    void changeSpatial(int pos, int length, int newLength, bool sticky=false );
 
     void setRange( int anchor, int caret, int index = 0 );
     void setRange( const TextRange& range , int index = 0 );
