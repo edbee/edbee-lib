@@ -571,6 +571,7 @@ void TextEditorController::replaceSelection(const QStringList& texts, int coales
 void TextEditorController::replaceRangeSet(TextRangeSet& rangeSet, const QString& text, int coalesceId)
 {
     textDocument()->replaceRangeSet(rangeSet, text, coalesceId, this );
+    notifyStateChange();
 }
 
 
@@ -581,6 +582,7 @@ void TextEditorController::replaceRangeSet(TextRangeSet& rangeSet, const QString
 void TextEditorController::replaceRangeSet(TextRangeSet& rangeSet, const QStringList& texts, int coalesceId)
 {
     textDocument()->replaceRangeSet( rangeSet, texts, coalesceId, this );
+    notifyStateChange();
 }
 
 
