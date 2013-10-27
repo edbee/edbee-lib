@@ -9,31 +9,32 @@
 
 namespace edbee {
 
-/// The selection action
+/// The selection command is used to move the caret and anchors to
+/// make selections and move the carets around
 class SelectionCommand : public TextEditorCommand
 {
 public:
     enum SelectionType {
 
       // movement and selection
-        MoveCaretByCharacter,
-        // SubWord, // TODO, implement subword selectin
-        MoveCaretByWord,
-        MoveCaretByLine,
-        MoveCaretByPage,
-        MoveCaretToLineBoundary,
-        MoveCaretToDocumentBegin,
-        MoveCaretToDocumentEnd,
-        MoveCaretToExactOffset,         // amount is the exact offset value
+        MoveCaretByCharacter,           ///< Moves the caret(s) by the given amount of characters
+        // SubWord, // TODO, implement subword selecting
+        MoveCaretByWord,                ///< moves the caret(s) by the given amount of words
+        MoveCaretByLine,                ///< moves the caret(s) by the given amount of lines
+        MoveCaretByPage,                ///< moves the caret(s) by the given amount of pages
+        MoveCaretToLineBoundary,        ///< moves the caret to a line-boundary (<0 begin of line, >0 end of line)
+        MoveCaretToDocumentBegin,       ///< moves the caret to the document start
+        MoveCaretToDocumentEnd,         ///< moves the caret to the document end
+        MoveCaretToExactOffset,         ///< moves the caret to the given offset (given in  amount)
 
       // selection only
-        SelectAll,                      // amount is not used
-        SelectWord,                     // select a full word
-        SelectFullLine,                 // select a full line
+        SelectAll,                      ///< selects the complete document
+        SelectWord,                     ///< select a full word
+        SelectFullLine,                 ///< select a full line
 
       // add an extra caret
-        AddCaretAtOffset,                // amount is the caret offset
-        AddCaretByLine,                 /// amount is the amount of lines and the direction to add
+        AddCaretAtOffset,               ///< adds a extra caret at the given offset (amount is the caret offset)
+        AddCaretByLine,                 ///< adds a caret at the given line amount is the amount of lines and the direction to add
         ResetSelection
     };
 

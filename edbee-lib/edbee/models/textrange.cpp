@@ -158,7 +158,11 @@ void TextRange::moveCaretByCharGroup(TextDocument *doc, int amount, const QStrin
     }
 }
 
+
 /// This moves the caret to a line boundary
+/// @param doc the document this range operates on
+/// @param amount the direction to move to
+/// @par    am whitespace the characters that need to be interpreted as whitespace
 void TextRange::moveCaretToLineBoundary(TextDocument* doc, int amount, const QString& whitespace )
 {
     TextBuffer* buf     = doc->buffer();
@@ -176,9 +180,12 @@ void TextRange::moveCaretToLineBoundary(TextDocument* doc, int amount, const QSt
             caret = lineStart;
         }
     } else {
-        if( caret == doc->length() ) return;    // do nothing
+
         caret = offsetNextLine;
-        if( caret < doc->length() ) --caret;
+        if( line != doc->lineCount()-1 ) {
+            --caret;
+        }
+
     }
     setCaretBounded( doc, caret );
 }
@@ -226,7 +233,6 @@ void TextRange::expandToFullLine(TextDocument* doc, int amount)
         if( maxLineStartOffset != maxOffset ) {
             maxOffset = doc->offsetFromLine( doc->lineFromOffset(maxOffset)+1 );
         }
-
 
         caret_ = minOffset;
         anchor_ = maxOffset;
@@ -637,6 +643,7 @@ void TextRangeSetBase::moveCarets( int amount )
     processChangesIfRequired();
 }
 
+
 /// This method moves the carets
 void TextRangeSetBase::moveCaretsByCharGroup(int amount, const QString& whitespace, const QStringList& characterGroups )
 {
@@ -646,15 +653,22 @@ void TextRangeSetBase::moveCaretsByCharGroup(int amount, const QString& whitespa
     processChangesIfRequired();
 }
 
-void TextRangeSetBase::moveCaretsToLineBoundary(int amount , const QString& whitespace)
+
+/// Moves al carets to the given line boundary (line-boundary automaticly switches between column 0 and first non-whitespace character)
+/// @param direction the direction < 0 to the start of the line (or first char)  > 0 to the end of the line
+/// @param whitespace the characters to see as whitespace
+void TextRangeSetBase::moveCaretsToLineBoundary(int direction , const QString& whitespace)
 {
+    // process all carets
     for( int rangeIdx=rangeCount()-1; rangeIdx >= 0; --rangeIdx ) {
-        range(rangeIdx).moveCaretToLineBoundary(textDocument(), amount, whitespace );
+        range(rangeIdx).moveCaretToLineBoundary(textDocument(), direction, whitespace );
     }
     processChangesIfRequired();
 }
 
 
+/// This method merges overlapping ranges
+/// @param joinBorders if joinborders is set, borders next to eachother are also interpretted as overlap. (inclusive/exclusive switch)
 void TextRangeSetBase::mergeOverlappingRanges( bool joinBorders )
 {
     // check the ranges

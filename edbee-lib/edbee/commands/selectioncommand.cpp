@@ -18,6 +18,11 @@
 
 namespace edbee {
 
+
+/// The constructor of the selection command
+/// @param unit the unit of this command
+/// @param amount the number of steps
+/// @param keepSelection when true the anchor stays put (and the selection is expanded)
 SelectionCommand::SelectionCommand( SelectionType unit, int amount, bool keepSelection )
     : unit_(unit)
     , amount_(amount)
@@ -25,11 +30,15 @@ SelectionCommand::SelectionCommand( SelectionType unit, int amount, bool keepSel
 {
 }
 
+
+/// The descructor of the command
 SelectionCommand::~SelectionCommand()
 {
 }
 
-// Return the command id
+
+/// Return the command id
+/// This is th coalesceId + the given selection item
 int SelectionCommand::commandId()
 {
     int coalesceId = CoalesceId_Selection + unit_* 10;
@@ -37,7 +46,9 @@ int SelectionCommand::commandId()
     return coalesceId;
 }
 
-/// execute the selection
+
+/// execute the given selection command
+/// @param controller the controller to execute the selection for
 void SelectionCommand::execute( TextEditorController* controller )
 {
     // save the selection state
@@ -138,7 +149,6 @@ void SelectionCommand::execute( TextEditorController* controller )
             break;
     }
 
-
     if( resetAnchors ) {
         sel->resetAnchors();
     }
@@ -149,10 +159,13 @@ void SelectionCommand::execute( TextEditorController* controller )
         return; // 0
     }
 
-
     controller->changeAndGiveTextSelection( sel, commandId() );
 }
 
+
+/// Converts the unit enumeration to a string
+/// @param unit the unit enumeration value
+/// @return the string representation of this unit
 static QString unitToString( int unit ) {
     switch( unit ) {
       case SelectionCommand::MoveCaretByCharacter: return "MoveCaretByCharacter";
@@ -172,6 +185,8 @@ static QString unitToString( int unit ) {
     }
 }
 
+
+/// Converts this command to a strings
 QString SelectionCommand::toString()
 {
     return QString("SelectionCommand(%1)").arg( unitToString(unit_) );

@@ -27,7 +27,6 @@ do { \
 } while(false)
 
 
-
 /// Creates a selection object
 /// @param doc the document to use
 /// @param definition the definition. In the format  anchor>caret,anchor>caret
@@ -44,20 +43,21 @@ static void addRanges( TextRangeSet* sel, const QString& definition )
 }
 
 
-
+/// Inializes this testcase
 void TextRangeTest::init()
 {
     doc_ = new CharTextDocument();
     bufRef_ = doc_->buffer();
 }
 
+
+/// cleansup this test case
 void TextRangeTest::clean()
 {
     bufRef_ = 0;
     delete doc_;
     doc_ = 0;
 }
-
 
 
 void TextRangeTest::testMoveCaret()
@@ -80,6 +80,7 @@ void TextRangeTest::testMoveCaret()
     range.moveCaret(doc_,10);
     testEqual( range.caret(), bufRef_->length() );
 }
+
 
 void TextRangeTest::testMoveCaretWhileChar()
 {
@@ -113,8 +114,8 @@ void TextRangeTest::testMoveCaretWhileChar()
 
     range.moveCaretWhileChar( doc_, -1, "a c" );
     testEqual( range.caret(), 0 );
-
 }
+
 
 void TextRangeTest::testMoveCaretUntilChar()
 {
@@ -139,7 +140,6 @@ void TextRangeTest::testMoveCaretUntilChar()
     testEqual( range.caret(), 0 );
 
 }
-
 
 
 void TextRangeTest::testMoveCaretByCharGroup()
@@ -218,12 +218,18 @@ void TextRangeTest::testMoveCaretToLineBoundary()
     range.moveCaretToLineBoundary( doc_, 1, ws );  // And should move to the end again
     testEqual( range.caret(), endDocPos );
 
+    // test issue #77
+    bufRef_->setText("a\nb\n");
+    range.set(2,2);
+    range.moveCaretToLineBoundary( doc_, 1, ws );
+    testEqual( range.caret(), 3 );
+
+
 }
 
 
-
-
 //=================================================================================
+
 
 /// initializes the test case
 void TextRangeSetTest::init()
@@ -235,6 +241,7 @@ void TextRangeSetTest::init()
     selRef_->clear();   // remove all ranges
 }
 
+
 /// cleans the test case
 void TextRangeSetTest::clean()
 {
@@ -245,12 +252,12 @@ void TextRangeSetTest::clean()
 }
 
 
-
 /// This method tests the constructor of the selection
 void TextRangeSetTest::testConstructor()
 {
     testRanges("");  // caret and anchor should be together
 }
+
 
 /// This method test the overlapping ranges
 void TextRangeSetTest::testAddRange()
@@ -303,8 +310,8 @@ void TextRangeSetTest::testRangesBetweenOffsets()
     testTrue( selRef_->rangesBetweenOffsets( 0, 4, first, last ) );
     testEqual( first, 0 );
     testEqual( last, 1);
-
 }
+
 
 /// This method 'tests' the movement of caters
 void TextRangeSetTest::testMoveCarets()
@@ -359,16 +366,13 @@ void TextRangeSetTest::testMoveCarets()
 
         selRef_->moveCarets(1);
         testRanges("0>3,4>13");
-
-
 }
+
 
 /// This method test that changing of the spatial information
 void TextRangeSetTest::testChangeSpatial()
 {
-
     bufRef_->appendText("a1\nbb2\nccc3\n...\n");
-
 
     selRef_->addRange(0,0);
     // range (0,0)
@@ -434,8 +438,6 @@ void TextRangeSetTest::testSubstractRange()
     testRanges("2>4,6>10");
 
 }
-
-
 
 
 } // edbee

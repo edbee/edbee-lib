@@ -14,6 +14,8 @@ class TextDocument;
 class TextEditorController;
 class TextRangeSet;
 
+
+/// The base TextRange test classs
 class TextRangeTest : public edbee::test::TestCase
 {
     Q_OBJECT
@@ -34,6 +36,7 @@ private:
 };
 
 
+/// Tests a set of ranges
 class TextRangeSetTest : public edbee::test::TestCase
 {
     Q_OBJECT

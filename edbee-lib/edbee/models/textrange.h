@@ -156,7 +156,7 @@ public:
   // movement
     void moveCarets( int amount );
     void moveCaretsByCharGroup( int amount, const QString& whitespace, const QStringList& charGroups );
-    void moveCaretsToLineBoundary( int amount, const QString& whitespace  );
+    void moveCaretsToLineBoundary(int direction, const QString& whitespace  );
     void moveCaretsByLine( int amount );
 
 
