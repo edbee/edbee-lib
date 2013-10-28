@@ -344,6 +344,23 @@ TextRange &TextRangeSetBase::firstRange()
 }
 
 
+/// This method returns the range index at the given offset
+/// @param offset the offset to check
+/// @return the offset index or -1 if not found
+int TextRangeSetBase::rangeIndexAtOffset(int offset)
+{
+    // find the range of this offset
+    for( int i=0, cnt = rangeCount(); i<cnt; ++i ) {
+        TextRange& found = this->range(i);
+        int minOffset = found.min();
+        int maxOffset = found.max();
+        if( minOffset <= offset && offset <= maxOffset ) {
+            return i;
+        }
+    }
+    return -1;
+}
+
 
 /// returns the range indices that are being overlapped by the given offsetBegin and offsetEnd
 /// @param offsetBegin the offset to search
@@ -538,6 +555,12 @@ void TextRangeSetBase::endChangesWithoutProcessing()
 }
 
 
+/// Checks if the current rangeset is in a changing state
+bool TextRangeSetBase::changing() const
+{
+    return changing_ != 0;
+}
+
 
 /// adds a range
 void TextRangeSetBase::addRange(const TextRange& range)
@@ -633,6 +656,48 @@ void TextRangeSetBase::expandToWords(const QString& whitespace, const QStringLis
     }
     processChangesIfRequired();
 }
+
+
+/// Selects the word at the given offset
+/// @param offset the offset of the wordt to select
+void TextRangeSetBase::selectWordAt(int offset, const QString& whitespace, const QStringList& characterGroups )
+{
+    TextRange newRange(offset,offset);
+    newRange.expandToWord( textDocument(), whitespace, characterGroups );
+    addRange(newRange);
+    processChangesIfRequired();
+}
+
+/// Toggles a word selection at the given location
+/// The idea is the following, double-click an empty place to select the wordt at the given location
+/// Double click an existing selection to remove the selection (and caret)
+void TextRangeSetBase::toggleWordSelectionAt(int offset, const QString& whitespace, const QStringList& characterGroups)
+{
+    int idx = rangeIndexAtOffset( offset );
+
+    // range found
+    if( idx >= 0) {
+        TextRange& found = this->range(idx);
+
+        // found a range with selection
+        if( found.hasSelection() ) {
+
+            // when multiple range, just remove the range
+            if( rangeCount() > 1 ) {
+                removeRange(idx);
+                return;
+
+            // when this is the last range, just place the caret
+            } else {
+                found.set(offset,offset);
+                return;
+            }
+        }
+    }
+    // default operation is select word at
+    selectWordAt( offset, whitespace, characterGroups );
+}
+
 
 /// This method moves the carets by character
 void TextRangeSetBase::moveCarets( int amount )

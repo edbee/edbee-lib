@@ -120,6 +120,7 @@ public:
     TextRange& lastRange();
     TextRange& firstRange();
 
+    int rangeIndexAtOffset( int offset );
     bool rangesBetweenOffsets( int offsetBegin, int offsetEnd, int& firstIndex, int& lastIndex );
     bool rangesBetweenOffsetsExlusiveEnd( int offsetBegin, int offsetEnd, int& firstIndex, int& lastIndex );
     bool rangesAtLine( int line, int& firstIndex, int& lastIndex );
@@ -137,7 +138,7 @@ public:
     void beginChanges();
     void endChanges();
     void endChangesWithoutProcessing();
-    bool changing() const { return changing_ != 0; }
+    bool changing() const;
 
     void resetAnchors();
     void clearSelection();
@@ -152,6 +153,8 @@ public:
   // selection
     void expandToFullLines(int amount);
     void expandToWords( const QString& whitespace, const QStringList& characterGroups);
+    void selectWordAt(int offset , const QString& whitespace, const QStringList& characterGroups);
+    void toggleWordSelectionAt( int offset, const QString& whitespace, const QStringList& characterGroups);
 
   // movement
     void moveCarets( int amount );

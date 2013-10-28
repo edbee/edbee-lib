@@ -31,6 +31,8 @@ public:
         SelectAll,                      ///< selects the complete document
         SelectWord,                     ///< select a full word
         SelectFullLine,                 ///< select a full line
+        SelectWordAt,                   ///< select 'toggles' a word. Double click on a word to select a word or deselect a word
+        ToggleWordSelectionAt,          ///< Toggles the selection and caret at the given location
 
       // add an extra caret
         AddCaretAtOffset,               ///< adds a extra caret at the given offset (amount is the caret offset)

@@ -123,6 +123,16 @@ void SelectionCommand::execute( TextEditorController* controller )
             resetAnchors = false;   // do not reset the anchors
             break;
 
+        case SelectWordAt:
+            sel->selectWordAt( amount_, document->config()->whitespaces(), document->config()->charGroups() );
+            resetAnchors = false;
+            break;
+
+        case ToggleWordSelectionAt:
+            sel->toggleWordSelectionAt( amount_, document->config()->whitespaces(), document->config()->charGroups() );
+            resetAnchors = false;
+            break;
+
         case SelectFullLine:
             sel->expandToFullLines( amount_);
             resetAnchors = false;
@@ -177,6 +187,8 @@ static QString unitToString( int unit ) {
       case SelectionCommand::MoveCaretToExactOffset: return "MoveCaretToExactOffset";
       case SelectionCommand::SelectAll: return "SelectAll";
       case SelectionCommand::SelectWord: return "SelectWord";
+      case SelectionCommand::SelectWordAt: return "SelectWordAt";
+      case SelectionCommand::ToggleWordSelectionAt: return "ToggleWordSelectionAt";
       case SelectionCommand::SelectFullLine: return "SelectFullLine";
       case SelectionCommand::AddCaretAtOffset: return "AddCaretAtOffset";
       case SelectionCommand::AddCaretByLine: return "AddCaretByLine";

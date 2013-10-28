@@ -380,7 +380,21 @@ void TextEditorComponent::mouseDoubleClickEvent( QMouseEvent* event )
 {
     static SelectionCommand selectWord( SelectionCommand::SelectWord );
     if( event->button() == Qt::LeftButton ) {
-        controller()->executeCommand( &selectWord  );
+
+        if( event->modifiers()&Qt::ControlModifier ) {
+
+            // get the location of the double
+            int x = event->x();
+            int y = event->y();
+            int line = textRenderer()->rawLineIndexForYpos( y );
+            int col = textRenderer()->columnIndexForXpos( line, x );
+
+            // add the word there
+            SelectionCommand toggleWordSelectionAtCommand( SelectionCommand::ToggleWordSelectionAt, textDocument()->offsetFromLineAndColumn(line,col) );
+            controller()->executeCommand( &toggleWordSelectionAtCommand );
+        } else {
+            controller()->executeCommand( &selectWord  );
+        }
     }
     QWidget::mouseDoubleClickEvent(event);
 }
