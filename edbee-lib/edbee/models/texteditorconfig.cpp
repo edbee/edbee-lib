@@ -9,6 +9,10 @@
 
 namespace edbee {
 
+
+/// The default constructor
+/// Fills this configuration object with some sane defaults
+/// @param parent the parent references of this Qobject
 TextEditorConfig::TextEditorConfig( QObject* parent )
     : QObject(parent)
     , changeInProgressLevel_(0)
@@ -17,6 +21,7 @@ TextEditorConfig::TextEditorConfig( QObject* parent )
     , caretBlinkingRate_(700)   // 0 means no blinking (default = 700)
     , indentSize_(4)
     , useTabChar_(true)
+    , smartTab_(true)
     , charGroups_()
     , whitespaces_("\n\t ")
     , whitespaceWithoutNewline_("\t ")
@@ -30,10 +35,12 @@ TextEditorConfig::TextEditorConfig( QObject* parent )
     charGroups_.append( QString("./\\()\"'-:,.;<>~!@#$%^&*|+=[]{}`~?"));
 }
 
+
 /// empty constructor :)
 TextEditorConfig::~TextEditorConfig()
 {
 }
+
 
 /// use this method to start a group of changes.
 /// Default behaviour is to emit a configChanged signal if a setting is changed
@@ -45,7 +52,9 @@ void TextEditorConfig::beginChanges()
     ++changeInProgressLevel_;
 }
 
-/// use this
+
+/// Ends the previous call of beginChanges. It will notify a change
+/// when all items have been changes
 void TextEditorConfig::endChanges()
 {
     Q_ASSERT(changeInProgressLevel_ > 0 );
@@ -55,13 +64,16 @@ void TextEditorConfig::endChanges()
     }
 }
 
+
 /// Returns the caret width in pixels
 int TextEditorConfig::caretWidth() const
 {
     return caretWidth_;
 }
 
-/// Sets the caret redner width in pixels
+
+/// Sets the caret render width in pixels
+/// @param width the caret width in pixels
 void TextEditorConfig::setCaretWidth(int width)
 {
     if( caretWidth_ != width ) {
@@ -70,6 +82,7 @@ void TextEditorConfig::setCaretWidth(int width)
     }
 }
 
+
 /// Returns the caret blinking rate (delay) (lower means faster )
 /// The blinking delay is in milliseconds
 int TextEditorConfig::caretBlinkingRate() const
@@ -77,8 +90,9 @@ int TextEditorConfig::caretBlinkingRate() const
     return  caretBlinkingRate_;
 }
 
+
 /// Sets the caret blinking rate (delay) (lower means faster )
-/// The blinking delay is in milliseconds
+/// @param rate The blinking delay is in milliseconds
 void TextEditorConfig::setCaretBlinkRate(int rate)
 {
     if( caretBlinkingRate_ != rate ) {
@@ -87,13 +101,16 @@ void TextEditorConfig::setCaretBlinkRate(int rate)
     }
 }
 
+
 /// Returns the indent size in the number of characters
 int TextEditorConfig::indentSize() const
 {
     return indentSize_;
 }
 
+
 /// Sets the indentsize in characters
+/// @param size the size of indentation in nr of characters
 void TextEditorConfig::setIndentSize(int size)
 {
     if( indentSize_ != size ) {
@@ -102,13 +119,16 @@ void TextEditorConfig::setIndentSize(int size)
     }
 }
 
+
 /// Should the tab-character be used?
-bool TextEditorConfig::useTabChar()
+bool TextEditorConfig::useTabChar() const
 {
     return useTabChar_;
 }
 
+
 /// Should the tab-character be used?
+/// @param enable enable or disable the use of tab characters
 void TextEditorConfig::setUseTabChar(bool enable)
 {
     if( useTabChar_ != enable ) {
@@ -116,6 +136,26 @@ void TextEditorConfig::setUseTabChar(bool enable)
         notifyChange();
     }
 }
+
+
+/// Returns the state of smarttab mode
+/// Smarttab enables the automatic addition of indents
+bool TextEditorConfig::smartTab() const
+{
+    return smartTab_;
+}
+
+
+/// Sets the smarttab mode
+/// @param enable should smarttab be enabled
+void TextEditorConfig::setSmartTab(bool enable)
+{
+    if( smartTab_ != enable ) {
+        smartTab_ = enable;
+        notifyChange();
+    }
+}
+
 
 /// Returns the characters groups
 /// Character groups are groups that considered the 'same' kind of characters.
@@ -125,6 +165,7 @@ const QStringList& TextEditorConfig::charGroups() const
 {
     return charGroups_;
 }
+
 
 /// Sets the character groups
 /// @see TextEditorConfig::charGroups
@@ -136,11 +177,13 @@ void TextEditorConfig::setCharGroups(const QStringList &items)
     }
 }
 
+
 /// Returns all white-space characters
 const QString& TextEditorConfig::whitespaces() const
 {
     return whitespaces_;
 }
+
 
 /// Sets the whitespace characters
 void TextEditorConfig::setWhitespaces(const QString& value)
@@ -151,12 +194,16 @@ void TextEditorConfig::setWhitespaces(const QString& value)
     }
 }
 
+
 /// Retuns the whitespace character without newlines
 const QString& TextEditorConfig::whitespaceWithoutNewline() const
 {
     return whitespaceWithoutNewline_;
 }
 
+
+/// Sets the characters that are considered whitespace. Excluding the newline character
+/// @param value the list of characters that are considered whitespace characters
 void TextEditorConfig::setWhitespaceWithoutNewline(const QString& value)
 {
     if( whitespaceWithoutNewline_ != value ) {
@@ -165,13 +212,16 @@ void TextEditorConfig::setWhitespaceWithoutNewline(const QString& value)
     }
 }
 
+
 /// Returns the extra line spacing in pixels
 int TextEditorConfig::extraLineSpacing() const
 {
     return extraLineSpacing_;
 }
 
+
 /// Sets the extra line spacing between lines in pixels
+/// @param value the number of extra line-spacing between editor lines
 void TextEditorConfig::setExtraLineSpacing(int value)
 {
     if( useLineSeparator_ != value ) {
@@ -180,12 +230,14 @@ void TextEditorConfig::setExtraLineSpacing(int value)
     }
 }
 
+
 /// Should we use a line seperator pen
 /// @see TextEditorConfig::lineSeparatorPen
 bool TextEditorConfig::useLineSeparator() const
 {
     return useLineSeparator_;
 }
+
 
 /// Should we use a sline seperator?
 /// @see TextEditorConfig::lineSeparatorPen
@@ -197,6 +249,7 @@ void TextEditorConfig::setUseLineSeparator(bool value)
     }
 }
 
+
 /// The line sperator pen to use.When the setting useLineSeparator is set
 /// this pen is used to draw lines between the text-lines
 /// @see TextEditorConfig::useLineSeparator
@@ -204,6 +257,7 @@ const QPen& TextEditorConfig::lineSeparatorPen() const
 {
     return lineSeparatorPen_;
 }
+
 
 /// This method sets the line seperator pen that used to paint
 /// line between the text-lines
@@ -216,6 +270,7 @@ void TextEditorConfig::setLineSeperatorPen(const QPen& pen)
     }
 }
 
+
 /// Should a space result in a new 'undo-group'
 /// The default behaviour is that pressing a space character results in the
 /// closing of an undo group. (This groups the entered characters into 1 undo operation)
@@ -223,6 +278,7 @@ bool TextEditorConfig::undoGroupPerSpace() const
 {
     return undoGroupPerSpace_;
 }
+
 
 /// Sets the undo group per space value
 /// @see TextEditorConfig::undoGroupPerSpace
@@ -234,6 +290,7 @@ void TextEditorConfig::setUndoGroupPerSpace(bool enable)
     }
 }
 
+
 /// should the caret-offset been shown. The texteditor can signal a
 /// statusbar text to a slot. This text can optionally contain the
 /// current caret offset
@@ -241,6 +298,7 @@ bool TextEditorConfig::showCaretOffset() const
 {
     return showCaretOffset_;
 }
+
 
 /// Enables / disables the passing of the character offset
 /// @see TextEditorConfig::showCaretOffset
@@ -252,6 +310,7 @@ void TextEditorConfig::setShowCaretOffset(bool enable)
     }
 }
 
+
 /// returns the active theme name
 /// (The theme name is the name without the file-extension of the file in the theme directory)
 QString TextEditorConfig::themeName()
@@ -259,7 +318,9 @@ QString TextEditorConfig::themeName()
     return themeName_;
 }
 
+
 /// This method sets the active theme name
+/// @param name the name of the active theme (this is the filename of the theme without the extension)
 void TextEditorConfig::setThemeName(const QString& name)
 {
     if( themeName_ != name ) {
@@ -268,11 +329,13 @@ void TextEditorConfig::setThemeName(const QString& name)
     }
 }
 
+
 /// returns the current font to use
 QFont TextEditorConfig::font() const
 {
     return font_;
 }
+
 
 /// Changes the font that's used by the editor
 void TextEditorConfig::setFont(const QFont& font)
@@ -282,6 +345,7 @@ void TextEditorConfig::setFont(const QFont& font)
         notifyChange();
     }
 }
+
 
 /// This internal method is used to notify the listener that a change has happend
 /// Thi smethod only emits a signal if there's no config group change busy
@@ -293,8 +357,6 @@ void TextEditorConfig::notifyChange()
         changeCount_= 0;
     }
 }
-
-
 
 
 } // edbee

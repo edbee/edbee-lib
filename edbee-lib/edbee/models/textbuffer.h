@@ -140,7 +140,6 @@ public:
     virtual int findCharPosOrClamp( int offset, int direction, const QString& chars, bool equals );
     virtual int findCharPosWithinRangeOrClamp( int offset, int direction, const QString& chars, bool equals, int beginRange, int endRange );
 
-
     virtual QString lineOffsetsAsString();
 
  signals:

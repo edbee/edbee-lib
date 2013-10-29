@@ -34,8 +34,11 @@ public:
     int indentSize() const;
     void setIndentSize( int size );
 
-    bool useTabChar();
+    bool useTabChar() const;
     void setUseTabChar( bool enable );
+
+    bool smartTab() const;
+    void setSmartTab( bool enable );
 
     const QStringList& charGroups() const;
     void setCharGroups( const QStringList& items );
@@ -67,13 +70,9 @@ public:
     QFont font() const ;
     void setFont( const QFont& font );
 
-public slots:
-
 
 signals:
-
     void configChanged();
-
 
 protected:
     void notifyChange();
@@ -87,6 +86,8 @@ private:
     int caretBlinkingRate_;             ///< The caret blinking rate
     int indentSize_;                    ///< The ident-size in characters
     bool useTabChar_;                   ///< Should the tab character be used?
+    bool smartTab_;                     ///< Is smarttab enabled?
+
     QStringList charGroups_;            ///< Character groups
     QString whitespaces_;               ///< All whitespaces
     QString whitespaceWithoutNewline_;  ///< Whitespace characters without newline
@@ -97,8 +98,6 @@ private:
     bool showCaretOffset_;              ///< Show the caret offset?
     QString themeName_;                 ///< The active theme name
     QFont font_;                        ///< The font to used
-
-
 };
 
 } // edbee

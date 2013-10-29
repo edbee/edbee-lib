@@ -11,6 +11,7 @@
 #include "edbee/commands/duplicatecommand.h"
 #include "edbee/commands/findcommand.h"
 #include "edbee/commands/pastecommand.h"
+#include "edbee/commands/newlinecommand.h"
 #include "edbee/commands/redocommand.h"
 #include "edbee/commands/removeselectioncommand.h"
 #include "edbee/commands/replaceselectioncommand.h"
@@ -65,7 +66,7 @@ TextEditorCommandMap::TextEditorCommandMap(QObject* parent)
     give( "sel_reset", new SelectionCommand( SelectionCommand::ResetSelection ) );
 
     // line entry
-    give( "ins_newline", new ReplaceSelectionCommand( "\n", CoalesceId_InsertNewLine ));
+    give( "ins_newline", new NewlineCommand() );
 
     give( "del_left", new RemoveSelectionCommand(-1) );
     give( "del_right", new RemoveSelectionCommand(1) );

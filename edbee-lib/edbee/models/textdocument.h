@@ -112,14 +112,11 @@ public:
     void replace( int offset, int length, const QString& text, int coalesceId=0);
     void setText( const QString& text );
 
-
-
     // raw access for filling the document
     void rawAppendBegin();
     void rawAppendEnd();
     void rawAppend( QChar c );
     void rawAppend(const QChar *chars, int length );
-
 
 public:
 

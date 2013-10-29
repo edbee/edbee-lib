@@ -349,7 +349,6 @@ void TextDocument::rawAppend(const QChar* chars, int length)
     buffer()->rawAppend(chars,length);
 }
 
-
 /// This method executes the given 'multi-text-change'
 //void TextDocument::giveChange(TextChange *change, bool merge)
 //{

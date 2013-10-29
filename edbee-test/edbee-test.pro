@@ -31,7 +31,9 @@ SOURCES += \
     edbee/models/textundostacktest.cpp \
     edbee/util/cascadingqvariantmaptest.cpp \
     edbee/models/textsearchertest.cpp \
-    edbee/commands/duplicatecommandtest.cpp
+    edbee/commands/duplicatecommandtest.cpp \
+    edbee/commands/newlinecommandtest.cpp \
+    edbee/util/utiltest.cpp
 
 HEADERS += \
 	edbee/commands/replaceselectioncommandtest.h \
@@ -49,7 +51,9 @@ HEADERS += \
     edbee/models/textundostacktest.h \
     edbee/util/cascadingqvariantmaptest.h \
     edbee/models/textsearchertest.h \
-    edbee/commands/duplicatecommandtest.h
+    edbee/commands/duplicatecommandtest.h \
+    edbee/commands/newlinecommandtest.h \
+    edbee/util/utiltest.h
 
 
 INCLUDEPATH += $$PWD/../edbee-lib

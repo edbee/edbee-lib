@@ -80,7 +80,9 @@ SOURCES += \
     edbee/edbee.cpp \
     edbee/models/textdocumentfilter.cpp \
     edbee/util/cascadingqvariantmap.cpp \
-    edbee/commands/duplicatecommand.cpp
+    edbee/commands/duplicatecommand.cpp \
+    edbee/commands/newlinecommand.cpp \
+    edbee/util/util.cpp
 
 HEADERS += \
     util/logging.h \
@@ -147,7 +149,9 @@ HEADERS += \
     edbee/commands/tabcommand.h \
     edbee/edbee.h \
     edbee/util/cascadingqvariantmap.h \
-    edbee/commands/duplicatecommand.h
+    edbee/commands/duplicatecommand.h \
+    edbee/commands/newlinecommand.h \
+    edbee/util/util.h
     
 message($$INCLUDEPATH)
 
