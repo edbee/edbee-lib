@@ -38,7 +38,7 @@ public:
     void scrollPositionVisible( int xPosIn, int yPosIn );
 
     // a whole bunch of getters
-    inline TextEditorController* controller() const;
+    TextEditorController* controller() const;
     TextEditorConfig* config() const;
     TextEditorCommandMap* commandMap() const;
     TextEditorKeyMap* keyMap() const;
