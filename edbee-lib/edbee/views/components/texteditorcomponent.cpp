@@ -18,7 +18,9 @@
 #include "edbee/models/textundostack.h"
 #include "edbee/texteditorcommand.h"
 #include "edbee/texteditorcontroller.h"
+#include "edbee/texteditorwidget.h"
 #include "edbee/views/components/texteditorrenderer.h"
+#include "edbee/views/texteditorscrollarea.h"
 #include "edbee/views/textrenderer.h"
 #include "edbee/views/textselection.h"
 
@@ -84,14 +86,14 @@ TextEditorCommandMap* TextEditorComponent::commandMap()
 
 
 /// Returns the active configuration
-TextEditorConfig* TextEditorComponent::config()
+TextEditorConfig* TextEditorComponent::config() const
 {
     return textDocument()->config();
 }
 
 
 /// Returns the active textdocument
-TextDocument* TextEditorComponent::textDocument()
+TextDocument* TextEditorComponent::textDocument() const
 {
     return controllerRef_->textDocument();
 }
@@ -128,7 +130,16 @@ void TextEditorComponent::giveTextEditorRenderer(TextEditorRenderer *renderer)
 QSize TextEditorComponent::sizeHint() const
 {
     TextRenderer* ren = textRenderer();
-    return QSize( ren->totalWidth(), ren->totalHeight() );
+    int height = ren->totalHeight();
+
+    // when scroll past end is enabled we need to be able to scroll past the last line
+    if( config()->scrollPastEnd() ) {
+        int viewPortHeight = controllerRef_->widget()->textScrollArea()->size().height();
+        height += viewPortHeight;
+        height -= textRenderer()->lineHeight()*2;   // *2 because we have an extra blank line at the end
+    }
+
+    return QSize( ren->totalWidth(), height );
 }
 
 

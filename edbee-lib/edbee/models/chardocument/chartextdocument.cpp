@@ -26,7 +26,7 @@
 
 namespace edbee {
 
-
+/// The main contstructor of the chartext document
 CharTextDocument::CharTextDocument(QObject *object)
     : TextDocument(object)
     , config_(0)
@@ -65,6 +65,8 @@ CharTextDocument::CharTextDocument(QObject *object)
     connect( textScopes_, SIGNAL(lastScopedOffsetChanged(int,int)), this, SIGNAL(lastScopedOffsetChanged(int,int)) );
 }
 
+
+/// The default constructor
 CharTextDocument::~CharTextDocument()
 {
     delete textUndoStack_;
@@ -75,11 +77,13 @@ CharTextDocument::~CharTextDocument()
     delete config_;
 }
 
+
 /// returns the language grammar
 TextGrammar *CharTextDocument::languageGrammar()
 {
     return textLexer_->grammar();
 }
+
 
 /// Sets the language grammar
 void CharTextDocument::setLanguageGrammar(TextGrammar* grammar)
@@ -92,12 +96,23 @@ void CharTextDocument::setLanguageGrammar(TextGrammar* grammar)
 }
 
 
+/// This method returns the configuration
+TextEditorConfig*CharTextDocument::config() const
+{
+    return config_;
+}
+
+
 // currently not implemented
 //TextLineData* CharTextDocument::takeLineData(int line, int field)
 //{
 //    return textLineDataManager_->take( line, field );
 //}
 
+
+/// Gives a change to the undo stack without invoking the filter
+/// @param change the change to execute
+/// @param coalesceId the coalescing identifier
 void CharTextDocument::giveChangeWithoutFilter(TextChange *change, int coalesceId )
 {
     textUndoStack()->giveChange( change, coalesceId);

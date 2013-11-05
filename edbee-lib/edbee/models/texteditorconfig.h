@@ -70,6 +70,9 @@ public:
     QFont font() const ;
     void setFont( const QFont& font );
 
+    bool scrollPastEnd() const;
+    void setScrollPastEnd( bool enabled );
+
 
 signals:
     void configChanged();
@@ -98,6 +101,8 @@ private:
     bool showCaretOffset_;              ///< Show the caret offset?
     QString themeName_;                 ///< The active theme name
     QFont font_;                        ///< The font to used
+
+    bool scrollPastEnd_;                ///< Should the last line of the document be  scrollable to the top of the window
 };
 
 } // edbee

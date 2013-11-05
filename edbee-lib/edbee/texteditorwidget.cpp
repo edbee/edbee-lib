@@ -206,10 +206,12 @@ QScrollBar* TextEditorWidget::horizontalScrollBar() const
     return scrollAreaRef_->horizontalScrollBar();
 }
 
+
 QScrollBar* TextEditorWidget::verticalScrollBar() const
 {
     return scrollAreaRef_->verticalScrollBar();
 }
+
 
 /// Use this method to change a scrollbar. By using this method listeners of the scrollbar
 /// well be informed the scrollbar has been changed
@@ -226,11 +228,13 @@ void TextEditorWidget::setHorizontalScrollBar(QScrollBar *scrollBar)
     emit verticalScrollBarChanged( scrollBar );
 }
 
+
 void TextEditorWidget::resizeEvent(QResizeEvent* event)
 {
     QWidget::resizeEvent(event);
     updateRendererViewport();
 }
+
 
 /// a basic event-filter for recieving focus-events of the ditor
 bool TextEditorWidget::eventFilter(QObject* obj, QEvent* event)

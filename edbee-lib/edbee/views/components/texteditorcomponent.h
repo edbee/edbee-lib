@@ -30,8 +30,8 @@ public:
     virtual ~TextEditorComponent();
 
     TextEditorCommandMap* commandMap();
-    TextEditorConfig* config();
-    TextDocument* textDocument();
+    TextEditorConfig* config() const;
+    TextDocument* textDocument() const;
     TextEditorKeyMap* keyMap();
     TextEditorController* controller();
     TextSelection* textSelection();

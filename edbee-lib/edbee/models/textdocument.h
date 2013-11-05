@@ -90,7 +90,7 @@ public:
     virtual void setPersisted(bool enabled=true);
 
     /// this method should return the config
-    virtual TextEditorConfig* config() = 0; 
+    virtual TextEditorConfig* config() const = 0;
 
     virtual void setDocumentFilter( TextDocumentFilter* filter );
     virtual void giveDocumentFilter( TextDocumentFilter* filter );

@@ -31,6 +31,7 @@ TextEditorConfig::TextEditorConfig( QObject* parent )
     , undoGroupPerSpace_(true)
     , showCaretOffset_(true)
     , themeName_("Monokai")
+    , scrollPastEnd_(false)
 {
     charGroups_.append( QString("./\\()\"'-:,.;<>~!@#$%^&*|+=[]{}`~?"));
 }
@@ -342,6 +343,26 @@ void TextEditorConfig::setFont(const QFont& font)
 {
     if( font_ != font ) {
         font_ = font;
+        notifyChange();
+    }
+}
+
+
+/// returns the scroll past end setting
+/// @return
+bool TextEditorConfig::scrollPastEnd() const
+{
+    return scrollPastEnd_;
+}
+
+
+/// Sets the scroll past end option.
+/// When enabled the last line of the document is scrollable to the top of the window
+/// @param enabled should scroll past end be enabled ?
+void TextEditorConfig::setScrollPastEnd(bool enabled)
+{
+    if( scrollPastEnd_ != enabled ) {
+        scrollPastEnd_ = enabled;
         notifyChange();
     }
 }

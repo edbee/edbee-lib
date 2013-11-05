@@ -69,8 +69,7 @@ public:
     /// returns the text undo stack
     virtual TextUndoStack* textUndoStack() { return textUndoStack_; }
 
-    /// This method returns the configuration
-    virtual TextEditorConfig* config() { return config_; }
+    virtual TextEditorConfig* config() const;
 
     virtual void giveChangeWithoutFilter(TextChange* change, int coalesceId );
 
