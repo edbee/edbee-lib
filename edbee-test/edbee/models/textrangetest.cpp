@@ -60,6 +60,7 @@ void TextRangeTest::clean()
 }
 
 
+/// tests the move carets operations
 void TextRangeTest::testMoveCaret()
 {
     bufRef_->appendText("regel 1.\n   leading whitespace\n   \n trailing  whitespace   \neof");
@@ -82,6 +83,53 @@ void TextRangeTest::testMoveCaret()
 }
 
 
+/// Test the move caret or deselect operation
+/// The move caret or deselect operation depends on the state of the range
+void TextRangeTest::testMoveCaretOrDeselect()
+{
+    bufRef_->setText("abcdefghijklmnop");
+
+    // test normal move left
+    TextRange range(1,1);
+    range.moveCaretOrDeselect(doc_,-1);
+    testEqual( range.caret(), 0);
+    testEqual( range.anchor(), 1);
+
+    // test normal move right
+    range.moveCaretOrDeselect(doc_,1);
+    testEqual( range.caret(), 1);
+    testEqual( range.anchor(), 1);
+
+    // when there's a range is should be placed to the left
+    range.set( 1, 2 );
+    range.moveCaretOrDeselect(doc_,-1);
+    testEqual( range.caret(), 1);
+    testEqual( range.anchor(), 1);
+
+    // and test the reverse
+    range.set( 2, 1 );
+    range.moveCaretOrDeselect(doc_,-1);
+    testEqual( range.caret(), 1);
+    testEqual( range.anchor(), 1);
+
+
+    // when there's a range is should be placed to the left
+    range.set( 1, 2 );
+    range.moveCaretOrDeselect(doc_,1);
+    testEqual( range.caret(), 2);
+    testEqual( range.anchor(), 2);
+
+    // test the reverse
+    range.set( 2, 1 );
+    range.moveCaretOrDeselect(doc_,1);
+    testEqual( range.caret(), 2);
+    testEqual( range.anchor(), 2);
+
+}
+
+
+
+/// This method moves the caret while the current character is the given values
 void TextRangeTest::testMoveCaretWhileChar()
 {
     bufRef_->replaceText(0,0,"  abacdx!");

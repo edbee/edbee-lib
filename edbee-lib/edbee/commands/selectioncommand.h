@@ -18,6 +18,7 @@ public:
 
       // movement and selection
         MoveCaretByCharacter,           ///< Moves the caret(s) by the given amount of characters
+        MoveCaretsOrDeselect,           ///< Moves the caret(s) by the given amount of characters or deselects the current selection
         // SubWord, // TODO, implement subword selecting
         MoveCaretByWord,                ///< moves the caret(s) by the given amount of words
         MoveCaretByLine,                ///< moves the caret(s) by the given amount of lines

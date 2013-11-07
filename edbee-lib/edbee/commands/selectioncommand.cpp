@@ -65,6 +65,16 @@ void SelectionCommand::execute( TextEditorController* controller )
             sel->moveCarets(amount_);
             break;
 
+        // This results in clearing the selection if a selection is present or it results in a movement of the caret.
+        // When clearing a selection the caret is placed next to the selection (which side depends on the direction)
+        case MoveCaretsOrDeselect:
+            if( keepSelection_ ) {
+                sel->moveCarets(amount_);
+            } else {
+                sel->moveCaretsOrDeselect(amount_);
+            }
+            break;
+
         case MoveCaretByWord:
             sel->moveCaretsByCharGroup(amount_, document->config()->whitespaceWithoutNewline(), document->config()->charGroups() );
             break;

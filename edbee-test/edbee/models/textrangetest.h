@@ -25,6 +25,7 @@ private slots:
     void clean();
 
     void testMoveCaret();
+    void testMoveCaretOrDeselect();
     void testMoveCaretWhileChar();
     void testMoveCaretUntilChar();
     void testMoveCaretByCharGroup();

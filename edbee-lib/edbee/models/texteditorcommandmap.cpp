@@ -30,8 +30,8 @@ namespace edbee {
 TextEditorCommandMap::TextEditorCommandMap(QObject* parent)
     : QObject(parent)
 {
-    give( "goto_next_char", new SelectionCommand( SelectionCommand::MoveCaretByCharacter, 1 ) );
-    give( "goto_prev_char", new SelectionCommand( SelectionCommand::MoveCaretByCharacter, -1 ) );
+    give( "goto_next_char", new SelectionCommand( SelectionCommand::MoveCaretsOrDeselect, 1 ) );
+    give( "goto_prev_char", new SelectionCommand( SelectionCommand::MoveCaretsOrDeselect, -1 ) );
     give( "goto_next_word", new SelectionCommand( SelectionCommand::MoveCaretByWord, 1 ) );
     give( "goto_prev_word", new SelectionCommand( SelectionCommand::MoveCaretByWord, -1 ) );
     give( "goto_bol", new SelectionCommand( SelectionCommand::MoveCaretToLineBoundary, -1 ) );

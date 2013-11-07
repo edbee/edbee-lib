@@ -26,6 +26,7 @@ void TextRange::setAnchorBounded(TextDocument* doc, int anchor)
     setAnchor( qBound( 0,  anchor, doc->length() ) );
 }
 
+
 /// Sets the caret to the given location, and forces the caret to say between the document bounds
 /// @param doc the document (used for checking the document bounds)
 /// @param caret the caret position to set
@@ -33,6 +34,7 @@ void TextRange::setCaretBounded(TextDocument* doc, int caret)
 {
     setCaret( qBound( 0,  caret, doc->length() ) );
 }
+
 
 /// Changes the length by modifying the max-variable
 void TextRange::setLength(int newLength)
@@ -42,24 +44,50 @@ void TextRange::setLength(int newLength)
     vMax = vMin + newLength;
 }
 
+
 /// This method converts a text-selection range to a string helpfull with debuggin
 QString TextRange::toString() const
 {
     return QString("%1>%2").arg(anchor_).arg(caret_);
 }
 
+
 /// Moves the caret the given amount
-void TextRange::moveCaret(TextDocument *doc, int amount )
+/// @param doc the document to move the caret for
+/// @param amount the amount to move
+void TextRange::moveCaret(TextDocument* doc, int amount )
 {
     setCaretBounded( doc, caret_ + amount );
 }
+
+
+/// move the caret or deselect the given amount
+/// @param doc the document to move the caret in
+/// @param amount the amount to move
+void TextRange::moveCaretOrDeselect(TextDocument* doc, int amount)
+{
+    // when there's a selection clear it (move the caret to the right side
+    if( hasSelection() ) {
+        if( amount < 0 ) {
+            setCaret(min());
+        } else {
+            setCaret(max());
+        }
+        setAnchor( caret() );
+
+    // just moves the caret
+    } else {
+        setCaretBounded( doc, caret_ + amount );
+    }
+}
+
 
 /// This method charactes after the given char group
 /// When moving to the left the cursor is placed AFTER the last character
 /// @param doc the text document
 /// @param var the initial position
 /// @param amount the amount to move
-int TextRange::moveWhileChar(TextDocument *doc, int pos, int amount, const QString& chars)
+int TextRange::moveWhileChar(TextDocument* doc, int pos, int amount, const QString& chars)
 {
     int docLength = doc->length();
     if( amount < 0 ) {
@@ -72,9 +100,10 @@ int TextRange::moveWhileChar(TextDocument *doc, int pos, int amount, const QStri
     return pos;
 }
 
+
 /// This method charactes until the given chargroup is found
 /// When moving to the LEFT the cursor is placed AFTER the found character
-int TextRange::moveUntilChar(TextDocument *doc, int pos, int amount, const QString& chars)
+int TextRange::moveUntilChar(TextDocument* doc, int pos, int amount, const QString& chars)
 {
     int docLength = doc->length();
     if( amount < 0 ) {
@@ -87,20 +116,25 @@ int TextRange::moveUntilChar(TextDocument *doc, int pos, int amount, const QStri
     return pos;
 }
 
-void TextRange::moveCaretWhileChar(TextDocument *doc, int amount, const QString& chars)
+
+/// moves the caret while a character is moving
+void TextRange::moveCaretWhileChar(TextDocument* doc, int amount, const QString& chars)
 {
     caret_ = moveWhileChar(doc, caret_, amount, chars );
 }
+
 
 void TextRange::moveCaretUntilChar(TextDocument *doc, int amount, const QString& chars)
 {
     caret_ = moveUntilChar(doc, caret_, amount, chars );
 }
 
+
 void TextRange::moveAnchortWhileChar(TextDocument *doc, int amount, const QString &chars)
 {
     anchor_ = moveWhileChar(doc, anchor_, amount, chars );
 }
+
 
 void TextRange::moveAnchorUntilChar(TextDocument *doc, int amount, const QString &chars)
 {
@@ -410,6 +444,7 @@ bool TextRangeSetBase::rangesBetweenOffsetsExlusiveEnd(int offsetBegin, int offs
     return firstIndex>=0;
 }
 
+
 /// Returns the range indices that are being used on the given line
 bool TextRangeSetBase::rangesAtLine(int line, int& firstIndex, int& lastIndex)
 {
@@ -418,6 +453,7 @@ bool TextRangeSetBase::rangesAtLine(int line, int& firstIndex, int& lastIndex)
     int offsetEnd   = doc->offsetFromLine(line+1)-1;
     return rangesBetweenOffsets( offsetBegin, offsetEnd, firstIndex, lastIndex );
 }
+
 
 /// This method checks if there's a selection available
 /// A selection is an range with a different anchor then it's caret
@@ -429,6 +465,7 @@ bool TextRangeSetBase::hasSelection()
     return false;
 }
 
+
 /// This method checks if two selections are equal
 bool TextRangeSetBase::equals( TextRangeSetBase& sel)
 {
@@ -438,6 +475,7 @@ bool TextRangeSetBase::equals( TextRangeSetBase& sel)
     }
     return true;
 }
+
 
 /// Replaces all ranges with the supplied ranges
 void TextRangeSetBase::replaceAll(const TextRangeSetBase& base)
@@ -469,6 +507,7 @@ QString TextRangeSetBase::getSelectedText()
     return buffer;
 }
 
+
 /// Returns ALL lines that are touched by the selection. This means
 /// Full lines are always returned
 QString TextRangeSetBase::getSelectedTextExpandedToFullLines()
@@ -494,7 +533,6 @@ QString TextRangeSetBase::getSelectedTextExpandedToFullLines()
     }
     return buffer;
 }
-
 
 
 /// This method converts the selection ranges as a string, in the format:   anchor>caret,anchor>caret
@@ -538,12 +576,14 @@ void TextRangeSetBase::beginChanges()
     ++changing_;
 }
 
+
 void TextRangeSetBase::endChanges()
 {
     Q_ASSERT(changing_ > 0);
     --changing_;
     processChangesIfRequired();
 }
+
 
 /// Ends the changes without processing.
 /// WARNING, you should ONLY call this method if the operation you performed kept the rangeset
@@ -567,6 +607,7 @@ void TextRangeSetBase::addRange(const TextRange& range)
 {
     addRange( range.anchor(), range.caret() );
 }
+
 
 /// An union operation
 /// This method adds all text selection-items.
@@ -592,6 +633,7 @@ void TextRangeSetBase::substractTextRanges(const TextRangeSetBase& sel)
     --changing_;
     processChangesIfRequired();
 }
+
 
 /// This method substracts a single range from the ranges list
 void TextRangeSetBase::substractRange(int minB, int maxB)
@@ -648,6 +690,7 @@ void TextRangeSetBase::expandToFullLines( int amount )
 
 }
 
+
 /// Expands the selection to full words
 void TextRangeSetBase::expandToWords(const QString& whitespace, const QStringList& characterGroups)
 {
@@ -667,6 +710,7 @@ void TextRangeSetBase::selectWordAt(int offset, const QString& whitespace, const
     addRange(newRange);
     processChangesIfRequired();
 }
+
 
 /// Toggles a word selection at the given location
 /// The idea is the following, double-click an empty place to select the wordt at the given location
@@ -704,6 +748,16 @@ void TextRangeSetBase::moveCarets( int amount )
 {
     for( int i=0, cnt=rangeCount(); i<cnt; ++i ) {
         range(i).moveCaret( textDocument(), amount);
+    }
+    processChangesIfRequired();
+}
+
+
+/// This method moves the carets or deslects the given character
+void TextRangeSetBase::moveCaretsOrDeselect(int amount)
+{
+    for( int i=0, cnt=rangeCount(); i<cnt; ++i ) {
+        range(i).moveCaretOrDeselect( textDocument(), amount);
     }
     processChangesIfRequired();
 }
@@ -784,7 +838,6 @@ void TextRangeSetBase::mergeOverlappingRanges( bool joinBorders )
                 break;
             }
 
-
             // Overlappping possibilities:
             // 1:   [        ]
             // 2         [XXXXXXX]
@@ -862,7 +915,6 @@ void TextRangeSetBase::changeSpatial(int pos, int length, int newLength, bool st
     for( int i=rangeCount()-1; i>=0; --i ) {
 
         TextRange& range = this->range(i);
-
 //if( &range == rangeToSkip ) { continue; }
 
         int anchor = range.anchor();
@@ -987,7 +1039,6 @@ void TextRangeSet::sortRanges()
 {
     qSort(selectionRanges_.begin(), selectionRanges_.end(), TextRange::lessThan );
 }
-
 
 
 } // edbee

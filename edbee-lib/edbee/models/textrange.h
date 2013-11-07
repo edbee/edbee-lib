@@ -61,6 +61,7 @@ public:
     QString toString() const;
 
     void moveCaret( TextDocument* doc, int amount );
+    void moveCaretOrDeselect( TextDocument* doc, int amount );
     int moveWhileChar( TextDocument* doc, int pos, int amount, const QString& chars );
     int moveUntilChar( TextDocument* doc, int pos, int amount, const QString& chars );
     void moveCaretWhileChar( TextDocument* doc, int amount, const QString& chars );
@@ -158,6 +159,7 @@ public:
 
   // movement
     void moveCarets( int amount );
+    void moveCaretsOrDeselect( int amount );
     void moveCaretsByCharGroup( int amount, const QString& whitespace, const QStringList& charGroups );
     void moveCaretsToLineBoundary(int direction, const QString& whitespace  );
     void moveCaretsByLine( int amount );
