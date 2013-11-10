@@ -45,7 +45,9 @@ void GrammarTextLexerTest::clean()
 /// for lexing. This test assumes the haml-language definition has been loaded
 void GrammarTextLexerTest::testHamlLexer()
 {
-/* We need some goot tests for the grammar lexer!
+/* We need some good tests for the grammar lexer!
+ *
+ *
 //    createFixtureDocument("%a=1\n%b");
     createFixtureDocument("%a a\n%b");
 

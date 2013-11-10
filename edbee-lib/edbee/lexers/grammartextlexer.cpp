@@ -201,7 +201,7 @@ TextGrammarRule* GrammarTextLexer::findAndApplyNextGrammarRule( int currentDocOf
     // next we have found the rule that matched a certain scope
     if( foundRule ) {
         int matchedLength = foundRegExp->matchedLength();
-        if( !matchedLength ) { matchedLength=1; }   // always match at least 1 character! (else we're in big trouble )
+//        if( !matchedLength ) { matchedLength=1; }   // always match at least 1 character! (else we're in big trouble )
 
         int startPos = foundPosition;
         int endPos   = startPos + matchedLength;
@@ -249,6 +249,7 @@ TextGrammarRule* GrammarTextLexer::findAndApplyNextGrammarRule( int currentDocOf
 
 
         // increase the offset for the next search
+//qlog_info() << " ++ " << matchedLength;
         offsetInLine = foundPosition + matchedLength;
 
         return foundRule;
@@ -397,7 +398,7 @@ bool GrammarTextLexer::lexLine( int lineIdx, int& currentDocOffset )
     TextDocument* doc = textDocument();
     TextDocumentScopes* docScopes = textScopes();
 
-    QString line        = doc->lineWithoutNewline(lineIdx) + "\n";
+    QString line        = doc->line(lineIdx); //+ "\n";
 
     //    int lineStartOffset = doc->offsetFromLine(lineIdx);
 
@@ -423,6 +424,7 @@ bool GrammarTextLexer::lexLine( int lineIdx, int& currentDocOffset )
     // find the first 'matching' rule
     int offsetInLine = 0;
     int lastOffsetInLine = 0;
+    int sameOffsetCounter = 0;
     while( true ) {
 //QString debug;
 //debug.append( QString(" =[%1,%2,%3]= ").arg(lineIdx).arg(offsetInLine).arg(currentDocOffset) );
@@ -437,8 +439,16 @@ bool GrammarTextLexer::lexLine( int lineIdx, int& currentDocOffset )
             qlog_info() << " - line: " << line;
             qlog_info() << " - rule: " << foundRule->toString();
         }
-        Q_ASSERT( offsetInLine != lastOffsetInLine);
-        if( offsetInLine == lastOffsetInLine ) break;   // no endless loop please
+//        Q_ASSERT( offsetInLine != lastOffsetInLine);
+//        if( offsetInLine == lastOffsetInLine ) break;   // no endless loop please
+
+        // better infinite loop prevention (which allows the PHP regular expression match
+        if( offsetInLine == lastOffsetInLine ) {
+            ++sameOffsetCounter ;
+            if( sameOffsetCounter > 2 ) { break; }
+        } else {
+            sameOffsetCounter = 0;
+        }
         lastOffsetInLine = offsetInLine;
     }
 
@@ -459,7 +469,7 @@ bool GrammarTextLexer::lexLine( int lineIdx, int& currentDocOffset )
     closedMultiRangesRangesRefList_.clear();
 
     // increase the current document offset
-    currentDocOffset += line.size() + 1;    // +1 because we didn't retrieve the newline
+    currentDocOffset += line.size(); // + 1;    // +1 because we didn't retrieve the newline
     return result;
 }
 
