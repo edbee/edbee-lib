@@ -387,7 +387,7 @@ bool GrammarTextLexer::lexLine( int lineIdx, int& currentDocOffset )
     TextDocument* doc = textDocument();
     TextDocumentScopes* docScopes = textScopes();
 
-    QString line        = doc->lineWithoutNewline(lineIdx);
+    QString line        = doc->lineWithoutNewline(lineIdx) + "\n";
 //    int lineStartOffset = doc->offsetFromLine(lineIdx);
 
     Q_ASSERT( currentMultiLineRangeList_.isEmpty() );
