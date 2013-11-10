@@ -14,6 +14,8 @@
 
 #include "edbee/edbee.h"
 
+#include "debug.h"
+
 
 //#define SINGLE_TEST_TO_RUN "rbit::texteditor::LineOffsetVectorTest"
 //#define SINGLE_TEST_TO_RUN "rbit::texteditor::PlainTextDocumentTest"
@@ -30,7 +32,23 @@ int main(int argc, char* argv[])
     logger.addDestination(debugDestination.get());
     logger.setLoggingLevel(QsLogging::TraceLevel);
 
-    edbee::Edbee::instance()->init();
+
+
+    // Load the grammars
+    QString appDataPath;
+    #ifdef Q_OS_MAC
+        appDataPath = app.applicationDirPath() + "/../Resources/";
+    #else
+        appDataPath= app.applicationDirPath() + "/data/";
+    #endif
+qlog_info() << "LOAD DATA:" << appDataPath;
+
+    // configure the edbee component to use the default paths
+    edbee::Edbee* tm = edbee::Edbee::instance();
+//    tm->setKeyMapPath( QString("%1%2").arg(appDataPath).arg("keymaps"));
+    tm->setGrammarPath(  QString("%1%2").arg(appDataPath).arg("syntaxfiles") );
+//    tm->setThemePath( QString("%1%2").arg(appDataPath).arg("themes") );
+    tm->init();
 
     // next run all tests
 #ifdef SINGLE_TEST_TO_RUN
@@ -46,7 +64,7 @@ int main(int argc, char* argv[])
 //    timer.start(100);
 //    app.exec();
 
-    edbee::Edbee::instance()->shutdown();
+    tm->shutdown();
 
     return 0;
 }

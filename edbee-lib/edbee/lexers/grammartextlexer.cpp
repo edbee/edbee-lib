@@ -18,7 +18,8 @@
 
 namespace edbee {
 
-
+/// Constructs the grammar textlexer
+/// @param scopes a reference to the scopes model
 GrammarTextLexer::GrammarTextLexer(TextDocumentScopes* scopes)
     : TextLexer( scopes )
     , lineRangeList_( 0 )
@@ -27,6 +28,7 @@ GrammarTextLexer::GrammarTextLexer(TextDocumentScopes* scopes)
 }
 
 
+/// The destructor
 GrammarTextLexer::~GrammarTextLexer()
 {
     delete lineRangeList_;  // just in case
@@ -62,7 +64,8 @@ RegExp* GrammarTextLexer::createEndRegExp( RegExp* startRegExp, const QString& e
     return new RegExp(endRegExpString);
 }
 
-/// Search a grammar rule
+
+/// Search the next grammar rule
 /// @param (out) foundRegExp the found regexp
 /// @param (out) foundPosition the found position
 /// @return the grammarRule found
@@ -134,6 +137,7 @@ void GrammarTextLexer::findNextGrammarRule( const QString& line, int offsetInLin
     }// while ruleIterators
 }
 
+
 /// This method processes the captures and adds them to the active line
 /// @param foundRegExp the found regexp
 /// @param foundCaptures the found captures
@@ -162,8 +166,10 @@ void GrammarTextLexer::processCaptures( RegExp* foundRegExp, const QMap<int, QSt
 }
 
 
-/// This is the main algorithm for finding and matching the correct scopes with help of the
-/// regular expressions
+/// This is the main algorithm for finding and matching the correct scopes with help of the regular expressions
+/// @param currentDocOffset the current document offset
+/// @param line the line that's being matches
+/// @param offsetInLine (in/out) the current offset in the line
 TextGrammarRule* GrammarTextLexer::findAndApplyNextGrammarRule( int currentDocOffset, const QString& line, int& offsetInLine  )
 {
     Q_ASSERT(lineRangeList_);
@@ -251,6 +257,7 @@ TextGrammarRule* GrammarTextLexer::findAndApplyNextGrammarRule( int currentDocOf
     return 0;   // no rule found
 }
 
+
 /// internal method that returns the active grammar rule
 MultiLineScopedTextRange* GrammarTextLexer::activeMultiLineRange()
 {
@@ -260,12 +267,14 @@ MultiLineScopedTextRange* GrammarTextLexer::activeMultiLineRange()
     return result;
 }
 
+
 /// Returns the active scoped text range
 ScopedTextRange *GrammarTextLexer::activeScopedTextRange()
 {
     Q_ASSERT( !activeScopedRangesRefList_.isEmpty() );
     return activeScopedRangesRefList_.last();
 }
+
 
 /// removes the active range from the stack
 /// If the ranges is added for the current line, it is removed from the currentLineRangeList.
@@ -286,8 +295,8 @@ void GrammarTextLexer::popActiveRange()
 
     activeMultiLineRangesRefList_.pop_back();
     activeScopedRangesRefList_.pop_back();
-
 }
+
 
 /// Adds the given range to the multiscoped textranges
 /// And to the list of current line ranges
@@ -297,11 +306,11 @@ void GrammarTextLexer::pushActiveRange(ScopedTextRange* range, MultiLineScopedTe
     activeMultiLineRangesRefList_.push_back( multiRange );
     currentMultiLineRangeList_.push_back( multiRange );
     activeScopedRangesRefList_.push_back( range );
-
 //qlog_info() << "[push]";
 //    activeRangesRefList_.push_back( range );
 //    currentLineRangesList_.push_back(range);
 }
+
 
 /// T his method finds the 'included' grammar rule
 TextGrammarRule* GrammarTextLexer::findIncludeGrammarRule(TextGrammarRule* base)
@@ -379,6 +388,7 @@ void GrammarTextLexer::textChanged( const TextBufferChange& change )
     }
 }
 
+
 /// This method lexes a single line
 /// @return the last indexed offset
 /// WARNING lexline CANNOT be called indepdently of lexLines (beacuse lex-lines set the activeScopes!
@@ -388,7 +398,8 @@ bool GrammarTextLexer::lexLine( int lineIdx, int& currentDocOffset )
     TextDocumentScopes* docScopes = textScopes();
 
     QString line        = doc->lineWithoutNewline(lineIdx) + "\n";
-//    int lineStartOffset = doc->offsetFromLine(lineIdx);
+
+    //    int lineStartOffset = doc->offsetFromLine(lineIdx);
 
     Q_ASSERT( currentMultiLineRangeList_.isEmpty() );
     Q_ASSERT( closedMultiRangesRangesRefList_.isEmpty() );
@@ -534,8 +545,6 @@ void GrammarTextLexer::lexRange( int beginOffset, int endOffset )
 
     lexLines(lineStart, lineEnd-lineStart);
 }
-
-
 
 
 } // edbee

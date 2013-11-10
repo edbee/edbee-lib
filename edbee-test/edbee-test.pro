@@ -33,7 +33,8 @@ SOURCES += \
     edbee/models/textsearchertest.cpp \
     edbee/commands/duplicatecommandtest.cpp \
     edbee/commands/newlinecommandtest.cpp \
-    edbee/util/utiltest.cpp
+    edbee/util/utiltest.cpp \
+    edbee/lexers/grammartextlexertest.cpp
 
 HEADERS += \
 	edbee/commands/replaceselectioncommandtest.h \
@@ -53,7 +54,23 @@ HEADERS += \
     edbee/models/textsearchertest.h \
     edbee/commands/duplicatecommandtest.h \
     edbee/commands/newlinecommandtest.h \
-    edbee/util/utiltest.h
+    edbee/util/utiltest.h \
+    edbee/lexers/grammartextlexertest.h
+
+#OTHER_FILES += ../edbee-data/config/*
+#OTHER_FILES += ../edbee-data/keymaps/*
+OTHER_FILES += ../edbee-data/syntaxfiles/*
+#OTHER_FILES += ../edbee-data/themes/*
+
+## Extra data files
+##==================
+
+## Install all app data files to the application bundle
+## TODO: We need to find a way to copy these files next to the exe file on windows (And later we need to check linux)
+APP_DATA_FILES.files = $$files(../edbee-data/*)
+APP_DATA_FILES.path = Contents/Resources
+
+QMAKE_BUNDLE_DATA += APP_DATA_FILES
 
 
 INCLUDEPATH += $$PWD/../edbee-lib

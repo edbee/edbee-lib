@@ -38,7 +38,7 @@ class TextScope
 public:
 
     const QString name();
-    int atomCount() { return scopeAtomCount_; }
+    int atomCount();
     TextScopeAtomId atomAt(int idx) const;
 
     bool startsWith( TextScope* scope );
@@ -185,8 +185,8 @@ public:
     ScopedTextRange( const MultiLineScopedTextRange& range );
     virtual ~ScopedTextRange();
 
-    void setScope( TextScope* scope ) { scopeRef_ = scope; }
-    TextScope* scope() const { return scopeRef_; }
+    void setScope( TextScope* scope );
+    TextScope* scope() const;
 
     QString toString() const;
 
@@ -213,10 +213,11 @@ public:
     void giveAndPrependRange(ScopedTextRange* range );
 
     void squeeze();
-    void setIndependent(bool enable=true) { independent_ = enable; }
-    bool isIndependent() { return independent_; }
+    void setIndependent(bool enable=true);
+    bool isIndependent() const;
 
     QString toString();
+
 
 private:
 
@@ -238,11 +239,11 @@ public:
     MultiLineScopedTextRange( int anchor=0, int caret=0 );
     virtual ~MultiLineScopedTextRange();
 
-    void setGrammarRule( TextGrammarRule* rule ) { ruleRef_ = rule; }
-    TextGrammarRule* grammarRule() const { return ruleRef_; }
+    void setGrammarRule( TextGrammarRule* rule );
+    TextGrammarRule* grammarRule() const;
 
     void giveEndRegExp( RegExp* regExp );
-    RegExp* endRegExp() { return endRegExp_; }
+    RegExp* endRegExp();
 
     static bool lessThan( MultiLineScopedTextRange* r1, MultiLineScopedTextRange* r2);
 
@@ -265,7 +266,7 @@ public:
     void reset();
 
   // text range functionality
-    virtual int rangeCount() const { return scopedRangeList_.size(); }
+    virtual int rangeCount() const;
     virtual TextRange& range(int idx);
     virtual const TextRange& constRange(int idx) const;
     virtual void addRange( int anchor, int caret );
@@ -274,20 +275,12 @@ public:
     virtual void toSingleRange();
     virtual void sortRanges();
     virtual MultiLineScopedTextRange& scopedRange(int idx);
-
     virtual MultiLineScopedTextRange& addRange(int anchor, int caret, const QString& name , TextGrammarRule *rule);
-
 
     void removeAndInvalidateRangesAfterOffset( int offset );
 
   // adds a text scope
     void giveScopedTextRange( MultiLineScopedTextRange* textScope );
-
-
-  // simple getters
-
-//    TextScopeRange* scopedTextRangeAtOffset( int offset );
-
     void processChangesIfRequired( bool joinBorders );
 
     QString toString();
@@ -314,7 +307,7 @@ public:
     TextDocumentScopes( TextDocument* textDocument);
     virtual ~TextDocumentScopes();
 
-    int lastScopedOffset() { return lastScopedOffset_; }
+    int lastScopedOffset();
     void setLastScopedOffset( int offset );
 
 
@@ -334,11 +327,11 @@ public:
     QVector<MultiLineScopedTextRange*> scopedRangesBetweenOffsets( int offsetBegin, int offsetEnd );
     QVector<TextScope*> scopesAtOffset( int offset );
 
-
     QString toString();
+    QStringList scopesAsStringList();
 
   // getters
-    TextDocument* textDocument() { return textDocumentRef_; }
+    TextDocument* textDocument();
 
 protected slots:
 
@@ -354,9 +347,8 @@ private:
 //    TextScope* defaultScope_;                   ///< The default scope
     MultiLineScopedTextRange defaultScopedRange_;          ///< The default scoped text range
 //    QHash<QString,TextScope*> scopeMap_;                 ///< A list of all defined/used scopes (pointers to these scopes are smaller then full strings)
-    MultiLineScopedTextRangeSet scopedRanges_;                      ///< A list with all (multi-line) ranges
+    MultiLineScopedTextRangeSet scopedRanges_;             ///< A list with all (multi-line) ranges
     GapVector<ScopedTextRangeList*>  lineRangeList_;       ///< A list of all line scopes
-
 
     /// This special variable is used to 'remember' to which offset the document has been scoped.
     /// This should speed up the syntax highlighting drasticly because the parsing only needs to happen
@@ -367,7 +359,6 @@ private:
     ///
     /// The scopedToOffset_ should only mark the multi-line scopes. Single lines scopes do NOT affect other regions of the document
     int lastScopedOffset_;            ///< How far has the text been fully scoped?
-
 
 };
 

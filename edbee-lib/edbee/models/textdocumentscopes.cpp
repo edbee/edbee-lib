@@ -16,41 +16,72 @@
 
 namespace edbee {
 
+/// A scoped text range
+/// @param anchor the start of the range
+/// @param caret the caret position of the range
+/// @param scope the text scope
 ScopedTextRange::ScopedTextRange(int anchor, int caret, TextScope* scope)
     : TextRange(anchor,caret)
     , scopeRef_(scope)
 {
 }
 
+
+/// A constructor for filling with a MultiScopedTextRange
 ScopedTextRange::ScopedTextRange(const MultiLineScopedTextRange& range)
     : TextRange( range.anchor(), range.caret() )
     , scopeRef_( range.scope() )
 {
 }
 
+
+/// The default destructor
 ScopedTextRange::~ScopedTextRange()
 {
 }
 
+
+/// sets the scope of this textrange
+void ScopedTextRange::setScope(TextScope* scope)
+{
+    scopeRef_ = scope;
+}
+
+
+/// returns the scope
+TextScope*ScopedTextRange::scope() const
+{
+    return scopeRef_;
+}
+
+
+/// Converts the scoped textrange to a string
 QString ScopedTextRange::toString() const
 {
     return QString("%1>%2:%3").arg(anchor()).arg(caret()).arg(scopeRef_->name() );
 }
 
+
 //===========================================
 
+
+/// A scoped textrange lsit
 ScopedTextRangeList::ScopedTextRangeList()
     : independent_(false)
 {
 
 }
 
+
+/// The default destructor
 ScopedTextRangeList::~ScopedTextRangeList()
 {
     qDeleteAll(ranges_);
     ranges_.clear();
 }
 
+
+/// Returns the scoped textrange at the given list
 ScopedTextRange* ScopedTextRangeList::at(int idx)
 {
     Q_ASSERT(idx < ranges_.size() );
@@ -58,23 +89,43 @@ ScopedTextRange* ScopedTextRangeList::at(int idx)
 }
 
 /// give a rnage to the range set
+/// @param range the scoped text range
 void ScopedTextRangeList::giveRange(ScopedTextRange* range)
 {
     ranges_.append(range);
 }
 
+
+/// Prepends a range
+/// @param range the range to prepend
 void ScopedTextRangeList::giveAndPrependRange(ScopedTextRange* range)
 {
     ranges_.prepend(range);
 }
 
 
-
+/// Squeezes the ranges (reduces the memory usage)
 void ScopedTextRangeList::squeeze()
 {
     ranges_.squeeze();
 }
 
+
+/// set the independent flag. The independent flag means it's not dependent on other lines
+void ScopedTextRangeList::setIndependent(bool enable)
+{
+    independent_ = enable;;
+}
+
+
+/// returns the independent flag
+bool ScopedTextRangeList::isIndependent() const
+{
+    return independent_;
+}
+
+
+/// Converts the scoped textrange list to a strubg
 QString ScopedTextRangeList::toString()
 {
     QString result;
@@ -90,7 +141,8 @@ QString ScopedTextRangeList::toString()
 //===========================================
 
 
-/// This method deletes the scoped textrange
+/// The multiline scoped textrange
+/// @param anchor
 MultiLineScopedTextRange::MultiLineScopedTextRange(int anchor, int caret)
     : ScopedTextRange(anchor,caret,0)
     , endRegExp_(0)
@@ -98,16 +150,41 @@ MultiLineScopedTextRange::MultiLineScopedTextRange(int anchor, int caret)
 {
 }
 
+
+/// The multi-line destructor
 MultiLineScopedTextRange::~MultiLineScopedTextRange()
 {
     delete endRegExp_;
 }
+
+
+/// Sets the rule (we need the rule to perform end-of-line matching)
+void MultiLineScopedTextRange::setGrammarRule(TextGrammarRule* rule)
+{
+    ruleRef_ = rule;
+}
+
+
+/// Returnst he active grammar rule
+TextGrammarRule* MultiLineScopedTextRange::grammarRule() const
+{
+    return ruleRef_;
+}
+
 
 /// Gives the end regular expression
 void MultiLineScopedTextRange::giveEndRegExp( RegExp* regExp)
 {
     endRegExp_ = regExp;
 }
+
+
+/// returns the end-regular expression
+RegExp*MultiLineScopedTextRange::endRegExp()
+{
+    return endRegExp_;
+}
+
 
 /// This method compares selection ranges
 bool MultiLineScopedTextRange::lessThan(MultiLineScopedTextRange* r1, MultiLineScopedTextRange* r2)
@@ -119,9 +196,11 @@ bool MultiLineScopedTextRange::lessThan(MultiLineScopedTextRange* r1, MultiLineS
     return ( diff < 0);
 }
 
+
 //===========================================
 
 
+/// A textcope is an object that represents a scope name
 TextScope::TextScope(const QString& fullScope )
     : scopeAtomCount_(0)
     , scopeAtoms_(0)
@@ -137,10 +216,13 @@ TextScope::TextScope(const QString& fullScope )
     }
 }
 
+
+// Destructs the textscope
 TextScope::~TextScope()
 {
     delete scopeAtoms_;
 }
+
 
 /// This method returns the name of this scope
 const QString TextScope::name()
@@ -155,6 +237,14 @@ const QString TextScope::name()
     return str;
 }
 
+
+/// returns the number of atom items
+int TextScope::atomCount()
+{
+    return scopeAtomCount_;
+}
+
+
 /// This method returns the atom at the given index
 TextScopeAtomId TextScope::atomAt(int idx) const
 {
@@ -162,8 +252,10 @@ TextScopeAtomId TextScope::atomAt(int idx) const
     return scopeAtoms_[idx];
 }
 
+
 /// Checks if the current scope starts with the given scope
 /// wild-card atoms will always match
+/// @param scope the scope to check
 bool TextScope::startsWith(TextScope* scope)
 {
     if( scope->atomCount() > atomCount() ) { return false; }    // match is never possible
@@ -206,25 +298,32 @@ int TextScope::rindexOf(TextScope* scope)
     return -1;
 }
 
+
 //=============================================
 
+
+/// A list of text scopes
 TextScopeList::TextScopeList()
 {
 }
 
 
+/// The text scopelist with an initial size
 TextScopeList::TextScopeList(int initialSize)
 {
     reserve(initialSize);
 }
 
-TextScopeList::TextScopeList(QVector<ScopedTextRange *> &ranges)
+
+/// Fills the scopelist with a list of ranges
+TextScopeList::TextScopeList(QVector<ScopedTextRange *>& ranges)
 {
     reserve(ranges.size());
     foreach( ScopedTextRange* scopedRange, ranges ) {
         append( scopedRange->scope() );
     }
 }
+
 
 /// This method returns the total number of atoms
 int TextScopeList::atomCount() const
@@ -237,6 +336,7 @@ int TextScopeList::atomCount() const
 }
 
 
+/// Converts the scopelist to a string
 QString TextScopeList::toString()
 {
     QString result;
@@ -249,6 +349,9 @@ QString TextScopeList::toString()
 
 //=============================================
 
+
+/// The textscope selector
+/// @param selector the selector to select a scope
 TextScopeSelector::TextScopeSelector(const QString& selector)
 {
     QStringList selectorList = selector.split(",");
@@ -259,11 +362,14 @@ TextScopeSelector::TextScopeSelector(const QString& selector)
     }
 }
 
+
+/// The destructor
 TextScopeSelector::~TextScopeSelector()
 {
     qDeleteAll(selectorList_);
     selectorList_.clear();
 }
+
 
 /// This method calculates the matching score of the scope with this selector
 /// Currently the scope-calculation is very 'basic'. Just enough to perform the most basic form of matching
@@ -282,6 +388,8 @@ double TextScopeSelector::calculateMatchScore(const TextScopeList* scopeList)
     return result;
 }
 
+
+/// Converts the scope to a string
 QString TextScopeSelector::toString()
 {
     QString result;
@@ -291,6 +399,7 @@ QString TextScopeSelector::toString()
     }
     return result;
 }
+
 
 /// This method calculates the matching score of the scope with this selector
 /// Currently the scope-calculation is very 'basic'. Just enough to perform the most basic form of matching
@@ -304,7 +413,6 @@ double TextScopeSelector::calculateMatchScoreForSelector(TextScopeList* selector
 {
     double result = 0.0;
     double power = 0.0;
-
 
     // this method checks if the scope matches
     bool foundMatch=false;
@@ -340,6 +448,14 @@ double TextScopeSelector::calculateMatchScoreForSelector(TextScopeList* selector
 //=============================================
 
 
+/// The scopemanager constructor
+TextScopeManager::TextScopeManager()
+{
+    reset();
+}
+
+
+/// The destructor of the scope manager
 TextScopeManager::~TextScopeManager()
 {
     foreach( TextScope* textScope, textScopeList_ ) { delete textScope; }
@@ -347,7 +463,9 @@ TextScopeManager::~TextScopeManager()
     textScopeRefMap_.clear();
 }
 
+
 /// This method clears and delets all scopes. WARNING this destroys all registered text-scopes
+/// This method also registers the wildcard scope atom id
 void TextScopeManager::reset()
 {
     if( !textScopeList_.isEmpty() ) {
@@ -363,6 +481,7 @@ void TextScopeManager::reset()
     wildCardId_ = findOrRegisterScopeAtom("*");
 }
 
+
 /// This method registers the scope element
 TextScopeAtomId TextScopeManager::findOrRegisterScopeAtom(const QString& atom)
 {
@@ -375,6 +494,7 @@ TextScopeAtomId TextScopeManager::findOrRegisterScopeAtom(const QString& atom)
     return id;
 }
 
+
 /// This method finds or creates a full-scope
 TextScope* TextScopeManager::refTextScope(const QString& scopeString)
 {
@@ -385,6 +505,7 @@ TextScope* TextScopeManager::refTextScope(const QString& scopeString)
     textScopeRefMap_.insert(scopeString,scope);
     return scope;
 }
+
 
 /// This method creates a text-scope list from the given scope string
 TextScopeList *TextScopeManager::createTextScopeList(const QString& scopeListString)
@@ -397,27 +518,26 @@ TextScopeList *TextScopeManager::createTextScopeList(const QString& scopeListStr
     return list;
 }
 
+
+/// Returns the name of the given atom id
 const QString& TextScopeManager::atomName(TextScopeAtomId id)
 {
     Q_ASSERT(0 <= id && id < atomNameList_.length() );
     return atomNameList_.at(id);
 }
 
-TextScopeManager::TextScopeManager()
-{
-    reset();
-}
-
 
 //===========================================
 
 
+/// A multilinescoped textrange set
 MultiLineScopedTextRangeSet::MultiLineScopedTextRangeSet(TextDocument *textDocument , TextDocumentScopes *textDocumentScopes)
     : TextRangeSetBase( textDocument )
     , textDocumentScopesRef_( textDocumentScopes )
 {
 }
 
+/// the destructor of the multiline scoped rangeset
 MultiLineScopedTextRangeSet::~MultiLineScopedTextRangeSet()
 {
     reset();
@@ -431,12 +551,21 @@ void MultiLineScopedTextRangeSet::reset()
     scopedRangeList_.clear();
 }
 
+
+/// Returns the number of ranges
+int MultiLineScopedTextRangeSet::rangeCount() const
+{
+    return scopedRangeList_.size();
+}
+
+
 /// returns the given textrange
 TextRange& MultiLineScopedTextRangeSet::range(int idx)
 {
     Q_ASSERT( 0 <= idx && idx < rangeCount() );
     return *(scopedRangeList_[idx]);
 }
+
 
 /// returns the cont range
 const TextRange& MultiLineScopedTextRangeSet::constRange(int idx) const
@@ -445,11 +574,13 @@ const TextRange& MultiLineScopedTextRangeSet::constRange(int idx) const
     return *(scopedRangeList_[idx]);
 }
 
+
 /// This method adds a range with the default scope
 void MultiLineScopedTextRangeSet::addRange(int anchor, int caret)
 {
     scopedRangeList_.append( new MultiLineScopedTextRange(anchor, caret)  );
 }
+
 
 ///' removes the given scope
 void MultiLineScopedTextRangeSet::removeRange(int idx)
@@ -458,17 +589,21 @@ void MultiLineScopedTextRangeSet::removeRange(int idx)
     scopedRangeList_.removeAt(idx);
 }
 
+
 /// removes all scopes
 void MultiLineScopedTextRangeSet::clear()
 {
     qDeleteAll( scopedRangeList_ );
     scopedRangeList_.clear();
 }
+
+
 void MultiLineScopedTextRangeSet::toSingleRange()
 {
     Q_ASSERT( false ); ///< NOT IMPLEMENTED
     //scopedRangeList_.remove(1, scopedRangeList_.size()-1);
 }
+
 
 /// This method sorts all ranges
 void MultiLineScopedTextRangeSet::sortRanges()
@@ -476,12 +611,14 @@ void MultiLineScopedTextRangeSet::sortRanges()
     qSort( scopedRangeList_.begin(), scopedRangeList_.end(), MultiLineScopedTextRange::lessThan );
 }
 
+
 /// this method returns the scoped range
 MultiLineScopedTextRange& MultiLineScopedTextRangeSet::scopedRange(int idx)
 {
     Q_ASSERT( 0 <= idx && idx < rangeCount() );
     return *(scopedRangeList_[idx]);
 }
+
 
 /// Adds a textrange with the given name
 MultiLineScopedTextRange& MultiLineScopedTextRangeSet::addRange(int anchor, int caret, const QString& name, TextGrammarRule* rule )
@@ -494,6 +631,7 @@ MultiLineScopedTextRange& MultiLineScopedTextRangeSet::addRange(int anchor, int 
     scopedRangeList_.append( tr  );
     return *tr;
 }
+
 
 /// This method removes all ranges after a given offset. This means it will remove all
 /// complete ranges after the given offset. Ranges that start before the offset and
@@ -521,6 +659,7 @@ void MultiLineScopedTextRangeSet::giveScopedTextRange(MultiLineScopedTextRange* 
     scopedRangeList_.append( textScope );
 }
 
+
 /// This method process the changes if required
 void MultiLineScopedTextRangeSet::processChangesIfRequired(bool joinBorders )
 {
@@ -532,6 +671,7 @@ void MultiLineScopedTextRangeSet::processChangesIfRequired(bool joinBorders )
         --changing_;
     }
 }
+
 
 /// convert the found ranges to strings
 QString MultiLineScopedTextRangeSet::toString()
@@ -549,6 +689,8 @@ QString MultiLineScopedTextRangeSet::toString()
 //===========================================
 
 
+/// The constructor for storing/managing the textdocument scopes
+/// @param textDocument the textdocument this scoping is for
 TextDocumentScopes::TextDocumentScopes(TextDocument* textDocument)
     : textDocumentRef_( textDocument )
     , defaultScopedRange_()
@@ -559,6 +701,8 @@ TextDocumentScopes::TextDocumentScopes(TextDocument* textDocument)
     connect( textDocument, SIGNAL(languageGrammarChanged()), this, SLOT(grammarChanged()) );
 }
 
+
+/// The destructor
 TextDocumentScopes::~TextDocumentScopes()
 {
     for( int i=0,cnt=lineRangeList_.length(); i<cnt; ++i ) {
@@ -567,6 +711,16 @@ TextDocumentScopes::~TextDocumentScopes()
     lineRangeList_.clear();
 }
 
+
+/// returns the last scoped offset
+int TextDocumentScopes::lastScopedOffset()
+{
+    return lastScopedOffset_;
+}
+
+
+/// Sets the last scoped offset
+/// @param offset the last scoped offset
 void TextDocumentScopes::setLastScopedOffset(int offset)
 {
     int previousOffset = lastScopedOffset_ ;
@@ -577,14 +731,19 @@ void TextDocumentScopes::setLastScopedOffset(int offset)
 }
 
 
-///  This method sets the default scope
+/// This method sets the default scope
+/// @param the name of the scope
+/// @param rule the rule that matched
 void TextDocumentScopes::setDefaultScope(const QString& name, TextGrammarRule* rule )
 {
     defaultScopedRange_.setScope( Edbee::instance()->scopeManager()->refTextScope(name) );
     defaultScopedRange_.setGrammarRule(rule);
 }
 
+
 /// This method sets the scoped line list
+/// @param line the line
+/// @param list the list with all scopes on the given line
 void TextDocumentScopes::giveLineScopedRangeList(int line, ScopedTextRangeList* list)
 {
     int len = lineRangeList_.length();
@@ -596,14 +755,20 @@ void TextDocumentScopes::giveLineScopedRangeList(int line, ScopedTextRangeList* 
 }
 
 
+
 /// This method returns all scoped ranges on the given line
+/// @param line the line to retrieve the scoped ranges for
+/// @return the scoped textrange list
 ScopedTextRangeList* TextDocumentScopes::scopedRangesAtLine(int line)
 {
     if( line >= lineRangeList_.length() || line < 0 ) { return 0; }
     return lineRangeList_.at(line);
 }
 
+
 /// changes the delta of the lines
+/// @param line the line to to change
+/// @paran linesAdded the number of lines added or removed
 void TextDocumentScopes::changeLineDelta(int line, int linesAdded)
 {
     if( linesAdded > 0 ) {
@@ -617,6 +782,7 @@ void TextDocumentScopes::changeLineDelta(int line, int linesAdded)
     }
 }
 
+
 /// Returns the number of scopes lines in the lineRangeList_
 int TextDocumentScopes::scopedLineCount()
 {
@@ -624,7 +790,7 @@ int TextDocumentScopes::scopedLineCount()
 }
 
 
-/// gives the multi-lined textrange
+/// gives the multi-lined textrange to the scopedranges
 void TextDocumentScopes::giveMultiLineScopedTextRange(MultiLineScopedTextRange *range)
 {
     scopedRanges_.giveScopedTextRange(range);
@@ -632,6 +798,7 @@ void TextDocumentScopes::giveMultiLineScopedTextRange(MultiLineScopedTextRange *
 
 
 /// This method invalidates all scopes after the given offset
+/// @param offset the offset from which to remove the offset
 void TextDocumentScopes::removeScopesAfterOffset(int offset)
 {
     if( offset == 0 ) {
@@ -670,6 +837,7 @@ QVector<MultiLineScopedTextRange*> TextDocumentScopes::scopedRangesBetweenOffset
     return result;
 }
 
+
 /// returns all scopes between the given offsets
 QVector<TextScope *> TextDocumentScopes::scopesAtOffset( int offset )
 {
@@ -699,17 +867,52 @@ QVector<TextScope *> TextDocumentScopes::scopesAtOffset( int offset )
 }
 
 
+/// Converts the textdocument scoped to a string
 QString TextDocumentScopes::toString()
 {
     return scopedRanges_.toString();
 }
+
+
+/// Returns a string-list will all scopes. This list is mainly used for debugging and testing
+QStringList TextDocumentScopes::scopesAsStringList()
+{
+    QStringList result;
+
+    // first add all multi-line scopes
+    for( int i=0,cnt=scopedRanges_.rangeCount(); i<cnt; ++i ) {
+        MultiLineScopedTextRange& range = scopedRanges_.scopedRange(i);
+        result.append( range.toString() );
+    }
+
+    result.append("**");
+
+    // next add all line based scoped
+    for( int i=0,lineCnt=lineRangeList_.length(); i<lineCnt; ++i ) {
+        ScopedTextRangeList* list = lineRangeList_.at(i);
+        result.append( list->toString() );
+//        for( int listIdx=0,cnt=list->size(); listIdx<cnt; ++listIdx ) {
+//            ScopedTextRange* range = list->at(listIdx);
+//            result.append(range->toString());
+//        }
+    }
+
+    return result;
+}
+
+
+/// returns the current textdocument scope
+TextDocument*TextDocumentScopes::textDocument()
+{
+    return textDocumentRef_;
+}
+
 
 /// the grammar has been changed
 void TextDocumentScopes::grammarChanged()
 {
     removeScopesAfterOffset(0);
 }
-
 
 
 } // edbee
