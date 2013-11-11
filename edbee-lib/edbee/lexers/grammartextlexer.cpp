@@ -424,7 +424,7 @@ bool GrammarTextLexer::lexLine( int lineIdx, int& currentDocOffset )
     // find the first 'matching' rule
     int offsetInLine = 0;
     int lastOffsetInLine = 0;
-    int sameOffsetCounter = 0;
+    TextGrammarRule* lastFoundRule = 0;
     while( true ) {
 //QString debug;
 //debug.append( QString(" =[%1,%2,%3]= ").arg(lineIdx).arg(offsetInLine).arg(currentDocOffset) );
@@ -435,20 +435,17 @@ bool GrammarTextLexer::lexLine( int lineIdx, int& currentDocOffset )
 
         /// check the next offset
         if( offsetInLine == lastOffsetInLine ) {
-            qlog_info() << "Found grammar-rule("<< lineIdx << "," << offsetInLine<<")";
-            qlog_info() << " - line: " << line;
-            qlog_info() << " - rule: " << foundRule->toString();
-        }
-//        Q_ASSERT( offsetInLine != lastOffsetInLine);
-//        if( offsetInLine == lastOffsetInLine ) break;   // no endless loop please
 
-        // better infinite loop prevention (which allows the PHP regular expression match
-        if( offsetInLine == lastOffsetInLine ) {
-            ++sameOffsetCounter ;
-            if( sameOffsetCounter > 2 ) { break; }
-        } else {
-            sameOffsetCounter = 0;
+            if( lastFoundRule == foundRule ) {
+                qlog_info() << "Found grammar-rule("<< lineIdx << "," << offsetInLine<<")";
+                qlog_info() << " - line: " << line;
+                qlog_info() << " - rule: " << foundRule->toString();
+                qlog_info() << " INFINITE LOOP PREVENTION";
+                break;
+            }
         }
+        lastFoundRule = foundRule;
+
         lastOffsetInLine = offsetInLine;
     }
 
