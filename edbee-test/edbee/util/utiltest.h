@@ -16,6 +16,8 @@ class UtilTest : public edbee::test::TestCase
 
 private slots:
     void testConvertTabsToSpaces();
+    void testTabColumnOffsets();
+
 };
 
 

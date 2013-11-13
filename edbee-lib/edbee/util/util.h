@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include <QList>
+
 class QString;
 
 namespace edbee {
@@ -16,8 +18,8 @@ namespace edbee {
 class Util
 {
 public:
-    QString convertTabsToSpaces( const QString& str, int tabSize);
-
+    QString convertTabsToSpaces( const QString& str, int tabSize );
+    QList<int> tabColumnOffsets( const QString& str, int tabSize );
 };
 
 } // edbee

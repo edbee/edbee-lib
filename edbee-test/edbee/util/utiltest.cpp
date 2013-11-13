@@ -5,6 +5,8 @@
 
 #include "utiltest.h"
 
+#include <QList>
+
 #include "edbee/util/util.h"
 
 #include "debug.h"
@@ -33,6 +35,31 @@ void UtilTest::testConvertTabsToSpaces()
 
     // when using a tab character in the middle of the line it should work
     testEqual( Util().convertTabsToSpaces("12345\t9",4), QString("12345   9") );
+}
+
+
+/// helper function to convert a QVector<int> to a string list
+static QString str( const QList<int>& list )
+{
+    QString result;
+    foreach( int val, list ) {
+        if( !result.isEmpty() ) { result.append(","); }
+        result.append( QString::number(val) );
+    }
+    return result;
+}
+
+
+/// Tests the calculation of tab-column offests
+void UtilTest::testTabColumnOffsets()
+{
+    testEqual( str(Util().tabColumnOffsets("",4)), "0" );
+    testEqual( str(Util().tabColumnOffsets("  ",4)), "0" );
+    testEqual( str(Util().tabColumnOffsets("    ",4)), "0,4" );
+    testEqual( str(Util().tabColumnOffsets("\t",4)), "0,1" );
+    testEqual( str(Util().tabColumnOffsets("  \t",4)), "0,3" );
+    testEqual( str(Util().tabColumnOffsets("  \t \t",4)), "0,3,5" );
+    testEqual( str(Util().tabColumnOffsets("\t\t\t",4)), "0,1,2,3" );
 }
 
 

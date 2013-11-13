@@ -82,7 +82,8 @@ SOURCES += \
     edbee/util/cascadingqvariantmap.cpp \
     edbee/commands/duplicatecommand.cpp \
     edbee/commands/newlinecommand.cpp \
-    edbee/util/util.cpp
+    edbee/util/util.cpp \
+    edbee/commands/backspacecommand.cpp
 
 HEADERS += \
     util/logging.h \
@@ -151,7 +152,8 @@ HEADERS += \
     edbee/util/cascadingqvariantmap.h \
     edbee/commands/duplicatecommand.h \
     edbee/commands/newlinecommand.h \
-    edbee/util/util.h
+    edbee/util/util.h \
+    edbee/commands/backspacecommand.h
     
 message($$INCLUDEPATH)
 

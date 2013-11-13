@@ -5,6 +5,7 @@
 
 #include "texteditorcommandmap.h"
 
+#include "edbee/commands/backspacecommand.h"
 #include "edbee/commands/copycommand.h"
 #include "edbee/commands/cutcommand.h"
 #include "edbee/commands/debugcommand.h"
@@ -68,7 +69,7 @@ TextEditorCommandMap::TextEditorCommandMap(QObject* parent)
     // line entry
     give( "ins_newline", new NewlineCommand() );
 
-    give( "del_left", new RemoveSelectionCommand(-1) );
+    give( "del_left", new BackspaceCommand() );
     give( "del_right", new RemoveSelectionCommand(1) );
 
     // special text entry commands
