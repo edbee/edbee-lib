@@ -338,7 +338,6 @@ void TextSearcher::selectUnderExpand( TextEditorWidget* widget, bool selectAllTe
 }
 
 
-
 /// Marks the regexp as dirty (and deletes it)
 void TextSearcher::setDirty()
 {

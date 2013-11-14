@@ -66,6 +66,9 @@ public slots:
 
     void selectUnderExpand(TextEditorWidget* widget, bool selectAllTexts );
 
+
+
+
 protected:
 
     void setDirty();

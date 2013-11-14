@@ -28,7 +28,9 @@
 
 namespace edbee {
 
-TextRenderer::TextRenderer(TextEditorController *controller)
+
+/// The default textrenderer constructor
+TextRenderer::TextRenderer(TextEditorController* controller)
     : QObject( 0 )
     , controllerRef_(controller)
     , caretTime_(0)
@@ -41,6 +43,7 @@ TextRenderer::TextRenderer(TextEditorController *controller)
     textThemeStyler_ = new TextThemeStyler( controller );
 }
 
+
 /// the destructor
 TextRenderer::~TextRenderer()
 {
@@ -49,6 +52,7 @@ TextRenderer::~TextRenderer()
 //    qDeleteAll(cachedTextLayoutList_);
 }
 
+
 /// The init method is called if all objects required for editing have been created!
 void TextRenderer::init()
 {
@@ -56,12 +60,14 @@ void TextRenderer::init()
     resetCaretTime();
 }
 
+
 /// This method resets all caching information
 void TextRenderer::reset()
 {
     totalWidthCache_ = 0;
     cachedTextLayoutList_.clear();
 }
+
 
 /// This method returns the (maximum) line-height in pixels
 int TextRenderer::lineHeight()
@@ -72,12 +78,15 @@ int TextRenderer::lineHeight()
     return fm.ascent() + fm.descent() + fm.leading() + config()->extraLineSpacing(); // (the 1 is for the base line).
 }
 
+
 /// This method converts the give y position to a line index
 /// Warning this returns a RAW line index, which means it can be an invalid line
+/// @param y the y position
 int TextRenderer::rawLineIndexForYpos(int y)
 {
     return y / lineHeight();
 }
+
 
 /// This method returns a valid line index for the given y-pos
 /// If the y-position isn't on a line it returns a value < 0
@@ -87,6 +96,7 @@ int TextRenderer::lineIndexForYpos(int y)
     if( line >= textDocument()->lineCount() ) return -1;
     return line;
 }
+
 
 /// Returns the total width of the editor. This method is NOT the real with
 /// This method takes the maximum line length and multiplies it with the widest character.
@@ -118,17 +128,20 @@ int TextRenderer::totalWidth()
     */
 }
 
+
 /// This method returns the total height
 int TextRenderer::totalHeight()
 {
     return textDocument()->lineCount() * lineHeight() + lineHeight();
 }
 
+
 /// This method returns width of the M cahracter
 int TextRenderer::emWidth()
 {
     return textWidget()->fontMetrics().width("M");
 }
+
 
 /// The M-width isn't good enough for calculating the width of numbers.
 /// Often the M is to wide. That why we have a nr width which takes the 8 for the width
@@ -137,6 +150,7 @@ int TextRenderer::nrWidth()
     return textWidget()->fontMetrics().width("8");
 }
 
+
 /// This method returns the number of lines
 int TextRenderer::viewHeightInLines()
 {
@@ -144,11 +158,13 @@ int TextRenderer::viewHeightInLines()
     return result;
 }
 
+
 /// This method returns the first visible line
 int TextRenderer::firstVisibleLine()
 {
     return viewportY() / lineHeight();
 }
+
 
 /// This method returns the (closet) valid column for the given x-position
 int TextRenderer::columnIndexForXpos(int line, int x )
@@ -162,6 +178,7 @@ int TextRenderer::columnIndexForXpos(int line, int x )
     return tl.xToCursor( x );
 }
 
+
 /// This method returns the x position for the given column
 int TextRenderer::xPosForColumn(int line, int column)
 {
@@ -173,6 +190,7 @@ int TextRenderer::xPosForColumn(int line, int column)
     }
     return x;
 }
+
 
 /// This method returns the x-coordinate for the given offset
 int TextRenderer::xPosForOffset(int offset)
@@ -188,11 +206,13 @@ int TextRenderer::xPosForOffset(int offset)
     return x;
 }
 
+
 /// This method returns the y position for the given line
 int TextRenderer::yPosForLine(int line)
 {
     return line * lineHeight();
 }
+
 
 /// This method returns the offset position for the given line
 int TextRenderer::yPosForOffset(int offset)
@@ -219,7 +239,10 @@ QTextLayout *TextRenderer::textLayoutForLine(int line)
 
         QTextOption option;
         option.setTabStop( config()->indentSize() * tabWidth );
-        //option.setFlags( QTextOption::ShowTabsAndSpaces );        /// TODO: Make an option to show spaces and tabs
+
+        if( config()->showWhitespaceMode() == TextEditorConfig::ShowWhitespaces ) {
+            option.setFlags( QTextOption::ShowTabsAndSpaces );        /// TODO: Make an option to show spaces and tabs
+        }
 
           textLayout->setFont( textWidget()->font() );
 //qlog_info() << "font: " <<   textWidget()->();
@@ -266,7 +289,6 @@ QTextLayout *TextRenderer::textLayoutForLine(int line)
 
     return textLayout;
 }
-
 
 
 /// This method starts rendering
@@ -320,21 +342,25 @@ void TextRenderer::renderEnd( const QRect& rect )
 
 
 /// This method returns the document
-TextDocument *TextRenderer::textDocument()
+TextDocument* TextRenderer::textDocument()
 {
     return controllerRef_->textDocument();
 }
 
+
 /// This method returns the textselection
-TextSelection *TextRenderer::textSelection()
+TextSelection* TextRenderer::textSelection()
 {
     return controllerRef_->textSelection();
 }
 
-TextEditorConfig *TextRenderer::config()
+
+/// Returns the editor configuration
+TextEditorConfig* TextRenderer::config()
 {
     return textDocument()->config();
 }
+
 
 /// This method returns the widget
 TextEditorWidget *TextRenderer::textWidget()
@@ -342,7 +368,9 @@ TextEditorWidget *TextRenderer::textWidget()
     return controllerRef_->widget();
 }
 
-void TextRenderer::setViewport(const QRect &viewport)
+
+/// Sets the current viewport of the renderer
+void TextRenderer::setViewport(const QRect& viewport)
 {
     viewport_ = viewport;
 }
@@ -356,6 +384,7 @@ void TextRenderer::resetCaretTime()
     }
 }
 
+
 /// this method returnst true if the caret is visible
 bool TextRenderer::shouldRenderCaret()
 {
@@ -365,16 +394,19 @@ bool TextRenderer::shouldRenderCaret()
     return (time % caretBlinkRate_) < (caretBlinkRate_>> 1);
 }
 
+
+/// Returns true if the caret is visible
 bool TextRenderer::isCaretVisible()
 {
     return caretTime_ >= 0;
 }
 
+
+/// sets the carets to visible or invisible
 void TextRenderer::setCaretVisible(bool visible)
 {
     caretTime_ = visible ? QDateTime::currentMSecsSinceEpoch() : -1;
 }
-
 
 
 /// Returns the active theme
@@ -382,6 +414,7 @@ TextTheme* TextRenderer::theme()
 {
     return textThemeStyler_->theme();
 }
+
 
 /// Selects the active theme name
 void TextRenderer::setThemeName(const QString& name)
@@ -397,13 +430,13 @@ void TextRenderer::textDocumentChanged(edbee::TextDocument *oldDocument, edbee::
     if( oldDocument ) {
         disconnect(oldDocument, 0, this, 0 );
     }
-
     reset();
 
     // connect with the new dpcument
     connect( newDocument, SIGNAL(textChanged(edbee::TextBufferChange)), this, SLOT(textChanged(edbee::TextBufferChange)));
     connect( newDocument, SIGNAL(lastScopedOffsetChanged(int,int)), this, SLOT(lastScopedOffsetChanged(int,int)) );
 }
+
 
 /// The text is replaced
 void TextRenderer::textChanged(edbee::TextBufferChange change)
@@ -427,6 +460,7 @@ void TextRenderer::textChanged(edbee::TextBufferChange change)
     }
 }
 
+
 /// The scoped to offset has been changed
 void TextRenderer::lastScopedOffsetChanged(int previousOffset, int newOffset)
 {
@@ -437,6 +471,8 @@ void TextRenderer::lastScopedOffsetChanged(int previousOffset, int newOffset)
         //    textWidget()->fullUpdate();
 }
 
+
+/// Invalidates the QTextLayout caches
 void TextRenderer::invalidateTextLayoutCaches(int fromLine)
 {
 //qlog_info() << "** invalidateTextLayoutCache("<<fromLine<<") **";
@@ -460,5 +496,6 @@ void TextRenderer::invalidateCaches()
     totalWidthCache_ = 0;
     cachedTextLayoutList_.clear();
 }
+
 
 } // edbee

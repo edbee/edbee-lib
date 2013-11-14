@@ -19,6 +19,16 @@ class TextEditorConfig : public QObject
 Q_OBJECT
 
 public:
+
+    /// an enumeration with the possible types of whitespace showing
+    enum ShowWhitespaceMode {
+        HideWhitespaces = 0,               ///< Don't show whitespaces
+        ShowWhitespaces = 1                ///< Alsways show the whitespace
+        /// TODO: In the future, only show when selected
+    };
+
+
+
     TextEditorConfig( QObject* parent=0 );
     virtual ~TextEditorConfig();
 
@@ -73,6 +83,10 @@ public:
     bool scrollPastEnd() const;
     void setScrollPastEnd( bool enabled );
 
+    int showWhitespaceMode() const;
+    void setShowWhitespaceMode( int mode );
+    void setShowWhitespaceMode( const QString& str );
+
 
 signals:
     void configChanged();
@@ -103,6 +117,7 @@ private:
     QFont font_;                        ///< The font to used
 
     bool scrollPastEnd_;                ///< Should the last line of the document be  scrollable to the top of the window
+    int showWhitespaceMode_;            ///< The current whitespace mode to make
 };
 
 } // edbee

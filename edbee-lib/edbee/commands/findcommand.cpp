@@ -87,7 +87,6 @@ void FindCommand::execute(TextEditorController* controller)
             break;
 
 
-
         default:
             qlog_warn() << "Warning, invalid FindCommand supplied!";
             Q_ASSERT(false);

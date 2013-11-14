@@ -32,6 +32,7 @@ TextEditorConfig::TextEditorConfig( QObject* parent )
     , showCaretOffset_(true)
     , themeName_("Monokai")
     , scrollPastEnd_(false)
+    , showWhitespaceMode_(HideWhitespaces)
 {
     charGroups_.append( QString("./\\()\"'-:,.;<>~!@#$%^&*|+=[]{}`~?"));
 }
@@ -364,6 +365,33 @@ void TextEditorConfig::setScrollPastEnd(bool enabled)
     if( scrollPastEnd_ != enabled ) {
         scrollPastEnd_ = enabled;
         notifyChange();
+    }
+}
+
+
+/// Shows the whitespacemode
+int TextEditorConfig::showWhitespaceMode() const
+{
+    return showWhitespaceMode_;
+}
+
+
+/// Sets the show the whitespace mode
+/// @param mode the whitespace mode to set. Can be one of the enumeration values. (Or another integer if you build your own renderer)
+void TextEditorConfig::setShowWhitespaceMode(int mode)
+{
+    showWhitespaceMode_ = mode;
+}
+
+
+
+/// Sets the show whitespace mode
+/// @param str the whitespace mode "show" or "hide" for now. (When invalid hide is used)
+void TextEditorConfig::setShowWhitespaceMode(const QString& str)
+{
+    showWhitespaceMode_ = HideWhitespaces;  //
+    if( str == "show" ) {
+        showWhitespaceMode_ = ShowWhitespaces;
     }
 }
 
