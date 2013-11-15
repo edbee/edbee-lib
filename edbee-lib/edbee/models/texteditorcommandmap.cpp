@@ -69,7 +69,9 @@ TextEditorCommandMap::TextEditorCommandMap(QObject* parent)
     // line entry
     give( "ins_newline", new NewlineCommand() );
 
-    give( "del_left", new BackspaceCommand() );
+    give( "del_left", new BackspaceCommand( BackspaceCommand::DeleteCharLeft ) );
+    give( "del_word_left", new BackspaceCommand( BackspaceCommand::DeleteWordLeft ) );
+    give( "del_line_left", new BackspaceCommand( BackspaceCommand::DeleteLineLeft ) );
     give( "del_right", new RemoveSelectionCommand(1) );
 
     // special text entry commands

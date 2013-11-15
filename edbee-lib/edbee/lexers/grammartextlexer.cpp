@@ -437,11 +437,31 @@ bool GrammarTextLexer::lexLine( int lineIdx, int& currentDocOffset )
         if( offsetInLine == lastOffsetInLine ) {
 
             if( lastFoundRule == foundRule ) {
-                qlog_info() << "Found grammar-rule("<< lineIdx << "," << offsetInLine<<")";
-                qlog_info() << " - line: " << line;
-                qlog_info() << " - rule: " << foundRule->toString();
-                qlog_info() << " INFINITE LOOP PREVENTION";
-                break;
+
+                // I'm very much in doubt how to solve this. What should happend here?
+                // when the same ruleis found, we need to stop else we will keep on
+                // getting this rule forever.
+                //
+                // btw. A grammar that fires this situation is the Ruby Haml language
+                // when using the %tagname construct
+                //
+                // There are several options to fix this:
+                // 1. simply ending the parsing of this line with break (Risk is that the rest of the line isn't parsed)
+                // 2. increase offsetInLine to the next character. (Risk is that prasing goes wrong, and start identifying at the wrong position)
+                // 3. Keep a list with found rules and never allow the same rule again. (Compelexer to implement don't really know if this is the solution)
+
+
+                // DEBUG info:
+                //qlog_info() << "Found grammar-rule("<< lineIdx << "," << offsetInLine<<")";
+                //qlog_info() << " - line: " << line;
+                //qlog_info() << " - rule: " << foundRule->toString();
+                //qlog_info() << " INFINITE LOOP PREVENTION";
+
+                // we're going for option [2] for the moment
+                ++offsetInLine; // never have an endless loop
+
+                // option[1] also works.
+                //break;
             }
         }
         lastFoundRule = foundRule;

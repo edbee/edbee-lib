@@ -20,7 +20,8 @@ namespace edbee {
 
 
 /// The backspace command constructor
-BackspaceCommand::BackspaceCommand()
+BackspaceCommand::BackspaceCommand( int deleteMode )
+    : deleteMode_( deleteMode )
 {
 }
 
@@ -64,35 +65,78 @@ int BackspaceCommand::smartBackspace(TextDocument* doc, int caret )
 }
 
 
+/// Delete characters to the left
+/// @param controller the controller
+/// @param ranges the ranges to delete
+void BackspaceCommand::rangesForDeleteCharLeft(TextEditorController* controller, TextRangeSet* ranges)
+{
+    // there's already a selection, just delete that one
+    if( ranges->hasSelection() ) { return; }
+
+    // when there isn't a selection we need to 'smart-move' the caret
+
+    // when a tab char is used the operation is pretty simple, just delete the character on the left
+    if( controller->textDocument()->config()->useTabChar() ) {
+        ranges->moveCarets(-1);
+
+    // in the case of spaces, we need to some smart stuff :)
+    } else {
+        for( int i=0,cnt=ranges->rangeCount(); i<cnt; ++i ) {
+            TextRange& range = ranges->range(i);
+            range.minVar() = smartBackspace( controller->textDocument(), range.min() );
+        }
+    }
+}
+
+
+/// Delets the word to the left
+/// @param controller the controller
+/// @param ranges the textranges to delete
+void BackspaceCommand::rangesForDeleteWordLeft(TextEditorController* controller, TextRangeSet* ranges)
+{
+    // there's already a selection, just delete that one
+    if( ranges->hasSelection() ) { return; }
+
+    TextEditorConfig* config = controller->textDocument()->config();
+    ranges->moveCaretsByCharGroup( -1, config->whitespaceWithoutNewline(), config->charGroups() );
+}
+
+
+/// Deletes the line to the left
+/// @param controller the controller to remove the data for
+/// @param ranges the textranges that are used for deletion
+void BackspaceCommand::rangesForDeleteLineLeft(TextEditorController* controller, TextRangeSet* ranges)
+{
+    ranges->moveCaretsToLineBoundary( -1, controller->textDocument()->config()->whitespaceWithoutNewline() );
+}
+
+
 /// preforms the backspace command
 /// @param controller the controller to use for the backspace
 void BackspaceCommand::execute(TextEditorController* controller)
 {
     TextSelection* sel = controller->textSelection();
-
-    // when there isn't a selection we need to 'smart-move' the caret
     TextRangeSet* ranges = new TextRangeSet( *sel );
-    if( !ranges->hasSelection() ) {
 
-        // when a tab char is used the operation is pretty simple, just delete the character on the left
-        if( controller->textDocument()->config()->useTabChar() ) {
-            ranges->moveCarets(-1);
-
-        // in the case of spaces, we need to some smart stuff :)
-        } else {
-            for( int i=0,cnt=ranges->rangeCount(); i<cnt; ++i ) {
-                TextRange& range = ranges->range(i);
-                range.minVar() = smartBackspace( controller->textDocument(), range.min() );
-            }
-        }
-
-        // when there still isn't a selection, simply delete/ignore this command
-        if( !ranges->hasSelection() ) {
-            delete ranges;
-            return;
-        }
+    // depending on the delete mode we need to expand the selection
+    switch( deleteMode_ ) {
+        case DeleteCharLeft:
+            rangesForDeleteCharLeft( controller, ranges );
+            break;
+        case DeleteWordLeft:
+            rangesForDeleteWordLeft( controller, ranges );
+            break;
+        case DeleteLineLeft:
+            rangesForDeleteLineLeft( controller, ranges );
+            break;
     }
 
+
+    // when there still isn't a selection, simply delete/ignore this command
+    if( !ranges->hasSelection() ) {
+        delete ranges;
+        return;
+    }
 
     // use the simple replacerangeset function
     controller->beginUndoGroup( new ComplexTextChange( controller ) );
@@ -105,7 +149,14 @@ void BackspaceCommand::execute(TextEditorController* controller)
 /// Converts the command to a string
 QString BackspaceCommand::toString()
 {
-    return "BackspaceCommand";
+    QString mode;
+    switch( deleteMode_ ) {
+        case DeleteCharLeft: mode = "DeleteCharLeft"; break;
+        case DeleteWordLeft: mode = "DeleteWordLeft"; break;
+        case DeleteLineLeft: mode = "DeleteLineLeft"; break;
+        default: mode = "Unkown!";
+    }
+    return QString("BackspaceCommand(%1)").arg(mode);
 }
 
 

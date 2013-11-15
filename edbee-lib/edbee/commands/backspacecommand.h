@@ -10,6 +10,7 @@
 namespace edbee {
 
 class TextDocument;
+class TextRangeSet;
 
 /// A backspace command. The behaviour of the backspace key depends
 /// on several factors:
@@ -22,10 +23,26 @@ class TextDocument;
 class BackspaceCommand : public TextEditorCommand
 {
 public:
-    BackspaceCommand();
+    enum DeleteMode {
+        DeleteCharLeft,
+        DeleteWordLeft,
+        DeleteLineLeft
+    };
+
+
+    BackspaceCommand( int deleteMode=DeleteCharLeft );
     int smartBackspace( TextDocument* doc, int caret );
+
+    void rangesForDeleteCharLeft( TextEditorController* controller, TextRangeSet* ranges );
+    void rangesForDeleteWordLeft( TextEditorController* controller, TextRangeSet* ranges );
+    void rangesForDeleteLineLeft( TextEditorController* controller, TextRangeSet* ranges );
+
     virtual void execute( TextEditorController* controller );
     virtual QString toString();
+
+
+private:
+    int deleteMode_;        ///< The delete mode
 };
 
 
