@@ -3,9 +3,9 @@
  * Author Rick Blommers
  */
 
-#include "backspacecommandtest.h"
+#include "removecommandtest.h"
 
-#include "edbee/commands/backspacecommand.h"
+#include "edbee/commands/removecommand.h"
 #include "edbee/models/chardocument/chartextdocument.h"
 #include "edbee/models/texteditorconfig.h"
 
@@ -14,22 +14,22 @@
 namespace edbee {
 
 
-/// test the smart backspace operation
-void BackspaceCommandTest::init()
+/// test the remove command operation
+void RemoveCommandTest::init()
 {
-    command_ = new BackspaceCommand();
+    command_ = new RemoveCommand( RemoveCommand::RemoveChar, RemoveCommand::Left );
 }
 
 
 /// the clean operation
-void BackspaceCommandTest::clean()
+void RemoveCommandTest::clean()
 {
     delete command_;
 }
 
 
 /// tests the smart backspace operation
-void BackspaceCommandTest::testSmartBackspace()
+void RemoveCommandTest::testSmartBackspace()
 {
     CharTextDocument doc;
     doc.config()->setUseTabChar(false);

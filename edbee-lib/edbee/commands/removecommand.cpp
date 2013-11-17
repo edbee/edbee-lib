@@ -3,7 +3,7 @@
  * Author Rick Blommers
  */
 
-#include "backspacecommand.h"
+#include "removecommand.h"
 
 #include "edbee/models/changes/complextextchange.h"
 #include "edbee/models/textdocument.h"
@@ -19,18 +19,32 @@
 namespace edbee {
 
 
-/// The backspace command constructor
-BackspaceCommand::BackspaceCommand( int deleteMode )
-    : deleteMode_( deleteMode )
+/// The remove command constructor
+/// @param removeMode the mode for removal
+/// @param direction the direction for the removal
+RemoveCommand::RemoveCommand( int removeMode, int direction  )
+    : removeMode_( removeMode )
+    , direction_( direction )
 {
 }
 
 
+/// This method returns the coalesceId to use
+/// Currently all commands in the same direction will get the same coalesceId
+/// @return the coalesceId to use
+int RemoveCommand::coalesceId() const
+{
+    return CoalesceId_Remove + ( direction_ == Left ? 1 : 2 );
+}
+
+
 /// Performs a smart backspace by adjusting the textrange so the backspace leads to the start of a column
+///
 /// @param controller to perform the smartbackspace for
 /// @param caret the current caret position
+///
 /// @return the new caret position
-int BackspaceCommand::smartBackspace(TextDocument* doc, int caret )
+int RemoveCommand::smartBackspace(TextDocument* doc, int caret )
 {
     TextBuffer* buf = doc->buffer();
     TextEditorConfig* config = doc->config();
@@ -65,19 +79,21 @@ int BackspaceCommand::smartBackspace(TextDocument* doc, int caret )
 }
 
 
-/// Delete characters to the left
-/// @param controller the controller
-/// @param ranges the ranges to delete
-void BackspaceCommand::rangesForDeleteCharLeft(TextEditorController* controller, TextRangeSet* ranges)
+/// Changes the ranges so one character on the left is removed
+/// This method can switch to smart-backspace mode, so backspace moves to the previous column at the start of the line
+///
+/// @param controller the active controller
+/// @param ranges (in/out) the ranges to modify for deletion
+void RemoveCommand::rangesForRemoveChar(TextEditorController* controller, TextRangeSet* ranges)
 {
     // there's already a selection, just delete that one
     if( ranges->hasSelection() ) { return; }
 
     // when there isn't a selection we need to 'smart-move' the caret
 
-    // when a tab char is used the operation is pretty simple, just delete the character on the left
-    if( controller->textDocument()->config()->useTabChar() ) {
-        ranges->moveCarets(-1);
+    // when a tab char is used (or we're deleting right) the operation is pretty simple, just delete the character on the left
+    if( direction_ == Right || controller->textDocument()->config()->useTabChar() ) {
+        ranges->moveCarets( directionSign() );
 
     // in the case of spaces, we need to some smart stuff :)
     } else {
@@ -89,48 +105,52 @@ void BackspaceCommand::rangesForDeleteCharLeft(TextEditorController* controller,
 }
 
 
-/// Delets the word to the left
-/// @param controller the controller
-/// @param ranges the textranges to delete
-void BackspaceCommand::rangesForDeleteWordLeft(TextEditorController* controller, TextRangeSet* ranges)
+/// Changes the ranges so one word at the left is removed
+///
+/// @param controller the active controller
+/// @param ranges (in/out) the ranges to modify so it spans a word
+void RemoveCommand::rangesForRemoveWord(TextEditorController* controller, TextRangeSet* ranges)
 {
     // there's already a selection, just delete that one
     if( ranges->hasSelection() ) { return; }
 
     TextEditorConfig* config = controller->textDocument()->config();
-    ranges->moveCaretsByCharGroup( -1, config->whitespaceWithoutNewline(), config->charGroups() );
+    ranges->moveCaretsByCharGroup( directionSign(), config->whitespaceWithoutNewline(), config->charGroups() );
 }
 
 
-/// Deletes the line to the left
-/// @param controller the controller to remove the data for
-/// @param ranges the textranges that are used for deletion
-void BackspaceCommand::rangesForDeleteLineLeft(TextEditorController* controller, TextRangeSet* ranges)
+/// Changes the ranges so one line at the left is removed
+///
+/// @param controller the active controller
+/// @param ranges (in/out) the ranges to modify so it spans a line
+void RemoveCommand::rangesForRemoveLine(TextEditorController* controller, TextRangeSet* ranges)
 {
-    ranges->moveCaretsToLineBoundary( -1, controller->textDocument()->config()->whitespaceWithoutNewline() );
+    ranges->moveCaretsToLineBoundary( directionSign(), controller->textDocument()->config()->whitespaceWithoutNewline() );
 }
 
 
-/// preforms the backspace command
-/// @param controller the controller to use for the backspace
-void BackspaceCommand::execute(TextEditorController* controller)
+/// Performs the remove command
+///
+/// @param controller the active controller
+void RemoveCommand::execute(TextEditorController* controller)
 {
     TextSelection* sel = controller->textSelection();
     TextRangeSet* ranges = new TextRangeSet( *sel );
 
     // depending on the delete mode we need to expand the selection
-    switch( deleteMode_ ) {
-        case DeleteCharLeft:
-            rangesForDeleteCharLeft( controller, ranges );
+    switch( removeMode_ ) {
+        case RemoveChar:
+            rangesForRemoveChar( controller, ranges );
             break;
-        case DeleteWordLeft:
-            rangesForDeleteWordLeft( controller, ranges );
+        case RemoveWord:
+            rangesForRemoveWord( controller, ranges );
             break;
-        case DeleteLineLeft:
-            rangesForDeleteLineLeft( controller, ranges );
+        case RemoveLine:
+            rangesForRemoveLine( controller, ranges );
             break;
+        default:
+            Q_ASSERT(false);
     }
-
 
     // when there still isn't a selection, simply delete/ignore this command
     if( !ranges->hasSelection() ) {
@@ -140,23 +160,37 @@ void BackspaceCommand::execute(TextEditorController* controller)
 
     // use the simple replacerangeset function
     controller->beginUndoGroup( new ComplexTextChange( controller ) );
-    controller->replaceRangeSet( *ranges, "", CoalesceId_Backspace );
+    controller->replaceRangeSet( *ranges, "", coalesceId());
     controller->changeAndGiveTextSelection( ranges );
-    controller->endUndoGroup( CoalesceId_Backspace, true );
+    controller->endUndoGroup( coalesceId(), true );
 }
 
 
 /// Converts the command to a string
-QString BackspaceCommand::toString()
+QString RemoveCommand::toString()
 {
+    // build the mode string
     QString mode;
-    switch( deleteMode_ ) {
-        case DeleteCharLeft: mode = "DeleteCharLeft"; break;
-        case DeleteWordLeft: mode = "DeleteWordLeft"; break;
-        case DeleteLineLeft: mode = "DeleteLineLeft"; break;
+    switch( removeMode_ ) {
+        case RemoveChar: mode = "Char"; break;
+        case RemoveWord: mode = "Word"; break;
+        case RemoveLine: mode = "Line"; break;
         default: mode = "Unkown!";
     }
-    return QString("BackspaceCommand(%1)").arg(mode);
+    // build the direction string
+    QString dir = direction_ == Left ? "Left" : "Right";
+
+    // next returnt he string
+    return QString("RemoveCommand(%1,%2)").arg(mode).arg(dir);
+}
+
+
+/// This method returns the direction sign.
+/// (It seems negative enumeration-values are not allowed on all compilers: http://stackoverflow.com/questions/159034/are-c-enums-signed-or-unsigned )
+/// @return -1 if left direction, 1 on the right direction.
+int RemoveCommand::directionSign() const
+{
+    return direction_ == Left ? -1 : 1;
 }
 
 

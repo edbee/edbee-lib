@@ -5,7 +5,6 @@
 
 #include "texteditorcommandmap.h"
 
-#include "edbee/commands/backspacecommand.h"
 #include "edbee/commands/copycommand.h"
 #include "edbee/commands/cutcommand.h"
 #include "edbee/commands/debugcommand.h"
@@ -14,7 +13,7 @@
 #include "edbee/commands/pastecommand.h"
 #include "edbee/commands/newlinecommand.h"
 #include "edbee/commands/redocommand.h"
-#include "edbee/commands/removeselectioncommand.h"
+#include "edbee/commands/removecommand.h"
 #include "edbee/commands/replaceselectioncommand.h"
 #include "edbee/commands/selectioncommand.h"
 #include "edbee/commands/tabcommand.h"
@@ -69,10 +68,15 @@ TextEditorCommandMap::TextEditorCommandMap(QObject* parent)
     // line entry
     give( "ins_newline", new NewlineCommand() );
 
-    give( "del_left", new BackspaceCommand( BackspaceCommand::DeleteCharLeft ) );
-    give( "del_word_left", new BackspaceCommand( BackspaceCommand::DeleteWordLeft ) );
-    give( "del_line_left", new BackspaceCommand( BackspaceCommand::DeleteLineLeft ) );
-    give( "del_right", new RemoveSelectionCommand(1) );
+    // remove text at the left
+    give( "del_left", new RemoveCommand( RemoveCommand::RemoveChar, RemoveCommand::Left ) );
+    give( "del_word_left", new RemoveCommand( RemoveCommand::RemoveWord, RemoveCommand::Left ) );
+    give( "del_line_left", new RemoveCommand( RemoveCommand::RemoveLine, RemoveCommand::Left ) );
+
+    // remove text at the rigth
+    give( "del_right", new RemoveCommand( RemoveCommand::RemoveChar, RemoveCommand::Right ) );
+    give( "del_word_right", new RemoveCommand( RemoveCommand::RemoveWord, RemoveCommand::Right ) );
+    give( "del_line_right", new RemoveCommand( RemoveCommand::RemoveLine, RemoveCommand::Right ) );
 
     // special text entry commands
     give( "duplicate", new DuplicateCommand() );

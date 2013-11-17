@@ -9,10 +9,10 @@
 
 namespace edbee {
 
-class BackspaceCommand;
+class RemoveCommand;
 
-/// The smart backspace command test
-class BackspaceCommandTest : public edbee::test::TestCase
+/// The unit tests for deleting characters/words and lines
+class RemoveCommandTest : public edbee::test::TestCase
 {
     Q_OBJECT
 
@@ -23,11 +23,11 @@ private slots:
     void testSmartBackspace();
 
 private:
-    BackspaceCommand* command_;
+    RemoveCommand* command_;
 };
 
 
 } // edbee
 
-DECLARE_TEST(edbee::BackspaceCommandTest );
+DECLARE_TEST(edbee::RemoveCommandTest );
 

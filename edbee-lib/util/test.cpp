@@ -137,7 +137,7 @@ OutputHandler::~OutputHandler()
 void OutputHandler::startRunAll(TestEngine* engine)
 {
     Q_UNUSED(engine);
-    qDebug() << "**************** Start Various Bits Test **************";
+    qDebug() << "**************** Start edbee tests **************";
 }
 
 void OutputHandler::endRunAll(TestEngine* engine)

@@ -5,7 +5,7 @@
 
 #include "textundostacktest.h"
 
-#include "edbee/commands/removeselectioncommand.h"
+#include "edbee/commands/removecommand.h"
 #include "edbee/models/textdocument.h"
 #include "edbee/models/textrange.h"
 #include "edbee/models/textundostack.h"
@@ -44,7 +44,7 @@ void TextUndoStackTest::testMultiCaretUndoIssue196()
     testEqual( doc->text(), "1a2b3c4d" );
     testEqual( controller->textSelection()->rangesAsString(), "2>2,4>4");
 
-    RemoveSelectionCommand del(1);
+    RemoveCommand del( RemoveCommand::RemoveChar, RemoveCommand::Right );
     del.execute(controller);
     testEqual( doc->text(), "1abc4d" );                          // 1a|b|c4d
     testEqual( controller->textSelection()->rangesAsString(), "2>2,3>3");

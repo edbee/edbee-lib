@@ -48,7 +48,6 @@ SOURCES += \
     edbee/commands/undocommand.cpp \
     edbee/commands/redocommand.cpp \
     edbee/commands/replaceselectioncommand.cpp \
-    edbee/commands/removeselectioncommand.cpp \
     edbee/commands/copycommand.cpp \
     edbee/commands/cutcommand.cpp \
     edbee/commands/pastecommand.cpp \
@@ -83,7 +82,7 @@ SOURCES += \
     edbee/commands/duplicatecommand.cpp \
     edbee/commands/newlinecommand.cpp \
     edbee/util/util.cpp \
-    edbee/commands/backspacecommand.cpp
+    edbee/commands/removecommand.cpp
 
 HEADERS += \
     util/logging.h \
@@ -117,7 +116,6 @@ HEADERS += \
     edbee/commands/undocommand.h \
     edbee/commands/redocommand.h \
     edbee/commands/replaceselectioncommand.h \
-    edbee/commands/removeselectioncommand.h \
     edbee/commands/copycommand.h \
     edbee/commands/cutcommand.h \
     edbee/commands/pastecommand.h \
@@ -153,7 +151,7 @@ HEADERS += \
     edbee/commands/duplicatecommand.h \
     edbee/commands/newlinecommand.h \
     edbee/util/util.h \
-    edbee/commands/backspacecommand.h
+    edbee/commands/removecommand.h
     
 message($$INCLUDEPATH)
 

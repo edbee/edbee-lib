@@ -114,3 +114,13 @@ Header files
 - You can make an exception (of course) for template classes / function
 - limit the use of templates! This slows down the compilation process and gives very crappy error messages 
 - Prefer pointers/references above class inclusions in the header file 
+
+
+Enumerations
+------------
+On several places in the code you will find enumeration definitions. We do not aways force the enumeration 
+type for variables. The reason for this is, that somethimes it's desirable to extends the number of enumeration options.
+And when forcing a enumeration type, you cannot easy pass a custom value and are limited to the predefined definitions.
+
+
+
