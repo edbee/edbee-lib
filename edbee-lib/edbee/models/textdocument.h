@@ -125,6 +125,7 @@ public:
     int length();
     int lineCount();
     QChar charAt(int idx);
+    QChar charAtOrNull(int idx);
     int offsetFromLine( int line );
     int lineFromOffset( int offset );
     int columnFromOffsetAndLine( int offset, int line=-1 );

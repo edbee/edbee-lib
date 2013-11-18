@@ -382,6 +382,20 @@ QChar TextDocument::charAt(int idx)
 }
 
 
+/// returns the char at the given index if the index is valid
+/// else the null character is returned
+///
+/// @param idx the index to retrieve
+/// @return the character at the given index or the null-character
+QChar TextDocument::charAtOrNull(int idx)
+{
+    if( 0 <= idx && idx < length() ) {
+        return charAt(idx);
+    }
+    return QChar();
+}
+
+
 /// Retrieves the character-offset of the given line
 /// @param line the line number (0-based) to retrieve the offset for
 /// @return the character offset

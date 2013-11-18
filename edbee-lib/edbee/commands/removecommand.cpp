@@ -125,7 +125,19 @@ void RemoveCommand::rangesForRemoveWord(TextEditorController* controller, TextRa
 /// @param ranges (in/out) the ranges to modify so it spans a line
 void RemoveCommand::rangesForRemoveLine(TextEditorController* controller, TextRangeSet* ranges)
 {
-    ranges->moveCaretsToLineBoundary( directionSign(), controller->textDocument()->config()->whitespaceWithoutNewline() );
+    TextDocument* doc = controller->textDocument();
+
+    // process all carets
+    int offset = direction_ == Left ? -1 : 0;
+    for( int rangeIdx=ranges->rangeCount()-1; rangeIdx >= 0; --rangeIdx ) {
+        TextRange& range = ranges->range(rangeIdx);
+        QChar chr = doc->charAtOrNull( range.caret() + offset );
+        if( chr == '\n' ) {
+            range.moveCaret(doc,directionSign());
+        } else {
+            range.moveCaretToLineBoundary(doc, directionSign(), controller->textDocument()->config()->whitespaceWithoutNewline());
+        }
+    }
 }
 
 
@@ -138,6 +150,7 @@ void RemoveCommand::execute(TextEditorController* controller)
     TextRangeSet* ranges = new TextRangeSet( *sel );
 
     // depending on the delete mode we need to expand the selection
+    ranges->beginChanges();
     switch( removeMode_ ) {
         case RemoveChar:
             rangesForRemoveChar( controller, ranges );
@@ -151,6 +164,7 @@ void RemoveCommand::execute(TextEditorController* controller)
         default:
             Q_ASSERT(false);
     }
+    ranges->endChanges();
 
     // when there still isn't a selection, simply delete/ignore this command
     if( !ranges->hasSelection() ) {
