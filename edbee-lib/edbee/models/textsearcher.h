@@ -58,11 +58,11 @@ public:
 
 public slots:
 
-    void findNext( TextEditorWidget* widget );
-    void findPrev( TextEditorWidget* widget );
-    void selectNext( TextEditorWidget* widget );
-    void selectPrev( TextEditorWidget* widget );
-    void selectAll( TextEditorWidget* widget );
+    bool findNext( TextEditorWidget* widget );
+    bool findPrev( TextEditorWidget* widget );
+    bool selectNext( TextEditorWidget* widget );
+    bool selectPrev( TextEditorWidget* widget );
+    bool selectAll( TextEditorWidget* widget );
 
     void selectUnderExpand(TextEditorWidget* widget, bool selectAllTexts );
 

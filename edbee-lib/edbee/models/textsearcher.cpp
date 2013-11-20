@@ -245,57 +245,67 @@ bool TextSearcher::selectAll( TextRangeSet* selection )
 
 /// Finds the next item based on the given caret position in the selection
 /// @param widget the widget to find the next item
-void TextSearcher::findNext(TextEditorWidget* widget )
+bool TextSearcher::findNext(TextEditorWidget* widget )
 {
     QScopedPointer<TextRangeSet> newRangeSet( new TextRangeSet( widget->textSelection() ) );
     if( findNext( newRangeSet.data() ) ) {
         widget->controller()->changeAndGiveTextSelection( newRangeSet.take() );
+        return true;
     }
+    return false;
 }
 
 
 /// Finds the previous item based on the given caret position in the selection
 /// @param widget the widget to search in
-void TextSearcher::findPrev( TextEditorWidget* widget)
+bool TextSearcher::findPrev( TextEditorWidget* widget)
 {
     QScopedPointer<TextRangeSet> newRangeSet( new TextRangeSet( widget->textSelection() ) );
     if( findPrev( newRangeSet.data() ) ) {
         widget->controller()->changeAndGiveTextSelection( newRangeSet.take() );
+        return true;
     }
+    return false;
 }
 
 
 /// Selects the next item that matches the given critaria (Adds an extra selection range )
 /// @param widget the widget to search in
-void TextSearcher::selectNext( TextEditorWidget* widget )
+bool TextSearcher::selectNext( TextEditorWidget* widget )
 {
     QScopedPointer<TextRangeSet> newRangeSet( new TextRangeSet( widget->textSelection() ) );
     if( selectNext( newRangeSet.data() ) ) {
         widget->controller()->changeAndGiveTextSelection( newRangeSet.take() );
+        return true;
     }
+    return false;
 }
 
 
 /// Selects the previous item based on the given caret position in the selection
 /// @param widget the widget to to search in
-void TextSearcher::selectPrev( TextEditorWidget* widget )
+bool TextSearcher::selectPrev( TextEditorWidget* widget )
 {
     QScopedPointer<TextRangeSet> newRangeSet( new TextRangeSet( widget->textSelection() ) );
     if( selectPrev( newRangeSet.data() ) ) {
         widget->controller()->changeAndGiveTextSelection( newRangeSet.take() );
+        return true;
     }
+    return false;
 }
 
 
 /// Selects all matches of the current item
 /// @param widget the widget to search in
 /// @param selection the selection to change
-void TextSearcher::selectAll( TextEditorWidget* widget )
+bool TextSearcher::selectAll( TextEditorWidget* widget )
 {
     QScopedPointer<TextRangeSet> newRangeSet( new TextRangeSet( widget->textSelection() ) );
     if( selectAll( newRangeSet.data() ) ) {
         widget->controller()->changeAndGiveTextSelection( newRangeSet.take() );
+        return true;
     }
+    return false;
 }
 
 /// A smart selection: when there's no selection the current word is used and selected.
