@@ -16,7 +16,7 @@ class TextDocument;
 class TextEditorController;
 
 
-/// A basic command
+/// A basic change
 class TextChange
 {
 public:
@@ -49,12 +49,14 @@ public:
     bool isDocumentChange() { return controllerContext() == 0; }
 
     /// A method to move the offset with the given delta
+    /// @param offset the offset where the delta is applied
     /// @param delta the delta to move
-    virtual void moveOffset( int delta ) { Q_UNUSED(delta); }
+    virtual void applyOffsetDelta( int offset, int length, int newLength ) { Q_UNUSED(offset); Q_UNUSED(length); Q_UNUSED(newLength); }
 
     /// This method can be overriden by a textchange to react when the line-delta is changed
+    /// @param line
     /// @param delta the delta to move the line
-    virtual void moveLine( int delta ) { Q_UNUSED(delta); }
+    virtual void applyLineDelta( int line, int length, int newLength) { Q_UNUSED(line); Q_UNUSED(length); Q_UNUSED(newLength); }
 
 
     virtual QString toString() = 0;

@@ -23,7 +23,7 @@ public:
 //    virtual bool canMerge( TextDocument* document, TextChange* textChange );
     virtual bool merge(TextDocument *document, TextChange* textChange );
 
-    virtual void moveOffset( int delta );
+    virtual void applyOffsetDelta( int offset, int length, int newLength );
 
     virtual QString toString();
 

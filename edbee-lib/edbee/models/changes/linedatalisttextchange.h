@@ -26,13 +26,13 @@ public:
 
     virtual bool merge(TextDocument* document, TextChange* textChange );
 
-    virtual void moveLine( int delta );
+    virtual void applyLineDelta( int line, int length, int newLength );
 
     virtual QString toString();
 
-    int line() { return line_; }
-    int length() { return length_; }
-    int newLength() { return newLength_; }
+    int line();
+    int length();
+    int newLength();
 
 
 private:

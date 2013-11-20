@@ -52,9 +52,9 @@ bool LineDataTextChange::merge(TextDocument* document, TextChange* textChange)
 }
 
 /// line is moved with the given delta
-void LineDataTextChange::moveLine(int delta)
+void LineDataTextChange::applyLineDelta(int line, int length, int newLength)
 {
-    line_ += delta;
+    line_ += line;
 }
 
 QString LineDataTextChange::toString()

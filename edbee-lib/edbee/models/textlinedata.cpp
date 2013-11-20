@@ -270,8 +270,10 @@ void TextLineDataManager::giveList(int line, TextLineDataList *newList)
 /// emits a lineDataChanged signal
 void TextLineDataManager::fillWithEmpty(int line, int length, int newLength)
 {
+
     destroyRange(line, length);
     textLineDataList_.fill( line, length, 0, newLength );
+//qlog_info() << "- TextLineDataManager::fillWithEmpty( line: " << line << ", length " << length << " newLength: " << newLength << ") len:" << this->textLineDataList_.length();
     emit lineDataChanged( line, length, newLength );
 }
 

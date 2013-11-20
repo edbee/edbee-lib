@@ -79,9 +79,11 @@ const QString SingleTextChange::docText(TextDocument* doc)
 }
 
 /// execute the a spatial change
-void SingleTextChange::moveOffset(int delta)
+void SingleTextChange::applyOffsetDelta(int offset, int length, int newLength)
 {
-    offset_ += delta;
+    if( offset <= offset ) {
+        offset_ += ( newLength - length );
+    }
 }
 
 /// This method returns a string used for testing

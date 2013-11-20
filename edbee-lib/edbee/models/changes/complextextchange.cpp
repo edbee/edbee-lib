@@ -79,7 +79,7 @@ void ComplexTextChange::revert( TextDocument* document )
 bool ComplexTextChange::mergeTextChange( TextDocument* document, SingleTextChange* gTextChange, int& nextTextChangeMergeIndex )
 {
     bool result = false;
-//qlog_info() << "MERGE=============";
+//qlog_info() << "MERGE===================================";
 //qlog_info() << "A> " << toString();
 //qlog_info() << "B> " << gTextChange->toString();
 
@@ -90,19 +90,53 @@ bool ComplexTextChange::mergeTextChange( TextDocument* document, SingleTextChang
 
         // merge succeeded?
         if( change->merge( document, gTextChange ) ) {
+
+            // find the linechange belonging to this textchange
+            LineDataListTextChange* lineDataChange = 0;
+
+            int nextBoundaryIndex = i+1;
+            while( nextBoundaryIndex<cnt ) {
+
+                // remember the line-data-change
+                if( dynamic_cast<LineDataListTextChange*>(change) ) {
+                    lineDataChange = dynamic_cast<LineDataListTextChange*>(change);
+                }
+
+                if( dynamic_cast<SingleTextChange*>(at(nextBoundaryIndex)) ) {
+                    break;
+                }
+                ++nextBoundaryIndex ;
+            }
+
+
+
+            // increase the next change to merge index
             Q_ASSERT( textChange );
             nextTextChangeMergeIndex = i+1;
             //appendChange = false;
             result = true;
 
             // we need to get the delta of the merge change
-            int delta = gTextChange->length() - gTextChange->text().length();
-            int lineDelta = gTextChange->docText( document ).count('\n') - gTextChange->text().count('\n');
+//            int delta = gTextChange->length() - gTextChange->text().length();
+//            int lineDelta = gTextChange->docText( document ).count('\n') - gTextChange->text().count('\n');
+//            int lineDelta = lineDataChange ? lineDataChange->length() - lineDataChange ->newLength() : 0;
 
-    //qlog_info() << "DELTA: " << delta << " + " << lineDelta << "("<<change->toString()<<")";
-    //qlog_info() << "WE SHOULD ALSO move the line DELTA for this change";
+//    qlog_info() << "DELTA: " << delta << " + " << lineDelta << "("<<change->toString()<<")";
+//    qlog_info() << "WE SHOULD ALSO move the line DELTA for this change.. offset: " << nextBoundaryIndex;
 
             // apply the delta of this merge to all NEXT items in the list
+            for( i=nextBoundaryIndex; i<cnt; ++i ) {
+                change = at(i);
+
+//idee, laat de change zelf bepalen of de move noodzakelijk is!!!!!!!!!!!
+                change->applyOffsetDelta( gTextChange->offset(), gTextChange->text().length(), gTextChange->length() );
+                if( lineDataChange ) {
+                   change->applyLineDelta( lineDataChange->line(), lineDataChange->length(), lineDataChange->newLength() );
+                }
+            }
+
+
+            /*
             bool nextBorderChangeFound = false;
             for(++i; i<cnt; ++i ) {
                 change = at(i);
@@ -111,8 +145,9 @@ bool ComplexTextChange::mergeTextChange( TextDocument* document, SingleTextChang
                 // only increase the offsets AFTER the next textchange or linedata-change (dirty hack for line-data issue)
                 // Very diry solution...(very bugprone !!! )
                 if( !nextBorderChangeFound ) {
-                   TextChange* borderChange = dynamic_cast<LineDataListTextChange*>(change);
-                   if( !borderChange ) { borderChange = dynamic_cast<SingleTextChange*>(change); }
+//                   TextChange* borderChange = dynamic_cast<LineDataListTextChange*>(change);
+                   TextChange* borderChange = dynamic_cast<SingleTextChange*>(change);
+//                   if( !borderChange ) { borderChange = dynamic_cast<SingleTextChange*>(change); }
                    if( borderChange ) { nextBorderChangeFound = true; }
                 }
                 if( nextBorderChangeFound ) {
@@ -121,6 +156,7 @@ bool ComplexTextChange::mergeTextChange( TextDocument* document, SingleTextChang
                 }
     //qlog_info() << " TODO: we should add moveLine?";
             }
+            */
 
         // merge failed, we're in deep trouble
         }
