@@ -25,7 +25,6 @@ public:
     virtual void revert(TextDocument* doc);
 
     virtual bool merge(TextDocument* document, TextChange* textChange );
-
     virtual void applyLineDelta( int line, int length, int newLength );
 
     virtual QString toString();
@@ -33,6 +32,9 @@ public:
     int line();
     int length();
     int newLength();
+
+    TextLineDataList** oldListList();
+    int oldListListLength();
 
 
 private:

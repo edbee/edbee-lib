@@ -128,7 +128,7 @@ bool LineDataListTextChange::merge(TextDocument* document, TextChange* textChang
                 // we need to store (and remember) the removed line items
                 oldListList_ = new TextLineDataList*[mergedLength];
 
-                if( line_ < lineChange->line_ ) {
+                if( line_ <= lineChange->line_ ) {
                     memcopy_or_zerofill( oldListList_, old, sizeof(TextLineDataList*)*length_ );
                     memcopy_or_zerofill( oldListList_ + length_ , lineChange->oldListList_, sizeof(TextLineDataList*)*lineChange->length_);
 
@@ -147,10 +147,7 @@ bool LineDataListTextChange::merge(TextDocument* document, TextChange* textChang
 //qlog_info() << " ok: " << toString();
             return true;
         }
-
     }
-
-
 
 //qlog_info() << "=(c) " << this->toString();
     return false;
@@ -195,6 +192,26 @@ int LineDataListTextChange::newLength()
 {
     return newLength_;
 }
+
+
+/// returns the old list list
+TextLineDataList**LineDataListTextChange::oldListList()
+{
+    return oldListList_;
+}
+
+
+/// retursn the length of th eold list list
+int LineDataListTextChange::oldListListLength()
+{
+    if( oldListList_ ) {
+        return length_;
+    }
+    return 0;
+}
+
+
+/// Returns the length of the old list list
 
 
 } // edbee
