@@ -11,6 +11,7 @@
 #include <QStringList>
 
 #include "edbee/commands/copycommand.h"
+#include "edbee/models/changes/complextextchange.h"
 #include "edbee/models/textbuffer.h"
 #include "edbee/models/textchange.h"
 #include "edbee/models/textdocument.h"
@@ -59,6 +60,10 @@ void PasteCommand::execute(TextEditorController* controller)
             newRanges.addRange(offset,offset);
         }
 
+//        controller->beginUndoGroup( new ComplexTextChange( controller ) );
+//        controller->changeAndGiveTextSelection(newRanges);
+//        controller->replaceSelection( text  );
+//        controller->endUndoGroup( commandId(), true );
         controller->replaceRangeSet( newRanges, text, commandId() );
         return;
 

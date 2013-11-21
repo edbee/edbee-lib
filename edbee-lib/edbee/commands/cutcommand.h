@@ -11,17 +11,17 @@ namespace edbee {
 
 class TextEditorController;
 
+
+/// Performs a cut command. The cut command removes the selected content
+/// and places onto the clipboard.
+///
+/// When pressing cut without selection, the full line is cut
 class CutCommand : public TextEditorCommand
 {
 public:
-    CutCommand();
-
-    /// This method should return the command identifier
-    virtual int commandId() { return CoalesceId_CutLine; }
-
-
     virtual void execute( TextEditorController* controller );
     virtual QString toString();
 };
+
 
 } // edbee
