@@ -90,23 +90,30 @@ void ComplexTextChange::addOffsetDeltaToTextChanges(int fromIndex, int delta)
 }
 
 
-/// gives the given textchange to the merge routine
-void ComplexTextChange::giveSingleTextChange(TextDocument* doc, SingleTextChange* newChange)
+/// This method finds the insert index for the given offset
+/// @param offset the offset of the change
+/// @return the inertindex used for inserting the data
+int ComplexTextChange::findTextChangeInsertIndexForOffset(int offset)
 {
-    //qlog_info() << "giveSingleTextChange" << newChange->toString();
-    // remember the orginal ranges so we know which changes are affected by this new change
-    int orgStartOffset = newChange->offset();
-    int orgEndOffset = newChange->offset() + newChange->newLength();
-
-    // some variables to remebmer
-    int mergedAtIndex = -1;                 // the index that a merge succeeded
-    int addDeltaFromIndex = size();         // From which change index should we add delta?!
-    int delta = 0;
-
-    // First try to merge this new change
+    int insertIndex = 0;
     for( int i=0,cnt=textChangeList_.size(); i<cnt; ++i ){
         SingleTextChange* change = textChangeList_.at(i);
-//qlog_info() << " - " << i << change->toString();
+        if( change->offset() < offset ) {
+            insertIndex = i+1;
+        }
+    }
+    return insertIndex;
+}
+
+
+/// This method tries to merge the given textchagne
+/// @param newChange the new change to merge
+/// @param delta (out) the delta applied to this change
+/// @return the merged index or -1 if not merged!
+int ComplexTextChange::mergeTextChange( TextDocument* doc, SingleTextChange* newChange, int& delta)
+{
+    for( int i=0,cnt=textChangeList_.size(); i<cnt; ++i ){
+        SingleTextChange* change = textChangeList_.at(i);
 
         // we need the previous length and new-length to know how the delta is changed of the other items
         int prevLength = change->length();
@@ -117,66 +124,77 @@ void ComplexTextChange::giveSingleTextChange(TextDocument* doc, SingleTextChange
 
             // apply the delta (newLength and length is reversed when in undo state!)
             delta += (change->length()-prevLength) - (change->newLength()-prevNewLength);
-//qlog_info() << "* merged: " << change->toString() << " (delta: " << delta << ")";
-            mergedAtIndex = i;
+            return i;
+        }
+    }
+    return -1;
+}
+
+
+/// When a normal merge was succesful (with mergeTextChange) we need to inverseMerge the other overlapping textchanges
+/// @param mergedAtIndex the index where the first merge was succeeded
+/// @param orgStartOffset the offset of the orgingal merged textchange
+/// @param orgEndoOffset the end offset of the original merged textchange
+/// @param delta the current delta used for offset calculating
+void ComplexTextChange::inverseMergeRemainingOverlappingTextChanges( TextDocument* doc, int mergedAtIndex, int orgStartOffset, int orgEndOffset, int delta)
+{
+    SingleTextChange* mergedChange = textChangeList_.at(mergedAtIndex);
+    for( int i=mergedAtIndex+1; i<textChangeList_.size(); ++i ) {
+        SingleTextChange* nextChange= textChangeList_.at(i);
+
+        // only perform merging if the change overlapped a previous change
+        if( nextChange->offset() < orgEndOffset && orgStartOffset < (nextChange->offset() + nextChange->length())   ) {
+
+            // take the delta of the previous change before the merge
+            int tmpDelta = mergedChange->newLength() - mergedChange->length() + delta;
+
+            // alter the delta, so we find the correct merge index
+            nextChange->addOffset(tmpDelta);
+
+            // notice the 'inversion of the merge. We apply the merged change to the next change
+            if( nextChange->giveAndMerge( doc, mergedChange) ) {
+                mergedChange = nextChange;
+                textChangeList_.removeAt(mergedAtIndex);
+                --i;
+            } else {
+                // remove the temporary delta
+                nextChange->addOffset(-tmpDelta);
+                break;  // cannot merge, we're done
+            }
+        } else {
             break;
         }
     }
+}
+
+
+/// gives the given textchange to the merge routine
+void ComplexTextChange::giveSingleTextChange(TextDocument* doc, SingleTextChange* newChange)
+{
+    //qlog_info() << "giveSingleTextChange" << newChange->toString();
+    // remember the orginal ranges so we know which changes are affected by this new change
+    int orgStartOffset = newChange->offset();
+    int orgEndOffset = newChange->offset() + newChange->newLength();
+
+    // some variables to remebmer
+    int addDeltaFromIndex = size();         // From which change index should we add delta?!
+    int delta = 0;
+
+    // First try to merge this new change
+    int mergedAtIndex = mergeTextChange( doc, newChange, delta );
 
     // when we could merge the change,
-    // we need to try to merge it with earlier changes
+    // we need to try to merge it with next overlapping changes
     if( mergedAtIndex >= 0 ) {
 
-        SingleTextChange* mergedChange = textChangeList_.at(mergedAtIndex);
-        for( int i=mergedAtIndex+1; i<textChangeList_.size(); ++i ) {
-            SingleTextChange* nextChange= textChangeList_.at(i);
-//qlog_info() << "   - " << i << nextChange->toString();
-
-            // only perform merging if the change overlapped a previous change
-            if( nextChange->offset() < orgEndOffset && orgStartOffset < (nextChange->offset() + nextChange->length())   ) {
-
-//                int prevLength = nextChange->length();
-//                int prevNewLength = nextChange->newLength();
-
-                // take the delta of the previous change before the merge
-                int tmpDelta = mergedChange->newLength() - mergedChange->length() + delta;
-//    qlog_info() << "       tmpDelta:" << tmpDelta;
-                // alter the delta, so we find the correct merge index
-                nextChange->addOffset(tmpDelta);
-
-                // notice the 'inversion of the merge. We apply the merged change to the next change
-                if( nextChange->giveAndMerge( doc, mergedChange) ) {
-//    qlog_info() << "  ~ delta: " << delta << ", length: " << prevLength << ", newLength: " << prevNewLength;
-                    //delta += (nextChange->length()-prevLength) - (nextChange->newLength()-prevNewLength);
-                    mergedChange = nextChange;
-//    qlog_info() << "  * merged2: " << mergedChange->toString() << " (delta: " << delta << ")";
-                    textChangeList_.removeAt(mergedAtIndex);
-                    --i;
-                } else {
-                    break;  // cannot merge, we're done
-
-                    // remove the temporary delta
-                    nextChange->addOffset(-tmpDelta);
-                }
-            } else {
-                break;
-            }
-        }
-//        qlog_info() << "Try to merge to morenodes, and adjust delta's on merge :D";
+        inverseMergeRemainingOverlappingTextChanges( doc, mergedAtIndex, orgStartOffset, orgEndOffset, delta );
         addDeltaFromIndex = mergedAtIndex + 1;
 
-    // not merged? then we need to add the change
-    // ad the given index
+    // not merged? then we need to add the change at the given index
     } else {
 
         // find the insert index
-        int insertIndex = 0;
-        for( int i=0,cnt=textChangeList_.size(); i<cnt; ++i ){
-            SingleTextChange* change = textChangeList_.at(i);
-            if( change->offset() < newChange->offset() ) {
-                insertIndex = i+1;
-            }
-        }
+        int insertIndex = findTextChangeInsertIndexForOffset( newChange->offset() );
 
         // just insert change
         textChangeList_.insert( insertIndex, newChange);
@@ -184,9 +202,6 @@ void ComplexTextChange::giveSingleTextChange(TextDocument* doc, SingleTextChange
 
         // apply the delta (newLength and length is reversed when in undo state!)
         delta += newChange->newLength() - newChange->length();
-
-//        qlog_info() << "* insert: " << newChange->toString() << " (delta: " << delta << ")";
-
     }
 
     // next apply the delta to the following change
@@ -224,7 +239,6 @@ void ComplexTextChange::giveChange( TextDocument* doc, TextChange* change)
     if( selectionChange ) {
         delete newSelection_;
         newSelection_ = selectionChange->takeRangeSet();
-        /// qlog_info() << "take new selection: " << QString::number( (quintptr)newSelection_,16);
 
         /// we can simply delete the change, the ComplexTextChange automaticly records the last change selection on the undoGroupEnd
         delete change;

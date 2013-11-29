@@ -32,9 +32,14 @@ public:
     virtual void execute(TextDocument* document);
     virtual void revert(TextDocument* document);
 
-    virtual void addOffsetDeltaToTextChanges( int fromIndex, int delta );
-    virtual void giveSingleTextChange( TextDocument* doc, SingleTextChange* change );
+private:
+    void addOffsetDeltaToTextChanges( int fromIndex, int delta );
+    int findTextChangeInsertIndexForOffset( int offset );
+    int mergeTextChange(TextDocument* doc, SingleTextChange* newChange, int& delta );
+    void inverseMergeRemainingOverlappingTextChanges(TextDocument* doc, int mergedAtIndex, int orgStartOffset, int orgEndOffset , int delta);
 
+public:
+    void giveSingleTextChange( TextDocument* doc, SingleTextChange* change );
     virtual void giveLineDataListTextChange( LineDataListTextChange* change );
 
     virtual void giveChange( TextDocument* doc, TextChange* change );
