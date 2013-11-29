@@ -75,9 +75,7 @@ void TextBufferTest::testColumnFromOffsetAndLine()
 
     // line overflow should return 0
     testEqual( buf->columnFromOffsetAndLine( 0, 100  ), 0 );
-
 }
-
 
 
 /// This method tests the replace text method
@@ -161,11 +159,10 @@ void TextBufferTest::testReplaceText()
         // inserting a text should change the newlines
         buf->replaceText(0,10,"");
         testBuffer( buf, "","0");
-
-
 }
 
 
+/// This method tests the finchar pos within range function
 void TextBufferTest::testFindCharPosWithinRange()
 {
     CharTextDocument doc;
@@ -205,6 +202,8 @@ void TextBufferTest::testFindCharPosWithinRange()
 
 }
 
+
+/// This method is for testing the line function
 void TextBufferTest::testLine()
 {
     CharTextDocument doc;
@@ -219,10 +218,10 @@ void TextBufferTest::testLine()
     testEqual( buf->lineWithoutNewline(3), "ddd" );
 }
 
+
+/// test method test the working of the lineoffsetvector. (Which fgot corrupted with certain replaces)
 void TextBufferTest::testReplaceIssue141()
 {
-qDebug() << "----------------------------------------------------------------";
-
     CharTextDocument doc;
     TextBuffer* buf = doc.buffer();
 //    CharTextBuffer* charBuf = dynamic_cast<CharTextBuffer*>(buf);
@@ -246,11 +245,9 @@ qDebug() << "----------------------------------------------------------------";
     // aa|bb|22|33
     // 0  3  6  9
 
-
     // next append the new text
     buf->replaceText(0,4,"aa\nbb\n");
     testBuffer( buf, "aa\nbb\n22\n33", "0,3,6,9" );
-
 }
 
 

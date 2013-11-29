@@ -40,13 +40,16 @@ void LineDataTextChange::revert(TextDocument* doc)
 }
 
 /// merge is never a problem, simply
-bool LineDataTextChange::merge(TextDocument* document, TextChange* textChange)
+bool LineDataTextChange::giveAndMerge(TextDocument* document, TextChange* textChange)
 {
     Q_UNUSED( document );
     Q_UNUSED( textChange );
     LineDataTextChange* change =  dynamic_cast<LineDataTextChange*>(lineData_);
     if( change ) {
-        return line_ == change->line_ && field_ == change->field_;
+        if( line_ == change->line_ && field_ == change->field_ ) {
+            delete textChange;
+            return true;
+        }
     }
     return false;
 }
@@ -54,7 +57,9 @@ bool LineDataTextChange::merge(TextDocument* document, TextChange* textChange)
 /// line is moved with the given delta
 void LineDataTextChange::applyLineDelta(int line, int length, int newLength)
 {
-    line_ += line;
+    if( line <= line_ ) {
+        line_ += newLength - length;
+    }
 }
 
 QString LineDataTextChange::toString()

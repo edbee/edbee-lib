@@ -208,8 +208,8 @@ public:
     virtual ~OutputHandler();
 
     // writes down the start of a multiple test run
-    virtual void startRunAll( TestEngine* engine );
-    virtual void endRunAll( TestEngine* engine );
+    virtual void startTestRun( TestEngine* engine );
+    virtual void endTestRun( TestEngine* engine );
 
 
     // writes down the 'category' of the test
@@ -257,8 +257,10 @@ public:
     virtual bool hasTest(TestCase* object);
     virtual void addTest(TestCase* object);
     virtual int runAll();
-    virtual int run(TestCase* object);
+    virtual int run( TestCase* object );
     virtual int run( const QString& name );
+    virtual void startRun();
+    virtual void endRun();
 
     virtual OutputHandler* outputHandler() { return outputHandlerRef_; }
     virtual void setOutputHandler( OutputHandler* handler ) { outputHandlerRef_ = handler; }

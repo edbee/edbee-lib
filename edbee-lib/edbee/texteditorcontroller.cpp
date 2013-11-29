@@ -570,7 +570,9 @@ void TextEditorController::replaceSelection(const QStringList& texts, int coales
 /// @param coalesceId the identifier for grouping undo operations
 void TextEditorController::replaceRangeSet(TextRangeSet& rangeSet, const QString& text, int coalesceId)
 {
-    textDocument()->replaceRangeSet(rangeSet, text, coalesceId, this );
+    textDocument()->beginChanges( this );
+    textDocument()->replaceRangeSet(rangeSet, text);
+    textDocument()->endChanges( coalesceId );
     notifyStateChange();
 }
 
@@ -581,7 +583,9 @@ void TextEditorController::replaceRangeSet(TextRangeSet& rangeSet, const QString
 /// @param coalesceId the identifier for grouping undo operations
 void TextEditorController::replaceRangeSet(TextRangeSet& rangeSet, const QStringList& texts, int coalesceId)
 {
-    textDocument()->replaceRangeSet( rangeSet, texts, coalesceId, this );
+    textDocument()->beginChanges( this );
+    textDocument()->replaceRangeSet( rangeSet, texts );
+    textDocument()->endChanges( coalesceId );
     notifyStateChange();
 }
 

@@ -7,8 +7,6 @@
 
 #include "edbee/models/textchange.h"
 #include "edbee/texteditorcommand.h"
-
-// todo delete these two line
 #include "edbee/models/textdocument.h"
 
 #include "debug.h"
@@ -17,6 +15,8 @@
 
 namespace edbee {
 
+
+/// Constructs the main undostack
 TextUndoStack::TextUndoStack( TextDocument* doc, QObject *parent)
     : QObject(parent)
     , documentRef_(doc)
@@ -33,6 +33,7 @@ TextUndoStack::TextUndoStack( TextDocument* doc, QObject *parent)
     lastCoalesceIdStack_.push(0);
 }
 
+
 /// the undo stack items
 TextUndoStack::~TextUndoStack()
 {
@@ -40,7 +41,8 @@ TextUndoStack::~TextUndoStack()
     destruct();
 }
 
-/// deletes all new-ed objects
+
+/// deletes all created objects
 void TextUndoStack::destruct()
 {
     qDeleteAll(changeList_);
@@ -68,11 +70,13 @@ void TextUndoStack::clear()
     }
 }
 
+
 /// Registers acontroller for it's own view pointer
 void TextUndoStack::registerContoller(TextEditorController* controller)
 {
     controllerIndexMap_.insert(controller,changeIndex_);
 }
+
 
 /// Unregisters the given controller
 void TextUndoStack::unregisterController(TextEditorController* controller)
@@ -90,6 +94,7 @@ void TextUndoStack::beginUndoGroup( TextChangeGroup* group )
     emit undoGroupStarted( group );
 }
 
+
 /// This method returns the current active group
 /// @return the current undo stack item or 0
 TextChangeGroup* TextUndoStack::currentGroup()
@@ -98,6 +103,10 @@ TextChangeGroup* TextUndoStack::currentGroup()
     return undoGroupStack_.last();
 }
 
+
+/// Ends the undogroup
+/// @param coalesceId the coalesceId to use
+/// @param flatten should the textchange groups be flattened
 void TextUndoStack::endUndoGroup(int coalesceId, bool flatten )
 {
     Q_ASSERT(!undoGroupStack_.isEmpty());
@@ -130,6 +139,7 @@ void TextUndoStack::endUndoGroup(int coalesceId, bool flatten )
     }
 }
 
+
 /// Ends the undo-group and discards all content
 void TextUndoStack::endUndoGroupAndDiscard()
 {
@@ -145,6 +155,7 @@ void TextUndoStack::endUndoGroupAndDiscard()
     }
 }
 
+
 /// returns the number of stacked undo-groups
 int TextUndoStack::undoGroupLevel()
 {
@@ -158,17 +169,22 @@ int TextUndoStack::lastCoalesceIdAtCurrentLevel()
     return lastCoalesceIdStack_[ lastCoalesceIdStack_.size()-1 ];
 }
 
+
+/// Sets the last coalesceId at the current level
 void TextUndoStack::setLastCoalesceIdAtCurrentLevel(int id)
 {
     lastCoalesceIdStack_[ lastCoalesceIdStack_.size()-1 ] = id;
 }
 
+
+/// Resets all coalsceIds
 void TextUndoStack::resetAllLastCoalesceIds()
 {
     for( int i=0, cnt=lastCoalesceIdStack_.size(); i<cnt; ++i ) {
         lastCoalesceIdStack_[i]=0;
     }
 }
+
 
 /// This method gives the command and tries to coalesce the command if possible
 /// Warning when a change is MERGED, the original change is deleted!!! And the original pointer is invalid!!!!
@@ -198,12 +214,11 @@ bool TextUndoStack::giveChange(TextChange* change, int coalesceId )
         // try to merge the operation
         if( merge ) {
             TextChange* lastChange = group->last();
-            if( lastChange && lastChange->merge( documentRef_, change ) ) {
-                delete change;
+            if( lastChange && lastChange->giveAndMerge( documentRef_, change ) ) {
                 return true;
             }
         }
-        group->giveCommand(change);
+        group->giveChange( document(), change);
         return false;
 
     // normal operation
@@ -217,9 +232,8 @@ bool TextUndoStack::giveChange(TextChange* change, int coalesceId )
         // try to merge the operation
         if( merge ) {
             TextChange* lastChange = this->findUndoChange(controller);
-            if( lastChange && lastChange->merge( documentRef_, change ) ) {
-                emit changeMerged( lastChange, change );
-                delete change;
+            if( lastChange && lastChange->giveAndMerge( documentRef_, change ) ) {
+                //emit changeMerged( lastChange, change );
                 dumpStackInternal();
                 return true;
             }
@@ -248,6 +262,7 @@ bool TextUndoStack::giveChange(TextChange* change, int coalesceId )
     return false;
 }
 
+
 /// Should check if a undo operation can be performed.
 /// When no controller is given a document-undo is checkd
 /// else a view specific soft undo is tested
@@ -256,6 +271,7 @@ bool TextUndoStack::canUndo(TextEditorController* controller)
     return findUndoChange(controller) != 0;
 }
 
+
 /// Should check if a redo operation can be performed.
 /// When no controller is given a document-redo is checkd
 /// else a view specific soft redo is tested
@@ -263,6 +279,7 @@ bool TextUndoStack::canRedo(TextEditorController* controller)
 {
     return findRedoChange(controller) != 0;
 }
+
 
 /// performs an undo operation
 /// @param controller this method is called
@@ -287,7 +304,10 @@ void TextUndoStack::undo(TextEditorController* controller, bool controllerOnly )
     undoRunning_ = false;
 }
 
+
 /// performs the redo operation for the given controller
+/// @param controller the controller to execute the redo for
+/// @param controllerOnly undo controller undo's only?
 void TextUndoStack::redo(TextEditorController* controller, bool controllerOnly )
 {
     Q_ASSERT(!redoRunning_);
@@ -307,16 +327,20 @@ void TextUndoStack::redo(TextEditorController* controller, bool controllerOnly )
     redoRunning_ = false;
 }
 
+
 /// returns the number of changes on the stack
 int TextUndoStack::size()
 {
     return changeList_.size();
 }
 
+
+/// returns the change at the given index
 TextChange* TextUndoStack::at(int idx)
 {
     return changeList_.at(idx);
 }
+
 
 /// This method return the index that's active for the given controller
 /// The currentIndex points directly AFTER the last placed item on the stack
@@ -331,6 +355,7 @@ int TextUndoStack::currentIndex(TextEditorController* controller)
 
 }
 
+
 /// This method returns the current redo change. This maybe the change for the given context or the document change
 /// depending on what comes first
 /// @param controller the controller this change is for
@@ -344,6 +369,7 @@ TextChange* TextUndoStack::findRedoChange(TextEditorController* controller)
     return 0;
 }
 
+
 /// This method returns the last index for a given controller
 /// The lastIndex points to the index on the stack
 /// @return the index on the stack or -1 if the item isn't on the undo-stack
@@ -351,6 +377,18 @@ int TextUndoStack::lastIndex(TextEditorController *controller)
 {
     return currentIndex( controller ) - 1;
 }
+
+
+/// Returns last textchange on the undo stack
+/// @param controller the controller
+/// @return the last change (with optional the controller context) 0 if no last change
+TextChange* TextUndoStack::last(TextEditorController* controller)
+{
+    int idx = lastIndex(controller);
+    if( idx < 0 ) { return  0; }
+    return at(idx);
+}
+
 
 /// The number of doc-'undo' items on the stack
 int TextUndoStack::sizeInDocChanges()
@@ -361,6 +399,7 @@ int TextUndoStack::sizeInDocChanges()
     }
     return count;
 }
+
 
 /// This method returns the current doc change index
 int TextUndoStack::currentIndexInDocChanges()
@@ -382,6 +421,7 @@ TextChange* TextUndoStack::findUndoChange(TextEditorController* controller)
     }
     return 0;
 }
+
 
 /// Marks the current documentIndex as persisted
 void TextUndoStack::setPersisted(bool enabled)
@@ -414,12 +454,12 @@ bool TextUndoStack::isPersisted()
     return true;
 }
 
+
 /// This method returns the current persisted index
 int TextUndoStack::persistedIndex()
 {
     return persistedIndex_;
 }
-
 
 
 /// makes a dump of the current stack
@@ -469,12 +509,15 @@ QString TextUndoStack::dumpStack()
     return result;
 }
 
+
+/// Dumps the internal stack
 void TextUndoStack::dumpStackInternal()
 {
 #ifdef DUMP_UNDO_STACK
-    dumpStack();
+    qlog_info() << dumpStack();
 #endif
 }
+
 
 /// This method finds the next redo-item
 /// @param index the index to search it from
@@ -493,6 +536,7 @@ int TextUndoStack::findRedoIndex(int index, TextEditorController* controller)
     return changeList_.size();
 }
 
+
 /// This method finds the index of the given stackitem from the given index
 /// @param  index the previous index
 /// @param controller the controller context
@@ -508,7 +552,6 @@ int TextUndoStack::findUndoIndex( int index, TextEditorController* controller)
     }
     return -1;
 }
-
 
 
 /// Clears all redo's for the given controller
@@ -548,6 +591,7 @@ void TextUndoStack::clearRedo(TextEditorController* controller)
     }
 }
 
+
 /// This method undos the given controller change. This method does NOT undo document changes
 /// @param controller the controller to undo the change form
 /// @return true if a change has been undone.
@@ -566,6 +610,7 @@ bool TextUndoStack::undoControllerChange(TextEditorController* controller)
     }
     return false;
 }
+
 
 /// Performs an document-change undo.
 void TextUndoStack::undoDocumentChange()
@@ -596,6 +641,7 @@ void TextUndoStack::undoDocumentChange()
 
 }
 
+
 /// undo's the given controller change
 bool TextUndoStack::redoControllerChange(TextEditorController *controller)
 {
@@ -612,6 +658,7 @@ bool TextUndoStack::redoControllerChange(TextEditorController *controller)
     }
     return false;
 }
+
 
 /// redo a document change
 void TextUndoStack::redoDocumentChange()
@@ -637,6 +684,7 @@ void TextUndoStack::redoDocumentChange()
     }
 }
 
+
 /// Sets the persisted in dex and fires a signal
 void TextUndoStack::setPersistedIndex(int index)
 {
@@ -647,6 +695,7 @@ void TextUndoStack::setPersistedIndex(int index)
         emit persistedChanged( persisted );
     }
 }
+
 
 /// When setting the change-index we sometimes must emit a persisted change
 void TextUndoStack::setChangeIndex(int index)
@@ -660,16 +709,6 @@ void TextUndoStack::setChangeIndex(int index)
         }
 
     }
-    /*
-    if( index != changeIndex_ ) {
-        bool mustEmit = (persistedIndex_ == changeIndex_) || ( persistedIndex_ == index && !isPersisted());
-        changeIndex_ = index;
-        if( mustEmit ) {
-            emit persistedChanged( isPersisted() );
-        }
-
-    }
-    */
 }
 
 

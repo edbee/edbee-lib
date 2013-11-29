@@ -488,4 +488,18 @@ void TextRangeSetTest::testSubstractRange()
 }
 
 
+/// Test the mergin of overlapping ranges
+void TextRangeSetTest::testMergeOverlappingRanges()
+{
+    selRef_->beginChanges();
+    selRef_->addRange(2,0);
+    selRef_->addRange(4,0);
+    selRef_->addRange(8,0);
+    testRanges("2>0,4>0,8>0");
+    selRef_->mergeOverlappingRanges(false);
+    testRanges("8>0");
+    selRef_->endChanges();
+}
+
+
 } // edbee

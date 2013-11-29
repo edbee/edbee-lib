@@ -6,6 +6,7 @@
 #include "textundostacktest.h"
 
 #include "edbee/commands/removecommand.h"
+#include "edbee/models/textchange.h"
 #include "edbee/models/textdocument.h"
 #include "edbee/models/textrange.h"
 #include "edbee/models/textundostack.h"
@@ -31,7 +32,6 @@ namespace edbee {
 
 void TextUndoStackTest::testMultiCaretUndoIssue196()
 {
-
     TextEditorWidget widget;
     TextDocument* doc = widget.textDocument();
     TextEditorController* controller = widget.controller();
@@ -45,6 +45,7 @@ void TextUndoStackTest::testMultiCaretUndoIssue196()
     testEqual( controller->textSelection()->rangesAsString(), "2>2,4>4");
 
     RemoveCommand del( RemoveCommand::RemoveChar, RemoveCommand::Right );
+
     del.execute(controller);
     testEqual( doc->text(), "1abc4d" );                          // 1a|b|c4d
     testEqual( controller->textSelection()->rangesAsString(), "2>2,3>3");
@@ -52,6 +53,8 @@ void TextUndoStackTest::testMultiCaretUndoIssue196()
     del.execute(controller);
     testEqual( controller->textSelection()->rangesAsString(), "2>2");
     testEqual( doc->text(), "1a4d" );                       // 1a||4d
+
+
 
     del.execute(controller);
     testEqual( doc->text(), "1ad" );
@@ -64,6 +67,10 @@ void TextUndoStackTest::testMultiCaretUndoIssue196()
     del.execute(controller);
     testEqual( doc->text(), "1a" );
     testEqual( controller->textSelection()->rangesAsString(), "2>2");
+
+//qlog_info() << "STACK: ---------------------------------------";
+//qlog_info() << doc->textUndoStack()->dumpStack();
+//qlog_info() << "----------------------------------------------";
 
     controller->undo();
 

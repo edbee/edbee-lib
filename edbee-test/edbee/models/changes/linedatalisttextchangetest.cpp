@@ -71,7 +71,8 @@ void LineDataListTextChangeTest::testMerge_growBelow()
     change2->execute(doc_);
     testEqual( data2str(change2), "" );
 
-    testTrue( change1->merge( doc_, change2 ) );
+    testTrue( change1->giveAndMerge( doc_, change2 ) );
+    takeChange(change2);
     testEqual( change1->line(), 1);
     testEqual( change1->length(), 0);
     testEqual( change1->newLength(), 2);
@@ -90,7 +91,8 @@ void LineDataListTextChangeTest::testMerge_growAbove()
     change2->execute(doc_);
     testEqual( data2str(change2), "" );
 
-    testTrue( change1->merge( doc_, change2 ) );
+    testTrue( change1->giveAndMerge( doc_, change2 ) );
+    takeChange(change2);
     testEqual( change1->line(), 1);
     testEqual( change1->length(), 0);
     testEqual( change1->newLength(), 2);
@@ -109,7 +111,8 @@ void LineDataListTextChangeTest::testMerge_shrinkBelow()
     change2->execute(doc_);
     testEqual( data2str(change2), "c" );
 
-    testTrue( change1->merge( doc_, change2 ) );
+    testTrue( change1->giveAndMerge( doc_, change2 ) );
+    takeChange(change2);
     testEqual( change1->line(), 1);
     testEqual( change1->length(), 2);
     testEqual( change1->newLength(), 0);
@@ -128,7 +131,8 @@ void LineDataListTextChangeTest::testMerge_shrinkAbove()
     change2->execute(doc_);
     testEqual( data2str(change2), "a" );
 
-    testTrue( change1->merge( doc_, change2 ) );
+    testTrue( change1->giveAndMerge( doc_, change2 ) );
+    takeChange(change2);
     testEqual( change1->line(), 0);
     testEqual( change1->length(), 2);
     testEqual( change1->newLength(), 0);
@@ -152,6 +156,14 @@ LineDataListTextChange* LineDataListTextChangeTest::createChange(int line, int l
     LineDataListTextChange* result = new LineDataListTextChange( manager(), line, length, newLength );
     changeList_.append(result);
     return result;
+}
+
+
+/// Takes the given change (and remove it from the delete lsit )
+/// @param change the change to take
+LineDataListTextChange* LineDataListTextChangeTest::takeChange(LineDataListTextChange* change)
+{
+    return changeList_.takeAt( changeList_.indexOf(change) );
 }
 
 
@@ -187,7 +199,7 @@ QString LineDataListTextChangeTest::data2ptr( LineDataListTextChange* change )
         if( list[i] ) {
             TextLineData* lineData = list[i]->at(manager(),TEST_FIELD_INDEX);
             if( lineData ) {
-                result.append( QString("").sprintf("%08p", lineData) );
+                result.append( QString("").sprintf("%8p", lineData) );
             } else {
                 result.append(".");
             }

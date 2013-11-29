@@ -55,6 +55,7 @@ private slots:
     void testGetSelectedTextExpandedToFullLines();
 
     void testSubstractRange();
+    void testMergeOverlappingRanges();
 
 
 private:

@@ -33,7 +33,7 @@ void DuplicateCommand::execute(TextEditorController* controller)
     TextDocument* doc = controller->textDocument();
 
     int coalesceId = CoalesceId_Duplicate;
-    int lastFullLine = -1;
+//    int lastFullLine = -1;
 
     // iterate over all range and build the new texts to insert
     int delta = 0;
@@ -53,10 +53,10 @@ void DuplicateCommand::execute(TextEditorController* controller)
 // FIXME: (#73) This is a hack!! Currenlty duplicating multiple lines with multiple carets on the same line
 //        exposes a bug int the coalescing system. The current coalescing system requires an equal number of textrange
 //        of course this shouldn't be required
-if( lastFullLine  == line ) {
-    coalesceId = 0;
-}
-lastFullLine  = line;
+//if( lastFullLine  == line ) {
+//    coalesceId = 0;
+//}
+//lastFullLine  = line;
 
 
 

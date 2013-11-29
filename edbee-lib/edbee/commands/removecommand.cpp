@@ -153,22 +153,6 @@ void RemoveCommand::execute(TextEditorController* controller)
 
     int coalesceId = this->coalesceId();
 
-    // refs issue #98
-    // Work-around for for wrong coalescing/undo history (similar issue as duplicate line work around)
-    // Currently there's issue when multiple caretes are at the same line
-    // and delete to end of line pressed
-    if( direction_ == Right && removeMode_ != RemoveChar ) {
-        int lastLine = -1;
-        for( int rangeIdx=ranges->rangeCount()-1; rangeIdx >= 0; --rangeIdx ) {
-            int line = controller->textDocument()->lineFromOffset( ranges->range(rangeIdx).min());
-            if( lastLine == line ) {
-                coalesceId = 0;
-                break;
-            }
-            lastLine = line;
-        }
-    }
-
     // depending on the delete mode we need to expand the selection
     ranges->beginChanges();
     switch( removeMode_ ) {
@@ -194,10 +178,16 @@ void RemoveCommand::execute(TextEditorController* controller)
 
 
     // use the simple replacerangeset function
-    controller->beginUndoGroup( new ComplexTextChange( controller ) );
-    controller->replaceRangeSet( *ranges, "", coalesceId);
-    controller->changeAndGiveTextSelection( ranges );
-    controller->endUndoGroup( coalesceId, true );
+    TextDocument* doc = controller->textDocument();
+    doc->beginChanges( controller );
+    doc->replaceRangeSet( *ranges, "" );
+    doc->giveSelection( controller, ranges );
+    doc->endChanges(coalesceId);
+
+//    controller->beginUndoGroup( new ComplexTextChange( controller ) );
+//    controller->replaceRangeSet( *ranges, "", coalesceId);
+//    controller->changeAndGiveTextSelection( ranges );
+//    controller->endUndoGroup( coalesceId, true );
 }
 
 

@@ -3,7 +3,6 @@
  * Author Rick Blommers
  */
 
-
 #include <QMetaObject>
 #include <QMetaMethod>
 #include <QDebug>
@@ -17,7 +16,13 @@ namespace edbee { namespace test {
 // TestResult
 //=============================================================================
 
-TestResult::TestResult(TestCase* testCase, const QString &methodName, const QString& description, const char* file, int lineNumber )
+/// A single test result
+/// @param testCase the testCase
+/// @param methodName the called method name
+/// @param description the description of this test
+/// @param file the file of the test
+/// @param lineNUmber the line numbrer of the test
+TestResult::TestResult(TestCase* testCase, const QString& methodName, const QString& description, const char* file, int lineNumber )
     : testCaseRef_(testCase)
     , methodName_( methodName )
     , description_( description )
@@ -32,13 +37,24 @@ TestResult::TestResult(TestCase* testCase, const QString &methodName, const QStr
 {
 }
 
+
+/// Sets the result and the state of the test
+/// @param result the result status
+/// @param statement the executed statement
 void TestResult::setBooleanResult(bool result, const char* statement)
 {
     status_ = result ? Passed : Failed;
     actualStatementRef_ = statement;
 }
 
-void TestResult::setCompareResult(bool result, const QString &actualValue, const QString &expectedValue, const char *actualStatement, const char *expectedStatement)
+
+/// Sets a compare result
+/// @param result the compare result
+/// @param actualValue the actual value set
+/// @param expectedValue the expected value of this operation
+/// @param actualStatement the executed statement
+/// @param actualValue the actual value of the compare
+void TestResult::setCompareResult(bool result, const QString& actualValue, const QString& expectedValue, const char* actualStatement, const char* expectedStatement)
 {
     status_ = result ? Passed : Failed;
     compareStatement_ = true;
@@ -50,12 +66,11 @@ void TestResult::setCompareResult(bool result, const QString &actualValue, const
 }
 
 
+/// A skip test result
 void TestResult::setSkip()
 {
     status_ = Skipped;
 }
-
-
 
 
 //=============================================================================
@@ -63,20 +78,27 @@ void TestResult::setSkip()
 //=============================================================================
 
 
-
-
+/// Constructs the testcase
 TestCase::TestCase()
     : engineRef_(0)
 {
 }
 
 /// this method returns the outputhandler
+/// @return the output handler
 OutputHandler *TestCase::out()
 {
     Q_ASSERT(engine());
     return engine()->outputHandler();
 }
 
+
+/// The test true implementation
+/// @param condition the condition to test
+/// @param statement the statement of the operation
+/// @param description the description of this test item
+/// @param file the source file
+/// @param line the line number
 void TestCase::testTrueImpl(bool condition, const char* statement, const QString& description, const char* file, int line)
 {
     TestResult *testResult = new TestResult( engine()->currentTest(), engine()->currentMethodName(), description, file, line );
@@ -84,6 +106,16 @@ void TestCase::testTrueImpl(bool condition, const char* statement, const QString
     engine()->giveTestResult(testResult);
 }
 
+
+/// The test equal implementation
+/// @param result the result of the compare
+/// @param actual the actual result
+/// @param expected the expected result
+/// @param actualStatement the statement of the operation
+/// @param exptectedStatement the expected statement
+/// @param description the description of this test item
+/// @param file the source file
+/// @param line the line number
 void TestCase::testEqualImpl(bool result, const QString& actual, const QString& expected, const char* actualStatement, const char* expectedStatement, const QString& description, const char* file, int line)
 {
     TestResult* testResult = new TestResult( engine()->currentTest(), engine()->currentMethodName(), description, file, line );
@@ -92,6 +124,10 @@ void TestCase::testEqualImpl(bool result, const QString& actual, const QString& 
 }
 
 
+/// Implements the skip test operation
+/// @param description the description of the test
+/// @param file the source file
+/// @param line the line number
 void TestCase::testSkipImpl(const QString& description, const char* file, int line)
 {
     TestResult* testResult = new TestResult( engine()->currentTest(), engine()->currentMethodName(), description, file, line );
@@ -121,26 +157,36 @@ void TestCase::giveTestResultToEngine(TestResult *result)
 }
 
 
-
 //=============================================================================
 // QDebug output handler
 //=============================================================================
 
+
+/// The output handler constructor of this test
 OutputHandler::OutputHandler()
 {
 }
 
+
+/// the descructor of this output handler
 OutputHandler::~OutputHandler()
 {
 }
 
-void OutputHandler::startRunAll(TestEngine* engine)
+
+/// This method is called if the test run is started
+/// @param engine the test engine
+void OutputHandler::startTestRun(TestEngine* engine)
 {
     Q_UNUSED(engine);
     qDebug() << "**************** Start edbee tests **************";
 }
 
-void OutputHandler::endRunAll(TestEngine* engine)
+
+
+/// This method is called if the test run is completed
+/// @param engine the test engine
+void OutputHandler::endTestRun(TestEngine* engine)
 {
     int passedCount=0;
     int failedCount=0;
@@ -167,11 +213,16 @@ void OutputHandler::endRunAll(TestEngine* engine)
 }
 
 
+/// This method is called if a testcase is started
+/// @param engine the test engine
 void OutputHandler::startTestCase( TestEngine* engine )
 {
     qDebug() << "class" << engine->currentClassName() << " ================";
 }
 
+
+/// This method is called if a testcase is ended
+/// @param engine the test engine
 void OutputHandler::endTestCase( TestEngine* engine )
 {
     Q_UNUSED(engine);
@@ -179,6 +230,9 @@ void OutputHandler::endTestCase( TestEngine* engine )
 
 }
 
+
+/// This method is called if a test method is started
+/// @param engine the test engine
 void OutputHandler::startTestMethod( TestEngine* engine)
 {
     buffer_.append( "- ");
@@ -186,6 +240,9 @@ void OutputHandler::startTestMethod( TestEngine* engine)
     buffer_.append( " ");
 }
 
+
+/// This method is called if a test method is ended
+/// @param engine the test engine
 void OutputHandler::endTestMethod( TestEngine* engine)
 {
     Q_UNUSED(engine);
@@ -201,6 +258,8 @@ void OutputHandler::endTestMethod( TestEngine* engine)
 
 
 /// This method is called if a test result is added
+/// @param engine the test engine
+/// @param testResul tthe testresult of this operation
 void OutputHandler::testResultAdded( TestEngine* engine, TestResult* testResult)
 {
     Q_UNUSED(engine);
@@ -243,6 +302,8 @@ void OutputHandler::testResultAdded( TestEngine* engine, TestResult* testResult)
 // Test Engine
 //=============================================================================
 
+
+/// The test engine constructor
 TestEngine::TestEngine()
     : outputHandlerRef_(0)
     , currentTestRef_(0)
@@ -251,6 +312,8 @@ TestEngine::TestEngine()
     outputHandlerRef_ = &outputHandler;
 }
 
+
+/// destructs the testengine
 TestEngine::~TestEngine()
 {
     qDeleteAll( testResultList_ );
@@ -259,6 +322,7 @@ TestEngine::~TestEngine()
 
 
 /// this method returns true if the given object is found
+/// @param object the testcase object
 bool TestEngine::hasTest(TestCase* object)
 {
     if (testRefList_.contains(object)) return true;
@@ -269,24 +333,27 @@ bool TestEngine::hasTest(TestCase* object)
     return false;
 }
 
+
 /// this metohd adds a test
+/// @param object the testcase to add
 void TestEngine::addTest(TestCase* object)
 {
     if (!hasTest(object)) testRefList_.append(object);
 }
 
+
 /// This method runs all tests
+/// @return at the moment 0
 int TestEngine::runAll()
 {
-
-    outputHandler()->startRunAll( this );
+    startRun();
 
     int ret = 0;
     foreach( TestCase* test, testRefList_) {
         ret += run(test);
     }
 
-    outputHandler()->endRunAll( this );
+    endRun();
 
     return ret;
 
@@ -294,6 +361,7 @@ int TestEngine::runAll()
 
 /// This class executes all tests on the given test object (all private Slots)
 /// @param object hte object that needs to be run
+/// @return at the moment 0
 int TestEngine::run(TestCase* test)
 {
     // start a test
@@ -335,14 +403,11 @@ int TestEngine::run(TestCase* test)
             method.invoke( test );
             if( cleanTestIndex >= 0 ) metaObject->invokeMethod(test,"clean");
 
-
             outputHandler()->endTestMethod( this );
-
             currentMethodName_.clear();
 
         }
     }
-
 
     // cleanupTestCase() will be called after the last testfunction was executed.
     if( cleanTestCaseIndex >= 0 ) metaObject->invokeMethod(test,"cleanupTestCase");
@@ -350,16 +415,16 @@ int TestEngine::run(TestCase* test)
     // close it
     outputHandler()->endTestCase( this );
 
-
     currentTestRef_->setEngine(0);
     currentTestRef_ = 0;
-
 
     return 0;
 
 }
 
+
 /// This method runs the given test
+/// @param name the name of this test
 int TestEngine::run(const QString& name)
 {
     foreach (TestCase* test, testRefList_) {
@@ -370,11 +435,30 @@ int TestEngine::run(const QString& name)
     return 0;
 }
 
+
+/// should be called before the first run when manually running single unit tests
+/// When using runAll you should not call this method
+void TestEngine::startRun()
+{
+    outputHandler()->startTestRun( this );
+}
+
+
+/// This method should be called when your done with running single test
+/// When using runAll you should not call this method
+void TestEngine::endRun()
+{
+    outputHandler()->endTestRun( this );
+}
+
+
 /// Appends the test result
+/// @param testResult the result of the tests to add to the list of results
 void TestEngine::giveTestResult(TestResult* testResult)
 {
     testResultList_.append(testResult);
     outputHandler()->testResultAdded( this, testResult );
 }
+
 
 }} // edbee::test

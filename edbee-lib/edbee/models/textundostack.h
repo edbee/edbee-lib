@@ -95,6 +95,7 @@ public:
     TextChange* at(int idx);
     int currentIndex( TextEditorController* controller=0 );
     int lastIndex( TextEditorController* controller=0 );
+    TextChange* last(TextEditorController* controller=0 );
 
     int sizeInDocChanges();
     int currentIndexInDocChanges();
@@ -131,7 +132,7 @@ signals:
     /// the group pointer will be 0!!
     void undoGroupEnded( int coalesceId, bool merged, int action );
     void changeAdded( edbee::TextChange* change );
-    void changeMerged( edbee::TextChange* oldChange, edbee::TextChange* change );
+//    void changeMerged( edbee::TextChange* oldChange, edbee::TextChange* change );
     void undoExecuted( edbee::TextChange* change );
     void redoExecuted( edbee::TextChange* change );
 

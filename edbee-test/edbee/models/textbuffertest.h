@@ -9,6 +9,8 @@
 
 namespace edbee {
 
+
+/// The clas for testing the textbuffer
 class TextBufferTest : public edbee::test::TestCase
 {
     Q_OBJECT
@@ -20,9 +22,7 @@ private slots:
     void testReplaceText();
     void testFindCharPosWithinRange();
     void testLine();
-
     void testReplaceIssue141();
-
 };
 
 } // edbee

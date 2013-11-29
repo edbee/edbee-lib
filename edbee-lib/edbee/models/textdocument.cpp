@@ -9,6 +9,7 @@
 
 #include "edbee/models/changes/complextextchange.h"
 #include "edbee/models/changes/linedatatextchange.h"
+#include "edbee/models/changes/selectiontextchange.h"
 #include "edbee/models/changes/singletextchange.h"
 #include "edbee/models/changes/singletextchangewithcaret.h"
 
@@ -181,15 +182,122 @@ TextDocumentFilter* TextDocument::documentFilter()
 }
 
 
+/// Start the changesa
+void TextDocument::beginChanges(TextEditorController* controller)
+{
+    beginUndoGroup( new ComplexTextChange( controller) );
+}
+
+
+/// Replaces the given rangeset
+void TextDocument::replaceRangeSet(TextRangeSet& rangeSet, const QString& textIn )
+{
+    return replaceRangeSet( rangeSet, QStringList(textIn) );
+}
+
+
+/// replaces the given rangeset
+void TextDocument::replaceRangeSet(TextRangeSet& rangeSet, const QStringList& textsIn )
+{
+    /*
+    QStringList texts = textsIn;
+
+    // adjust the ranges so they take into account the delta
+    int delta=0;
+    rangeSet.beginChanges();
+    for( int idx=0,cnt=rangeSet.rangeCount(); idx<cnt; ++idx ) {
+
+        TextRange& range = rangeSet.range(idx);
+        range.setCaret( range.caret() + delta );
+        range.setAnchor( range.anchor() + delta );
+
+        QString text = texts.at(idx%texts.size());  // rotating text-fetching
+        delta += (text.length() - range.length());
+
+        //range.setCaret( range.min() + text.length() );
+    }
+    rangeSet.endChanges();
+
+    // next replace the changes
+    for( int idx=0,cnt=rangeSet.rangeCount(); idx<cnt; ++idx ) {
+        QString text = texts.at(idx%texts.size());  // rotating text-fetching
+        TextRange& range = rangeSet.range(idx);
+
+        SingleTextChangeWithCaret* change = new SingleTextChangeWithCaret(range.min(),range.length(),text,-1);
+        executeAndGiveChange( change, false );
+    }
+    */
+
+    QStringList texts = textsIn;
+    if( documentFilter() ) {
+        documentFilter()->filterReplaceRangeSet( this, rangeSet, texts );
+    }
+
+    rangeSet.beginChanges();
+    int delta = 0;
+    int idx = 0, oldRangeCount = 0;
+    while( idx < (oldRangeCount = rangeSet.rangeCount())  ) {
+        TextRange& range = rangeSet.range(idx);
+        QString text = texts.at(idx%texts.size());  // rotating text-fetching
+
+        //qlog_info() << idx << ">> " << text << " : delta="<<delta<<", " << range.toString();
+        range.setCaret( range.caret() + delta );
+        range.setAnchor( range.anchor() + delta );
+        //qlog_info() << "  => " << range.toString();
+        delta += (text.length() - range.length());
+
+
+        SingleTextChangeWithCaret* change = new SingleTextChangeWithCaret(range.min(),range.length(),text,-1);
+        executeAndGiveChange( change, false );
+
+        // so we need to adjust the caret with the (possible) adjusted change
+        if( change->caret() < 0 ) {
+            range.setCaret( change->offset() + change->length() );
+        } else {
+            range.setCaret( change->caret() );
+        }
+        range.reset();
+
+        // next range
+        if( rangeSet.rangeCount() < oldRangeCount ) {
+qlog_info() <<  "TEST TO SEE IF THIS REALLY HAPPENS!! I think it cannot happen. (but I'm not sure)";
+Q_ASSERT(false);
+
+        // else we stay at the same location
+        } else {
+            ++idx;
+        }
+
+    }
+    rangeSet.endChanges();
+}
+
+
+/// sets the selectioin for the current rangeset
+void TextDocument::giveSelection( TextEditorController* controller,  TextRangeSet* rangeSet)
+{
+    SelectionTextChange* selChange = new SelectionTextChange( controller );
+    selChange->giveTextRangeSet( rangeSet );
+    executeAndGiveChange( selChange, 0 );
+}
+
+
+//// end the changes
+void TextDocument::endChanges(int coalesceId)
+{
+    endUndoGroup(coalesceId,true);
+}
+
+
 /// replaces the given range-set with the given string
 /// Warning when a documentfilter is installed it is possible the rangeSet is modified!!
 /// @param rangeSet the rangeSet to replace
 /// @param text the text to place at the given ranges
 /// @param coalesceId the coalesceid
-void TextDocument::replaceRangeSet(TextRangeSet& rangeSet, const QString& textIn, int coalesceId, TextEditorController* controller)
-{
-    return replaceRangeSet( rangeSet, QStringList(textIn), coalesceId, controller );
-}
+//void TextDocument::replaceRangeSet(TextRangeSet& rangeSet, const QString& textIn, int coalesceId, TextEditorController* controller)
+//{
+//    return replaceRangeSet( rangeSet, QStringList(textIn), coalesceId, controller );
+//}
 
 
 /// A special replace rangeset. This replace-rangeset can have a text per range
@@ -199,6 +307,9 @@ void TextDocument::replaceRangeSet(TextRangeSet& rangeSet, const QString& textIn
 /// @param texts the list of texts to paste in the rangeset.
 /// @param coalesceId the coalesceId of the operation
 /// @param controller the controller of the operation
+
+/* WHAT a pieceof S**T
+
 void TextDocument::replaceRangeSet(TextRangeSet& rangeSet, const QStringList& textsIn, int coalesceId, TextEditorController* controller)
 {
 //qlog_info() << "replaceRangeSet: " << rangeSet.rangesAsString() << ", " << textsIn.join(".");
@@ -265,7 +376,7 @@ Q_ASSERT(false);
 }
 
 
-/* Temporary disabled
+/ * Temporary disabled
 void TextDocument::replace(int offset, int length, const QString& newText, bool merge )
 {
     textUndoStack()->beginUndoGroup(0);  // we need to start a new undo-group, because line-data-changes are added seperately

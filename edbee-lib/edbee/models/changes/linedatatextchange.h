@@ -24,7 +24,7 @@ public:
     virtual void execute(TextDocument* document);
     virtual void revert(TextDocument* doc);
 
-    virtual bool merge(TextDocument* document, TextChange* textChange );
+    virtual bool giveAndMerge(TextDocument* document, TextChange* textChange );
 
     virtual void applyLineDelta( int line, int length, int newLength );
 

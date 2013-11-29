@@ -810,7 +810,7 @@ void TextRangeSetBase::mergeOverlappingRanges( bool joinBorders )
             if( min1 <= min2 && max2 <= max1 ) {
                 removeRange(j);
                 --i;
-                break;
+                continue;
             }
 
             // Overlappping possibilities:
@@ -891,6 +891,14 @@ void TextRangeSetBase::processChangesIfRequired(bool joinBorders )
         sortRanges();
         --changing_;
     }
+}
+
+
+/// Returns the associated textdocument
+/// @return the associated text document
+TextDocument*TextRangeSetBase::textDocument() const
+{
+    return textDocumentRef_;
 }
 
 

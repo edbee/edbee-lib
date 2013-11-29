@@ -20,26 +20,46 @@
 
 namespace edbee {
 
+
+/// The selection textchange constructor
+/// @param controller the controler this selection change is for
 SelectionTextChange::SelectionTextChange(TextEditorController* controller )
     : ControllerTextChange( controller )
     , rangeSet_(0)
 {
 }
 
+
+/// destructs the textrange
 SelectionTextChange::~SelectionTextChange()
 {
     delete rangeSet_;
 }
 
 
+/// Gives the textrange to the textchange
 void SelectionTextChange::giveTextRangeSet(TextRangeSet* rangeSet)
 {
+    delete rangeSet_;
     rangeSet_ = rangeSet;
 }
 
 
+/// Takes ownership of the rangeset and clears the clearset
+/// @return the rangeset
+TextRangeSet* SelectionTextChange::takeRangeSet()
+{
+    TextRangeSet* result = rangeSet_;
+    rangeSet_ = 0;
+    return result;
+}
+
+
+/// Executes the textchange
+/// @param document the textdocument to execute this change for
 void SelectionTextChange::execute( TextDocument* document )
 {
+    if( !rangeSet_ ) { return; }
     Q_UNUSED(document);
     TextRangeSet* currentSelection = dynamic_cast<TextRangeSet*>( controllerContext()->textSelection() );
     TextRangeSet oldSelection( *currentSelection );
@@ -50,16 +70,19 @@ void SelectionTextChange::execute( TextDocument* document )
     notifyChange();
 }
 
+
 /// Reverts the selection change
+/// @param document the textdocument to revert this change for
 void SelectionTextChange::revert(TextDocument* document)
 {
+    if( !rangeSet_ ) { return; }
+
     Q_UNUSED(document);
     TextRangeSet* currentSelection = dynamic_cast<TextRangeSet*>( controllerContext()->textSelection() );
     TextRangeSet newSelection( *currentSelection );
 
     *currentSelection = *rangeSet_;
     *rangeSet_ = newSelection;
-
     notifyChange();
 }
 
@@ -67,24 +90,25 @@ void SelectionTextChange::revert(TextDocument* document)
 /// This method tries to merge the given change with the other change
 /// The textChange supplied with this method. Should NOT have been executed yet.
 /// It's the choice of this merge operation if the execution is required
-bool SelectionTextChange::merge( TextDocument* document, TextChange* textChange)
+bool SelectionTextChange::giveAndMerge( TextDocument* document, TextChange* textChange)
 {
     Q_UNUSED( document );
     SelectionTextChange* selectionChange = dynamic_cast<SelectionTextChange*>( textChange );
     if( selectionChange ) {
 //        *rangeSet_ = *selectionChange->rangeSet_;
+        delete textChange;
         return true;
     }
     return false;
 }
 
 
-
-
+/// Convert this change to a string
 QString SelectionTextChange::toString()
 {
     return QString("SelectionTextChange(%1)").arg(rangeSet_->rangesAsString());
 }
+
 
 /// This method is called internally for notifying the control the selection has been changed
 /// Perhaps we should make e proper emit-signal for this purpose

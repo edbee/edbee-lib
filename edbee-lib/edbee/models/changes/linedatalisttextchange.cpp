@@ -101,7 +101,7 @@ static void memcopy_or_zerofill( void* target, void* source, size_t size)
 /// @param document the document the changes are fior
 /// @param textChange the other textchange
 /// @return true if the merge succeed, false if not
-bool LineDataListTextChange::merge(TextDocument* document, TextChange* textChange)
+bool LineDataListTextChange::giveAndMerge(TextDocument* document, TextChange* textChange)
 {
     Q_UNUSED(document);
     Q_UNUSED(textChange);
@@ -145,6 +145,8 @@ bool LineDataListTextChange::merge(TextDocument* document, TextChange* textChang
             length_    = mergedLength;
             newLength_ += lineChange->newLength_;
 //qlog_info() << " ok: " << toString();
+
+            delete textChange;
             return true;
         }
     }

@@ -11,6 +11,10 @@
 
 namespace edbee {
 
+/// This is the basic text change that's the base of the textchanges
+///
+/// This class re-uses the variables offset/length and text. Depending on the undo/redo state
+/// these variables contain the new data or the changed data
 class SingleTextChange : public TextChange
 {
 public:
@@ -20,26 +24,27 @@ public:
     virtual void execute(TextDocument* document);
     virtual void revert(TextDocument* document);
 
-//    virtual bool canMerge( TextDocument* document, TextChange* textChange );
-    virtual bool merge(TextDocument *document, TextChange* textChange );
-
+    virtual bool giveAndMerge(TextDocument *document, TextChange* textChange );
     virtual void applyOffsetDelta( int offset, int length, int newLength );
 
     virtual QString toString();
 
+    int offset() const;
+    void setOffset( int offset );
+    void addOffset( int amount );
 
-    int offset() { return offset_; }
-    void setOffset( int offset ) { offset_ = offset; }
+    int length() const;
+    void setLength( int len );
+    int newLength() const;
 
-    int length() { return length_; }
-    void setLength( int len ) { length_ = len; }
-
-    const QString& text() { return text_ ; }
-    void setText( const QString& text ) { text_ = text; }
-    void appendText( const QString& text ) { text_.append( text ); }
-    const QString docText( TextDocument* doc );
+    const QString& text() const;
+    void setText( const QString& text );
+    void appendText( const QString& text );
+    const QString docText( TextDocument* doc ) const;
 
     QString testString();
+    bool isOverlappedBy( SingleTextChange* secondChange );
+    bool isTouchedBy( SingleTextChange* secondChange );
 
 protected:
 

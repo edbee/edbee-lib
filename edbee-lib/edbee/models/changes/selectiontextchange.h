@@ -22,11 +22,12 @@ public:
     virtual ~SelectionTextChange();
 
     virtual void giveTextRangeSet( TextRangeSet* rangeSet );
+    virtual TextRangeSet* takeRangeSet();
 
     virtual void execute(TextDocument* document);
     virtual void revert(TextDocument* document);
 
-    virtual bool merge(TextDocument *document, TextChange* textChange );
+    virtual bool giveAndMerge(TextDocument *document, TextChange* textChange );
     TextRangeSet* rangeSet() { return rangeSet_; }
 
     virtual QString toString();

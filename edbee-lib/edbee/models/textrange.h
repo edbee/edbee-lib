@@ -175,11 +175,9 @@ public:
     virtual void processChangesIfRequired(bool joinBorders=false);
 
   // getters
-    TextDocument* textDocument() const { return textDocumentRef_; }
+    TextDocument* textDocument() const;
     //TextBuffer* textBuffer() const { return textBufferRef_; }
 
-
-protected:
 
     void mergeOverlappingRanges( bool joinBorders );
 

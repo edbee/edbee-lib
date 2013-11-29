@@ -9,9 +9,9 @@
 #include "edbee/models/changes/singletextchange.h"
 #include "edbee/models/changes/linedatalisttextchange.h"
 #include "edbee/models/textrange.h"
-
 #include "edbee/views/textselection.h"
 #include "edbee/texteditorcontroller.h"
+#include "edbee/util/util.h"
 
 #include "debug.h"
 
@@ -33,8 +33,16 @@ ComplexTextChange::ComplexTextChange(TextEditorController* controller)
 /// The default destructor
 ComplexTextChange::~ComplexTextChange()
 {
+    clear(true);
     delete newSelection_;
     delete previousSelection_;
+}
+
+
+/// default not discardable
+bool ComplexTextChange::isDiscardable()
+{
+    return false;
 }
 
 
@@ -42,6 +50,7 @@ ComplexTextChange::~ComplexTextChange()
 void ComplexTextChange::groupClosed()
 {
     if( controller() ) {
+        delete newSelection_;
         newSelection_ = new TextRangeSet( *(controller()->textSelection() ) ) ;
     }
 }
@@ -59,7 +68,6 @@ void ComplexTextChange::execute(TextDocument* document)
 }
 
 
-
 /// this method is called to revert the operation
 /// reverts the given operation
 void ComplexTextChange::revert( TextDocument* document )
@@ -72,233 +80,377 @@ void ComplexTextChange::revert( TextDocument* document )
 }
 
 
-/// Merges a single textchange
-/// @param gTextChange the global textchange
-/// @param nextTechangeMergeIndex (in/out) alters the nextTextChangeMergeIndex
-/// @return true if the merge succeeded
-bool ComplexTextChange::mergeTextChange( TextDocument* document, SingleTextChange* gTextChange, int& nextTextChangeMergeIndex )
+/// This method adds the given delta to the changes
+void ComplexTextChange::addOffsetDeltaToTextChanges(int fromIndex, int delta)
 {
-    bool result = false;
-//qlog_info() << "MERGE===================================";
-//qlog_info() << "A> " << toString();
-//qlog_info() << "B> " << gTextChange->toString();
-
-    // find the location to MERGE it with in the list
-    for( int i=nextTextChangeMergeIndex, cnt=size(); i<cnt; ++i ) {
-        TextChange* change = at(i);
-        SingleTextChange* textChange = dynamic_cast<SingleTextChange*>(change);
-
-        // merge succeeded?
-        if( change->merge( document, gTextChange ) ) {
-
-            // find the linechange belonging to this textchange
-            LineDataListTextChange* lineDataChange = 0;
-
-            int nextBoundaryIndex = i+1;
-            while( nextBoundaryIndex<cnt ) {
-
-                // remember the line-data-change
-                if( dynamic_cast<LineDataListTextChange*>(change) ) {
-                    lineDataChange = dynamic_cast<LineDataListTextChange*>(change);
-                }
-
-                if( dynamic_cast<SingleTextChange*>(at(nextBoundaryIndex)) ) {
-                    break;
-                }
-                ++nextBoundaryIndex ;
-            }
-
-
-
-            // increase the next change to merge index
-            Q_ASSERT( textChange );
-            nextTextChangeMergeIndex = i+1;
-            //appendChange = false;
-            result = true;
-
-            // we need to get the delta of the merge change
-//            int delta = gTextChange->length() - gTextChange->text().length();
-//            int lineDelta = gTextChange->docText( document ).count('\n') - gTextChange->text().count('\n');
-//            int lineDelta = lineDataChange ? lineDataChange->length() - lineDataChange ->newLength() : 0;
-
-//    qlog_info() << "DELTA: " << delta << " + " << lineDelta << "("<<change->toString()<<")";
-//    qlog_info() << "WE SHOULD ALSO move the line DELTA for this change.. offset: " << nextBoundaryIndex;
-
-            // apply the delta of this merge to all NEXT items in the list
-            for( i=nextBoundaryIndex; i<cnt; ++i ) {
-                change = at(i);
-
-//idee, laat de change zelf bepalen of de move noodzakelijk is!!!!!!!!!!!
-                change->applyOffsetDelta( gTextChange->offset(), gTextChange->text().length(), gTextChange->length() );
-                if( lineDataChange ) {
-                   change->applyLineDelta( lineDataChange->line(), lineDataChange->length(), lineDataChange->newLength() );
-                }
-            }
-
-
-            /*
-            bool nextBorderChangeFound = false;
-            for(++i; i<cnt; ++i ) {
-                change = at(i);
-
-
-                // only increase the offsets AFTER the next textchange or linedata-change (dirty hack for line-data issue)
-                // Very diry solution...(very bugprone !!! )
-                if( !nextBorderChangeFound ) {
-//                   TextChange* borderChange = dynamic_cast<LineDataListTextChange*>(change);
-                   TextChange* borderChange = dynamic_cast<SingleTextChange*>(change);
-//                   if( !borderChange ) { borderChange = dynamic_cast<SingleTextChange*>(change); }
-                   if( borderChange ) { nextBorderChangeFound = true; }
-                }
-                if( nextBorderChangeFound ) {
-                    change->moveOffset(delta);
-                    change->moveLine(lineDelta);
-                }
-    //qlog_info() << " TODO: we should add moveLine?";
-            }
-            */
-
-        // merge failed, we're in deep trouble
-        }
+    for(int i = fromIndex; i<textChangeList_.size(); ++i ) {
+        SingleTextChange* s2 = textChangeList_.at(i);
+        s2->addOffset( delta );
     }
-
-    if (!result ){
-       qlog_info() << "The textmerge FAILED, we're in deep trouble. ";
-       qlog_info() << "I'm affraid I need to build in support for a canMerge function in text-changes";
-       qlog_info() << "... very difficult to solve this ... ";
-       Q_ASSERT(false == "SingleTextChange in ComplexTextChange merge failed!!!");
-    }
-    return result;
 }
 
-/// merges a line data textchange
-/// @param document the textdocument
-/// @param lineDataTextChange the text change
-/// @param nextLineChangeIndex the next line chane
-bool ComplexTextChange::mergeLineDataTextChange( TextDocument* document, LineDataListTextChange* lineDataTextChange, int& nextLineChangeIndex )
+
+/// gives the given textchange to the merge routine
+void ComplexTextChange::giveSingleTextChange(TextDocument* doc, SingleTextChange* newChange)
 {
-    // find the location to MERGE it with in the list
-    for( int i=nextLineChangeIndex, cnt=size(); i<cnt; ++i ) {
-        TextChange* change = at(i);
-        LineDataListTextChange* lineChange= dynamic_cast<LineDataListTextChange*>(change);
+    //qlog_info() << "giveSingleTextChange" << newChange->toString();
+    // remember the orginal ranges so we know which changes are affected by this new change
+    int orgStartOffset = newChange->offset();
+    int orgEndOffset = newChange->offset() + newChange->newLength();
 
-        // merge succeeded?
-        if( change->merge( document, lineDataTextChange ) ) {
-            Q_ASSERT( lineChange );
-            nextLineChangeIndex = i+1;
-            return true;
-        }
-    }
-    return false;
-}
+    // some variables to remebmer
+    int mergedAtIndex = -1;                 // the index that a merge succeeded
+    int addDeltaFromIndex = size();         // From which change index should we add delta?!
+    int delta = 0;
 
-/// a special (internal) TextChange for marking the end of a mergable-scope
-/// We need this to 'kwow' where to start merging changes
-class TextStartMergeMarker : public TextChange
-{
-public:
-    virtual void execute( TextDocument*) {}
-    virtual void revert( TextDocument*) {}
-    virtual QString toString() { return "TextStartMergeMarker"; }
+    // First try to merge this new change
+    for( int i=0,cnt=textChangeList_.size(); i<cnt; ++i ){
+        SingleTextChange* change = textChangeList_.at(i);
+//qlog_info() << " - " << i << change->toString();
 
-};
+        // we need the previous length and new-length to know how the delta is changed of the other items
+        int prevLength = change->length();
+        int prevNewLength = change->newLength();
 
+        // try to merge it
+        if( change->giveAndMerge( doc, newChange ) ) {
 
-/// this method tries to merge the textchange with this text change
-bool ComplexTextChange::merge(TextDocument* document, TextChange* textChange)
-{
-    // when the new change isn't a group change return
-    ComplexTextChange* groupChange = dynamic_cast<ComplexTextChange*>( textChange );
-    if( !groupChange ) return false;
-
-
-    // when the previous change is an end marker, we must add all items
-    if( size() > 0 && dynamic_cast<TextStartMergeMarker*>(at(size()-1))) {
-        while( groupChange->size() ) {
-            TextChange* gChange = groupChange->take(0);
-            giveCommand( gChange);
-        }
-        qSwap( newSelection_, groupChange->newSelection_ );
-        return true;
-
-    }
-
-    int nextTextChangeMergeIndex = 0;
-    int nextLineChangeIndex = 0;
-
-    /// find the start merge offset (This is the first change after the last Selection)
-    for( int i=size()-1; i>= 0; --i ) {
-        TextChange* gChange = at(i);
-        TextStartMergeMarker* marker = dynamic_cast<TextStartMergeMarker*>(gChange);
-        if( marker ) {
-            nextTextChangeMergeIndex = i;
-            nextLineChangeIndex = i;
+            // apply the delta (newLength and length is reversed when in undo state!)
+            delta += (change->length()-prevLength) - (change->newLength()-prevNewLength);
+//qlog_info() << "* merged: " << change->toString() << " (delta: " << delta << ")";
+            mergedAtIndex = i;
             break;
         }
     }
 
+    // when we could merge the change,
+    // we need to try to merge it with earlier changes
+    if( mergedAtIndex >= 0 ) {
 
-    // (Hack) Different number of ranges, the merge is not possible
-    bool appendMergeEndMarker = false;
-    if( newSelection_ &&
-        groupChange->newSelection_ &&
-        newSelection_->rangeCount() != groupChange->newSelection_->rangeCount() ) {
-        appendMergeEndMarker = true;
-    }
+        SingleTextChange* mergedChange = textChangeList_.at(mergedAtIndex);
+        for( int i=mergedAtIndex+1; i<textChangeList_.size(); ++i ) {
+            SingleTextChange* nextChange= textChangeList_.at(i);
+//qlog_info() << "   - " << i << nextChange->toString();
 
-    // merge all changes to the current list. And join changes as good as possible
-    for( int gIdx=0; gIdx<groupChange->size(); ++gIdx ){
-        TextChange* gChange = groupChange->at(gIdx);
+            // only perform merging if the change overlapped a previous change
+            if( nextChange->offset() < orgEndOffset && orgStartOffset < (nextChange->offset() + nextChange->length())   ) {
 
-        SingleTextChange* gTextChange = dynamic_cast<SingleTextChange*>(gChange);
-        LineDataListTextChange* lineDataListTextChange = dynamic_cast<LineDataListTextChange*>(gChange);
-        bool appendChange=true;
+//                int prevLength = nextChange->length();
+//                int prevNewLength = nextChange->newLength();
 
-        // MERGE text changes?
-        if( gTextChange ) {
-            appendChange = !mergeTextChange( document, gTextChange, nextTextChangeMergeIndex );
+                // take the delta of the previous change before the merge
+                int tmpDelta = mergedChange->newLength() - mergedChange->length() + delta;
+//    qlog_info() << "       tmpDelta:" << tmpDelta;
+                // alter the delta, so we find the correct merge index
+                nextChange->addOffset(tmpDelta);
 
-        // cannot merge/  no text change? just append the change
-        } else if( lineDataListTextChange  ) {
-            appendChange = !mergeLineDataTextChange( document, lineDataListTextChange, nextLineChangeIndex );
+                // notice the 'inversion of the merge. We apply the merged change to the next change
+                if( nextChange->giveAndMerge( doc, mergedChange) ) {
+//    qlog_info() << "  ~ delta: " << delta << ", length: " << prevLength << ", newLength: " << prevNewLength;
+                    //delta += (nextChange->length()-prevLength) - (nextChange->newLength()-prevNewLength);
+                    mergedChange = nextChange;
+//    qlog_info() << "  * merged2: " << mergedChange->toString() << " (delta: " << delta << ")";
+                    textChangeList_.removeAt(mergedAtIndex);
+                    --i;
+                } else {
+                    break;  // cannot merge, we're done
 
-        } else {
+                    // remove the temporary delta
+                    nextChange->addOffset(-tmpDelta);
+                }
+            } else {
+                break;
+            }
+        }
+//        qlog_info() << "Try to merge to morenodes, and adjust delta's on merge :D";
+        addDeltaFromIndex = mergedAtIndex + 1;
 
-            // dirty hack to support RemoveSelectionCommand. This prevents the padding of infinite textchanges
-            SelectionTextChange* gTextChange = dynamic_cast<SelectionTextChange*>(gChange);
-            if( gTextChange ) {
-                appendChange = false;
+    // not merged? then we need to add the change
+    // ad the given index
+    } else {
+
+        // find the insert index
+        int insertIndex = 0;
+        for( int i=0,cnt=textChangeList_.size(); i<cnt; ++i ){
+            SingleTextChange* change = textChangeList_.at(i);
+            if( change->offset() < newChange->offset() ) {
+                insertIndex = i+1;
             }
         }
 
+        // just insert change
+        textChangeList_.insert( insertIndex, newChange);
+        addDeltaFromIndex = insertIndex+1;
 
-        // cannot merge, just append the change (before the next text/line-change 'border' )
-        if( appendChange ) {
-            groupChange->take(gIdx);        // remove the change and give it to the list
-            --gIdx;                           // make sure the next iteration takes the correct item
-            //giveCommand(gChange);
-            giveCommandAtIndex( nextTextChangeMergeIndex+1, gChange);
-        }
+        // apply the delta (newLength and length is reversed when in undo state!)
+        delta += newChange->newLength() - newChange->length();
+
+//        qlog_info() << "* insert: " << newChange->toString() << " (delta: " << delta << ")";
+
+    }
+
+    // next apply the delta to the following change
+    addOffsetDeltaToTextChanges(addDeltaFromIndex,delta);
+}
 
 
-    } // for group
+/// gives a line data list text change
+void ComplexTextChange::giveLineDataListTextChange(LineDataListTextChange* change)
+{
+    lineDataTextChangeList_.append(change);
+}
 
 
-    // add a end marker
-    if( appendMergeEndMarker ) {        
-        giveCommand( new TextStartMergeMarker() );
+/// Gives the change
+void ComplexTextChange::giveChange( TextDocument* doc, TextChange* change)
+{
+    // a single text change
+    SingleTextChange* textChange = dynamic_cast<SingleTextChange*>(change);
+    if( textChange ) {
+        //textChangeList_.append(textChange);
+        giveSingleTextChange( doc, textChange);
+        return;
+    }
+
+    // a list text change
+    LineDataListTextChange* lineDataTextChange = dynamic_cast<LineDataListTextChange*>(change);
+    if( lineDataTextChange ) {
+        giveLineDataListTextChange(lineDataTextChange);
+        return;
+    }
+
+    // a selection change simply is moved to the new selection object
+    SelectionTextChange* selectionChange = dynamic_cast<SelectionTextChange*>(change);
+    if( selectionChange ) {
+        delete newSelection_;
+        newSelection_ = selectionChange->takeRangeSet();
+        /// qlog_info() << "take new selection: " << QString::number( (quintptr)newSelection_,16);
+
+        /// we can simply delete the change, the ComplexTextChange automaticly records the last change selection on the undoGroupEnd
+        delete change;
+        return;
+    }
+
+    // a group changes, just add all the groups
+    TextChangeGroup* group = dynamic_cast<TextChangeGroup*>(change);
+    if( group ) {
+        moveChangesFromGroup(doc,group);
+        delete group;
+        return;
     }
 
 
-    // the new selection is the selection of the merged group
-    qSwap( newSelection_, groupChange->newSelection_ );
+    // other changes are (currently) added to a misch change list. And are pretty scary for now :)
+    miscChangeList_.append(change);
+}
+
+
+///returns the textchange at the given index
+TextChange* ComplexTextChange::at(int idx)
+{
+    // plain text changes
+    if( idx < textChangeList_.size() ) {
+        return textChangeList_.at(idx);
+    }
+    // line-data changes
+    idx -= textChangeList_.size();
+    if( idx < lineDataTextChangeList_.size() ) {
+        return lineDataTextChangeList_.at(idx);
+    }
+    // other changes
+    idx -= lineDataTextChangeList_.size();
+    Q_ASSERT(idx < miscChangeList_.size() );
+    return miscChangeList_.at(idx);
+}
+
+
+/// Takes the given item
+TextChange*ComplexTextChange::take(int idx)
+{
+    // plain text changes
+    if( idx < textChangeList_.size() ) {
+        return textChangeList_.takeAt(idx);
+    }
+    // line-data changes
+    idx -= textChangeList_.size();
+    if( idx < lineDataTextChangeList_.size() ) {
+        return lineDataTextChangeList_.takeAt(idx);
+    }
+    // other changes
+    idx -= lineDataTextChangeList_.size();
+    Q_ASSERT(idx < miscChangeList_.size() );
+    return miscChangeList_.takeAt(idx);
+}
+
+
+/// returns the number of elements
+int ComplexTextChange::size()
+{
+    return textChangeList_.size() + lineDataTextChangeList_.size() + miscChangeList_.size();
+}
+
+
+/// clears all items
+void ComplexTextChange::clear(bool performDelete)
+{
+    // delete
+    if( performDelete ) {
+        qDeleteAll(textChangeList_);
+        qDeleteAll(lineDataTextChangeList_);
+        qDeleteAll(miscChangeList_);
+    }
+
+    // clear the changes
+    textChangeList_.clear();
+    lineDataTextChangeList_.clear();
+    miscChangeList_.clear();
+}
+
+
+/// this method tries to merge the textchange with this text change
+bool ComplexTextChange::giveAndMerge(TextDocument* document, TextChange* textChange)
+{
+    giveChange( document, textChange );
     return true;
 }
 
+
+
+/// Converts this textchange to a textual representation
 QString ComplexTextChange::toString()
 {
     return QString("Complex::%1").arg(TextChangeGroup::toString());
 }
 
+
+/// Converts the textchangeList as as string
+/// The format is the following:
+/// <offset>:<length>:<str>,...
+///
+/// sample:
+/// 0:2:ABC,1:2:QW
+QString ComplexTextChange::toSingleTextChangeTestString()
+{
+    QString result;
+    foreach( SingleTextChange* change, textChangeList_ ) {
+        if( !result.isEmpty() ) result.append(",");
+        result.append( QString("%1:%2:%3").arg(change->offset()).arg(change->length()).arg(change->text()));
+    }
+    return result;
+}
+
+
+/// Moves all textchanges from the given group to this group
+/// @param group the group to move the selection from
+void ComplexTextChange::moveChangesFromGroup( TextDocument* doc, TextChangeGroup* group )
+{
+//qlog_info() << "moveChangeFromGroup **************** (MERGE)";
+//qlog_info() << "A:" << this->toString();
+//qlog_info() << "B:" << group->toString();
+
+    // process all changes
+    for( int i=0,cnt=group->size(); i<cnt; ++i ) {
+
+        TextChange* change = group->at(i);
+
+        // handle nested groups
+        if( change->isGroup() ) {
+            TextChangeGroup* childGroup = dynamic_cast<TextChangeGroup*>( change );
+            if( childGroup ) {
+                moveChangesFromGroup( doc, childGroup );
+                delete childGroup;
+                continue;
+            }
+        }
+
+        // merge the the change
+        giveChange( doc, change );
+    }
+    group->clear(false); // no delete we've taken the ownership
+
+//qlog_info() << "=1>:" << this->toString();
+
+    // next we need to compress the changes (merging changes that are next to eachother)
+    compressChanges(doc);
+//qlog_info() << "************************";
+//qlog_info() << "=2>:" << this->toString();
+
+    // when it's a complex text change, also move the selection to this group
+    ComplexTextChange* complexGroup = dynamic_cast<ComplexTextChange*>(group);
+    if( complexGroup ) {
+        qSwap( newSelection_, complexGroup->newSelection_ );
+    }
+}
+
+
+
+/// merges the given textchange as a group.
+/// @param document the document this merge is for
+/// @param textChange the textchange to merge
+/// @return true if the textchange was merged as group.
+bool ComplexTextChange::mergeAsGroup(TextDocument* document, TextChange* textChange )
+{
+    Q_UNUSED(document);
+
+    // make sure it's a group
+    if( !textChange->isGroup() ) { return false; }
+    TextChangeGroup* group = dynamic_cast<TextChangeGroup*>(textChange);
+    if( !group ) { return false; }
+
+    // move all changes from the other group to this group
+    moveChangesFromGroup(document, group);
+
+    delete textChange;
+    return true;
+}
+
+
+//// @param document the document this merge is for
+/// @param textChange the textchange to merge
+/// @return true if the textchange was merged as group.
+// merge the text selection
+/// @param document the document this merge is for
+/// @param textChange the textchange to merge
+/// @return true if the textchange was merged as group.
+bool ComplexTextChange::mergeAsSelection(TextDocument* document, TextChange* textChange)
+{
+    Q_UNUSED(document);
+    SelectionTextChange* selectionChange = dynamic_cast<SelectionTextChange*>(textChange);
+    if( !selectionChange ) { return false; }
+
+    // simply take the selection from the textchange and make this the new selection
+    delete newSelection_;
+    newSelection_ = selectionChange->takeRangeSet();
+    delete textChange;
+    return true;
+}
+
+
+/// Compresses the textchanges
+/// @param document the document to merge the changes for
+void ComplexTextChange::compressTextChanges(TextDocument* document)
+{
+    // compress single text changes
+    for( int i=0; i<textChangeList_.size(); ++i ) {
+        SingleTextChange* change1 = textChangeList_.at(i);
+
+        // find the next text change
+        for( int j=i+1; j<textChangeList_.size(); ++j ) {
+            SingleTextChange* change2 = textChangeList_.at(j);
+            if( change1->giveAndMerge( document, change2 ) ) {
+                textChangeList_.takeAt(j);  // just take it, the item is already deleted by the merge
+                --j;
+            }
+        } // for j
+    } // for i
+}
+
+
+/// This is going to be the magic method that's going to merge all changes
+/// @param document the document to merge the changes for
+void ComplexTextChange::compressChanges(TextDocument* document)
+{
+    compressTextChanges(document);
+}
 
 } // edbee

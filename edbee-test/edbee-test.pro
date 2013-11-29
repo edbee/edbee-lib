@@ -36,7 +36,9 @@ SOURCES += \
     edbee/util/utiltest.cpp \
     edbee/lexers/grammartextlexertest.cpp \
     edbee/commands/removecommandtest.cpp \
-    edbee/models/changes/linedatalisttextchangetest.cpp
+    edbee/models/changes/linedatalisttextchangetest.cpp \
+    edbee/models/changes/complextextchangetest.cpp \
+    edbee/models/changes/singletextchangetest.cpp
 
 HEADERS += \
 	edbee/commands/replaceselectioncommandtest.h \
@@ -59,7 +61,9 @@ HEADERS += \
     edbee/util/utiltest.h \
     edbee/lexers/grammartextlexertest.h \
     edbee/commands/removecommandtest.h \
-    edbee/models/changes/linedatalisttextchangetest.h
+    edbee/models/changes/linedatalisttextchangetest.h \
+    edbee/models/changes/complextextchangetest.h \
+    edbee/models/changes/singletextchangetest.h
 
 #OTHER_FILES += ../edbee-data/config/*
 #OTHER_FILES += ../edbee-data/keymaps/*

@@ -5,33 +5,45 @@
 
 #include <QApplication>
 #include <QDebug>
+#include <QList>
 #include <QTimer>
 
 #include <QsLog.h>
 #include <QsLogDest.h>
 
 #include "util/test.h"
-
 #include "edbee/edbee.h"
 
 #include "debug.h"
 
 
-//#define SINGLE_TEST_TO_RUN "rbit::texteditor::LineOffsetVectorTest"
-//#define SINGLE_TEST_TO_RUN "rbit::texteditor::PlainTextDocumentTest"
-//#define SINGLE_TEST_TO_RUN "rbit::texteditor::TextLineDataTest"
-
+/// the main entry method of the test
 int main(int argc, char* argv[])
 {
     QApplication app( argc, argv);
 
+    // add all tests that need to be run
+    //==================================
+    QList<QString> tests;
+
+    tests.append( "edbee::SingleTextChangeTest");
+    tests.append( "edbee::ComplexTextChangeTest");
+    tests.append( "edbee::LineOffsetVectorTest");
+    tests.append( "edbee::PlainTextDocumentTest");
+    tests.append( "edbee::TextLineDataTest");
+    tests.append( "edbee::TextRangeSetTest");
+    tests.append( "edbee::TextUndoStackTest");
+
+    tests.clear();      // when the tests lists is empty all tests are run
+
+    // test initialization
+    //=====================
+
     // make sure we see the QsLogging items
     QsLogging::Logger& logger = QsLogging::Logger::instance();
     static QsLogging::DestinationPtr debugDestination( QsLogging::DestinationFactory::MakeDebugOutputDestination() );
-    //delete (void*)1;    // crash :-)
     logger.addDestination(debugDestination.get());
     logger.setLoggingLevel(QsLogging::TraceLevel);
-
 
 
     // Load the grammars
@@ -41,29 +53,29 @@ int main(int argc, char* argv[])
     #else
         appDataPath= app.applicationDirPath() + "/data/";
     #endif
-qlog_info() << "LOAD DATA:" << appDataPath;
 
     // configure the edbee component to use the default paths
     edbee::Edbee* tm = edbee::Edbee::instance();
-//    tm->setKeyMapPath( QString("%1%2").arg(appDataPath).arg("keymaps"));
+    //tm->setKeyMapPath( QString("%1%2").arg(appDataPath).arg("keymaps"));
     tm->setGrammarPath(  QString("%1%2").arg(appDataPath).arg("syntaxfiles") );
-//    tm->setThemePath( QString("%1%2").arg(appDataPath).arg("themes") );
+    //tm->setThemePath( QString("%1%2").arg(appDataPath).arg("themes") );
     tm->init();
 
     // next run all tests
-#ifdef SINGLE_TEST_TO_RUN
-    edbee::test::engine().run(SINGLE_TEST_TO_RUN);
-#else
-    edbee::test::engine().runAll();
-#endif
+    if( tests.isEmpty() ) {
+        edbee::test::engine().runAll();
+
+    // only run the selected tests
+    } else {
+        edbee::test::engine().startRun();
+        foreach( QString test, tests ) {
+            edbee::test::engine().run(test);
+        }
+        edbee::test::engine().endRun();
+    }
 
 
-    // dirty hack to send a shutdown-hook signal
-//    QTimer timer;
-//    timer.connect(&timer,SIGNAL(timeout()),&app, SLOT(quit()));
-//    timer.start(100);
-//    app.exec();
-
+    // shutdown edbee
     tm->shutdown();
 
     return 0;

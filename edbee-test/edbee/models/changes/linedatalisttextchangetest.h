@@ -33,6 +33,7 @@ private slots:
 private:
     TextLineDataManager* manager();
     LineDataListTextChange* createChange( int line, int length, int newLength );
+    LineDataListTextChange* takeChange(LineDataListTextChange* change);
     QString data2str( LineDataListTextChange* change );
     QString data2ptr( LineDataListTextChange* change );
 

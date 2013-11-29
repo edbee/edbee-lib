@@ -94,7 +94,7 @@ void TextDocumentTest::testReplaceRangeSet_simple()
     ranges.addRange(1,2);
 
     // execute the replace, this should also move the ranges
-    doc.replaceRangeSet( ranges, "X", 0 );
+    doc.replaceRangeSet( ranges, "X" );
     testEqual( doc.text(), "aXcd");
     testEqual( ranges.rangesAsString(), "2>2");
 
@@ -102,7 +102,7 @@ void TextDocumentTest::testReplaceRangeSet_simple()
     /// b) "a[X]b[c]d => "aR[]bSd
     ranges.setRange(1,2);
     ranges.addRange(3,4);
-    doc.replaceRangeSet( ranges, QString("R,S").split(","), 0 );
+    doc.replaceRangeSet( ranges, QString("R,S").split(",") );
     testEqual( doc.text(), "aRcS");
     testEqual( ranges.rangesAsString(), "2>2,4>4");
 }
@@ -121,7 +121,7 @@ void TextDocumentTest::testReplaceRangeSet_sizeDiff()
     ranges.addRange(5,7);
 
     // execute the replace, this should move the ranges
-    doc.replaceRangeSet( ranges, QString("X,Y").split(","), 0 );
+    doc.replaceRangeSet( ranges, QString("X,Y").split(",") );
     testEqual( doc.text(), "aXdeYh");
 }
 
@@ -138,7 +138,7 @@ void TextDocumentTest::testReplaceRangeSet_simpleInsert()
     ranges.addRange(1,1);
     ranges.addRange(2,2);
 
-    doc.replaceRangeSet( ranges, QString("X,Y").split(","), 0 );
+    doc.replaceRangeSet( ranges, QString("X,Y").split(",") );
     testEqual( doc.text(), "aXbYcd");
     testEqual( ranges.rangesAsString(), "2>2,4>4" );
 
@@ -157,7 +157,7 @@ void TextDocumentTest::testReplaceRangeSet_delete()
     ranges.addRange(1,2);
     ranges.addRange(5,6);
 
-    doc.replaceRangeSet( ranges, "", 0 );
+    doc.replaceRangeSet( ranges, "" );
     testEqual( doc.text(), "ab2cd4" );
     testEqual( ranges.rangesAsString(), "1>1,4>4" );
 }
