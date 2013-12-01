@@ -14,7 +14,8 @@ namespace edbee {
 class TextLineDataManager;
 class TextLineDataList;
 
-/// A full line data text change
+/// A full line data text change. This means the growing or shrinking of the line data buffer
+/// It stores the old-data list that needs to be remebered for undoing
 class LineDataListTextChange : public TextChange
 {
 public:
@@ -29,9 +30,11 @@ public:
 
     virtual QString toString();
 
-    int line();
-    int length();
-    int newLength();
+    int line() const;
+    int length() const;
+    int newLength() const;
+    void setLine( int line );
+    void addDeltaToLine( int delta );
 
     TextLineDataList** oldListList();
     int oldListListLength();

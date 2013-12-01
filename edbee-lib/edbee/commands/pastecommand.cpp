@@ -41,14 +41,12 @@ int PasteCommand::commandId()
 /// @param controller the controller context this operation is executed for
 void PasteCommand::execute(TextEditorController* controller)
 {
-
     QClipboard* clipboard     = QApplication::clipboard();
     const QMimeData* mimeData = clipboard->mimeData();
     QString text              = clipboard->text();
 
     TextDocument* doc    = controller->textDocument();
     TextRangeSet* sel    = controller->textSelection();
-
 
     // a line-based paste
     if( mimeData->hasFormat( CopyCommand::EDBEE_TEXT_TYPE ) ) {
@@ -60,10 +58,6 @@ void PasteCommand::execute(TextEditorController* controller)
             newRanges.addRange(offset,offset);
         }
 
-//        controller->beginUndoGroup( new ComplexTextChange( controller ) );
-//        controller->changeAndGiveTextSelection(newRanges);
-//        controller->replaceSelection( text  );
-//        controller->endUndoGroup( commandId(), true );
         controller->replaceRangeSet( newRanges, text, commandId() );
         return;
 

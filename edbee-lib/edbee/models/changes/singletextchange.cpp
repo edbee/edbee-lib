@@ -77,17 +77,7 @@ bool SingleTextChange::giveAndMerge( TextDocument* document, TextChange* textCha
                     newText.append( change->text().mid(0, offset() - change->offset() ) );
                 }
 
-                // when the b-change falls in the delete of the first change, we need to 'split' the old test
-//                if( false &&  a->offset() < b->offset() && b->offset() < (a->offset()+a->newLength())   ) {
-//                    int split = b->offset()-a->offset();
-
-//                    newText.append( a->text().mid(0,split) );
-//                    newText.append( b->text() );
-//                    newText.append( a->text().mid(split) );
-//                // default operation is to add the full text
-//                } else {
-                    newText.append(text());
-//                }
+                newText.append(text());
 
                 // then we need to append the remainer
                 int delta = offset()-change->offset();

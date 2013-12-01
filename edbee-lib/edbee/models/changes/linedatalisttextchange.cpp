@@ -176,23 +176,30 @@ QString LineDataListTextChange::toString()
 
 
 /// Returns the line
-int LineDataListTextChange::line()
+int LineDataListTextChange::line() const
 {
     return line_;
 }
 
 
 /// returns the length
-int LineDataListTextChange::length()
+int LineDataListTextChange::length() const
 {
     return length_;
 }
 
 
 /// returns the new length
-int LineDataListTextChange::newLength()
+int LineDataListTextChange::newLength() const
 {
     return newLength_;
+}
+
+
+/// Adds the given amount of delta to the line data
+void LineDataListTextChange::addDeltaToLine(int delta)
+{
+    line_ += delta;
 }
 
 
@@ -212,8 +219,6 @@ int LineDataListTextChange::oldListListLength()
     return 0;
 }
 
-
-/// Returns the length of the old list list
 
 
 } // edbee

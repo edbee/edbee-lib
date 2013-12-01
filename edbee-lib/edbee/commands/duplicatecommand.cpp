@@ -16,12 +16,6 @@
 namespace edbee {
 
 
-/// constructs the duplication command
-DuplicateCommand::DuplicateCommand()
-{
-}
-
-
 /// Executes the duplication command
 /// @param controller the active controller
 void DuplicateCommand::execute(TextEditorController* controller)
@@ -31,9 +25,6 @@ void DuplicateCommand::execute(TextEditorController* controller)
     TextRangeSet* newSelection = new TextRangeSet( controller->textSelection() );
     QStringList newTexts;
     TextDocument* doc = controller->textDocument();
-
-    int coalesceId = CoalesceId_Duplicate;
-//    int lastFullLine = -1;
 
     // iterate over all range and build the new texts to insert
     int delta = 0;
@@ -49,17 +40,6 @@ void DuplicateCommand::execute(TextEditorController* controller)
             range.setAnchor( range.caret() );
             newTexts.append( QString("%1\n").arg(doc->lineWithoutNewline(line)) );
 
-
-// FIXME: (#73) This is a hack!! Currenlty duplicating multiple lines with multiple carets on the same line
-//        exposes a bug int the coalescing system. The current coalescing system requires an equal number of textrange
-//        of course this shouldn't be required
-//if( lastFullLine  == line ) {
-//    coalesceId = 0;
-//}
-//lastFullLine  = line;
-
-
-
         } else {
 
             // append the new text, and change the insert position to the place before the caret :)
@@ -71,24 +51,16 @@ void DuplicateCommand::execute(TextEditorController* controller)
         // insert the spatial at the caret position.
         // we only insert text so the length = 0 and the new length is the length of the inserted text
         int length = newTexts.last().length();
-//qlog_info() << i << ">> change spatial: " << newSelection->rangesAsString() << ": " << ( range.caret() + delta ) << ", " << length;
         newSelection->changeSpatial( range.caret() + delta, 0, length );
         delta += length;
 
-//qlog_info() <<  "  =>> change spatial: " << newSelection->rangesAsString();
-
-        // we also msut move the next ranges
-//        newRanges.changeSpatial( range.caret(), 0, newTexts.last().size() );
     }
-//qlog_info() << "REPLACE RANGESET: " << newRanges.rangesAsString() << " | texts= " << newTexts.join(",");
-//qlog_info() << "REPLACE SELECTION: " << newSelection->rangesAsString();
 
-
-    // changes the ranges
-    controller->beginUndoGroup( new ComplexTextChange( controller ) );
-    controller->replaceRangeSet( newRanges, newTexts, coalesceId );
-    controller->changeAndGiveTextSelection( newSelection );
-    controller->endUndoGroup( coalesceId, true ); // commandId(), true );
+    // replace the texts
+    doc->beginChanges(controller);
+    doc->replaceRangeSet( newRanges, newTexts );
+    doc->giveSelection( controller,  newSelection );
+    doc->endChanges( CoalesceId_Duplicate );
 }
 
 

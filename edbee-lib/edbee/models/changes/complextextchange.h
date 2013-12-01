@@ -40,7 +40,7 @@ private:
 
 public:
     void giveSingleTextChange( TextDocument* doc, SingleTextChange* change );
-    virtual void giveLineDataListTextChange( LineDataListTextChange* change );
+    void giveLineDataListTextChange( TextDocument* doc, LineDataListTextChange* change );
 
     virtual void giveChange( TextDocument* doc, TextChange* change );
     virtual TextChange* at( int idx );

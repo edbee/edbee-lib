@@ -16,7 +16,6 @@ namespace edbee {
 class DuplicateCommand : public TextEditorCommand
 {
 public:
-    DuplicateCommand();
     virtual void execute( TextEditorController* controller );
     virtual QString toString();
 };

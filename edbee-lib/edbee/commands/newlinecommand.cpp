@@ -19,12 +19,6 @@
 namespace edbee {
 
 
-/// The default newline command
-NewlineCommand::NewlineCommand()
-{
-}
-
-
 /// This method calculates the required 'smart' indent value at the given positon
 /// @param controller the controller
 /// @param range the range to calculate the smart tab for

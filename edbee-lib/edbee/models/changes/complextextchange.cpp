@@ -210,9 +210,50 @@ void ComplexTextChange::giveSingleTextChange(TextDocument* doc, SingleTextChange
 
 
 /// gives a line data list text change
-void ComplexTextChange::giveLineDataListTextChange(LineDataListTextChange* change)
+void ComplexTextChange::giveLineDataListTextChange(TextDocument* doc, LineDataListTextChange* newChange)
 {
-    lineDataTextChangeList_.append(change);
+    Q_UNUSED(doc);
+    this->lineDataTextChangeList_.append(newChange);    // no merge for the moment
+/* TODO:  Work in progress below. This algorithm seems identical to the one used with SingleTextChanges
+ *  we need to abstract the interfaces and create a general merge-ranges operation
+ *
+    // try to merge the change
+    int mergeIndex = -1;
+    int delta = 0;
+    int addDeltaIndex = lineDataTextChangeList_.size();
+
+    for( int i=0, cnt=lineDataTextChangeList_.size(); i<cnt; ++i ) {
+        LineDataListTextChange* change = lineDataTextChangeList_.at(i);
+
+        // we need the previous length and new-length to know how the delta is changed of the other items
+        int prevLength = change->length();
+        int prevNewLength = change->newLength();
+
+        if( change->giveAndMerge( doc, newChange ) ) {
+            mergeIndex = i;
+            delta += (change->length()-prevLength) - (change->newLength()-prevNewLength);
+            break;
+        }
+    }
+
+    // when merge succeeded, add the delta index
+    if( mergeIndex >= 0 ) {
+        addDeltaIndex = mergeIndex+1;
+    }
+
+    // when not merged, find the insert index
+    if( mergeIndex < 0 ) {
+        // STILL a TODO
+        lineDataTextChangeList_.append(newChange);
+    }
+
+    // next add delta offsets from the given index
+    for(int i = addDeltaIndex,cnt=lineDataTextChangeList_.size(); i<cnt; ++i ) {
+        LineDataListTextChange* s2 = lineDataTextChangeList_.at(i);
+        s2->addDeltaToLine(delta);
+    }
+*/
+
 }
 
 
@@ -230,7 +271,7 @@ void ComplexTextChange::giveChange( TextDocument* doc, TextChange* change)
     // a list text change
     LineDataListTextChange* lineDataTextChange = dynamic_cast<LineDataListTextChange*>(change);
     if( lineDataTextChange ) {
-        giveLineDataListTextChange(lineDataTextChange);
+        giveLineDataListTextChange(doc,lineDataTextChange);
         return;
     }
 

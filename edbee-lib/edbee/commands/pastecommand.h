@@ -21,7 +21,6 @@ class PasteCommand : public TextEditorCommand
 public:
     PasteCommand();
 
-    /// This method should return the command identifier
     virtual int commandId();
 
     virtual void execute( TextEditorController* controller );

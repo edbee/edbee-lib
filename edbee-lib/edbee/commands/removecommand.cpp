@@ -176,18 +176,12 @@ void RemoveCommand::execute(TextEditorController* controller)
         return;
     }
 
-
     // use the simple replacerangeset function
     TextDocument* doc = controller->textDocument();
     doc->beginChanges( controller );
     doc->replaceRangeSet( *ranges, "" );
     doc->giveSelection( controller, ranges );
     doc->endChanges(coalesceId);
-
-//    controller->beginUndoGroup( new ComplexTextChange( controller ) );
-//    controller->replaceRangeSet( *ranges, "", coalesceId);
-//    controller->changeAndGiveTextSelection( ranges );
-//    controller->endUndoGroup( coalesceId, true );
 }
 
 

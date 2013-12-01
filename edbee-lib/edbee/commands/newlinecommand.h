@@ -18,7 +18,6 @@ class TextRange;
 class NewlineCommand : public TextEditorCommand
 {
 public:
-    NewlineCommand();
     QString calculateSmartIndent( TextEditorController* controller, TextRange& range );
     virtual void execute( TextEditorController* controller );
     virtual QString toString();

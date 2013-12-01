@@ -57,8 +57,6 @@ public:
 
     };
 
-
-
 public:
     explicit TextUndoStack( TextDocument* doc, QObject* parent = 0);
     virtual ~TextUndoStack();
