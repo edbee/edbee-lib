@@ -78,17 +78,6 @@ bool TextChange::isGroup()
 }
 
 
-/// A method to move the offset with the given delta
-/// @param offset the offset where the delta is applied
-/// @param delta the delta to move
-void TextChange::applyOffsetDelta(int offset, int length, int newLength)
-{
-    Q_UNUSED(offset);
-    Q_UNUSED(length);
-    Q_UNUSED(newLength);
-}
-
-
 /// This method can be overriden by a textchange to react when the line-delta is changed
 /// @param line
 /// @param delta the delta to move the line

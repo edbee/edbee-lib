@@ -82,7 +82,8 @@ SOURCES += \
     edbee/commands/duplicatecommand.cpp \
     edbee/commands/newlinecommand.cpp \
     edbee/util/util.cpp \
-    edbee/commands/removecommand.cpp
+    edbee/commands/removecommand.cpp \
+    edbee/models/changes/abstractrangedtextchange.cpp
 
 HEADERS += \
     util/logging.h \
@@ -151,7 +152,8 @@ HEADERS += \
     edbee/commands/duplicatecommand.h \
     edbee/commands/newlinecommand.h \
     edbee/util/util.h \
-    edbee/commands/removecommand.h
+    edbee/commands/removecommand.h \
+    edbee/models/changes/abstractrangedtextchange.h
     
 message($$INCLUDEPATH)
 

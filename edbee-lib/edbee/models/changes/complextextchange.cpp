@@ -116,14 +116,14 @@ int ComplexTextChange::mergeTextChange( TextDocument* doc, SingleTextChange* new
         SingleTextChange* change = textChangeList_.at(i);
 
         // we need the previous length and new-length to know how the delta is changed of the other items
-        int prevLength = change->length();
         int prevNewLength = change->newLength();
+        int prevOldLength = change->oldLength();
 
         // try to merge it
         if( change->giveAndMerge( doc, newChange ) ) {
 
             // apply the delta (newLength and length is reversed when in undo state!)
-            delta += (change->length()-prevLength) - (change->newLength()-prevNewLength);
+            delta += (change->newLength()-prevNewLength) - (change->oldLength()-prevOldLength);
             return i;
         }
     }
@@ -143,10 +143,10 @@ void ComplexTextChange::inverseMergeRemainingOverlappingTextChanges( TextDocumen
         SingleTextChange* nextChange= textChangeList_.at(i);
 
         // only perform merging if the change overlapped a previous change
-        if( nextChange->offset() < orgEndOffset && orgStartOffset < (nextChange->offset() + nextChange->length())   ) {
+        if( nextChange->offset() < orgEndOffset && orgStartOffset < (nextChange->offset() + nextChange->newLength())   ) {
 
             // take the delta of the previous change before the merge
-            int tmpDelta = mergedChange->newLength() - mergedChange->length() + delta;
+            int tmpDelta = mergedChange->oldLength() - mergedChange->newLength() + delta;
 
             // alter the delta, so we find the correct merge index
             nextChange->addOffset(tmpDelta);
@@ -174,7 +174,7 @@ void ComplexTextChange::giveSingleTextChange(TextDocument* doc, SingleTextChange
     //qlog_info() << "giveSingleTextChange" << newChange->toString();
     // remember the orginal ranges so we know which changes are affected by this new change
     int orgStartOffset = newChange->offset();
-    int orgEndOffset = newChange->offset() + newChange->newLength();
+    int orgEndOffset = newChange->offset() + newChange->oldLength();
 
     // some variables to remebmer
     int addDeltaFromIndex = size();         // From which change index should we add delta?!
@@ -201,7 +201,7 @@ void ComplexTextChange::giveSingleTextChange(TextDocument* doc, SingleTextChange
         addDeltaFromIndex = insertIndex+1;
 
         // apply the delta (newLength and length is reversed when in undo state!)
-        delta += newChange->newLength() - newChange->length();
+        delta += newChange->oldLength() - newChange->newLength();
     }
 
     // next apply the delta to the following change
@@ -389,7 +389,7 @@ QString ComplexTextChange::toSingleTextChangeTestString()
     QString result;
     foreach( SingleTextChange* change, textChangeList_ ) {
         if( !result.isEmpty() ) result.append(",");
-        result.append( QString("%1:%2:%3").arg(change->offset()).arg(change->length()).arg(change->text()));
+        result.append( QString("%1:%2:%3").arg(change->offset()).arg(change->length()).arg(change->storedText()) );
     }
     return result;
 }

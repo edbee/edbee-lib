@@ -33,7 +33,6 @@ public:
     bool isDocumentChange();
     virtual bool isGroup();
 
-    virtual void applyOffsetDelta( int offset, int length, int newLength );
     virtual void applyLineDelta( int line, int length, int newLength);
 
     virtual QString toString() = 0;

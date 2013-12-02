@@ -1,5 +1,5 @@
 /**
- * Copyright 2011-2012 - Reliable Bits Software by Blommers IT. All Rights Reserved.
+ * Copyright 2011-2013 - Reliable Bits Software by Blommers IT. All Rights Reserved.
  * Author Rick Blommers
  */
 
@@ -13,11 +13,16 @@
 namespace edbee {
 
 
-///
-SingleTextChange::SingleTextChange(int offset, int length, const QString &text )
+/// Constructs a single textchange
+/// @param offset, the offset of the change
+/// @param length, the length of the change
+/// @param text , the new text
+/// @param executed, a boolean (mainly used for testing) to mark this change as exected
+SingleTextChange::SingleTextChange(int offset, int length, const QString& text, bool executed )
     : offset_(offset)
     , length_(length)
     , text_(text)
+    , executed_(executed)
 {
 }
 
@@ -28,11 +33,13 @@ SingleTextChange::~SingleTextChange()
 void SingleTextChange::execute(TextDocument* document)
 {
     replaceText(document);
+    executed_ = true;
 }
 
 void SingleTextChange::revert(TextDocument* document)
 {
     replaceText(document);
+    executed_ = false;
 }
 
 //bool SingleTextChange::canMerge(TextDocument* document, TextChange* textChange)
@@ -47,7 +54,7 @@ void SingleTextChange::revert(TextDocument* document)
 //}
 
 /// This method gives the given change to this textchange. The changes will be merged
-/// if possible
+/// if possible. This method currently only works with executed changes!!!
 ///
 /// @param document the document
 /// @param textChange the textchange to mege
@@ -57,8 +64,10 @@ void SingleTextChange::revert(TextDocument* document)
 bool SingleTextChange::giveAndMerge( TextDocument* document, TextChange* textChange)
 {
     Q_UNUSED( document );
+    Q_ASSERT( executed_ );
     SingleTextChange* change = dynamic_cast<SingleTextChange*>( textChange );
     if( change ) {
+        Q_ASSERT(change->executed_);
 
         // overlap is a bit harder
         if( isOverlappedBy(change) || isTouchedBy(change) ) {
@@ -66,32 +75,32 @@ bool SingleTextChange::giveAndMerge( TextDocument* document, TextChange* textCha
             SingleTextChange* a = this;
             SingleTextChange* b = change;
 //qlog_info() << "giveAndMerge----------";
-//qlog_info() << "A:" << a->toString();
-//qlog_info() << "B:" << b->toString();
+//qlog_info() << "A:" << a->toString() << " | " << a->isExecuted();
+//qlog_info() << "B:" << b->toString() << " | " << b->isExecuted();
 
             // build the new text
             QString newText;
             {
                 // we first need to 'take' the leading part of the new change
                 if( change->offset() < offset() ) {
-                    newText.append( change->text().mid(0, offset() - change->offset() ) );
+                    newText.append( change->oldText(document).mid(0, offset() - change->offset() ) );
                 }
 
-                newText.append(text());
+                newText.append(oldText(document));
 
                 // then we need to append the remainer
                 int delta = offset()-change->offset();
-                int remainerOffset = a->length() + delta;
+                int remainerOffset = a->newLength() + delta;
                 if( remainerOffset >= 0 ) {
-                    if( remainerOffset < b->text().length() ) {
+                    if( remainerOffset < b->oldLength() ) {
                         //Q_ASSERT(false);    // need to figure out if this works
-                        newText.append( b->text().mid(remainerOffset ) );
+                        newText.append( b->oldText( document  ).mid(remainerOffset ) );
                     }
                 }
             }
 
             // build the new length
-            int len = b->length();
+            int len = b->newLength();
             {
                 // add the prefix of the a length
                 if( offset() < b->offset() ) { // && b->offset() < (offset() + length())   ) {
@@ -99,8 +108,8 @@ bool SingleTextChange::giveAndMerge( TextDocument* document, TextChange* textCha
                 }
 
                 // add the postfix of the length
-                int aEnd = a->offset() + a->length();
-                int bEnd = b->offset() + b->newLength();
+                int aEnd = a->offset() + a->newLength();
+                int bEnd = b->offset() + b->oldLength();
                 if( bEnd < aEnd ) {
                     len += aEnd-bEnd;
                 }
@@ -156,7 +165,21 @@ void SingleTextChange::addOffset(int amount)
 }
 
 
-/// returns the length of the change
+/// this method returns the old length of the change
+int SingleTextChange::oldLength() const
+{
+    return isExecuted() ? text_.size() : length_;
+}
+
+
+/// This method returns the new length of the text
+int SingleTextChange::newLength() const
+{
+    return isExecuted() ? length_ : text_.size();
+}
+
+
+/// Returns the length of the text currently in the doc depending on the undo state
 int SingleTextChange::length() const
 {
     return length_;
@@ -171,30 +194,37 @@ void SingleTextChange::setLength(int len)
 }
 
 
-/// Returns the new length which essentially is the length of the text variable
-int SingleTextChange::newLength() const
+/// This method returns the old text of the change
+QString SingleTextChange::oldText(TextDocument* doc) const
 {
-    return text_.length();
+    return isExecuted() ? text_ : doc->textPart(offset(), oldLength() );
 }
 
 
-/// Returns a const reference to the text
-const QString& SingleTextChange::text() const
+/// This method returns the changed text
+QString SingleTextChange::newText(TextDocument* doc) const
 {
-    return text_ ;
+    return isExecuted() ? doc->textPart(offset(), length_ ) : text_;
+}
+
+
+/// The text currently stored in this textchange
+QString SingleTextChange::storedText() const
+{
+    return text_;
 }
 
 
 /// Sets the text of this change
 /// @param text the new text
-void SingleTextChange::setText(const QString& text)
+void SingleTextChange::setStoredText(const QString& text)
 {
     text_ = text;
 }
 
 
 /// Appends the text to this change
-void SingleTextChange::appendText(const QString& text)
+void SingleTextChange::appendStoredText(const QString& text)
 {
     text_.append( text );
 }
@@ -231,14 +261,9 @@ QString SingleTextChange::testString()
 bool SingleTextChange::isOverlappedBy(SingleTextChange* secondChange)
 {
     return
-    ( offset() < ( secondChange->offset() + secondChange->length() ) &&  secondChange->offset() < (offset() + length()) )
-    || (  offset() < ( secondChange->offset() + secondChange->newLength() ) && secondChange->offset() < (offset() + length())  )
-    || (
-        false
-//         secondChange->length() < secondChange->newLength()  &&
-//         offset() < ( secondChange->offset() ) && secondChange->offset() < (offset() + newLength())
-       )
-            ;
+    ( offset() < ( secondChange->offset() + secondChange->newLength() ) &&  secondChange->offset() < (offset() + newLength()) )
+    || (  offset() < ( secondChange->offset() + secondChange->oldLength() ) && secondChange->offset() < (offset() + newLength())  )
+    ;
 }
 
 
@@ -248,13 +273,20 @@ bool SingleTextChange::isOverlappedBy(SingleTextChange* secondChange)
 /// @return true if the changes overlap
 bool SingleTextChange::isTouchedBy(SingleTextChange* secondChange)
 {
-    return offset() == (secondChange->offset() + secondChange->length() )
-        || (offset() + length()) == secondChange->offset()
+    return offset() == (secondChange->offset() + secondChange->newLength() )
+        || (offset() + newLength()) == secondChange->offset()
         // Delete operation should be supported
-        || ( secondChange->length() < secondChange->newLength() &&  offset() == (secondChange->offset() + secondChange->newLength() ) )
+        || ( secondChange->newLength() < secondChange->oldLength() &&  offset() == (secondChange->offset() + secondChange->oldLength() ) )
         // delete touch (Should we add those length < newlength condition!??)
         //|| ( ( length() < newLength() ) && (offset() + newLength()) == secondChange->offset() )
-        ;
+            ;
+}
+
+
+/// This method returns true if the change has been executed
+bool SingleTextChange::isExecuted() const
+{
+    return executed_;
 }
 
 
@@ -269,5 +301,6 @@ void SingleTextChange::replaceText(TextDocument* document)
     length_ = text_.length();
     text_ = old;
 }
+
 
 } // edbee

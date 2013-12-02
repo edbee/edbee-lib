@@ -18,7 +18,7 @@ namespace edbee {
 class SingleTextChange : public TextChange
 {
 public:
-    SingleTextChange(int offset, int length, const QString& text );
+    SingleTextChange(int offset, int length, const QString& text, bool executed=false );
     virtual ~SingleTextChange();
 
     virtual void execute(TextDocument* document);
@@ -33,18 +33,26 @@ public:
     void setOffset( int offset );
     void addOffset( int amount );
 
-    int length() const;
-    void setLength( int len );
+    int oldLength() const;
     int newLength() const;
 
-    const QString& text() const;
-    void setText( const QString& text );
-    void appendText( const QString& text );
+    int length() const;
+    void setLength( int len );
+
+    QString oldText( TextDocument* doc ) const;
+    QString newText( TextDocument* doc ) const;
+    QString storedText() const;
+
+
+    void setStoredText( const QString& text );
+    void appendStoredText( const QString& text );
     const QString docText( TextDocument* doc ) const;
 
     QString testString();
     bool isOverlappedBy( SingleTextChange* secondChange );
     bool isTouchedBy( SingleTextChange* secondChange );
+
+    bool isExecuted() const;
 
 protected:
 
@@ -54,6 +62,7 @@ private:
     int offset_;            ///< The offset of the text
     int length_;            ///< the length of the text
     QString text_;          ///< The text
+    bool executed_;         ///< The executed flag (has the change been executed?)
 };
 
 } // edbee
