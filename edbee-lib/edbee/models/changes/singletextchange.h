@@ -24,6 +24,11 @@ public:
     virtual void execute(TextDocument* document);
     virtual void revert(TextDocument* document);
 
+protected:
+    virtual void mergeOldData( AbstractRangedTextChange* change );
+    virtual bool merge( AbstractRangedTextChange* change );
+
+public:
     virtual bool giveAndMerge(TextDocument *document, TextChange* textChange );
     virtual void applyOffsetDelta( int offset, int length, int newLength );
 
@@ -31,18 +36,16 @@ public:
 
     int offset() const;
     void setOffset( int offset );
-    void addOffset( int amount );
 
     int oldLength() const;
     int newLength() const;
 
     int length() const;
-    void setLength( int len );
+    void setOldLength( int len );
 
     QString oldText( TextDocument* doc ) const;
     QString newText( TextDocument* doc ) const;
     QString storedText() const;
-
 
     void setStoredText( const QString& text );
     void appendStoredText( const QString& text );

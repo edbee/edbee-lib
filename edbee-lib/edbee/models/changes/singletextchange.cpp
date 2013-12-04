@@ -26,21 +26,90 @@ SingleTextChange::SingleTextChange(int offset, int length, const QString& text, 
 {
 }
 
+
+/// undo's a single textchange
 SingleTextChange::~SingleTextChange()
 {
 }
 
+
+/// executes the given textchange
+/// @param document the document to execute the change on
 void SingleTextChange::execute(TextDocument* document)
 {
     replaceText(document);
     executed_ = true;
 }
 
+
+/// Reverts the single textchange
+/// @param document the document to execute the change on
 void SingleTextChange::revert(TextDocument* document)
 {
     replaceText(document);
     executed_ = false;
 }
+
+
+/// This method merges the old data with the new data
+/// @apram change the data to merge with
+void SingleTextChange::mergeOldData(AbstractRangedTextChange* change)
+{
+    SingleTextChange* singleTextChange = dynamic_cast<SingleTextChange*>(change);
+
+    QString newText;
+    newText.resize( calculateMergeDataSize( change) );
+    mergeData( newText.data(), text_.data(), singleTextChange->text_.data(), change, sizeof(QChar) );
+    /*
+      QString newText;
+      // we first need to 'take' the leading part of the new change
+      if( change->offset() < offset() ) {
+          newText.append( change->oldText(document).mid(0, offset() - change->offset() ) );
+      }
+
+      newText.append(oldText(document));
+
+      // then we need to append the remainer
+      int delta = offset()-change->offset();
+      int remainerOffset = newLength() + delta;
+      if( remainerOffset >= 0 ) {
+          if( remainerOffset < change->oldLength() ) {
+              //Q_ASSERT(false);    // need to figure out if this works
+              newText.append( change->oldText( document  ).mid(remainerOffset ) );
+          }
+      }
+
+  */
+
+    text_ = newText;
+}
+
+
+/// This method merges the change
+/// @param document the document to merges
+/// @param change the change change to merge
+bool SingleTextChange::merge( AbstractRangedTextChange* change )
+{
+    // overlap is a bit harder
+    if( isOverlappedBy(change) || isTouchedBy(change) ) {
+
+        // build the new sizes and offsets
+        int newOffset = qMin( offset(), change->offset() );
+        int newLength = getMergedLength(change);
+
+        // merge the data
+        mergeOldData( change );
+
+        // when the data is meged assign the new dimensions
+        length_ = newLength;
+        offset_ = newOffset;
+        delete change;
+        return true;
+    }
+    return false;
+}
+
+
 
 /// This method gives the given change to this textchange. The changes will be merged
 /// if possible. This method currently only works with executed changes!!!
@@ -48,8 +117,6 @@ void SingleTextChange::revert(TextDocument* document)
 /// @param document the document
 /// @param textChange the textchange to mege
 /// @return true on success else false
-///
-/// TODO: Split this method up in several small methods: (mergeText, mergeLength)
 bool SingleTextChange::giveAndMerge( TextDocument* document, TextChange* textChange)
 {
     Q_UNUSED( document );
@@ -57,66 +124,7 @@ bool SingleTextChange::giveAndMerge( TextDocument* document, TextChange* textCha
     SingleTextChange* change = dynamic_cast<SingleTextChange*>( textChange );
     if( change ) {
         Q_ASSERT(change->executed_);
-
-        // overlap is a bit harder
-        if( isOverlappedBy(change) || isTouchedBy(change) ) {
-
-            SingleTextChange* a = this;
-            SingleTextChange* b = change;
-//qlog_info() << "giveAndMerge----------";
-//qlog_info() << "A:" << a->toString() << " | " << a->isExecuted();
-//qlog_info() << "B:" << b->toString() << " | " << b->isExecuted();
-
-            // build the new text
-            QString newText;
-            {
-                // we first need to 'take' the leading part of the new change
-                if( change->offset() < offset() ) {
-                    newText.append( change->oldText(document).mid(0, offset() - change->offset() ) );
-                }
-
-                newText.append(oldText(document));
-
-                // then we need to append the remainer
-                int delta = offset()-change->offset();
-                int remainerOffset = a->newLength() + delta;
-                if( remainerOffset >= 0 ) {
-                    if( remainerOffset < b->oldLength() ) {
-                        //Q_ASSERT(false);    // need to figure out if this works
-                        newText.append( b->oldText( document  ).mid(remainerOffset ) );
-                    }
-                }
-            }
-
-            // build the new length
-            int len = b->newLength();
-            {
-                // add the prefix of the a length
-                if( offset() < b->offset() ) { // && b->offset() < (offset() + length())   ) {
-                    len += ( b->offset()-offset() );
-                }
-
-                // add the postfix of the length
-                int aEnd = a->offset() + a->newLength();
-                int bEnd = b->offset() + b->oldLength();
-                if( bEnd < aEnd ) {
-                    len += aEnd-bEnd;
-                }
-            }
-
-            // now assign the new length
-            length_ = len;
-
-            // set the text
-            text_ = newText;
-
-            /// the new offset is the minimum offset
-            offset_ = qMin( offset_, b->offset_ );
-
-            delete change;
-            return true;
-        }
-
+        return merge( change );
     }
     return false;
 }
@@ -146,14 +154,6 @@ void SingleTextChange::setOffset(int offset)
 }
 
 
-/// Adds the given amount to the offset
-/// @param amount the offset to add
-void SingleTextChange::addOffset(int amount)
-{
-    offset_ += amount;
-}
-
-
 /// this method returns the old length of the change
 int SingleTextChange::oldLength() const
 {
@@ -177,8 +177,9 @@ int SingleTextChange::length() const
 
 /// Set the length of the change
 /// @param len sets the length of the change
-void SingleTextChange::setLength(int len)
+void SingleTextChange::setOldLength(int len)
 {
+    Q_ASSERT(executed_);
     length_ = len;
 }
 
