@@ -110,15 +110,11 @@ public:
 
     virtual bool isGroup();
 
-//    virtual void giveChangeAtIndex( int idx, TextChange* change ) = 0;
-
     virtual bool isDiscardable();
     virtual void groupClosed();
 
     virtual void execute( TextDocument* document);
     virtual void revert( TextDocument* document);
-
-//    virtual void moveChangeFromGroup( TextChangeGroup* group );
 
     virtual bool giveAndMerge( TextDocument* document, TextChange* textChange ) = 0;
     virtual void flatten();

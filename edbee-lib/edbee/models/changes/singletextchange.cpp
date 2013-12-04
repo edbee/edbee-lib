@@ -42,17 +42,6 @@ void SingleTextChange::revert(TextDocument* document)
     executed_ = false;
 }
 
-//bool SingleTextChange::canMerge(TextDocument* document, TextChange* textChange)
-//{
-//    Q_UNUSED( document );
-//    SingleTextChange* change = dynamic_cast<SingleTextChange*>( textChange );
-//    if( change ) {
-//        if( offset_ + length_ == change->offset_ ) return true;
-//        if( change->offset_ + change->length_ == offset_ ) return true;
-//    }
-//    return false;
-//}
-
 /// This method gives the given change to this textchange. The changes will be merged
 /// if possible. This method currently only works with executed changes!!!
 ///
@@ -252,35 +241,6 @@ QString SingleTextChange::testString()
     return QString("%1:%2:%3").arg(offset_).arg(length_).arg(QString(text_).replace("\n","§"));
 }
 
-
-/// This method checks if this textchange is overlapped by the second text change
-/// overlapping is an exclusive overlap, which means the changes are really on top of eachother
-/// to test if the changes are touching use isTouchedBy
-/// @param secondChange the other change to compare it to
-/// @return tue if the changes overlap
-bool SingleTextChange::isOverlappedBy(SingleTextChange* secondChange)
-{
-    return
-    ( offset() < ( secondChange->offset() + secondChange->newLength() ) &&  secondChange->offset() < (offset() + newLength()) )
-    || (  offset() < ( secondChange->offset() + secondChange->oldLength() ) && secondChange->offset() < (offset() + newLength())  )
-    ;
-}
-
-
-/// Touched ranges are ranges that are next to eachother
-/// Touching means the end offset of one range is the start offset of the other range
-/// @param secondChange the other change to match
-/// @return true if the changes overlap
-bool SingleTextChange::isTouchedBy(SingleTextChange* secondChange)
-{
-    return offset() == (secondChange->offset() + secondChange->newLength() )
-        || (offset() + newLength()) == secondChange->offset()
-        // Delete operation should be supported
-        || ( secondChange->newLength() < secondChange->oldLength() &&  offset() == (secondChange->offset() + secondChange->oldLength() ) )
-        // delete touch (Should we add those length < newlength condition!??)
-        //|| ( ( length() < newLength() ) && (offset() + newLength()) == secondChange->offset() )
-            ;
-}
 
 
 /// This method returns true if the change has been executed

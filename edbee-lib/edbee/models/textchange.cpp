@@ -203,23 +203,6 @@ bool TextChangeGroup::isGroup()
 }
 
 
-/// Adds a change to this group
-/// @param change the change to give
-//void TextChangeGroup::giveChange(TextChange* change)
-//{
-//    changeList_.append(change);
-//}
-
-
-/// Adds a change to this group at the given index
-/// @param idx the index to add the group to
-/// @param change the change to give
-//void TextChangeGroup::giveChangeAtIndex(int idx, TextChange* change)
-//{
-//    changeList_.insert(idx,change);
-//}
-
-
 /// This method is called it the group is discardable. A discardable group will be optimized away if
 /// the group is empty, or if there's a single item in the group. A none-discardable group will
 /// always remain
@@ -256,117 +239,6 @@ void TextChangeGroup::revert(TextDocument* document)
 }
 
 
-/// Moves all textchanges from the given group to this group
-/*
-void TextChangeGroup::moveChangeFromGroup(TextChangeGroup* group)
-{
-    for( int i=0,cnt=group->size(); i<cnt; ++i ) {
-        TextChange* change = group->at(i);
-        if( change->isGroup() ) {
-            TextChangeGroup* childGroup = dynamic_cast<TextChangeGroup*>( change );
-            if( childGroup ) {
-                moveChangeFromGroup( childGroup );
-                continue;
-            }
-        }
-        giveChange( change );
-    }
-    group->clear(false); // no delete we've taken the ownership
-}
-*/
-
-#if 0
-
-/// This method tries to merge the given change with the other change
-/// The textChange supplied with this method should NOT have been executed yet.
-/// It's the choice of this merge operation if the execution is required
-/// @param document the document scope this merge needs to be executed for
-/// @param textChange the textchange to merge
-/// @return true if the merge has been successfull. False if nothing has been merged and executed
-bool TextChangeGroup::giveAndMerge(TextDocument* document, TextChange* textChange)
-{
-    Q_UNUSED( document );
-    Q_UNUSED( textChange );
-
-    // whent the given textchange is a group the change is simply merged
-    if( textChange->isGroup() ) {
-        TextChangeGroup* group= dynamic_cast<TextChangeGroup*>(textChange);
-        if( group ) {
-            moveChangeFromGroup(group);
-            delete textChange;
-            return true;
-        }
-    }
-
-
-//qlog_info() << "DISABLED merge!";
-//return false;
-
-/// TODO: We probably should put this 'magic' merge in a special 'TextChangeGroup' !!!!
-/*
-    TextChangeGroup* groupChange = dynamic_cast<TextChangeGroup*>( textChange );
-    if( groupChange) {
-
-        int nextTextChangeMergeIndex = 0;
-        int nextSelectionChangeMergeIndex = 0;
-
-        // merge all changes to the current list. And join changes as good as possible
-        for( int gIdx=0; gIdx<groupChange->size(); ++gIdx ){
-            TextChange* gChange = groupChange->changeList_[gIdx];
-
-            // MERGE text changes?
-            SingleTextChange* gTextChange = dynamic_cast<SingleTextChange*>(gChange);
-            if( gTextChange ) {
-
-                // find the location to MERGE it with in the list
-                for( int i=nextTextChangeMergeIndex, cnt=changeList_.size(); i<cnt; ++i ) {
-                    TextChange* change = changeList_[i];
-                    SingleTextChange* textChange = dynamic_cast<SingleTextChange*>(change);
-
-                    // merge succeeded?
-                    if( change->merge( document, gChange ) ) {
-                        Q_ASSERT( textChange );
-                        nextTextChangeMergeIndex = i+1;
-
-                        // we need to get the delta of the merge change
-                        int delta = gTextChange->length() - gTextChange->text().length();
-
-                        // apply the delta of this merge to all NEXT items in the list
-                        for(++i; i<cnt; ++i ) {
-                            change = changeList_[i];
-                            textChange = dynamic_cast<SingleTextChange*>(change);
-                            if( textChange ) {
-                                textChange->moveOffset(delta);
-                            }
-                        }
-                    }
-                }
-            // cannot merge/  no text change? just append the change
-            } else {
-                groupChange->changeList_.removeAt(gIdx);        // remove the change and give it to the list
-                --gIdx;                                         // make sure the next iteration takes the correct item
-                changeList_.append(gChange);
-          }
-        } // for group
-        return true;
-    } // group change?
-*/
-    /* groups should not be merged
-    TextChangeGroup* groupChange = dynamic_cast<TextChangeGroup*>( textChange );
-    if( groupChange) {
-        for( int i=0,cnt=groupChange->changeList_.size(); i <cnt; ++i ) {
-            changeList_.append( groupChange->changeList_.at(i) );
-        }
-        groupChange->changeList_.clear();
-        return true;
-    }
-    */
-    return false;
-}
-
-#endif
-
-
 /// This method flattens the undo-group by expanding all subgroups to local groups
 void TextChangeGroup::flatten()
 {
@@ -390,24 +262,6 @@ void TextChangeGroup::flatten()
 }
 
 
-/// This method returns the textchange at the given index
-/// @param idx the index of the change
-/// @return the textchange
-//TextChange* TextChangeGroup::at(int idx)
-//{
-//    return changeList_.at(idx);
-//}
-
-
-/// This method takes the textchange from the group, taking the ownership
-/// @param idx the index of the change
-/// @return the textchange
-//TextChange* TextChangeGroup::take(int idx)
-//{
-//    return changeList_.takeAt(idx);
-//}
-
-
 /// This method returns the last change in the change group
 /// @return the last textchange
 TextChange* TextChangeGroup::last()
@@ -426,14 +280,6 @@ TextChange* TextChangeGroup::takeLast()
 }
 
 
-/// This method return the number of items
-/// @return the number of items in the changelist
-//int TextChangeGroup::size()
-//{
-//    return changeList_.size();
-//}
-
-
 /// The total number of items in the list (excluding the group items)
 /// @return the number of items recussive (iterating) all groups
 int TextChangeGroup::recursiveSize()
@@ -449,15 +295,6 @@ int TextChangeGroup::recursiveSize()
     }
     return itemCount;
 }
-
-
-/// This method remove all items from the group
-/// @param performDelete (defaults to true)
-//void TextChangeGroup::clear(bool performDelete)
-//{
-//    if( performDelete ) { qDeleteAll(changeList_); }
-//    changeList_.clear();
-//}
 
 
 /// if this commandgroup only contains commands for a single controller context

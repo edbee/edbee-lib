@@ -7,7 +7,7 @@
 
 #include <QString>
 
-#include "edbee/models/textchange.h"
+#include "edbee/models/changes/abstractrangedtextchange.h"
 
 namespace edbee {
 
@@ -15,7 +15,7 @@ namespace edbee {
 ///
 /// This class re-uses the variables offset/length and text. Depending on the undo/redo state
 /// these variables contain the new data or the changed data
-class SingleTextChange : public TextChange
+class SingleTextChange : public AbstractRangedTextChange
 {
 public:
     SingleTextChange(int offset, int length, const QString& text, bool executed=false );
@@ -49,8 +49,6 @@ public:
     const QString docText( TextDocument* doc ) const;
 
     QString testString();
-    bool isOverlappedBy( SingleTextChange* secondChange );
-    bool isTouchedBy( SingleTextChange* secondChange );
 
     bool isExecuted() const;
 
