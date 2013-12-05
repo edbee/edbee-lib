@@ -9,6 +9,7 @@
 
 namespace edbee {
 
+class AbstractRangedTextChange;
 class LineDataListTextChange;
 class SingleTextChange;
 class TextRangeSet;
@@ -33,10 +34,14 @@ public:
     virtual void revert(TextDocument* document);
 
 private:
-    void addOffsetDeltaToTextChanges( int fromIndex, int delta );
-    int findTextChangeInsertIndexForOffset( int offset );
-    int mergeTextChange(TextDocument* doc, SingleTextChange* newChange, int& delta );
-    void inverseMergeRemainingOverlappingTextChanges(TextDocument* doc, int mergedAtIndex, int orgStartOffset, int orgEndOffset , int delta);
+    void addOffsetDeltaToChanges( QList<AbstractRangedTextChange*>& changes, int fromIndex, int delta );
+    int findInsertIndexForOffset( QList<AbstractRangedTextChange*>& changes, int offset );
+    int mergeChange( QList<AbstractRangedTextChange*>& changes, TextDocument* doc, AbstractRangedTextChange* newChange, int& delta );
+    void inverseMergeRemainingOverlappingChanges( QList<AbstractRangedTextChange*>& changes, TextDocument* doc, int mergedAtIndex, int orgStartOffset, int orgEndOffset , int delta);
+
+    void giveChangeToList(  QList<AbstractRangedTextChange*>& changes, TextDocument* doc, AbstractRangedTextChange* change );
+
+//TODO:     void giveAbstractRangedTextChange( TextDocument* doc, QList<AbstractRangedTextChange* changeList>& changes, AbstractRangedTextChange* change );
 
 public:
     void giveSingleTextChange( TextDocument* doc, SingleTextChange* change );
@@ -70,7 +75,7 @@ protected:
 
 private:
 
-    QList<SingleTextChange*> textChangeList_;                   ///< The list of textchanges
+    QList<AbstractRangedTextChange*> textChangeList_;           ///< The list of textchanges
     QList<LineDataListTextChange*> lineDataTextChangeList_;     ///<The list with liendata text changes
     QList<TextChange*> miscChangeList_;                         ///< Other textchanges
 

@@ -5,6 +5,7 @@
 
 #include "complextextchange.h"
 
+#include "edbee/models/changes/abstractrangedtextchange.h"
 #include "edbee/models/changes/selectiontextchange.h"
 #include "edbee/models/changes/singletextchange.h"
 #include "edbee/models/changes/linedatalisttextchange.h"
@@ -81,10 +82,10 @@ void ComplexTextChange::revert( TextDocument* document )
 
 
 /// This method adds the given delta to the changes
-void ComplexTextChange::addOffsetDeltaToTextChanges(int fromIndex, int delta)
+void ComplexTextChange::addOffsetDeltaToChanges(QList<AbstractRangedTextChange*>& changes, int fromIndex, int delta)
 {
-    for(int i = fromIndex; i<textChangeList_.size(); ++i ) {
-        SingleTextChange* s2 = textChangeList_.at(i);
+    for(int i = fromIndex; i<changes.size(); ++i ) {
+        AbstractRangedTextChange* s2 = changes.at(i);
         s2->addOffset( delta );
     }
 }
@@ -93,11 +94,11 @@ void ComplexTextChange::addOffsetDeltaToTextChanges(int fromIndex, int delta)
 /// This method finds the insert index for the given offset
 /// @param offset the offset of the change
 /// @return the inertindex used for inserting the data
-int ComplexTextChange::findTextChangeInsertIndexForOffset(int offset)
+int ComplexTextChange::findInsertIndexForOffset(QList<AbstractRangedTextChange*>& changes, int offset)
 {
     int insertIndex = 0;
-    for( int i=0,cnt=textChangeList_.size(); i<cnt; ++i ){
-        SingleTextChange* change = textChangeList_.at(i);
+    for( int i=0,cnt=changes.size(); i<cnt; ++i ){
+        AbstractRangedTextChange* change = changes.at(i);
         if( change->offset() < offset ) {
             insertIndex = i+1;
         }
@@ -110,10 +111,10 @@ int ComplexTextChange::findTextChangeInsertIndexForOffset(int offset)
 /// @param newChange the new change to merge
 /// @param delta (out) the delta applied to this change
 /// @return the merged index or -1 if not merged!
-int ComplexTextChange::mergeTextChange( TextDocument* doc, SingleTextChange* newChange, int& delta)
+int ComplexTextChange::mergeChange(QList<AbstractRangedTextChange*>& changes, TextDocument* doc, AbstractRangedTextChange* newChange, int& delta)
 {
-    for( int i=0,cnt=textChangeList_.size(); i<cnt; ++i ){
-        SingleTextChange* change = textChangeList_.at(i);
+    for( int i=0,cnt=changes.size(); i<cnt; ++i ){
+        AbstractRangedTextChange* change = changes.at(i);
 
         // we need the previous length and new-length to know how the delta is changed of the other items
         int prevNewLength = change->newLength();
@@ -136,11 +137,11 @@ int ComplexTextChange::mergeTextChange( TextDocument* doc, SingleTextChange* new
 /// @param orgStartOffset the offset of the orgingal merged textchange
 /// @param orgEndoOffset the end offset of the original merged textchange
 /// @param delta the current delta used for offset calculating
-void ComplexTextChange::inverseMergeRemainingOverlappingTextChanges( TextDocument* doc, int mergedAtIndex, int orgStartOffset, int orgEndOffset, int delta)
+void ComplexTextChange::inverseMergeRemainingOverlappingChanges(QList<AbstractRangedTextChange*>& changes, TextDocument* doc, int mergedAtIndex, int orgStartOffset, int orgEndOffset, int delta)
 {
-    SingleTextChange* mergedChange = textChangeList_.at(mergedAtIndex);
-    for( int i=mergedAtIndex+1; i<textChangeList_.size(); ++i ) {
-        SingleTextChange* nextChange= textChangeList_.at(i);
+    AbstractRangedTextChange* mergedChange = changes.at(mergedAtIndex);
+    for( int i=mergedAtIndex+1; i<changes.size(); ++i ) {
+        AbstractRangedTextChange* nextChange= changes.at(i);
 
         // only perform merging if the change overlapped a previous change
         if( nextChange->offset() < orgEndOffset && orgStartOffset < (nextChange->offset() + nextChange->newLength())   ) {
@@ -154,7 +155,7 @@ void ComplexTextChange::inverseMergeRemainingOverlappingTextChanges( TextDocumen
             // notice the 'inversion of the merge. We apply the merged change to the next change
             if( nextChange->giveAndMerge( doc, mergedChange) ) {
                 mergedChange = nextChange;
-                textChangeList_.removeAt(mergedAtIndex);
+                changes.removeAt(mergedAtIndex);
                 --i;
             } else {
                 // remove the temporary delta
@@ -169,7 +170,7 @@ void ComplexTextChange::inverseMergeRemainingOverlappingTextChanges( TextDocumen
 
 
 /// gives the given textchange to the merge routine
-void ComplexTextChange::giveSingleTextChange(TextDocument* doc, SingleTextChange* newChange)
+void ComplexTextChange::giveChangeToList(QList<AbstractRangedTextChange*>& changes, TextDocument* doc, AbstractRangedTextChange* newChange)
 {
     //qlog_info() << "giveSingleTextChange" << newChange->toString();
     // remember the orginal ranges so we know which changes are affected by this new change
@@ -181,20 +182,20 @@ void ComplexTextChange::giveSingleTextChange(TextDocument* doc, SingleTextChange
     int delta = 0;
 
     // First try to merge this new change
-    int mergedAtIndex = mergeTextChange( doc, newChange, delta );
+    int mergedAtIndex = mergeChange( changes, doc, newChange, delta );
 
     // when we could merge the change,
     // we need to try to merge it with next overlapping changes
     if( mergedAtIndex >= 0 ) {
 
-        inverseMergeRemainingOverlappingTextChanges( doc, mergedAtIndex, orgStartOffset, orgEndOffset, delta );
+        inverseMergeRemainingOverlappingChanges( changes, doc, mergedAtIndex, orgStartOffset, orgEndOffset, delta );
         addDeltaFromIndex = mergedAtIndex + 1;
 
     // not merged? then we need to add the change at the given index
     } else {
 
         // find the insert index
-        int insertIndex = findTextChangeInsertIndexForOffset( newChange->offset() );
+        int insertIndex = findInsertIndexForOffset( changes, newChange->offset() );
 
         // just insert change
         textChangeList_.insert( insertIndex, newChange);
@@ -205,7 +206,14 @@ void ComplexTextChange::giveSingleTextChange(TextDocument* doc, SingleTextChange
     }
 
     // next apply the delta to the following change
-    addOffsetDeltaToTextChanges(addDeltaFromIndex,delta);
+    addOffsetDeltaToChanges( changes, addDeltaFromIndex, delta);
+}
+
+
+/// Gives a single textchange
+void ComplexTextChange::giveSingleTextChange(TextDocument* doc, SingleTextChange* change)
+{
+    giveChangeToList( textChangeList_, doc, change );
 }
 
 
@@ -387,7 +395,8 @@ QString ComplexTextChange::toString()
 QString ComplexTextChange::toSingleTextChangeTestString()
 {
     QString result;
-    foreach( SingleTextChange* change, textChangeList_ ) {
+    foreach( AbstractRangedTextChange* abstractChange, textChangeList_ ) {
+        SingleTextChange* change = dynamic_cast<SingleTextChange*>(abstractChange);
         if( !result.isEmpty() ) result.append(",");
         result.append( QString("%1:%2:%3").arg(change->offset()).arg(change->length()).arg(change->storedText()) );
     }
@@ -487,11 +496,11 @@ void ComplexTextChange::compressTextChanges(TextDocument* document)
 {
     // compress single text changes
     for( int i=0; i<textChangeList_.size(); ++i ) {
-        SingleTextChange* change1 = textChangeList_.at(i);
+        AbstractRangedTextChange* change1 = textChangeList_.at(i);
 
         // find the next text change
         for( int j=i+1; j<textChangeList_.size(); ++j ) {
-            SingleTextChange* change2 = textChangeList_.at(j);
+            AbstractRangedTextChange* change2 = textChangeList_.at(j);
             if( change1->giveAndMerge( document, change2 ) ) {
                 textChangeList_.takeAt(j);  // just take it, the item is already deleted by the merge
                 --j;
