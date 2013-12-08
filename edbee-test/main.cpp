@@ -29,6 +29,7 @@ int main(int argc, char* argv[])
     tests.append( "edbee::SingleTextChangeTest");
     tests.append( "edbee::ComplexTextChangeTest");
     tests.append( "edbee::LineOffsetVectorTest");
+    tests.append( "edbee::LineDataListTextChangeTest");
     tests.append( "edbee::PlainTextDocumentTest");
     tests.append( "edbee::TextLineDataTest");
     tests.append( "edbee::TextRangeSetTest");

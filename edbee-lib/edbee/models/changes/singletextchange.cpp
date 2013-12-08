@@ -18,11 +18,10 @@ namespace edbee {
 /// @param length, the length of the change
 /// @param text , the new text
 /// @param executed, a boolean (mainly used for testing) to mark this change as exected
-SingleTextChange::SingleTextChange(int offset, int length, const QString& text, bool executed )
+SingleTextChange::SingleTextChange(int offset, int length, const QString& text)
     : offset_(offset)
     , length_(length)
     , text_(text)
-    , executed_(executed)
 {
 }
 
@@ -38,7 +37,6 @@ SingleTextChange::~SingleTextChange()
 void SingleTextChange::execute(TextDocument* document)
 {
     replaceText(document);
-    executed_ = true;
 }
 
 
@@ -47,19 +45,18 @@ void SingleTextChange::execute(TextDocument* document)
 void SingleTextChange::revert(TextDocument* document)
 {
     replaceText(document);
-    executed_ = false;
 }
 
 
 /// This method merges the old data with the new data
 /// @apram change the data to merge with
-void SingleTextChange::mergeOldData(AbstractRangedTextChange* change)
+void SingleTextChange::mergeStoredData(AbstractRangedTextChange* change)
 {
     SingleTextChange* singleTextChange = dynamic_cast<SingleTextChange*>(change);
 
     QString newText;
-    newText.resize( calculateMergeDataSize( change) );
-    mergeData( newText.data(), text_.data(), singleTextChange->text_.data(), change, sizeof(QChar) );
+    newText.resize( getMergedStoredLength( change) );
+    mergeStoredDataViaMemcopy( newText.data(), text_.data(), singleTextChange->text_.data(), change, sizeof(QChar) );
     /*
       QString newText;
       // we first need to 'take' the leading part of the new change
@@ -79,36 +76,9 @@ void SingleTextChange::mergeOldData(AbstractRangedTextChange* change)
           }
       }
 
-  */
-
+    */
     text_ = newText;
 }
-
-
-/// This method merges the change
-/// @param document the document to merges
-/// @param change the change change to merge
-bool SingleTextChange::merge( AbstractRangedTextChange* change )
-{
-    // overlap is a bit harder
-    if( isOverlappedBy(change) || isTouchedBy(change) ) {
-
-        // build the new sizes and offsets
-        int newOffset = qMin( offset(), change->offset() );
-        int newLength = getMergedLength(change);
-
-        // merge the data
-        mergeOldData( change );
-
-        // when the data is meged assign the new dimensions
-        length_ = newLength;
-        offset_ = newOffset;
-        delete change;
-        return true;
-    }
-    return false;
-}
-
 
 
 /// This method gives the given change to this textchange. The changes will be merged
@@ -120,10 +90,8 @@ bool SingleTextChange::merge( AbstractRangedTextChange* change )
 bool SingleTextChange::giveAndMerge( TextDocument* document, TextChange* textChange)
 {
     Q_UNUSED( document );
-    Q_ASSERT( executed_ );
     SingleTextChange* change = dynamic_cast<SingleTextChange*>( textChange );
     if( change ) {
-        Q_ASSERT(change->executed_);
         return merge( change );
     }
     return false;
@@ -154,49 +122,26 @@ void SingleTextChange::setOffset(int offset)
 }
 
 
-/// this method returns the old length of the change
-int SingleTextChange::oldLength() const
-{
-    return isExecuted() ? text_.size() : length_;
-}
-
-
-/// This method returns the new length of the text
-int SingleTextChange::newLength() const
-{
-    return isExecuted() ? length_ : text_.size();
-}
-
-
-/// Returns the length of the text currently in the doc depending on the undo state
-int SingleTextChange::length() const
+/// This is the length in the document
+int SingleTextChange::docLength() const
 {
     return length_;
 }
 
 
+/// The content length is the length that's currently stored in memory.
+int SingleTextChange::storedLength() const
+{
+    return text_.size();
+}
+
+
 /// Set the length of the change
 /// @param len sets the length of the change
-void SingleTextChange::setOldLength(int len)
+void SingleTextChange::setDocLength(int len)
 {
-    Q_ASSERT(executed_);
     length_ = len;
 }
-
-
-/// This method returns the old text of the change
-QString SingleTextChange::oldText(TextDocument* doc) const
-{
-    return isExecuted() ? text_ : doc->textPart(offset(), oldLength() );
-}
-
-
-/// This method returns the changed text
-QString SingleTextChange::newText(TextDocument* doc) const
-{
-    return isExecuted() ? doc->textPart(offset(), length_ ) : text_;
-}
-
 
 /// The text currently stored in this textchange
 QString SingleTextChange::storedText() const
@@ -227,27 +172,10 @@ const QString SingleTextChange::docText(TextDocument* doc) const
 }
 
 
-/// execute the a spatial change
-void SingleTextChange::applyOffsetDelta(int offset, int length, int newLength)
-{
-    if( offset <= offset_ ) {
-        offset_ += ( newLength - length );
-    }
-}
-
-
 /// This method returns a string used for testing
 QString SingleTextChange::testString()
 {
     return QString("%1:%2:%3").arg(offset_).arg(length_).arg(QString(text_).replace("\n","§"));
-}
-
-
-
-/// This method returns true if the change has been executed
-bool SingleTextChange::isExecuted() const
-{
-    return executed_;
 }
 
 

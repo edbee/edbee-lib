@@ -73,9 +73,9 @@ void LineDataListTextChangeTest::testMerge_growBelow()
 
     testTrue( change1->giveAndMerge( doc_, change2 ) );
     takeChange(change2);
-    testEqual( change1->line(), 1);
-    testEqual( change1->length(), 0);
-    testEqual( change1->newLength(), 2);
+    testEqual( change1->offset (), 1);
+    testEqual( change1->storedLength(), 0);
+    testEqual( change1->docLength(), 2);
     testEqual( data2str(change1), "" );
 }
 
@@ -87,15 +87,16 @@ void LineDataListTextChangeTest::testMerge_growAbove()
     change1->execute(doc_);
     testEqual( data2str(change1), "" );
 
-    LineDataListTextChange* change2 = createChange(1, 0, 1);
+    LineDataListTextChange* change2 = createChange(2, 0, 1);    // previous test was wong, inserting at 1 and 2 doesn't merge!!
     change2->execute(doc_);
     testEqual( data2str(change2), "" );
 
     testTrue( change1->giveAndMerge( doc_, change2 ) );
+
     takeChange(change2);
-    testEqual( change1->line(), 1);
-    testEqual( change1->length(), 0);
-    testEqual( change1->newLength(), 2);
+    testEqual( change1->offset (), 2);
+    testEqual( change1->storedLength(), 0);
+    testEqual( change1->docLength(), 2);
     testEqual( data2str(change1), "" );
 }
 
@@ -113,9 +114,9 @@ void LineDataListTextChangeTest::testMerge_shrinkBelow()
 
     testTrue( change1->giveAndMerge( doc_, change2 ) );
     takeChange(change2);
-    testEqual( change1->line(), 1);
-    testEqual( change1->length(), 2);
-    testEqual( change1->newLength(), 0);
+    testEqual( change1->offset (), 1);
+    testEqual( change1->storedLength(), 2);
+    testEqual( change1->docLength(), 0);
     testEqual( data2str(change1), "bc" );
 }
 
@@ -133,9 +134,9 @@ void LineDataListTextChangeTest::testMerge_shrinkAbove()
 
     testTrue( change1->giveAndMerge( doc_, change2 ) );
     takeChange(change2);
-    testEqual( change1->line(), 0);
-    testEqual( change1->length(), 2);
-    testEqual( change1->newLength(), 0);
+    testEqual( change1->offset (), 0);
+    testEqual( change1->storedLength(), 2);
+    testEqual( change1->docLength(), 0);
     testEqual( data2str(change1), "ab" );
 }
 

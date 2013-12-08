@@ -361,7 +361,7 @@ void ComplexTextChangeTest::testGiveSingleTextChange_overlap()
 /// adds a new textchange
 void ComplexTextChangeTest::runSingleTextChange(int offset, int length, const QString& replacement)
 {
-    SingleTextChange* change = new SingleTextChange(offset,length,replacement, true);
+    SingleTextChange* change = new SingleTextChange(offset,length,replacement);
     change->execute( doc_ );
     group_->giveSingleTextChange(doc_,change);
 }
@@ -370,7 +370,7 @@ void ComplexTextChangeTest::runSingleTextChange(int offset, int length, const QS
 /// adds a new textchange to group 2
 void ComplexTextChangeTest::runSingleTextChange2(int offset, int length, const QString& replacement)
 {
-    SingleTextChange* change = new SingleTextChange(offset,length,replacement, true);
+    SingleTextChange* change = new SingleTextChange(offset,length,replacement);
     change->execute( doc_ );
     group2_->giveSingleTextChange(doc_,change);
 }
@@ -387,7 +387,7 @@ QString ComplexTextChangeTest::fillGroup(const QString& changes, ComplexTextChan
         Q_ASSERT( fields.size() == 3 );
         int offset = fields.at(0).toInt();
         int length = fields.at(1).toInt();
-        group->giveSingleTextChange(doc_, new SingleTextChange(offset, length, fields[2], true ) );
+        group->giveSingleTextChange(doc_, new SingleTextChange(offset, length, fields[2] ) );
     }
     return group->toSingleTextChangeTestString();
 }

@@ -33,8 +33,6 @@ public:
     bool isDocumentChange();
     virtual bool isGroup();
 
-    virtual void applyLineDelta( int line, int length, int newLength);
-
     virtual QString toString() = 0;
 };
 

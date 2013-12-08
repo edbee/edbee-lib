@@ -16,11 +16,11 @@ namespace edbee {
 void SingleTextChangeTest::testBoundaryMethods()
 {
     // INSERT TESTS
-    SingleTextChange s1(4,4,"",true);    //      [    ]
-    SingleTextChange s2(0,2,"",true);    // [  ]
-    SingleTextChange s3(5,2,"",true);    //       [  ]
-    SingleTextChange s4(1,2,"",true);    //  [  ]
-    SingleTextChange s5(2,2,"",true);    //    [  ]
+    SingleTextChange s1(4,4,"");    //      [    ]
+    SingleTextChange s2(0,2,"");    // [  ]
+    SingleTextChange s3(5,2,"");    //       [  ]
+    SingleTextChange s4(1,2,"");    //  [  ]
+    SingleTextChange s5(2,2,"");    //    [  ]
 
     // test non overlap touch
     testFalse( s1.isOverlappedBy(&s2) );
@@ -47,16 +47,16 @@ void SingleTextChangeTest::testBoundaryMethods()
     testFalse( s5.isOverlappedBy(&s2));
 
     // BACKSPACE TEST
-    SingleTextChange d1(0,0,"Y",true);
-    SingleTextChange d2(1,0,"X",true);
+    SingleTextChange d1(0,0,"Y");
+    SingleTextChange d2(1,0,"X");
     testFalse( d1.isTouchedBy(&d2) );
     testFalse( d1.isOverlappedBy(&d2) );
     testTrue( d2.isTouchedBy(&d1) );
     testFalse( d2.isOverlappedBy(&d1) );
 
 
-    SingleTextChange d3(0,0,"X",true);
-    SingleTextChange d4(0,0,"Y",true);
+    SingleTextChange d3(0,0,"X");
+    SingleTextChange d4(0,0,"Y");
     testTrue( d3.isTouchedBy(&d4) );
     testFalse( d3.isOverlappedBy(&d4) );
     testTrue( d4.isTouchedBy(&d3) );
@@ -70,12 +70,12 @@ void SingleTextChangeTest::testBoundaryMethods()
 /// = This should be merge into:   (M) 1:1:bcd        =>  bc + d
 void SingleTextChangeTest::testMerge1()
 {
-    SingleTextChange a(1,1,"bc",true);
-    SingleTextChange* b = new SingleTextChange(1,1,"xd",true);
+    SingleTextChange a(1,1,"bc");
+    SingleTextChange* b = new SingleTextChange(1,1,"xd");
 
     testTrue( a.giveAndMerge(0,b) );
     testEqual( a.offset(), 1 );
-    testEqual( a.newLength(), 1 );
+    testEqual( a.docLength(), 1 );
     testEqual( a.storedText(), "bcd" );
 }
 
@@ -86,12 +86,12 @@ void SingleTextChangeTest::testMerge1()
 /// = This should be merge into:      (M) 0:1:abc     =>  a + bc
 void SingleTextChangeTest::testMerge2()
 {
-    SingleTextChange a(1,3,"bc",true);
-    SingleTextChange* b = new SingleTextChange(0,1,"axyz",true);
+    SingleTextChange a(1,3,"bc");
+    SingleTextChange* b = new SingleTextChange(0,1,"axyz");
 
     testTrue( a.giveAndMerge(0,b) );
     testEqual( a.offset(), 0 );
-    testEqual( a.newLength(), 1 );
+    testEqual( a.docLength(), 1 );
     testEqual( a.storedText(), "abc" );
 }
 
@@ -102,12 +102,12 @@ void SingleTextChangeTest::testMerge2()
 /// = This should be merge into:   (M) 0:1:abcdef    =>  a + bc + def
 void SingleTextChangeTest::testMerge3()
 {
-    SingleTextChange a(1,1,"bc",true);
-    SingleTextChange* b = new SingleTextChange(0,1,"axdef",true);
+    SingleTextChange a(1,1,"bc");
+    SingleTextChange* b = new SingleTextChange(0,1,"axdef");
 
     testTrue( a.giveAndMerge(0,b) );
     testEqual( a.offset(), 0 );
-    testEqual( a.newLength(), 1 );
+    testEqual( a.docLength(), 1 );
     testEqual( a.storedText(), "abcdef" );
 }
 
@@ -118,12 +118,12 @@ void SingleTextChangeTest::testMerge3()
 ///= This should be merge into:             (M) 1:3:bc    =>  b + c
 void SingleTextChangeTest::testMerge4()
 {
-    SingleTextChange a(1,4,"b",true);
-    SingleTextChange* b = new SingleTextChange(3,1,"yzc",true);
+    SingleTextChange a(1,4,"b");
+    SingleTextChange* b = new SingleTextChange(3,1,"yzc");
 
     testTrue( a.giveAndMerge(0,b) );
     testEqual( a.offset(), 1 );
-    testEqual( a.newLength(), 3 );
+    testEqual( a.docLength(), 3 );
     testEqual( a.storedText(), "bc" );
 }
 
@@ -133,12 +133,12 @@ void SingleTextChangeTest::testMerge4()
 /// = This should be merge into:             (M) 1:4:b     =>  b
 void SingleTextChangeTest::testMerge5()
 {
-    SingleTextChange a(1,4,"b",true);
-    SingleTextChange* b = new SingleTextChange(3,1,"y",true);
+    SingleTextChange a(1,4,"b");
+    SingleTextChange* b = new SingleTextChange(3,1,"y");
 
     testTrue( a.giveAndMerge(0,b) );
     testEqual( a.offset(), 1 );
-    testEqual( a.newLength(), 4 );
+    testEqual( a.docLength(), 4 );
     testEqual( a.storedText(), "b" );
 }
 
@@ -150,11 +150,11 @@ void SingleTextChangeTest::testMerge5()
 /// (M) 0:0:ABCD
 void SingleTextChangeTest::testMerge6_splitMerge()
 {
-    SingleTextChange a(1,0,"bc",true);
-    SingleTextChange* b = new SingleTextChange(0,0,"ad",true);
+    SingleTextChange a(1,0,"bc");
+    SingleTextChange* b = new SingleTextChange(0,0,"ad");
     testTrue( a.giveAndMerge(0,b) );
     testEqual( a.offset(), 0 );
-    testEqual( a.newLength(), 0 );
+    testEqual( a.docLength(), 0 );
     testEqual( a.storedText(), "abcd" );
 }
 
@@ -172,48 +172,48 @@ void SingleTextChangeTest::testMerge6_splitMerge()
 void SingleTextChangeTest::testMerge7_splitMergeInvert()
 {
     {
-        SingleTextChange a(1,1,"",true) ;
-        SingleTextChange* b = new SingleTextChange(0,0,"axb",true);
+        SingleTextChange a(1,1,"") ;
+        SingleTextChange* b = new SingleTextChange(0,0,"axb");
         testTrue( a.giveAndMerge(0,b));
         testEqual( a.offset(),0 );
-        testEqual( a.newLength(),0 );
+        testEqual( a.docLength(),0 );
         testEqual( a.storedText(), "ab" );
     }
 
     {
-        SingleTextChange a(0,1,"",true) ;
-        SingleTextChange* b = new SingleTextChange(0,0,"xab",true);
+        SingleTextChange a(0,1,"") ;
+        SingleTextChange* b = new SingleTextChange(0,0,"xab");
         testTrue( a.giveAndMerge(0,b));
         testEqual( a.offset(),0 );
-        testEqual( a.newLength(),0 );
+        testEqual( a.docLength(),0 );
         testEqual( a.storedText(), "ab" );
     }
 
 
     {
-        SingleTextChange a(0,2,"",true) ;                                       // |abcd => [xy]abcd             (0:2:)
-        SingleTextChange* b = new SingleTextChange(1,0,"yab",true);             // x[yab]cd  => xcd              (1:0:yab)
-        testTrue( a.giveAndMerge(0,b));                                         // =>                            (0:1:ab)
+        SingleTextChange a(0,2,"") ;                                       // |abcd => [xy]abcd             (0:2:)
+        SingleTextChange* b = new SingleTextChange(1,0,"yab");             // x[yab]cd  => xcd              (1:0:yab)
+        testTrue( a.giveAndMerge(0,b));                                    // =>                            (0:1:ab)
         testEqual( a.offset(),0 );
-        testEqual( a.newLength(),1 );
+        testEqual( a.docLength(),1 );
         testEqual( a.storedText(), "ab" );
     }
 
     {
-        SingleTextChange a(1,3,"bc",true) ;                                     // a[bc]def     => aXYZdef        (1:3:bc)
-        SingleTextChange* b = new SingleTextChange(4,1,"de",true);              // aXYZ[de]f    => aXYZ?f         (4:1:de)
-        testTrue( a.giveAndMerge(0,b));                                         // =>                             (1:4:bcde)
+        SingleTextChange a(1,3,"bc") ;                                     // a[bc]def     => aXYZdef        (1:3:bc)
+        SingleTextChange* b = new SingleTextChange(4,1,"de");              // aXYZ[de]f    => aXYZ?f         (4:1:de)
+        testTrue( a.giveAndMerge(0,b));                                    // =>                             (1:4:bcde)
         testEqual( a.offset(),1 );
-        testEqual( a.newLength(),4 );
+        testEqual( a.docLength(),4 );
         testEqual( a.storedText(), "bcde" );
     }
 
     {
-        SingleTextChange a(1,4,"bc",true) ;                                     // a[bc]def     => aKLMNdef       (1:4:bc)
-        SingleTextChange* b = new SingleTextChange(2,2,"L",true);               // aK[L]MNdef  => aKxyMNdef       (2:2:L)
-        testTrue( a.giveAndMerge(0,b));                                         // =>                             (1:5:bc)
+        SingleTextChange a(1,4,"bc") ;                                     // a[bc]def     => aKLMNdef       (1:4:bc)
+        SingleTextChange* b = new SingleTextChange(2,2,"L");               // aK[L]MNdef  => aKxyMNdef       (2:2:L)
+        testTrue( a.giveAndMerge(0,b));                                    // =>                             (1:5:bc)
         testEqual( a.offset(),1 );
-        testEqual( a.newLength(),5 );
+        testEqual( a.docLength(),5 );
         testEqual( a.storedText(), "bc" );
     }
 

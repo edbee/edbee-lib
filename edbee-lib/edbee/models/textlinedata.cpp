@@ -23,8 +23,8 @@ TextLineDataList::TextLineDataList()
 TextLineDataList::~TextLineDataList()
 {
     if( lineDataList_ ) {
-        Q_ASSERT(false);    /// YOU MUST call destroy before the destructor!
-        qlog_warn() << "Warning TextLineDataList requires manual destruction!";
+//        Q_ASSERT(false);    /// YOU MUST call destroy before the destructor!
+        qlog_warn() << "** Warning TextLineDataList requires manual destruction! ** ";
     }
 }
 
@@ -230,17 +230,6 @@ TextChange* TextLineDataManager::createLinesReplacedChange(int lineStart, int li
 
     LineDataListTextChange* change = new LineDataListTextChange(this,lineStart, lineCount, newLineCount );
     return change;
-
-/// DIRTY HACK, to get old (working) funcionality
-//        // remove all items
-//        for( int i=lineStart,end=lineStart+lineCount; i<end; ++i ){
-//            TextLineDataList* list = textLineDataList_.at(i);
-//            if( list ) { list->destroy(this); }
-//            delete list;
-//        }
-//      // replace all old items with 0 values
-//      textLineDataList_.fill( lineStart, lineCount, 0, newLineCount );
-//      return 0;
 }
 
 

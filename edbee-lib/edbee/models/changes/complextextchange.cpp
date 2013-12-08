@@ -117,14 +117,14 @@ int ComplexTextChange::mergeChange(QList<AbstractRangedTextChange*>& changes, Te
         AbstractRangedTextChange* change = changes.at(i);
 
         // we need the previous length and new-length to know how the delta is changed of the other items
-        int prevNewLength = change->newLength();
-        int prevOldLength = change->oldLength();
+        int prevNewLength = change->docLength();
+        int prevContentLength = change->storedLength();
 
         // try to merge it
         if( change->giveAndMerge( doc, newChange ) ) {
 
             // apply the delta (newLength and length is reversed when in undo state!)
-            delta += (change->newLength()-prevNewLength) - (change->oldLength()-prevOldLength);
+            delta += (change->docLength()-prevNewLength) - (change->storedLength()-prevContentLength);
             return i;
         }
     }
@@ -144,10 +144,10 @@ void ComplexTextChange::inverseMergeRemainingOverlappingChanges(QList<AbstractRa
         AbstractRangedTextChange* nextChange= changes.at(i);
 
         // only perform merging if the change overlapped a previous change
-        if( nextChange->offset() < orgEndOffset && orgStartOffset < (nextChange->offset() + nextChange->newLength())   ) {
+        if( nextChange->offset() < orgEndOffset && orgStartOffset < (nextChange->offset() + nextChange->docLength())   ) {
 
             // take the delta of the previous change before the merge
-            int tmpDelta = mergedChange->oldLength() - mergedChange->newLength() + delta;
+            int tmpDelta = mergedChange->storedLength() - mergedChange->docLength() + delta;
 
             // alter the delta, so we find the correct merge index
             nextChange->addOffset(tmpDelta);
@@ -175,7 +175,7 @@ void ComplexTextChange::giveChangeToList(QList<AbstractRangedTextChange*>& chang
     //qlog_info() << "giveSingleTextChange" << newChange->toString();
     // remember the orginal ranges so we know which changes are affected by this new change
     int orgStartOffset = newChange->offset();
-    int orgEndOffset = newChange->offset() + newChange->oldLength();
+    int orgEndOffset = newChange->offset() + newChange->storedLength();
 
     // some variables to remebmer
     int addDeltaFromIndex = size();         // From which change index should we add delta?!
@@ -202,7 +202,7 @@ void ComplexTextChange::giveChangeToList(QList<AbstractRangedTextChange*>& chang
         addDeltaFromIndex = insertIndex+1;
 
         // apply the delta (newLength and length is reversed when in undo state!)
-        delta += newChange->oldLength() - newChange->newLength();
+        delta += newChange->storedLength() - newChange->docLength();
     }
 
     // next apply the delta to the following change
@@ -398,7 +398,7 @@ QString ComplexTextChange::toSingleTextChangeTestString()
     foreach( AbstractRangedTextChange* abstractChange, textChangeList_ ) {
         SingleTextChange* change = dynamic_cast<SingleTextChange*>(abstractChange);
         if( !result.isEmpty() ) result.append(",");
-        result.append( QString("%1:%2:%3").arg(change->offset()).arg(change->length()).arg(change->storedText()) );
+        result.append( QString("%1:%2:%3").arg(change->offset()).arg(change->docLength()).arg(change->storedText()) );
     }
     return result;
 }
@@ -469,9 +469,6 @@ bool ComplexTextChange::mergeAsGroup(TextDocument* document, TextChange* textCha
 }
 
 
-//// @param document the document this merge is for
-/// @param textChange the textchange to merge
-/// @return true if the textchange was merged as group.
 // merge the text selection
 /// @param document the document this merge is for
 /// @param textChange the textchange to merge
@@ -516,5 +513,6 @@ void ComplexTextChange::compressChanges(TextDocument* document)
 {
     compressTextChanges(document);
 }
+
 
 } // edbee

@@ -78,17 +78,6 @@ bool TextChange::isGroup()
 }
 
 
-/// This method can be overriden by a textchange to react when the line-delta is changed
-/// @param line
-/// @param delta the delta to move the line
-void TextChange::applyLineDelta(int line, int length, int newLength)
-{
-    Q_UNUSED(line);
-    Q_UNUSED(length);
-    Q_UNUSED(newLength);
-}
-
-
 //--------------------------------------------------------------
 
 

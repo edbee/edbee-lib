@@ -224,7 +224,7 @@ void TextDocument::replaceRangeSet(TextRangeSet& rangeSet, const QStringList& te
 
         // so we need to adjust the caret with the (possible) adjusted change
         if( change->caret() < 0 ) {
-            range.setCaret( change->offset() + change->newLength() );
+            range.setCaret( change->offset() + change->docLength() );
         } else {
             range.setCaret( change->caret() );
         }

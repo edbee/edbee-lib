@@ -22,24 +22,33 @@ public:
 
     /// this method should set the offset
     virtual void setOffset( int value ) = 0;
-
     void addOffset( int amount );
 
-    /// this method should return the old length of the change
-    virtual int oldLength() const = 0;
-
     /// this method should set the old length
-    virtual void setOldLength( int value ) = 0;
+    virtual void setDocLength( int value ) = 0;
 
-    /// this method should return the new length of the change
-    virtual int newLength() const = 0;
+    /// this method should return the length in the document
+    virtual int docLength() const = 0;
+
+    /// this method should return the length of this item in memory
+    virtual int storedLength() const = 0;
 
 
 protected:
 
-    int getMergedLength(AbstractRangedTextChange* change);
-    int calculateMergeDataSize(AbstractRangedTextChange* change);
-    void mergeData(void* targetData, void* data, void* changeData, AbstractRangedTextChange* change, int itemSize );
+    /// implement this method to merge to old data. Sample implementation
+    ///
+    /// SingleTextChange* singleTextChange = dynamic_cast<SingleTextChange*>(change);
+    /// QString newText;
+    /// newText.resize( calculateMergeDataSize( change) );
+    /// mergeData( newText.data(), text_.data(), singleTextChange->text_.data(), change, sizeof(QChar) );
+    virtual void mergeStoredData( AbstractRangedTextChange* change ) = 0;
+
+
+    int getMergedDocLength(AbstractRangedTextChange* change);
+    int getMergedStoredLength(AbstractRangedTextChange* change);
+    void mergeStoredDataViaMemcopy(void* targetData, void* data, void* changeData, AbstractRangedTextChange* change, int itemSize );
+    bool merge( AbstractRangedTextChange* change );
 
 public:
     bool isOverlappedBy( AbstractRangedTextChange* secondChange );

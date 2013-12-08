@@ -7,7 +7,7 @@
 
 #include <QVector>
 
-#include "edbee/models/textchange.h"
+#include "edbee/models/changes/abstractrangedtextchange.h"
 
 namespace edbee {
 
@@ -16,38 +16,39 @@ class TextLineDataList;
 
 /// A full line data text change. This means the growing or shrinking of the line data buffer
 /// It stores the old-data list that needs to be remebered for undoing
-class LineDataListTextChange : public TextChange
+class LineDataListTextChange : public AbstractRangedTextChange
 {
 public:
-    LineDataListTextChange( TextLineDataManager* manager, int line, int lenght, int newLength );
+    LineDataListTextChange( TextLineDataManager* manager, int offset , int lenght, int newLength );
     virtual ~LineDataListTextChange();
 
     virtual void execute(TextDocument* document);
     virtual void revert(TextDocument* doc);
 
+    virtual void mergeStoredData(AbstractRangedTextChange* change);
     virtual bool giveAndMerge(TextDocument* document, TextChange* textChange );
-    virtual void applyLineDelta( int line, int length, int newLength );
 
     virtual QString toString();
 
-    int line() const;
-    int length() const;
-    int newLength() const;
-    void setLine( int line );
-    void addDeltaToLine( int delta );
+    int offset() const;
+    void setOffset( int value );
+
+    virtual int docLength() const;
+    void setDocLength( int value );
+
+    virtual int storedLength() const;
 
     TextLineDataList** oldListList();
     int oldListListLength();
 
-
 private:
 
     TextLineDataManager* managerRef_;         ///< A reference to the manager
-    int line_;                                ///< The line number start
-    int length_;                              ///< The number of lines to "replace"
-    int newLength_;                           ///< The number of new items (they all will be 0)
+    int offset_;                              ///< The line number start
+    int docLength_;                           ///< The number of new items (they all will be 0)
 
     TextLineDataList** oldListList_;          /// The lists of items (old items)
+    int contentLength_;                       ///< The number of elements in the oldListList
 };
 
 } // edbee

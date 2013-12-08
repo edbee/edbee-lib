@@ -18,52 +18,41 @@ namespace edbee {
 class SingleTextChange : public AbstractRangedTextChange
 {
 public:
-    SingleTextChange(int offset, int length, const QString& text, bool executed=false );
+    SingleTextChange(int offset, int length, const QString& text );
     virtual ~SingleTextChange();
 
     virtual void execute(TextDocument* document);
     virtual void revert(TextDocument* document);
 
 protected:
-    virtual void mergeOldData( AbstractRangedTextChange* change );
-    virtual bool merge( AbstractRangedTextChange* change );
+    virtual void mergeStoredData( AbstractRangedTextChange* change );
 
 public:
     virtual bool giveAndMerge(TextDocument *document, TextChange* textChange );
-    virtual void applyOffsetDelta( int offset, int length, int newLength );
 
     virtual QString toString();
 
     int offset() const;
     void setOffset( int offset );
+    virtual int docLength() const;
+    virtual int storedLength() const;
 
-    int oldLength() const;
-    int newLength() const;
+    void setDocLength( int len );
 
-    int length() const;
-    void setOldLength( int len );
-
-    QString oldText( TextDocument* doc ) const;
-    QString newText( TextDocument* doc ) const;
     QString storedText() const;
-
     void setStoredText( const QString& text );
     void appendStoredText( const QString& text );
     const QString docText( TextDocument* doc ) const;
 
     QString testString();
 
-    bool isExecuted() const;
-
 protected:
-
     void replaceText( TextDocument* document );
 
 private:
     int offset_;            ///< The offset of the text
-    int length_;            ///< the length of the text
-    QString text_;          ///< The text
-    bool executed_;         ///< The executed flag (has the change been executed?)
+    int length_;            ///< the length of the change in the document
+    QString text_;          ///< The text data
 };
 
 } // edbee
