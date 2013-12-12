@@ -3,23 +3,23 @@
  * Author Rick Blommers
  */
 
-#include "textchange.h"
+#include "change.h"
 
 #include "edbee/models/textdocument.h"
-#include "edbee/models/changes/singletextchange.h"
+#include "edbee/models/changes/textchange.h"
 
 #include "debug.h"
 
 namespace edbee {
 
 /// a virtual empty destructor
-TextChange::~TextChange()
+Change::~Change()
 {
 }
 
 
 /// this method reverts the given operation
-void TextChange::revert(TextDocument*)
+void Change::revert(TextDocument*)
 {
     Q_ASSERT(false);
 }
@@ -30,7 +30,7 @@ void TextChange::revert(TextDocument*)
 /// @param document the document this change is for
 /// @param textChange the textchange
 /// @return true if the merge succeeded. The textChange ownership is only tranfered if true if returend
-bool TextChange::giveAndMerge(TextDocument* document, TextChange* textChange)
+bool Change::giveAndMerge(TextDocument* document, Change* textChange)
 {
     Q_UNUSED(document);
     Q_UNUSED(textChange );
@@ -39,7 +39,7 @@ bool TextChange::giveAndMerge(TextDocument* document, TextChange* textChange)
 
 
 /// This method should return true if the change can be reverted
-bool TextChange::canUndo()
+bool Change::canUndo()
 {
     return false;
 }
@@ -48,7 +48,7 @@ bool TextChange::canUndo()
 /// This  flag is used to mark this stack item as non-persistence requirable
 /// The default behaviour is that every textchange requires persistence. It is also possible to
 /// have certain changes that do not require persitence but should be placed on the undo stack
-bool TextChange::isPersistenceRequired()
+bool Change::isPersistenceRequired()
 {
     return true;
 }
@@ -57,14 +57,14 @@ bool TextChange::isPersistenceRequired()
 /// A text command can belong to a controller/view
 /// When it's a view only command. The undo only applies only to this view
 /// warning a DOCUMENT change may NEVER return a controllerContext!!
-TextEditorController*TextChange::controllerContext()
+TextEditorController*Change::controllerContext()
 {
     return 0;
 }
 
 
 /// this method can be used to check if the given change is a document change
-bool TextChange::isDocumentChange()
+bool Change::isDocumentChange()
 {
      return controllerContext() == 0;
 }
@@ -72,7 +72,7 @@ bool TextChange::isDocumentChange()
 
 /// This method returns true if this change is a group change. When an object is group change
 /// it should be inherited by TextChangeGroup
-bool TextChange::isGroup()
+bool Change::isGroup()
 {
     return false;
 }
@@ -82,24 +82,24 @@ bool TextChange::isGroup()
 
 
 /// Empty change doesn't do anything
-bool EmptyDocumentTextChange::isPersistenceRequired()
+bool EmptyDocumentChange::isPersistenceRequired()
 {
     return false;
 }
 
 
 /// does nothing
-void EmptyDocumentTextChange::execute(TextDocument*)
+void EmptyDocumentChange::execute(TextDocument*)
 {
 }
 
 /// does nothing
-void EmptyDocumentTextChange::revert(TextDocument*)
+void EmptyDocumentChange::revert(TextDocument*)
 {
 }
 
 /// returns the name of the textchange
-QString EmptyDocumentTextChange::toString()
+QString EmptyDocumentChange::toString()
 {
      return "EmptyDocumentTextChange";
 }
@@ -108,43 +108,9 @@ QString EmptyDocumentTextChange::toString()
 //--------------------------------------------------------------
 
 
-/// A replace document text change. A text replacement in the document
-/// @param offset the offset of the change
-/// @param length the length of the replaced text
-/// @param newText the newly placed text
-ReplaceDocumentTextChange::ReplaceDocumentTextChange(int offset, int length, const QString& newText)
-    : offset_( offset )
-    , length_( length )
-    , text_( newText )
-    , oldText_()
-{
-}
-
-
-/// executes the replacement of the text
-/// @param document the document to execute this change for
-void ReplaceDocumentTextChange::execute( TextDocument* document )
-{
-    // backup the old text
-    oldText_ = document->buffer()->textPart( offset_, length_ );
-    document->buffer()->replaceText( offset_, length_, text_ );
-}
-
-
-/// reverts the text replacement
-/// @param document the document to execute this change for
-void ReplaceDocumentTextChange::revert(TextDocument* document)
-{
-    document->buffer()->replaceText( offset_, text_.length(), oldText_ );
-}
-
-
-//--------------------------------------------------------------
-
-
 /// A controller specific textcommand. Warning you should NOT modify the textdocument!
 /// @param controller the controller this change is for
-ControllerTextChange::ControllerTextChange(TextEditorController* controller)
+ControllerChange::ControllerChange(TextEditorController* controller)
     : controllerRef_( controller )
 {
 }
@@ -152,14 +118,14 @@ ControllerTextChange::ControllerTextChange(TextEditorController* controller)
 
 /// A text command can belong to a controller/view
 /// When it's a view only command. The undo only applies only to this view
-TextEditorController*ControllerTextChange::controllerContext()
+TextEditorController* ControllerChange::controllerContext()
 {
     return controllerRef_;
 }
 
 
 /// returns the controller
-TextEditorController*ControllerTextChange::controller()
+TextEditorController* ControllerChange::controller()
 {
     return controllerRef_;;
 }
@@ -170,15 +136,15 @@ TextEditorController*ControllerTextChange::controller()
 
 /// default contructor
 /// @param controller the controller this groups belongs to
-TextChangeGroup::TextChangeGroup(TextEditorController* controller)
-    : ControllerTextChange( controller )
+ChangeGroup::ChangeGroup(TextEditorController* controller)
+    : ControllerChange( controller )
 
 {
 }
 
 
 /// The destructor deletes all added textchanges
-TextChangeGroup::~TextChangeGroup()
+ChangeGroup::~ChangeGroup()
 {
 //    qDeleteAll(changeList_);
 //    changeList_.clear();
@@ -186,7 +152,7 @@ TextChangeGroup::~TextChangeGroup()
 
 
 /// A group change is a group change, so this method returns true :)
-bool TextChangeGroup::isGroup()
+bool ChangeGroup::isGroup()
 {
     return true;
 }
@@ -195,21 +161,21 @@ bool TextChangeGroup::isGroup()
 /// This method is called it the group is discardable. A discardable group will be optimized away if
 /// the group is empty, or if there's a single item in the group. A none-discardable group will
 /// always remain
-bool TextChangeGroup::isDiscardable()
+bool ChangeGroup::isDiscardable()
 {
     return true;
 }
 
 /// This method is called if the group is closed and is added to the stack
 /// Default implementation is to do nothing
-void TextChangeGroup::groupClosed()
+void ChangeGroup::groupClosed()
 {
 }
 
 
 /// executes this command group
 /// @param document the document the document to execute this for
-void TextChangeGroup::execute(TextDocument* document)
+void ChangeGroup::execute(TextDocument* document)
 {
     Q_UNUSED(document);
     for( int i=0,cnt=size(); i<cnt; ++i ) {
@@ -219,7 +185,7 @@ void TextChangeGroup::execute(TextDocument* document)
 
 
 /// Reverts the command gorup
-void TextChangeGroup::revert(TextDocument* document)
+void ChangeGroup::revert(TextDocument* document)
 {
     Q_UNUSED(document);
     for( int i=size()-1; i>=0; --i ) {
@@ -229,14 +195,14 @@ void TextChangeGroup::revert(TextDocument* document)
 
 
 /// This method flattens the undo-group by expanding all subgroups to local groups
-void TextChangeGroup::flatten()
+void ChangeGroup::flatten()
 {
     for( int idx=0; idx < changeList_.size(); ++idx ) {
-        TextChangeGroup* group = dynamic_cast<TextChangeGroup*>( changeList_[idx] );
+        ChangeGroup* group = dynamic_cast<ChangeGroup*>( changeList_[idx] );
         if( group ) {
             changeList_.removeAt(idx);
             for( int i=0; i<group->size(); ++i ) {
-                TextChangeGroup* subGroup = dynamic_cast<TextChangeGroup*>( group->changeList_[i] );
+                ChangeGroup* subGroup = dynamic_cast<ChangeGroup*>( group->changeList_[i] );
                 if( subGroup ) {
                     subGroup->flatten();   // flatten the group
                     delete subGroup;
@@ -253,7 +219,7 @@ void TextChangeGroup::flatten()
 
 /// This method returns the last change in the change group
 /// @return the last textchange
-TextChange* TextChangeGroup::last()
+Change* ChangeGroup::last()
 {
     if( size() == 0 ) { return 0; }
     return at(size()-1);
@@ -262,7 +228,7 @@ TextChange* TextChangeGroup::last()
 
 /// Takes the ownership of the last element and removes it from the stack
 /// @return the last textchange
-TextChange* TextChangeGroup::takeLast()
+Change* ChangeGroup::takeLast()
 {
     if( size() == 0 ) { return 0; }
     return take(size()-1);
@@ -271,11 +237,11 @@ TextChange* TextChangeGroup::takeLast()
 
 /// The total number of items in the list (excluding the group items)
 /// @return the number of items recussive (iterating) all groups
-int TextChangeGroup::recursiveSize()
+int ChangeGroup::recursiveSize()
 {
     int itemCount = 0;
     for( int i=0,cnt=changeList_.size(); i<cnt; ++i ) {
-        TextChangeGroup* group = dynamic_cast<TextChangeGroup*>(changeList_[i]);
+        ChangeGroup* group = dynamic_cast<ChangeGroup*>(changeList_[i]);
         if( group ) {
             itemCount += group->size();
         } else {
@@ -288,7 +254,7 @@ int TextChangeGroup::recursiveSize()
 
 /// if this commandgroup only contains commands for a single controller context
 /// Then this context is returned else 0 is returned
-TextEditorController* TextChangeGroup::controllerContext()
+TextEditorController* ChangeGroup::controllerContext()
 {
     TextEditorController* context = 0;
     for( int i=size()-1; i>=0; --i ) {
@@ -306,7 +272,7 @@ TextEditorController* TextChangeGroup::controllerContext()
 
 
 /// Converts this change group to a string
-QString TextChangeGroup::toString()
+QString ChangeGroup::toString()
 {
     QString s;
     s = QString("%1/%2").arg(size()).arg(recursiveSize());
@@ -323,26 +289,9 @@ QString TextChangeGroup::toString()
         extra.append("\n");
     }
 
-    return QString("TextChangeGroup(%1)\n%2").arg(s).arg(extra);
+    return QString("ChangeGroup(%1)\n%2").arg(s).arg(extra);
 }
 
-
-//--------------------------------------------------------------
-
-
-/// creates a non-discardable undo-group
-TextChangeGroupNonDiscardable::TextChangeGroupNonDiscardable(TextEditorController* controller)
-    : TextChangeGroup(controller)
-{
-
-}
-
-
-/// this group may not be discarded
-bool TextChangeGroupNonDiscardable::isDiscardable()
-{
-    return false;
-}
 
 
 } // edbee

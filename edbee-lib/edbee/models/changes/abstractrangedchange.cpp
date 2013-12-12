@@ -3,21 +3,21 @@
  * Author Rick Blommers
  */
 
-#include "abstractrangedtextchange.h"
+#include "abstractrangedchange.h"
 
 #include "debug.h"
 
 namespace edbee {
 
 /// default destructor is empty
-AbstractRangedTextChange::~AbstractRangedTextChange()
+AbstractRangedChange::~AbstractRangedChange()
 {
 }
 
 
 /// Adds the given amount to the offset
 /// @param amount the offset to add
-void AbstractRangedTextChange::addOffset(int amount)
+void AbstractRangedChange::addOffset(int amount)
 {
     setOffset( offset() + amount );
 }
@@ -25,7 +25,7 @@ void AbstractRangedTextChange::addOffset(int amount)
 
 /// Calculates the merged length
 /// @param change the change that't being merged
-int AbstractRangedTextChange::getMergedDocLength(AbstractRangedTextChange* change)
+int AbstractRangedChange::getMergedDocLength(AbstractRangedChange* change)
 {
     int result = change->docLength();
 
@@ -47,7 +47,7 @@ int AbstractRangedTextChange::getMergedDocLength(AbstractRangedTextChange* chang
 /// Calculates the merge data size, that's required for merging the given change
 /// @param change the change to merge with this change
 /// @return the size of this change
-int AbstractRangedTextChange::getMergedStoredLength(AbstractRangedTextChange* change)
+int AbstractRangedChange::getMergedStoredLength(AbstractRangedChange* change)
 {
     int result = 0;
 
@@ -88,7 +88,7 @@ static void memcopy_or_zerofill( void* target, void* source, size_t size)
 /// @param changeData pointer to the of the other change data (this can be a 0 pointer!, which results in 0-filling the target)
 /// @param change the other change of the data to merge
 /// @param itemSize the size of single item
-void AbstractRangedTextChange::mergeStoredDataViaMemcopy(void* targetData, void* data, void* changeData, AbstractRangedTextChange* change, int itemSize )
+void AbstractRangedChange::mergeStoredDataViaMemcopy(void* targetData, void* data, void* changeData, AbstractRangedChange* change, int itemSize )
 {
     char* target = (char*)targetData;
 
@@ -115,7 +115,7 @@ void AbstractRangedTextChange::mergeStoredDataViaMemcopy(void* targetData, void*
 /// This method merges the change
 /// @param document the document to merges
 /// @param change the change change to merge
-bool AbstractRangedTextChange::merge( AbstractRangedTextChange* change )
+bool AbstractRangedChange::merge( AbstractRangedChange* change )
 {
     // overlap is a bit harder
     if( isOverlappedBy(change) || isTouchedBy(change) ) {
@@ -142,7 +142,7 @@ bool AbstractRangedTextChange::merge( AbstractRangedTextChange* change )
 /// to test if the changes are touching use isTouchedBy
 /// @param secondChange the other change to compare it to
 /// @return tue if the changes overlap
-bool AbstractRangedTextChange::isOverlappedBy(AbstractRangedTextChange* secondChange)
+bool AbstractRangedChange::isOverlappedBy(AbstractRangedChange* secondChange)
 {
     return
     ( offset() < ( secondChange->offset() + secondChange->docLength() ) &&  secondChange->offset() < (offset() + docLength()) )
@@ -155,7 +155,7 @@ bool AbstractRangedTextChange::isOverlappedBy(AbstractRangedTextChange* secondCh
 /// Touching means the end offset of one range is the start offset of the other range
 /// @param secondChange the other change to match
 /// @return true if the changes overlap
-bool AbstractRangedTextChange::isTouchedBy(AbstractRangedTextChange* secondChange)
+bool AbstractRangedChange::isTouchedBy(AbstractRangedChange* secondChange)
 {
     return offset() == (secondChange->offset() + secondChange->docLength() )
         || (offset() + docLength()) == secondChange->offset()

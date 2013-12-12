@@ -6,7 +6,7 @@
 #include "textundostacktest.h"
 
 #include "edbee/commands/removecommand.h"
-#include "edbee/models/textchange.h"
+#include "edbee/models/change.h"
 #include "edbee/models/textdocument.h"
 #include "edbee/models/textrange.h"
 #include "edbee/models/textundostack.h"

@@ -7,11 +7,11 @@
 
 #include <QStringList>
 
-#include "edbee/models/changes/complextextchange.h"
-#include "edbee/models/changes/linedatatextchange.h"
-#include "edbee/models/changes/selectiontextchange.h"
-#include "edbee/models/changes/singletextchange.h"
-#include "edbee/models/changes/singletextchangewithcaret.h"
+#include "edbee/models/changes/mergablechangegroup.h"
+#include "edbee/models/changes/linedatachange.h"
+#include "edbee/models/changes/selectionchange.h"
+#include "edbee/models/changes/textchange.h"
+#include "edbee/models/changes/textchangewithcaret.h"
 
 #include "edbee/models/textlinedata.h"
 #include "edbee/models/textdocumentfilter.h"
@@ -56,7 +56,7 @@ void TextDocument::setLineDataFieldsPerLine( int count )
 void TextDocument::giveLineData(int line, int field, TextLineData* dataItem)
 {
     Q_ASSERT(line < lineCount() );
-    LineDataTextChange* change = new LineDataTextChange( line, field );
+    LineDataChange* change = new LineDataChange( line, field );
     change->giveLineData( dataItem );
     executeAndGiveChange( change, true );
 }
@@ -77,7 +77,7 @@ TextLineData* TextDocument::getLineData(int line, int field)
 
 /// Starts an undo group
 /// @param group the textchange group that groups the undo operations
-void TextDocument::beginUndoGroup(TextChangeGroup* group)
+void TextDocument::beginUndoGroup(ChangeGroup* group)
 {
 //    if( documentFilter() ) {
 //        documentFilter()->filterBeginGroup( this, group );
@@ -185,7 +185,7 @@ TextDocumentFilter* TextDocument::documentFilter()
 /// Start the changesa
 void TextDocument::beginChanges(TextEditorController* controller)
 {
-    beginUndoGroup( new ComplexTextChange( controller) );
+    beginUndoGroup( new MergableChangeGroup( controller) );
 }
 
 
@@ -219,7 +219,7 @@ void TextDocument::replaceRangeSet(TextRangeSet& rangeSet, const QStringList& te
         delta += (text.length() - range.length());
 
 
-        SingleTextChangeWithCaret* change = new SingleTextChangeWithCaret(range.min(),range.length(),text,-1);
+        TextChangeWithCaret* change = new TextChangeWithCaret(range.min(),range.length(),text,-1);
         executeAndGiveChange( change, false );
 
         // so we need to adjust the caret with the (possible) adjusted change
@@ -248,7 +248,7 @@ Q_ASSERT(false);
 /// sets the selectioin for the current rangeset
 void TextDocument::giveSelection( TextEditorController* controller,  TextRangeSet* rangeSet)
 {
-    SelectionTextChange* selChange = new SelectionTextChange( controller );
+    SelectionChange* selChange = new SelectionChange( controller );
     selChange->giveTextRangeSet( rangeSet );
     executeAndGiveChange( selChange, 0 );
 }
@@ -264,7 +264,7 @@ void TextDocument::endChanges(int coalesceId)
 /// call this method to execute a change. The change is first passed to the filter
 /// so the documentFilter can handle the processing of the change
 /// When not filter is active the 'execute' method is called on the change
-void TextDocument::executeAndGiveChange(TextChange* change, int coalesceId )
+void TextDocument::executeAndGiveChange(Change* change, int coalesceId )
 {
     if( documentFilter() ) {
         documentFilter()->filterChange( this, change, coalesceId );
@@ -289,7 +289,7 @@ void TextDocument::append(const QString& text, int coalesceId )
 /// @param coalesceId (default 0) the coalesceId to use. Whe using the same number changes could be merged to one change. CoalesceId of 0 means no merging
 void TextDocument::replace( int offset, int length, const QString& text, int coalesceId )
 {
-    executeAndGiveChange( new SingleTextChange( offset, length, text ), coalesceId );
+    executeAndGiveChange( new TextChange( offset, length, text ), coalesceId );
 }
 
 

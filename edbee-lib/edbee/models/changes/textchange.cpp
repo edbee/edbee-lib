@@ -3,7 +3,7 @@
  * Author Rick Blommers
  */
 
-#include "singletextchange.h"
+#include "textchange.h"
 
 #include "edbee/models/textbuffer.h"
 #include "edbee/models/textdocument.h"
@@ -18,7 +18,7 @@ namespace edbee {
 /// @param length, the length of the change
 /// @param text , the new text
 /// @param executed, a boolean (mainly used for testing) to mark this change as exected
-SingleTextChange::SingleTextChange(int offset, int length, const QString& text)
+TextChange::TextChange(int offset, int length, const QString& text)
     : offset_(offset)
     , length_(length)
     , text_(text)
@@ -27,14 +27,14 @@ SingleTextChange::SingleTextChange(int offset, int length, const QString& text)
 
 
 /// undo's a single textchange
-SingleTextChange::~SingleTextChange()
+TextChange::~TextChange()
 {
 }
 
 
 /// executes the given textchange
 /// @param document the document to execute the change on
-void SingleTextChange::execute(TextDocument* document)
+void TextChange::execute(TextDocument* document)
 {
     replaceText(document);
 }
@@ -42,7 +42,7 @@ void SingleTextChange::execute(TextDocument* document)
 
 /// Reverts the single textchange
 /// @param document the document to execute the change on
-void SingleTextChange::revert(TextDocument* document)
+void TextChange::revert(TextDocument* document)
 {
     replaceText(document);
 }
@@ -50,9 +50,9 @@ void SingleTextChange::revert(TextDocument* document)
 
 /// This method merges the old data with the new data
 /// @apram change the data to merge with
-void SingleTextChange::mergeStoredData(AbstractRangedTextChange* change)
+void TextChange::mergeStoredData(AbstractRangedChange* change)
 {
-    SingleTextChange* singleTextChange = dynamic_cast<SingleTextChange*>(change);
+    TextChange* singleTextChange = dynamic_cast<TextChange*>(change);
 
     QString newText;
     newText.resize( getMergedStoredLength( change) );
@@ -87,10 +87,10 @@ void SingleTextChange::mergeStoredData(AbstractRangedTextChange* change)
 /// @param document the document
 /// @param textChange the textchange to mege
 /// @return true on success else false
-bool SingleTextChange::giveAndMerge( TextDocument* document, TextChange* textChange)
+bool TextChange::giveAndMerge( TextDocument* document, Change* textChange)
 {
     Q_UNUSED( document );
-    SingleTextChange* change = dynamic_cast<SingleTextChange*>( textChange );
+    TextChange* change = dynamic_cast<TextChange*>( textChange );
     if( change ) {
         return merge( change );
     }
@@ -99,7 +99,7 @@ bool SingleTextChange::giveAndMerge( TextDocument* document, TextChange* textCha
 
 
 /// converts the change to a string
-QString SingleTextChange::toString()
+QString TextChange::toString()
 {
 //    return "SingleTextChange";
     return QString("SingleTextChange:%1").arg(testString());
@@ -108,7 +108,7 @@ QString SingleTextChange::toString()
 
 /// Return the offset
 /// @return the offset of the change
-int SingleTextChange::offset() const
+int TextChange::offset() const
 {
     return offset_;
 }
@@ -116,21 +116,21 @@ int SingleTextChange::offset() const
 
 /// set the new offset
 /// @param offset the new offset
-void SingleTextChange::setOffset(int offset)
+void TextChange::setOffset(int offset)
 {
     offset_ = offset;
 }
 
 
 /// This is the length in the document
-int SingleTextChange::docLength() const
+int TextChange::docLength() const
 {
     return length_;
 }
 
 
 /// The content length is the length that's currently stored in memory.
-int SingleTextChange::storedLength() const
+int TextChange::storedLength() const
 {
     return text_.size();
 }
@@ -138,13 +138,13 @@ int SingleTextChange::storedLength() const
 
 /// Set the length of the change
 /// @param len sets the length of the change
-void SingleTextChange::setDocLength(int len)
+void TextChange::setDocLength(int len)
 {
     length_ = len;
 }
 
 /// The text currently stored in this textchange
-QString SingleTextChange::storedText() const
+QString TextChange::storedText() const
 {
     return text_;
 }
@@ -152,28 +152,28 @@ QString SingleTextChange::storedText() const
 
 /// Sets the text of this change
 /// @param text the new text
-void SingleTextChange::setStoredText(const QString& text)
+void TextChange::setStoredText(const QString& text)
 {
     text_ = text;
 }
 
 
 /// Appends the text to this change
-void SingleTextChange::appendStoredText(const QString& text)
+void TextChange::appendStoredText(const QString& text)
 {
     text_.append( text );
 }
 
 
 /// This method returns the text currently in the document
-const QString SingleTextChange::docText(TextDocument* doc) const
+const QString TextChange::docText(TextDocument* doc) const
 {
     return doc->textPart( offset_, length_ );
 }
 
 
 /// This method returns a string used for testing
-QString SingleTextChange::testString()
+QString TextChange::testString()
 {
     return QString("%1:%2:%3").arg(offset_).arg(length_).arg(QString(text_).replace("\n","§"));
 }
@@ -181,7 +181,7 @@ QString SingleTextChange::testString()
 
 /// replaces the text and stores the 'old' content
 /// @param document the document to change it for
-void SingleTextChange::replaceText(TextDocument* document)
+void TextChange::replaceText(TextDocument* document)
 {
     TextBuffer* buffer = document->buffer();
     QString old = buffer->textPart( offset_, length_ );

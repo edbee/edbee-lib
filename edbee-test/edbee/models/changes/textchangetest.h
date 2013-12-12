@@ -10,7 +10,7 @@
 namespace edbee {
 
 /// performs some tests on the single textchanges
-class SingleTextChangeTest : public edbee::test::TestCase
+class TextChangeTest : public edbee::test::TestCase
 {
     Q_OBJECT
 
@@ -28,4 +28,4 @@ private slots:
 
 } // edbee
 
-DECLARE_TEST(edbee::SingleTextChangeTest);
+DECLARE_TEST(edbee::TextChangeTest);

@@ -5,7 +5,7 @@
 
 #include "selectioncommand.h"
 
-#include "edbee/models/textchange.h"
+#include "edbee/models/change.h"
 #include "edbee/models/textdocument.h"
 #include "edbee/models/texteditorconfig.h"
 #include "edbee/models/textrange.h"

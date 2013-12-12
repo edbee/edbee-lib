@@ -5,7 +5,7 @@
 
 #include "textlinedata.h"
 
-#include "edbee/models/changes/linedatalisttextchange.h"
+#include "edbee/models/changes/linedatalistchange.h"
 #include "edbee/models/textlinedata.h"
 
 #include "debug.h"
@@ -223,12 +223,12 @@ void TextLineDataManager::setFieldsPerLine(int count)
 }
 
 /// This method creates a new lines replace change
-TextChange* TextLineDataManager::createLinesReplacedChange(int lineStart, int lineCount, int newLineCount )
+Change* TextLineDataManager::createLinesReplacedChange(int lineStart, int lineCount, int newLineCount )
 {
     // no changes
     if( lineCount == 0 && lineCount == newLineCount ) { return 0; }
 
-    LineDataListTextChange* change = new LineDataListTextChange(this,lineStart, lineCount, newLineCount );
+    LineDataListChange* change = new LineDataListChange(this,lineStart, lineCount, newLineCount );
     return change;
 }
 

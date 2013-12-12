@@ -9,13 +9,13 @@
 
 namespace edbee {
 
-class ComplexTextChange;
-class SingleTextChange;
+class MergableChangeGroup;
 class TextChange;
+class Change;
 class TextDocument;
 
 /// for testing the complex textchanges
-class ComplexTextChangeTest : public edbee::test::TestCase
+class MergableChangeGroupTest : public edbee::test::TestCase
 {
     Q_OBJECT
 
@@ -41,7 +41,7 @@ private:
     void runSingleTextChange( int offset, int length, const QString& replacement );
     void runSingleTextChange2( int   offset, int length, const QString& replacement );
 
-    QString fillGroup( const QString& changes, ComplexTextChange* group=0);
+    QString fillGroup( const QString& changes, MergableChangeGroup* group=0);
     QString mergeResult(const QString& groupDef1, const QString& groupDef2 );
 
 //    TextLineDataManager* manager();
@@ -49,12 +49,12 @@ private:
 //    LineDataListTextChange* takeChange(LineDataListTextChange* change);
 
     TextDocument* doc_;
-    ComplexTextChange* group_;
-    ComplexTextChange* group2_;
-    QList<TextChange*> changeList_;
+    MergableChangeGroup* group_;
+    MergableChangeGroup* group2_;
+    QList<Change*> changeList_;
 };
 
 
 } // edbee
 
-DECLARE_TEST(edbee::ComplexTextChangeTest );
+DECLARE_TEST(edbee::MergableChangeGroupTest );

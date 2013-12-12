@@ -7,7 +7,7 @@
 
 #include <QString>
 
-#include "edbee/models/changes/abstractrangedtextchange.h"
+#include "edbee/models/changes/abstractrangedchange.h"
 
 namespace edbee {
 
@@ -15,20 +15,20 @@ namespace edbee {
 ///
 /// This class re-uses the variables offset/length and text. Depending on the undo/redo state
 /// these variables contain the new data or the changed data
-class SingleTextChange : public AbstractRangedTextChange
+class TextChange : public AbstractRangedChange
 {
 public:
-    SingleTextChange(int offset, int length, const QString& text );
-    virtual ~SingleTextChange();
+    TextChange(int offset, int length, const QString& text );
+    virtual ~TextChange();
 
     virtual void execute(TextDocument* document);
     virtual void revert(TextDocument* document);
 
 protected:
-    virtual void mergeStoredData( AbstractRangedTextChange* change );
+    virtual void mergeStoredData( AbstractRangedChange* change );
 
 public:
-    virtual bool giveAndMerge(TextDocument *document, TextChange* textChange );
+    virtual bool giveAndMerge(TextDocument *document, Change* textChange );
 
     virtual QString toString();
 

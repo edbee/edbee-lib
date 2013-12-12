@@ -9,7 +9,7 @@
 #include <QKeySequence>
 
 #include "edbee/io/keymapparser.h"
-#include "edbee/models/textchange.h"
+#include "edbee/models/change.h"
 
 #include "edbee/texteditorcontroller.h"
 #include "edbee/models/textdocument.h"

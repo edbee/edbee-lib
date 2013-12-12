@@ -5,7 +5,7 @@
 
 #include "duplicatecommand.h"
 
-#include "edbee/models/changes/complextextchange.h"
+#include "edbee/models/changes/mergablechangegroup.h"
 #include "edbee/models/textdocument.h"
 #include "edbee/models/textrange.h"
 #include "edbee/views/textselection.h"

@@ -11,8 +11,8 @@ class QStringList;
 namespace edbee {
 
 class MultiTextChange;
-class TextChange;
-class TextChangeGroup;
+class Change;
+class ChangeGroup;
 class TextDocument;
 class TextRangeSet;
 
@@ -57,7 +57,7 @@ public:
     /// @param doc a reference to the document
     /// @param changes the multi-text-change that's excuted
     /// @param coalesceId the coalesceId
-    virtual void filterChange( TextDocument* doc, TextChange* change, int coalesceId ) = 0;
+    virtual void filterChange( TextDocument* doc, Change* change, int coalesceId ) = 0;
 
 
 

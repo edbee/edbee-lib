@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "edbee/models/textchange.h"
+#include "edbee/models/change.h"
 
 namespace edbee {
 
@@ -14,12 +14,12 @@ class TextEditorController;
 class TextRangeSet;
 
 /// Move the caret / and selection commands
-class SelectionTextChange: public ControllerTextChange
+class SelectionChange: public ControllerChange
 {
 public:
 
-    SelectionTextChange( TextEditorController* controller );
-    virtual ~SelectionTextChange();
+    SelectionChange( TextEditorController* controller );
+    virtual ~SelectionChange();
 
     virtual void giveTextRangeSet( TextRangeSet* rangeSet );
     virtual TextRangeSet* takeRangeSet();
@@ -27,7 +27,7 @@ public:
     virtual void execute(TextDocument* document);
     virtual void revert(TextDocument* document);
 
-    virtual bool giveAndMerge(TextDocument *document, TextChange* textChange );
+    virtual bool giveAndMerge(TextDocument *document, Change* textChange );
     TextRangeSet* rangeSet() { return rangeSet_; }
 
     virtual QString toString();

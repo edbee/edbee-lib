@@ -19,7 +19,7 @@ enum TextLineDataPredefinedFields {
 };
 
 
-class TextChange;
+class Change;
 class TextLineDataManager;
 
 
@@ -97,7 +97,7 @@ public:
     TextLineDataList* at(int idx) const { return textLineDataList_.at(idx); }
 
     // internal functions
-    TextChange* createLinesReplacedChange( int lineStart, int lineCount, int newLineCount );
+    Change* createLinesReplacedChange( int lineStart, int lineCount, int newLineCount );
     TextLineDataList* takeList( int line );
     void giveList( int line, TextLineDataList* list );
 

@@ -5,17 +5,17 @@
 
 #pragma once
 
-#include "edbee/models/textchange.h"
+#include "edbee/models/change.h"
 
 namespace edbee {
 
-/// This is an abstract class for ranged text-changes
+/// This is an abstract class for ranged changes
 /// This are changes (text changes and line changes) that span a range in an array.
 /// These ranges share a common alogrithm for performing merges, detecting overlaps etc.
-class AbstractRangedTextChange : public TextChange
+class AbstractRangedChange : public Change
 {
 public:
-    virtual ~AbstractRangedTextChange();
+    virtual ~AbstractRangedChange();
 
     /// this method should return the offset of the change
     virtual int offset() const = 0;
@@ -42,17 +42,17 @@ protected:
     /// QString newText;
     /// newText.resize( calculateMergeDataSize( change) );
     /// mergeData( newText.data(), text_.data(), singleTextChange->text_.data(), change, sizeof(QChar) );
-    virtual void mergeStoredData( AbstractRangedTextChange* change ) = 0;
+    virtual void mergeStoredData( AbstractRangedChange* change ) = 0;
 
 
-    int getMergedDocLength(AbstractRangedTextChange* change);
-    int getMergedStoredLength(AbstractRangedTextChange* change);
-    void mergeStoredDataViaMemcopy(void* targetData, void* data, void* changeData, AbstractRangedTextChange* change, int itemSize );
-    bool merge( AbstractRangedTextChange* change );
+    int getMergedDocLength(AbstractRangedChange* change);
+    int getMergedStoredLength(AbstractRangedChange* change);
+    void mergeStoredDataViaMemcopy(void* targetData, void* data, void* changeData, AbstractRangedChange* change, int itemSize );
+    bool merge( AbstractRangedChange* change );
 
 public:
-    bool isOverlappedBy( AbstractRangedTextChange* secondChange );
-    bool isTouchedBy( AbstractRangedTextChange* secondChange );
+    bool isOverlappedBy( AbstractRangedChange* secondChange );
+    bool isTouchedBy( AbstractRangedChange* secondChange );
 
 };
 

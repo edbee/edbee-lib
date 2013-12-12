@@ -3,12 +3,12 @@
  * Author Rick Blommers
  */
 
-#include "complextextchange.h"
+#include "mergablechangegroup.h"
 
-#include "edbee/models/changes/abstractrangedtextchange.h"
-#include "edbee/models/changes/selectiontextchange.h"
-#include "edbee/models/changes/singletextchange.h"
-#include "edbee/models/changes/linedatalisttextchange.h"
+#include "edbee/models/changes/abstractrangedchange.h"
+#include "edbee/models/changes/selectionchange.h"
+#include "edbee/models/changes/textchange.h"
+#include "edbee/models/changes/linedatalistchange.h"
 #include "edbee/models/textrange.h"
 #include "edbee/views/textselection.h"
 #include "edbee/texteditorcontroller.h"
@@ -20,8 +20,8 @@ namespace edbee {
 
 
 /// The default complex textchange constructor
-ComplexTextChange::ComplexTextChange(TextEditorController* controller)
-    : TextChangeGroup(controller)
+MergableChangeGroup::MergableChangeGroup(TextEditorController* controller)
+    : ChangeGroup(controller)
     , previousSelection_(0)
     , newSelection_(0)
 {
@@ -32,7 +32,7 @@ ComplexTextChange::ComplexTextChange(TextEditorController* controller)
 
 
 /// The default destructor
-ComplexTextChange::~ComplexTextChange()
+MergableChangeGroup::~MergableChangeGroup()
 {
     clear(true);
     delete newSelection_;
@@ -41,14 +41,14 @@ ComplexTextChange::~ComplexTextChange()
 
 
 /// default not discardable
-bool ComplexTextChange::isDiscardable()
+bool MergableChangeGroup::isDiscardable()
 {
     return false;
 }
 
 
 /// the group is closed, we must 'store' the selection
-void ComplexTextChange::groupClosed()
+void MergableChangeGroup::groupClosed()
 {
     if( controller() ) {
         delete newSelection_;
@@ -59,9 +59,9 @@ void ComplexTextChange::groupClosed()
 
 /// Executes this textchange
 /// @param document the document to execute this operation for
-void ComplexTextChange::execute(TextDocument* document)
+void MergableChangeGroup::execute(TextDocument* document)
 {
-    TextChangeGroup::execute( document );
+    ChangeGroup::execute( document );
     if( newSelection_ ) {
         TextRangeSet* currentSelection = dynamic_cast<TextRangeSet*>( controller()->textSelection() );
         *currentSelection = *newSelection_ ;
@@ -71,9 +71,9 @@ void ComplexTextChange::execute(TextDocument* document)
 
 /// this method is called to revert the operation
 /// reverts the given operation
-void ComplexTextChange::revert( TextDocument* document )
+void MergableChangeGroup::revert( TextDocument* document )
 {
-    TextChangeGroup::revert(document);
+    ChangeGroup::revert(document);
     if( previousSelection_) {
         TextRangeSet* currentSelection = dynamic_cast<TextRangeSet*>( controller()->textSelection() );
         *currentSelection = *previousSelection_;
@@ -82,10 +82,10 @@ void ComplexTextChange::revert( TextDocument* document )
 
 
 /// This method adds the given delta to the changes
-void ComplexTextChange::addOffsetDeltaToChanges(QList<AbstractRangedTextChange*>& changes, int fromIndex, int delta)
+void MergableChangeGroup::addOffsetDeltaToChanges(QList<AbstractRangedChange*>& changes, int fromIndex, int delta)
 {
     for(int i = fromIndex; i<changes.size(); ++i ) {
-        AbstractRangedTextChange* s2 = changes.at(i);
+        AbstractRangedChange* s2 = changes.at(i);
         s2->addOffset( delta );
     }
 }
@@ -94,11 +94,11 @@ void ComplexTextChange::addOffsetDeltaToChanges(QList<AbstractRangedTextChange*>
 /// This method finds the insert index for the given offset
 /// @param offset the offset of the change
 /// @return the inertindex used for inserting the data
-int ComplexTextChange::findInsertIndexForOffset(QList<AbstractRangedTextChange*>& changes, int offset)
+int MergableChangeGroup::findInsertIndexForOffset(QList<AbstractRangedChange*>& changes, int offset)
 {
     int insertIndex = 0;
     for( int i=0,cnt=changes.size(); i<cnt; ++i ){
-        AbstractRangedTextChange* change = changes.at(i);
+        AbstractRangedChange* change = changes.at(i);
         if( change->offset() < offset ) {
             insertIndex = i+1;
         }
@@ -111,10 +111,10 @@ int ComplexTextChange::findInsertIndexForOffset(QList<AbstractRangedTextChange*>
 /// @param newChange the new change to merge
 /// @param delta (out) the delta applied to this change
 /// @return the merged index or -1 if not merged!
-int ComplexTextChange::mergeChange(QList<AbstractRangedTextChange*>& changes, TextDocument* doc, AbstractRangedTextChange* newChange, int& delta)
+int MergableChangeGroup::mergeChange(QList<AbstractRangedChange*>& changes, TextDocument* doc, AbstractRangedChange* newChange, int& delta)
 {
     for( int i=0,cnt=changes.size(); i<cnt; ++i ){
-        AbstractRangedTextChange* change = changes.at(i);
+        AbstractRangedChange* change = changes.at(i);
 
         // we need the previous length and new-length to know how the delta is changed of the other items
         int prevNewLength = change->docLength();
@@ -137,11 +137,11 @@ int ComplexTextChange::mergeChange(QList<AbstractRangedTextChange*>& changes, Te
 /// @param orgStartOffset the offset of the orgingal merged textchange
 /// @param orgEndoOffset the end offset of the original merged textchange
 /// @param delta the current delta used for offset calculating
-void ComplexTextChange::inverseMergeRemainingOverlappingChanges(QList<AbstractRangedTextChange*>& changes, TextDocument* doc, int mergedAtIndex, int orgStartOffset, int orgEndOffset, int delta)
+void MergableChangeGroup::inverseMergeRemainingOverlappingChanges(QList<AbstractRangedChange*>& changes, TextDocument* doc, int mergedAtIndex, int orgStartOffset, int orgEndOffset, int delta)
 {
-    AbstractRangedTextChange* mergedChange = changes.at(mergedAtIndex);
+    AbstractRangedChange* mergedChange = changes.at(mergedAtIndex);
     for( int i=mergedAtIndex+1; i<changes.size(); ++i ) {
-        AbstractRangedTextChange* nextChange= changes.at(i);
+        AbstractRangedChange* nextChange= changes.at(i);
 
         // only perform merging if the change overlapped a previous change
         if( nextChange->offset() < orgEndOffset && orgStartOffset < (nextChange->offset() + nextChange->docLength())   ) {
@@ -170,7 +170,7 @@ void ComplexTextChange::inverseMergeRemainingOverlappingChanges(QList<AbstractRa
 
 
 /// gives the given textchange to the merge routine
-void ComplexTextChange::giveChangeToList(QList<AbstractRangedTextChange*>& changes, TextDocument* doc, AbstractRangedTextChange* newChange)
+void MergableChangeGroup::giveChangeToList(QList<AbstractRangedChange*>& changes, TextDocument* doc, AbstractRangedChange* newChange)
 {
     //qlog_info() << "giveSingleTextChange" << newChange->toString();
     // remember the orginal ranges so we know which changes are affected by this new change
@@ -211,14 +211,14 @@ void ComplexTextChange::giveChangeToList(QList<AbstractRangedTextChange*>& chang
 
 
 /// Gives a single textchange
-void ComplexTextChange::giveSingleTextChange(TextDocument* doc, SingleTextChange* change)
+void MergableChangeGroup::giveSingleTextChange(TextDocument* doc, TextChange* change)
 {
     giveChangeToList( textChangeList_, doc, change );
 }
 
 
 /// gives a line data list text change
-void ComplexTextChange::giveLineDataListTextChange(TextDocument* doc, LineDataListTextChange* newChange)
+void MergableChangeGroup::giveLineDataListTextChange(TextDocument* doc, LineDataListChange* newChange)
 {
     Q_UNUSED(doc);
     this->lineDataTextChangeList_.append(newChange);    // no merge for the moment
@@ -266,10 +266,10 @@ void ComplexTextChange::giveLineDataListTextChange(TextDocument* doc, LineDataLi
 
 
 /// Gives the change
-void ComplexTextChange::giveChange( TextDocument* doc, TextChange* change)
+void MergableChangeGroup::giveChange( TextDocument* doc, Change* change)
 {
     // a single text change
-    SingleTextChange* textChange = dynamic_cast<SingleTextChange*>(change);
+    TextChange* textChange = dynamic_cast<TextChange*>(change);
     if( textChange ) {
         //textChangeList_.append(textChange);
         giveSingleTextChange( doc, textChange);
@@ -277,14 +277,14 @@ void ComplexTextChange::giveChange( TextDocument* doc, TextChange* change)
     }
 
     // a list text change
-    LineDataListTextChange* lineDataTextChange = dynamic_cast<LineDataListTextChange*>(change);
+    LineDataListChange* lineDataTextChange = dynamic_cast<LineDataListChange*>(change);
     if( lineDataTextChange ) {
         giveLineDataListTextChange(doc,lineDataTextChange);
         return;
     }
 
     // a selection change simply is moved to the new selection object
-    SelectionTextChange* selectionChange = dynamic_cast<SelectionTextChange*>(change);
+    SelectionChange* selectionChange = dynamic_cast<SelectionChange*>(change);
     if( selectionChange ) {
         delete newSelection_;
         newSelection_ = selectionChange->takeRangeSet();
@@ -295,7 +295,7 @@ void ComplexTextChange::giveChange( TextDocument* doc, TextChange* change)
     }
 
     // a group changes, just add all the groups
-    TextChangeGroup* group = dynamic_cast<TextChangeGroup*>(change);
+    ChangeGroup* group = dynamic_cast<ChangeGroup*>(change);
     if( group ) {
         moveChangesFromGroup(doc,group);
         delete group;
@@ -309,7 +309,7 @@ void ComplexTextChange::giveChange( TextDocument* doc, TextChange* change)
 
 
 ///returns the textchange at the given index
-TextChange* ComplexTextChange::at(int idx)
+Change* MergableChangeGroup::at(int idx)
 {
     // plain text changes
     if( idx < textChangeList_.size() ) {
@@ -328,7 +328,7 @@ TextChange* ComplexTextChange::at(int idx)
 
 
 /// Takes the given item
-TextChange*ComplexTextChange::take(int idx)
+Change*MergableChangeGroup::take(int idx)
 {
     // plain text changes
     if( idx < textChangeList_.size() ) {
@@ -347,14 +347,14 @@ TextChange*ComplexTextChange::take(int idx)
 
 
 /// returns the number of elements
-int ComplexTextChange::size()
+int MergableChangeGroup::size()
 {
     return textChangeList_.size() + lineDataTextChangeList_.size() + miscChangeList_.size();
 }
 
 
 /// clears all items
-void ComplexTextChange::clear(bool performDelete)
+void MergableChangeGroup::clear(bool performDelete)
 {
     // delete
     if( performDelete ) {
@@ -371,7 +371,7 @@ void ComplexTextChange::clear(bool performDelete)
 
 
 /// this method tries to merge the textchange with this text change
-bool ComplexTextChange::giveAndMerge(TextDocument* document, TextChange* textChange)
+bool MergableChangeGroup::giveAndMerge(TextDocument* document, Change* textChange)
 {
     giveChange( document, textChange );
     return true;
@@ -380,9 +380,9 @@ bool ComplexTextChange::giveAndMerge(TextDocument* document, TextChange* textCha
 
 
 /// Converts this textchange to a textual representation
-QString ComplexTextChange::toString()
+QString MergableChangeGroup::toString()
 {
-    return QString("Complex::%1").arg(TextChangeGroup::toString());
+    return QString("Complex::%1").arg(ChangeGroup::toString());
 }
 
 
@@ -392,11 +392,11 @@ QString ComplexTextChange::toString()
 ///
 /// sample:
 /// 0:2:ABC,1:2:QW
-QString ComplexTextChange::toSingleTextChangeTestString()
+QString MergableChangeGroup::toSingleTextChangeTestString()
 {
     QString result;
-    foreach( AbstractRangedTextChange* abstractChange, textChangeList_ ) {
-        SingleTextChange* change = dynamic_cast<SingleTextChange*>(abstractChange);
+    foreach( AbstractRangedChange* abstractChange, textChangeList_ ) {
+        TextChange* change = dynamic_cast<TextChange*>(abstractChange);
         if( !result.isEmpty() ) result.append(",");
         result.append( QString("%1:%2:%3").arg(change->offset()).arg(change->docLength()).arg(change->storedText()) );
     }
@@ -406,7 +406,7 @@ QString ComplexTextChange::toSingleTextChangeTestString()
 
 /// Moves all textchanges from the given group to this group
 /// @param group the group to move the selection from
-void ComplexTextChange::moveChangesFromGroup( TextDocument* doc, TextChangeGroup* group )
+void MergableChangeGroup::moveChangesFromGroup( TextDocument* doc, ChangeGroup* group )
 {
 //qlog_info() << "moveChangeFromGroup **************** (MERGE)";
 //qlog_info() << "A:" << this->toString();
@@ -415,11 +415,11 @@ void ComplexTextChange::moveChangesFromGroup( TextDocument* doc, TextChangeGroup
     // process all changes
     for( int i=0,cnt=group->size(); i<cnt; ++i ) {
 
-        TextChange* change = group->at(i);
+        Change* change = group->at(i);
 
         // handle nested groups
         if( change->isGroup() ) {
-            TextChangeGroup* childGroup = dynamic_cast<TextChangeGroup*>( change );
+            ChangeGroup* childGroup = dynamic_cast<ChangeGroup*>( change );
             if( childGroup ) {
                 moveChangesFromGroup( doc, childGroup );
                 delete childGroup;
@@ -440,7 +440,7 @@ void ComplexTextChange::moveChangesFromGroup( TextDocument* doc, TextChangeGroup
 //qlog_info() << "=2>:" << this->toString();
 
     // when it's a complex text change, also move the selection to this group
-    ComplexTextChange* complexGroup = dynamic_cast<ComplexTextChange*>(group);
+    MergableChangeGroup* complexGroup = dynamic_cast<MergableChangeGroup*>(group);
     if( complexGroup ) {
         qSwap( newSelection_, complexGroup->newSelection_ );
     }
@@ -452,13 +452,13 @@ void ComplexTextChange::moveChangesFromGroup( TextDocument* doc, TextChangeGroup
 /// @param document the document this merge is for
 /// @param textChange the textchange to merge
 /// @return true if the textchange was merged as group.
-bool ComplexTextChange::mergeAsGroup(TextDocument* document, TextChange* textChange )
+bool MergableChangeGroup::mergeAsGroup(TextDocument* document, Change* textChange )
 {
     Q_UNUSED(document);
 
     // make sure it's a group
     if( !textChange->isGroup() ) { return false; }
-    TextChangeGroup* group = dynamic_cast<TextChangeGroup*>(textChange);
+    ChangeGroup* group = dynamic_cast<ChangeGroup*>(textChange);
     if( !group ) { return false; }
 
     // move all changes from the other group to this group
@@ -473,10 +473,10 @@ bool ComplexTextChange::mergeAsGroup(TextDocument* document, TextChange* textCha
 /// @param document the document this merge is for
 /// @param textChange the textchange to merge
 /// @return true if the textchange was merged as group.
-bool ComplexTextChange::mergeAsSelection(TextDocument* document, TextChange* textChange)
+bool MergableChangeGroup::mergeAsSelection(TextDocument* document, Change* textChange)
 {
     Q_UNUSED(document);
-    SelectionTextChange* selectionChange = dynamic_cast<SelectionTextChange*>(textChange);
+    SelectionChange* selectionChange = dynamic_cast<SelectionChange*>(textChange);
     if( !selectionChange ) { return false; }
 
     // simply take the selection from the textchange and make this the new selection
@@ -489,15 +489,15 @@ bool ComplexTextChange::mergeAsSelection(TextDocument* document, TextChange* tex
 
 /// Compresses the textchanges
 /// @param document the document to merge the changes for
-void ComplexTextChange::compressTextChanges(TextDocument* document)
+void MergableChangeGroup::compressTextChanges(TextDocument* document)
 {
     // compress single text changes
     for( int i=0; i<textChangeList_.size(); ++i ) {
-        AbstractRangedTextChange* change1 = textChangeList_.at(i);
+        AbstractRangedChange* change1 = textChangeList_.at(i);
 
         // find the next text change
         for( int j=i+1; j<textChangeList_.size(); ++j ) {
-            AbstractRangedTextChange* change2 = textChangeList_.at(j);
+            AbstractRangedChange* change2 = textChangeList_.at(j);
             if( change1->giveAndMerge( document, change2 ) ) {
                 textChangeList_.takeAt(j);  // just take it, the item is already deleted by the merge
                 --j;
@@ -509,7 +509,7 @@ void ComplexTextChange::compressTextChanges(TextDocument* document)
 
 /// This is going to be the magic method that's going to merge all changes
 /// @param document the document to merge the changes for
-void ComplexTextChange::compressChanges(TextDocument* document)
+void MergableChangeGroup::compressChanges(TextDocument* document)
 {
     compressTextChanges(document);
 }

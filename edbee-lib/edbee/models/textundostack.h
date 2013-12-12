@@ -11,10 +11,10 @@
 
 namespace edbee {
 
-class TextChange;
+class Change;
 class TextDocument;
 class TextEditorController;
-class TextChangeGroup;
+class ChangeGroup;
 
 
 /// This is the undo stack for the texteditor. This stack is SHARED by all views of the document
@@ -65,8 +65,8 @@ public:
     void registerContoller( TextEditorController* controller );
     void unregisterController( TextEditorController* controller );
 
-    void beginUndoGroup( TextChangeGroup* group );
-    TextChangeGroup* currentGroup();
+    void beginUndoGroup( ChangeGroup* group );
+    ChangeGroup* currentGroup();
     void endUndoGroup(int coalesceId , bool flatten);
     void endUndoGroupAndDiscard();
     int undoGroupLevel();
@@ -75,7 +75,7 @@ public:
     void setLastCoalesceIdAtCurrentLevel(int id);
     void resetAllLastCoalesceIds();
 
-    bool giveChange( TextChange* change, int coalesceId );
+    bool giveChange( Change* change, int coalesceId );
 
     bool canUndo( TextEditorController* controller=0 );
     bool canRedo( TextEditorController* controller=0 );
@@ -90,16 +90,16 @@ public:
     bool isRedoRunning() { return redoRunning_; }
 
     int size();
-    TextChange* at(int idx);
+    Change* at(int idx);
     int currentIndex( TextEditorController* controller=0 );
     int lastIndex( TextEditorController* controller=0 );
-    TextChange* last(TextEditorController* controller=0 );
+    Change* last(TextEditorController* controller=0 );
 
     int sizeInDocChanges();
     int currentIndexInDocChanges();
 
-    TextChange* findRedoChange( TextEditorController* controller=0);
-    TextChange* findUndoChange( TextEditorController* controller=0 );
+    Change* findRedoChange( TextEditorController* controller=0);
+    Change* findUndoChange( TextEditorController* controller=0 );
 
     void setPersisted(bool enabled);
     bool isPersisted();
@@ -124,15 +124,15 @@ protected:
 
 signals:
 
-    void undoGroupStarted( edbee::TextChangeGroup* group );
+    void undoGroupStarted( edbee::ChangeGroup* group );
 
     /// This signal is fired when the group is ended. Warning, when the group is merged
     /// the group pointer will be 0!!
     void undoGroupEnded( int coalesceId, bool merged, int action );
-    void changeAdded( edbee::TextChange* change );
+    void changeAdded( edbee::Change* change );
 //    void changeMerged( edbee::TextChange* oldChange, edbee::TextChange* change );
-    void undoExecuted( edbee::TextChange* change );
-    void redoExecuted( edbee::TextChange* change );
+    void undoExecuted( edbee::Change* change );
+    void redoExecuted( edbee::Change* change );
 
     /// This signal is emitted if the persisted state is changed
     void persistedChanged(bool persisted);
@@ -144,12 +144,12 @@ private:
 
     TextDocument* documentRef_;                           ///< A reference to the textdocument
 
-    QList<TextChange*> changeList_;                       ///< The list of stack commands
+    QList<Change*> changeList_;                       ///< The list of stack commands
     int changeIndex_;                                     ///< The current command index (TextDocument/Global)
     QMap<TextEditorController*,int> controllerIndexMap_;  ///< The current controller pointers (View specific)
     int persistedIndex_;                                  ///< The current persisted index. A persisted-index of -1, means it never is persisted
 
-    QStack<TextChangeGroup*> undoGroupStack_;             ///< A stack of all undo items
+    QStack<ChangeGroup*> undoGroupStack_;             ///< A stack of all undo items
     QStack<int> lastCoalesceIdStack_;                     ///< The last coalesceId
 
 //    int undoGroupLevel_;                                 ///< The undo group level

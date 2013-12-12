@@ -26,10 +26,10 @@ int main(int argc, char* argv[])
     //==================================
     QList<QString> tests;
 
-    tests.append( "edbee::SingleTextChangeTest");
-    tests.append( "edbee::ComplexTextChangeTest");
+    tests.append( "edbee::TextChangeTest");
+    tests.append( "edbee::MergableChangeGroupTest");
     tests.append( "edbee::LineOffsetVectorTest");
-    tests.append( "edbee::LineDataListTextChangeTest");
+    tests.append( "edbee::LineDataListChangeTest");
     tests.append( "edbee::PlainTextDocumentTest");
     tests.append( "edbee::TextLineDataTest");
     tests.append( "edbee::TextRangeSetTest");

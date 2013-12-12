@@ -11,7 +11,7 @@
 
 #include "chartextbuffer.h"
 #include "edbee/lexers/grammartextlexer.h"
-#include "edbee/models/changes/singletextchange.h"
+#include "edbee/models/changes/textchange.h"
 #include "edbee/models/textgrammar.h"
 #include "edbee/models/textdocumentscopes.h"
 #include "edbee/models/texteditorconfig.h"
@@ -20,7 +20,6 @@
 #include "edbee/edbee.h"
 #include "edbee/util/lineending.h"
 #include "edbee/util/textcodec.h"
-#include "edbee/models/changes/singletextchange.h"
 
 #include "debug.h"
 
@@ -113,7 +112,7 @@ TextEditorConfig*CharTextDocument::config() const
 /// Gives a change to the undo stack without invoking the filter
 /// @param change the change to execute
 /// @param coalesceId the coalescing identifier
-void CharTextDocument::giveChangeWithoutFilter(TextChange *change, int coalesceId )
+void CharTextDocument::giveChangeWithoutFilter(Change *change, int coalesceId )
 {
     textUndoStack()->giveChange( change, coalesceId);
 }
@@ -135,7 +134,7 @@ void CharTextDocument::textBufferChanged(const TextBufferChange& change)
 
     // execute the line change
     if( !isUndoOrRedoRunning() ) {
-        TextChange* lineDataChange = textLineDataManager_->createLinesReplacedChange( change.line()+1, change.lineCount(), change.newLineCount() );
+        Change* lineDataChange = textLineDataManager_->createLinesReplacedChange( change.line()+1, change.lineCount(), change.newLineCount() );
         if( lineDataChange ) {
             executeAndGiveChange( lineDataChange, true );
         }

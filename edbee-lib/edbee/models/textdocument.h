@@ -14,8 +14,8 @@ namespace edbee {
 
 
 class TextGrammar;
-class TextChange;
-class TextChangeGroup;
+class Change;
+class ChangeGroup;
 class TextCodec;
 class TextDocumentFilter;
 class TextDocumentScopes;
@@ -78,7 +78,7 @@ public:
 
     /// this method should return a reference to the undo stack
     virtual TextUndoStack* textUndoStack() = 0;
-    virtual void beginUndoGroup(TextChangeGroup* group);
+    virtual void beginUndoGroup(ChangeGroup* group);
     virtual void endUndoGroup(int coalesceId, bool flatten=false );
     virtual void endUndoGroupAndDiscard();
     virtual bool isUndoCollectionEnabled();
@@ -104,11 +104,11 @@ public:
 
 
 
-    void executeAndGiveChange(TextChange* change , int coalesceId );
+    void executeAndGiveChange(Change* change , int coalesceId );
 
 
 //    void giveChange( TextChange* change, bool merge  );
-    virtual void giveChangeWithoutFilter( TextChange* change, int coalesceId) = 0;
+    virtual void giveChangeWithoutFilter( Change* change, int coalesceId) = 0;
     void append(const QString& text, int coalesceId=0 );
     void replace( int offset, int length, const QString& text, int coalesceId=0);
     void setText( const QString& text );

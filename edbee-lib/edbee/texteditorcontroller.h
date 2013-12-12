@@ -16,7 +16,7 @@ namespace edbee {
 
 class TextBufferChange;
 class TextCaretCache;
-class TextChangeGroup;
+class ChangeGroup;
 class TextCommand;
 class TextDocument;
 class TextEditorCommand;
@@ -131,7 +131,7 @@ public slots:
     virtual void redo(bool soft=false);
 
     // command execution
-    virtual void beginUndoGroup( TextChangeGroup* group );
+    virtual void beginUndoGroup( ChangeGroup* group );
     virtual void endUndoGroup(int coalesceId, bool flatten);
 
     // low level command execution

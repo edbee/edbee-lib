@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "edbee/models/textchange.h"
+#include "edbee/models/change.h"
 
 namespace edbee {
 
@@ -13,28 +13,28 @@ class TextDocument;
 class TextLineData;
 
 /// a class to handle line-data textchanges
-class LineDataTextChange : public TextChange
+class LineDataChange : public Change
 {
 public:
-    LineDataTextChange(int line, int field);
-    virtual ~LineDataTextChange();
+    LineDataChange(int line, int field);
+    virtual ~LineDataChange();
 
     void giveLineData( TextLineData* lineData );
 
     virtual void execute(TextDocument* document);
     virtual void revert(TextDocument* doc);
 
-    virtual bool giveAndMerge(TextDocument* document, TextChange* textChange );
+    virtual bool giveAndMerge(TextDocument* document, Change* textChange );
 
     virtual void applyLineDelta( int line, int length, int newLength );
 
     virtual QString toString();
 
-    int line() { return line_; }
-    void setLine( int line ) { line_ = line; }
+    int line() const;
+    void setLine( int line );
 
-    int field() { return field_; }
-    void setField( int field )  { field_ = field; }
+    int field() const;
+    void setField( int field );
 
 private:
     void changeLineData( TextDocument* doc );

@@ -1,9 +1,9 @@
 /**
- * Copyright 2011-2012 - Reliable Bits Software by Blommers IT. All Rights Reserved.
+ * Copyright 2011-2013 - Reliable Bits Software by Blommers IT. All Rights Reserved.
  * Author Rick Blommers
  */
 
-#include "linedatalisttextchange.h"
+#include "linedatalistchange.h"
 
 #include "edbee/models/textdocument.h"
 #include "edbee/models/textlinedata.h"
@@ -20,7 +20,7 @@ class TextLineDataManager;
 /// @param line the starting line of the change
 /// @param length the number of lines affected
 /// @param newLength the new number of lines
-LineDataListTextChange::LineDataListTextChange( TextLineDataManager* manager, int line, int length, int newLength )
+LineDataListChange::LineDataListChange( TextLineDataManager* manager, int line, int length, int newLength )
     : managerRef_(manager)
     , offset_(line)
     , docLength_(newLength)
@@ -31,7 +31,7 @@ LineDataListTextChange::LineDataListTextChange( TextLineDataManager* manager, in
 
 
 /// Destructs the linedata textchange
-LineDataListTextChange::~LineDataListTextChange()
+LineDataListChange::~LineDataListChange()
 {
     if( oldListList_ ) {
         for( int i=0; i < contentLength_; ++i ) {
@@ -49,7 +49,7 @@ LineDataListTextChange::~LineDataListTextChange()
 
 /// Executes the line data changes
 /// @param document the document to execute the change for
-void LineDataListTextChange::execute(TextDocument* document)
+void LineDataListChange::execute(TextDocument* document)
 {
     Q_UNUSED(document);
     // backup the old items
@@ -71,7 +71,7 @@ void LineDataListTextChange::execute(TextDocument* document)
 
 /// Reverts the line data change
 /// @param doc the document to execute the change for
-void LineDataListTextChange::revert(TextDocument* doc)
+void LineDataListChange::revert(TextDocument* doc)
 {
     Q_UNUSED(doc);
     if( oldListList_ ) {
@@ -86,9 +86,9 @@ void LineDataListTextChange::revert(TextDocument* doc)
 
 /// This method merges the old data with the new data
 /// @apram change the data to merge with
-void LineDataListTextChange::mergeStoredData(AbstractRangedTextChange* change)
+void LineDataListChange::mergeStoredData(AbstractRangedChange* change)
 {
-    LineDataListTextChange* lineTextChange = dynamic_cast<LineDataListTextChange*>(change);
+    LineDataListChange* lineTextChange = dynamic_cast<LineDataListChange*>(change);
 
     // calculate the new size
     int newOldListSize = getMergedStoredLength( change);// qlog_info() << "CALCULATED: " << newOldListSize ;
@@ -157,11 +157,11 @@ void LineDataListTextChange::mergeStoredData(AbstractRangedTextChange* change)
 /// @param document the document the changes are fior
 /// @param textChange the other textchange
 /// @return true if the merge succeed, false if not
-bool LineDataListTextChange::giveAndMerge(TextDocument* document, TextChange* textChange)
+bool LineDataListChange::giveAndMerge(TextDocument* document, Change* textChange)
 {
     Q_UNUSED(document);
     Q_UNUSED(textChange);
-    LineDataListTextChange* change = dynamic_cast<LineDataListTextChange*>( textChange );
+    LineDataListChange* change = dynamic_cast<LineDataListChange*>( textChange );
     if( change ) {
         return merge( change );
     }
@@ -170,28 +170,28 @@ bool LineDataListTextChange::giveAndMerge(TextDocument* document, TextChange* te
 
 
 /// Converts this change to a string
-QString LineDataListTextChange::toString()
+QString LineDataListChange::toString()
 {
     return QString("LineDataListTextChange(%1,%2,%3)").arg(offset_).arg(contentLength_).arg(docLength_);
 }
 
 
 /// Returns the line
-int LineDataListTextChange::offset () const
+int LineDataListChange::offset () const
 {
     return offset_;
 }
 
 
 /// Sets the new offset
-void LineDataListTextChange::setOffset(int value)
+void LineDataListChange::setOffset(int value)
 {
     offset_ = value;
 }
 
 
 /// Retursn the length in the document/data
-int LineDataListTextChange::docLength() const
+int LineDataListChange::docLength() const
 {
     return docLength_;
 }
@@ -199,7 +199,7 @@ int LineDataListTextChange::docLength() const
 
 /// This method sets the old length
 /// @param value the new old-length value
-void LineDataListTextChange::setDocLength(int value)
+void LineDataListChange::setDocLength(int value)
 {
     docLength_ = value;
 }
@@ -207,21 +207,21 @@ void LineDataListTextChange::setDocLength(int value)
 
 
 /// The lengt of the content in this object
-int LineDataListTextChange::storedLength() const
+int LineDataListChange::storedLength() const
 {
     return contentLength_;
 }
 
 
 /// returns the old list list
-TextLineDataList**LineDataListTextChange::oldListList()
+TextLineDataList**LineDataListChange::oldListList()
 {
     return oldListList_;
 }
 
 
 /// retursn the length of th eold list list
-int LineDataListTextChange::oldListListLength()
+int LineDataListChange::oldListListLength()
 {
     if( oldListList_ ) {
         return contentLength_;

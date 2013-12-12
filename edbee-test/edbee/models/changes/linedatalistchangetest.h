@@ -11,12 +11,12 @@
 
 namespace edbee {
 
-class LineDataListTextChange;
+class LineDataListChange;
 class TextDocument;
 class TextLineDataManager;
 
 // For testing the line data list text changes
-class LineDataListTextChangeTest: public edbee::test::TestCase
+class LineDataListChangeTest: public edbee::test::TestCase
 {
     Q_OBJECT
 
@@ -32,16 +32,16 @@ private slots:
 
 private:
     TextLineDataManager* manager();
-    LineDataListTextChange* createChange( int line, int length, int newLength );
-    LineDataListTextChange* takeChange(LineDataListTextChange* change);
-    QString data2str( LineDataListTextChange* change );
-    QString data2ptr( LineDataListTextChange* change );
+    LineDataListChange* createChange( int line, int length, int newLength );
+    LineDataListChange* takeChange(LineDataListChange* change);
+    QString data2str( LineDataListChange* change );
+    QString data2ptr( LineDataListChange* change );
 
 
     TextDocument* doc_;                             ///< The document used for testing
-    QList<LineDataListTextChange*> changeList_;     ///< The change list (For auto deletion of changes)
+    QList<LineDataListChange*> changeList_;     ///< The change list (For auto deletion of changes)
 };
 
 } // edbee
 
-DECLARE_TEST(edbee::LineDataListTextChangeTest);
+DECLARE_TEST(edbee::LineDataListChangeTest);

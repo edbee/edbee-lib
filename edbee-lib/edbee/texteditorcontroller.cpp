@@ -10,13 +10,13 @@
 #include <QThread>
 
 #include "edbee/commands/selectioncommand.h"
-#include "edbee/models/changes/complextextchange.h"
-#include "edbee/models/changes/singletextchange.h"
-#include "edbee/models/changes/singletextchangewithcaret.h"
-#include "edbee/models/changes/selectiontextchange.h"
+#include "edbee/models/changes/mergablechangegroup.h"
+#include "edbee/models/changes/textchange.h"
+#include "edbee/models/changes/textchangewithcaret.h"
+#include "edbee/models/changes/selectionchange.h"
 #include "edbee/models/chardocument/chartextdocument.h"
 #include "edbee/models/textbuffer.h"
-#include "edbee/models/textchange.h"
+#include "edbee/models/change.h"
 #include "edbee/models/textdocument.h"
 #include "edbee/models/textdocumentscopes.h"
 #include "edbee/models/texteditorcommandmap.h"
@@ -485,7 +485,7 @@ void TextEditorController::scrollCaretVisible()
 /// @param coalsceId the coalescing identifier for merging/coalescing undo operations
 void TextEditorController::storeSelection(int coalesceId)
 {
-    SelectionTextChange* change = new SelectionTextChange(this);
+    SelectionChange* change = new SelectionChange(this);
     change->giveTextRangeSet( new TextRangeSet( *textSelection() ) );
     textDocument()->executeAndGiveChange( change, coalesceId );
 }
@@ -648,7 +648,7 @@ void TextEditorController::addCaretAtOffset(int offset)
 /// This method changes the text selection
 void TextEditorController::changeAndGiveTextSelection(TextRangeSet* rangeSet, int coalesceId )
 {
-    SelectionTextChange* change = new SelectionTextChange(this);
+    SelectionChange* change = new SelectionChange(this);
     change->giveTextRangeSet( rangeSet );
     textDocument()->executeAndGiveChange( change, coalesceId );
 }
@@ -674,7 +674,7 @@ void TextEditorController::redo(bool soft)
 
 /// Starts an undo group
 /// @param group the undogroup to use
-void TextEditorController::beginUndoGroup( TextChangeGroup* group )
+void TextEditorController::beginUndoGroup( ChangeGroup* group )
 {
     textDocument()->beginUndoGroup(group);
 }

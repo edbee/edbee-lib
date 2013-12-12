@@ -11,9 +11,9 @@
 #include <QStringList>
 
 #include "edbee/commands/copycommand.h"
-#include "edbee/models/changes/complextextchange.h"
+#include "edbee/models/changes/mergablechangegroup.h"
 #include "edbee/models/textbuffer.h"
-#include "edbee/models/textchange.h"
+#include "edbee/models/change.h"
 #include "edbee/models/textdocument.h"
 #include "edbee/models/textrange.h"
 #include "edbee/texteditorcontroller.h"

@@ -3,12 +3,12 @@
  * Author Rick Blommers
  */
 
-#include "complextextchangetest.h"
+#include "mergablechangegrouptest.h"
 
 #include <QStringList>
 
-#include "edbee/models/changes/complextextchange.h"
-#include "edbee/models/changes/singletextchange.h"
+#include "edbee/models/changes/mergablechangegroup.h"
+#include "edbee/models/changes/textchange.h"
 #include "edbee/models/chardocument/chartextdocument.h"
 
 #include "debug.h"
@@ -17,20 +17,20 @@ namespace edbee {
 
 
 /// intitialze the tests
-void ComplexTextChangeTest::init()
+void MergableChangeGroupTest::init()
 {
     // create the document
     doc_ = new CharTextDocument();
     doc_->setText("abcdefgh");
 
     // create the group
-    group_ = new ComplexTextChange(0);
-    group2_ = new ComplexTextChange(0);
+    group_ = new MergableChangeGroup(0);
+    group2_ = new MergableChangeGroup(0);
 }
 
 
 /// the clean operation
-void ComplexTextChangeTest::clean()
+void MergableChangeGroupTest::clean()
 {
     delete group2_;
     delete group_;
@@ -43,7 +43,7 @@ void ComplexTextChangeTest::clean()
 /// Test the moving of changes between groups
 /// - ab|cd|efgh  =>  abX|cdY|efg  =>  abXP|cdYQ|efg => abXQR|cdYPSefg
 ///
-void ComplexTextChangeTest::testMoveChangesFromGroup_grow()
+void MergableChangeGroupTest::testMoveChangesFromGroup_grow()
 {
     testEqual( doc_->text(), "abcdefgh" );
     testEqual( group_->toSingleTextChangeTestString(), "" );
@@ -95,7 +95,7 @@ void ComplexTextChangeTest::testMoveChangesFromGroup_grow()
 
 /// Tests the (backspace) removal of characters
 /// - abc|def|gh  =>  ab|de|gh  =>  a|d|gh => |gh
-void ComplexTextChangeTest::testMoveChangesFromGroup_backspace()
+void MergableChangeGroupTest::testMoveChangesFromGroup_backspace()
 {
     testEqual( doc_->text(), "abcdefgh" );
     testEqual( group_->toSingleTextChangeTestString(), "" );
@@ -150,7 +150,7 @@ void ComplexTextChangeTest::testMoveChangesFromGroup_backspace()
 
 /// Test the delete operation
 /// - a|bcd|efgh  =>  a|cd|fgh  =>  a|d|gh
-void ComplexTextChangeTest::testMoveChangesFromGroup_delete()
+void MergableChangeGroupTest::testMoveChangesFromGroup_delete()
 {
     testEqual( doc_->text(), "abcdefgh" );
     testEqual( group_->toSingleTextChangeTestString(), "" );
@@ -188,7 +188,7 @@ void ComplexTextChangeTest::testMoveChangesFromGroup_delete()
 
 /// Relates with the test for TextUndoStackTest::testMultiCaretUndoIssue196
 /// Aa[B]b[C]cDd  =>  Aa[b][c]Dd  =>  Aa|Dd
-void ComplexTextChangeTest::testMoveChangesFromGroup_multiRangeOverlap()
+void MergableChangeGroupTest::testMoveChangesFromGroup_multiRangeOverlap()
 {
     doc_->setText("AaBbCcDd");
     testEqual( doc_->text(), "AaBbCcDd" );
@@ -225,7 +225,7 @@ void ComplexTextChangeTest::testMoveChangesFromGroup_multiRangeOverlap()
 
 
 /// When having three lines |a$|b$|c$ (|=caret, $=eol). Pressing duplicate 3 times results in an incorrect merge :
-void ComplexTextChangeTest::testMoveChangesFromGroup_trippleDuplicateIssue()
+void MergableChangeGroupTest::testMoveChangesFromGroup_trippleDuplicateIssue()
 {
     doc_->setText("a0b0c0");
 
@@ -267,7 +267,7 @@ void ComplexTextChangeTest::testMoveChangesFromGroup_trippleDuplicateIssue()
 
 
 /// This method tests the merge changes
-void ComplexTextChangeTest::testMoveChangesMergeTest1()
+void MergableChangeGroupTest::testMoveChangesMergeTest1()
 {
     testEqual( mergeResult("0:2:,4:2:,8:2:", "2:2:,8:2:,14:2:"), "0:4:,6:4:,12:4:");
     testEqual( mergeResult("2:0:c,4:0:f", "1:0:b,2:0:e"), "1:0:bc,2:0:ef");
@@ -300,7 +300,7 @@ void ComplexTextChangeTest::testMoveChangesMergeTest1()
 
 
 /// A large (and complex) merge test, which spans multiple changes
-void ComplexTextChangeTest::testMoveChangesMergeTest2()
+void MergableChangeGroupTest::testMoveChangesMergeTest2()
 {
     // GROUP1:
     ///
@@ -318,7 +318,7 @@ void ComplexTextChangeTest::testMoveChangesMergeTest2()
 
 
 /// test the single text change
-void ComplexTextChangeTest::testGiveSingleTextChange_addMerge()
+void MergableChangeGroupTest::testGiveSingleTextChange_addMerge()
 {
     testEqual( doc_->text(), "abcdefgh" );
     testEqual( group_->toSingleTextChangeTestString(), "" );
@@ -340,7 +340,7 @@ void ComplexTextChangeTest::testGiveSingleTextChange_addMerge()
 /// - a[xd]efgh   =(y)=> ayefgh    (1) 1:1:xd
 ///
 /// This should be merge into:  (m) 1:1:bd
-void ComplexTextChangeTest::testGiveSingleTextChange_overlap()
+void MergableChangeGroupTest::testGiveSingleTextChange_overlap()
 {
     testEqual( doc_->text(), "abcdefgh" );
     testEqual( group_->toSingleTextChangeTestString(), "" );
@@ -359,25 +359,25 @@ void ComplexTextChangeTest::testGiveSingleTextChange_overlap()
 
 
 /// adds a new textchange
-void ComplexTextChangeTest::runSingleTextChange(int offset, int length, const QString& replacement)
+void MergableChangeGroupTest::runSingleTextChange(int offset, int length, const QString& replacement)
 {
-    SingleTextChange* change = new SingleTextChange(offset,length,replacement);
+    TextChange* change = new TextChange(offset,length,replacement);
     change->execute( doc_ );
     group_->giveSingleTextChange(doc_,change);
 }
 
 
 /// adds a new textchange to group 2
-void ComplexTextChangeTest::runSingleTextChange2(int offset, int length, const QString& replacement)
+void MergableChangeGroupTest::runSingleTextChange2(int offset, int length, const QString& replacement)
 {
-    SingleTextChange* change = new SingleTextChange(offset,length,replacement);
+    TextChange* change = new TextChange(offset,length,replacement);
     change->execute( doc_ );
     group2_->giveSingleTextChange(doc_,change);
 }
 
 
 /// Fills the given group with the given changes
-QString ComplexTextChangeTest::fillGroup(const QString& changes, ComplexTextChange* group)
+QString MergableChangeGroupTest::fillGroup(const QString& changes, MergableChangeGroup* group)
 {
     if( !group ) { group = group_; }
     group->clear(true);
@@ -387,7 +387,7 @@ QString ComplexTextChangeTest::fillGroup(const QString& changes, ComplexTextChan
         Q_ASSERT( fields.size() == 3 );
         int offset = fields.at(0).toInt();
         int length = fields.at(1).toInt();
-        group->giveSingleTextChange(doc_, new SingleTextChange(offset, length, fields[2] ) );
+        group->giveSingleTextChange(doc_, new TextChange(offset, length, fields[2] ) );
     }
     return group->toSingleTextChangeTestString();
 }
@@ -396,7 +396,7 @@ QString ComplexTextChangeTest::fillGroup(const QString& changes, ComplexTextChan
 /// This method returns the merge result of several textchange
 /// @param groupDef1 the group definition. Example:   0:2:AB:,4:2:AX
 /// @param groupDef2 the second group definition.
-QString ComplexTextChangeTest::mergeResult(const QString& groupDef1, const QString& groupDef2)
+QString MergableChangeGroupTest::mergeResult(const QString& groupDef1, const QString& groupDef2)
 {
     fillGroup( groupDef1, group_ );
     fillGroup( groupDef2, group2_ );

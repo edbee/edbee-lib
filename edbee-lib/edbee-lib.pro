@@ -43,19 +43,12 @@ SOURCES += \
     edbee/texteditorcontroller.cpp \
     edbee/texteditorcommand.cpp \
     edbee/commands/selectioncommand.cpp \
-    edbee/models/textchange.cpp \
-    edbee/models/changes/selectiontextchange.cpp \
     edbee/commands/undocommand.cpp \
     edbee/commands/redocommand.cpp \
     edbee/commands/replaceselectioncommand.cpp \
     edbee/commands/copycommand.cpp \
     edbee/commands/cutcommand.cpp \
     edbee/commands/pastecommand.cpp \
-    edbee/models/changes/singletextchange.cpp \
-    edbee/models/changes/singletextchangewithcaret.cpp \
-    edbee/models/changes/linedatatextchange.cpp \
-    edbee/models/changes/linedatalisttextchange.cpp \
-    edbee/models/changes/complextextchange.cpp \
 	edbee/io/textdocumentserializer.cpp \
     util/test.cpp \
     edbee/util/textcodec.cpp \
@@ -83,7 +76,14 @@ SOURCES += \
     edbee/commands/newlinecommand.cpp \
     edbee/util/util.cpp \
     edbee/commands/removecommand.cpp \
-    edbee/models/changes/abstractrangedtextchange.cpp
+    edbee/models/change.cpp \
+    edbee/models/changes/abstractrangedchange.cpp \
+    edbee/models/changes/linedatalistchange.cpp \
+    edbee/models/changes/linedatachange.cpp \
+    edbee/models/changes/selectionchange.cpp \
+    edbee/models/changes/textchange.cpp \
+    edbee/models/changes/textchangewithcaret.cpp \
+    edbee/models/changes/mergablechangegroup.cpp
 
 HEADERS += \
     util/logging.h \
@@ -112,8 +112,6 @@ HEADERS += \
     edbee/models/chardocument/chartextbuffer.h \
     edbee/texteditorcommand.h \
     edbee/commands/selectioncommand.h \
-    edbee/models/textchange.h \
-    edbee/models/changes/selectiontextchange.h \
     edbee/commands/undocommand.h \
     edbee/commands/redocommand.h \
     edbee/commands/replaceselectioncommand.h \
@@ -121,11 +119,6 @@ HEADERS += \
     edbee/commands/cutcommand.h \
     edbee/commands/pastecommand.h \
     edbee/models/textdocumentfilter.h \
-    edbee/models/changes/singletextchange.h \
-    edbee/models/changes/singletextchangewithcaret.h \
-    edbee/models/changes/linedatatextchange.h \
-    edbee/models/changes/linedatalisttextchange.h \
-    edbee/models/changes/complextextchange.h \ 
     debug.h \
 	edbee/io/textdocumentserializer.h \
     util/test.h \
@@ -153,7 +146,14 @@ HEADERS += \
     edbee/commands/newlinecommand.h \
     edbee/util/util.h \
     edbee/commands/removecommand.h \
-    edbee/models/changes/abstractrangedtextchange.h
+    edbee/models/change.h \
+    edbee/models/changes/abstractrangedchange.h \
+    edbee/models/changes/linedatalistchange.h \
+    edbee/models/changes/linedatachange.h \
+    edbee/models/changes/selectionchange.h \
+    edbee/models/changes/textchange.h \
+    edbee/models/changes/textchangewithcaret.h \
+    edbee/models/changes/mergablechangegroup.h
     
 message($$INCLUDEPATH)
 

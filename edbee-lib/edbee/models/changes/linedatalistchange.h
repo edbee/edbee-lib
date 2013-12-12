@@ -7,7 +7,7 @@
 
 #include <QVector>
 
-#include "edbee/models/changes/abstractrangedtextchange.h"
+#include "edbee/models/changes/abstractrangedchange.h"
 
 namespace edbee {
 
@@ -16,17 +16,17 @@ class TextLineDataList;
 
 /// A full line data text change. This means the growing or shrinking of the line data buffer
 /// It stores the old-data list that needs to be remebered for undoing
-class LineDataListTextChange : public AbstractRangedTextChange
+class LineDataListChange : public AbstractRangedChange
 {
 public:
-    LineDataListTextChange( TextLineDataManager* manager, int offset , int lenght, int newLength );
-    virtual ~LineDataListTextChange();
+    LineDataListChange( TextLineDataManager* manager, int offset , int lenght, int newLength );
+    virtual ~LineDataListChange();
 
     virtual void execute(TextDocument* document);
     virtual void revert(TextDocument* doc);
 
-    virtual void mergeStoredData(AbstractRangedTextChange* change);
-    virtual bool giveAndMerge(TextDocument* document, TextChange* textChange );
+    virtual void mergeStoredData(AbstractRangedChange* change);
+    virtual bool giveAndMerge(TextDocument* document, Change* textChange );
 
     virtual QString toString();
 

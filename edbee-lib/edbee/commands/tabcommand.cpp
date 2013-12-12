@@ -6,7 +6,7 @@
 #include "tabcommand.h"
 
 #include "edbee/texteditorcontroller.h"
-#include "edbee/models/changes/complextextchange.h"
+#include "edbee/models/changes/mergablechangegroup.h"
 #include "edbee/models/texteditorconfig.h"
 #include "edbee/models/textdocument.h"
 #include "edbee/views/textselection.h"
@@ -36,7 +36,7 @@ void TabCommand::indent( TextEditorController* controller )
     bool useTab = false; //doc->config()->useTabChar();
     QString tab = useTab ? "\t" : QString(" ").repeated(tabSize);
 
-    controller->beginUndoGroup( new ComplexTextChange( controller ) );
+    controller->beginUndoGroup( new MergableChangeGroup( controller ) );
 
     sel->beginChanges();
 

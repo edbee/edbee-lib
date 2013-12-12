@@ -3,11 +3,11 @@
  * Author Rick Blommers
  */
 
-#include "selectiontextchange.h"
+#include "selectionchange.h"
 
 #include "edbee/models/textbuffer.h"
 #include "edbee/models/texteditorconfig.h"
-#include "edbee/models/textchange.h"
+#include "edbee/models/change.h"
 #include "edbee/models/textdocument.h"
 #include "edbee/models/textrange.h"
 #include "edbee/models/textundostack.h"
@@ -21,24 +21,24 @@
 namespace edbee {
 
 
-/// The selection textchange constructor
-/// @param controller the controler this selection change is for
-SelectionTextChange::SelectionTextChange(TextEditorController* controller )
-    : ControllerTextChange( controller )
+/// The selection selection change constructor
+/// @param controller the crontroler this selection change is for
+SelectionChange::SelectionChange(TextEditorController* controller )
+    : ControllerChange( controller )
     , rangeSet_(0)
 {
 }
 
 
 /// destructs the textrange
-SelectionTextChange::~SelectionTextChange()
+SelectionChange::~SelectionChange()
 {
     delete rangeSet_;
 }
 
 
 /// Gives the textrange to the textchange
-void SelectionTextChange::giveTextRangeSet(TextRangeSet* rangeSet)
+void SelectionChange::giveTextRangeSet(TextRangeSet* rangeSet)
 {
     delete rangeSet_;
     rangeSet_ = rangeSet;
@@ -47,7 +47,7 @@ void SelectionTextChange::giveTextRangeSet(TextRangeSet* rangeSet)
 
 /// Takes ownership of the rangeset and clears the clearset
 /// @return the rangeset
-TextRangeSet* SelectionTextChange::takeRangeSet()
+TextRangeSet* SelectionChange::takeRangeSet()
 {
     TextRangeSet* result = rangeSet_;
     rangeSet_ = 0;
@@ -57,7 +57,7 @@ TextRangeSet* SelectionTextChange::takeRangeSet()
 
 /// Executes the textchange
 /// @param document the textdocument to execute this change for
-void SelectionTextChange::execute( TextDocument* document )
+void SelectionChange::execute( TextDocument* document )
 {
     if( !rangeSet_ ) { return; }
     Q_UNUSED(document);
@@ -73,7 +73,7 @@ void SelectionTextChange::execute( TextDocument* document )
 
 /// Reverts the selection change
 /// @param document the textdocument to revert this change for
-void SelectionTextChange::revert(TextDocument* document)
+void SelectionChange::revert(TextDocument* document)
 {
     if( !rangeSet_ ) { return; }
 
@@ -90,10 +90,10 @@ void SelectionTextChange::revert(TextDocument* document)
 /// This method tries to merge the given change with the other change
 /// The textChange supplied with this method. Should NOT have been executed yet.
 /// It's the choice of this merge operation if the execution is required
-bool SelectionTextChange::giveAndMerge( TextDocument* document, TextChange* textChange)
+bool SelectionChange::giveAndMerge( TextDocument* document, Change* textChange)
 {
     Q_UNUSED( document );
-    SelectionTextChange* selectionChange = dynamic_cast<SelectionTextChange*>( textChange );
+    SelectionChange* selectionChange = dynamic_cast<SelectionChange*>( textChange );
     if( selectionChange ) {
 //        *rangeSet_ = *selectionChange->rangeSet_;
         delete textChange;
@@ -104,7 +104,7 @@ bool SelectionTextChange::giveAndMerge( TextDocument* document, TextChange* text
 
 
 /// Convert this change to a string
-QString SelectionTextChange::toString()
+QString SelectionChange::toString()
 {
     return QString("SelectionTextChange(%1)").arg(rangeSet_->rangesAsString());
 }
@@ -112,7 +112,7 @@ QString SelectionTextChange::toString()
 
 /// This method is called internally for notifying the control the selection has been changed
 /// Perhaps we should make e proper emit-signal for this purpose
-void SelectionTextChange::notifyChange()
+void SelectionChange::notifyChange()
 {
     /// TODO: make the controllerContext only repaint the affected areas via the TextRangeSets
     controllerContext()->onSelectionChanged( rangeSet_ );
