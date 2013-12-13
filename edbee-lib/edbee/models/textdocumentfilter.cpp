@@ -5,6 +5,7 @@
 
 #include "textdocumentfilter.h"
 #include <QString>
+#include <QStringList>
 #include "edbee/models/textrange.h"
 
 #include "debug.h"

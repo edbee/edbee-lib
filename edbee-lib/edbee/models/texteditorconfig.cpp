@@ -226,7 +226,7 @@ int TextEditorConfig::extraLineSpacing() const
 /// @param value the number of extra line-spacing between editor lines
 void TextEditorConfig::setExtraLineSpacing(int value)
 {
-    if( useLineSeparator_ != value ) {
+    if( extraLineSpacing_ != value ) {
         extraLineSpacing_ = value;
         notifyChange();
     }
