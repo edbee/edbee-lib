@@ -190,11 +190,12 @@ bool TextEditorController::hasFocus()
 /// @param command the command that needs to be executed.
 /// @param text description of the command
 /// @param icon the optional icon of the command
+/// @param owner the QObject owner of this action
 /// @return the newly created QAction
-QAction* TextEditorController::createUnconnectedAction(const QString& command, const QString& text, const QIcon& icon )
+QAction* TextEditorController::createUnconnectedAction(const QString& command, const QString& text, const QIcon& icon, QObject* owner )
 {
     // create the action
-    QAction* action = new QAction( icon, text, 0 );
+    QAction* action = new QAction( icon, text, owner );
 
     // set the key if there's an assigned keyboard command
     TextEditorKey* key = keyMap()->get(command);
@@ -213,11 +214,12 @@ QAction* TextEditorController::createUnconnectedAction(const QString& command, c
 /// @param command the command that needs to be executed.
 /// @param text description of the command
 /// @param icon the optional icon of the command
+/// @param owner the QObject owner of this action
 /// @return the newly created QAction
-QAction* TextEditorController::createAction(const QString& command, const QString& text, const QIcon& icon )
+QAction* TextEditorController::createAction(const QString& command, const QString& text, const QIcon& icon , QObject* owner)
 {
     // create the action
-    QAction* action = createUnconnectedAction( command, text, icon );
+    QAction* action = createUnconnectedAction( command, text, icon, owner );
     /// connect the signal to executeCommand
     connect( action, SIGNAL(triggered()), SLOT(executeCommand()) );
     return action;
