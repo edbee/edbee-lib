@@ -88,6 +88,7 @@ ScopedTextRange* ScopedTextRangeList::at(int idx)
     return ranges_.at(idx);
 }
 
+
 /// give a rnage to the range set
 /// @param range the scoped text range
 void ScopedTextRangeList::giveRange(ScopedTextRange* range)
@@ -195,6 +196,14 @@ bool MultiLineScopedTextRange::lessThan(MultiLineScopedTextRange* r1, MultiLineS
     }
     return ( diff < 0);
 }
+
+
+/// Returns a reference to the textdocument scopes
+TextDocumentScopes* MultiLineScopedTextRangeSet::textDocumentScopes()
+{
+     return textDocumentScopesRef_;
+}
+
 
 
 //===========================================

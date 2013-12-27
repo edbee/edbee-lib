@@ -11,18 +11,30 @@
 
 namespace edbee {
 
+
+/// The constructor for the parser
 BasePListParser::BasePListParser()
     : xml_(0)
 {
 }
 
+
+/// the default desctructor
 BasePListParser::~BasePListParser()
 {
     delete xml_;
 }
 
-/// Start the parsing of the plist. If it isn't a valid plist
-/// this method return false. (it only checks and reads the existence of <plist>)
+
+/// Returns the last error message of the parsed file
+QString BasePListParser::lastErrorMessage()
+{
+    return lastErrorMessage_;
+}
+
+
+/// Start the parsing of the plist. If it isn't a valid plist this method return false.
+/// (it only checks and reads the existence of <plist>)
 bool BasePListParser::beginParsing(QIODevice* device)
 {
     lastErrorMessage_.clear();
@@ -37,7 +49,9 @@ bool BasePListParser::beginParsing(QIODevice* device)
     }
 }
 
+
 /// Closes the parsers
+/// @return true if the parsing was succesful
 bool BasePListParser::endParsing()
 {
     bool result = !xml_->error();
@@ -51,7 +65,9 @@ bool BasePListParser::endParsing()
 }
 
 
+
 /// Call this method to raise an error
+/// @param str the error to raise
 void BasePListParser::raiseError( const QString& str )
 {
     xml_->raiseError(str);
@@ -72,7 +88,7 @@ QList<QVariant> BasePListParser::readList()
 
 
 /// reads a dictionary
-QHash<QString, QVariant> BasePListParser::readDict( )
+QHash<QString, QVariant> BasePListParser::readDict()
 {
     QHash<QString, QVariant> result;
     int level = currentStackLevel();
@@ -84,8 +100,10 @@ QHash<QString, QVariant> BasePListParser::readDict( )
     return result;
 }
 
-// reads the next plist type
-QVariant BasePListParser::readNextPlistType( int level  )
+
+/// reads the next plist type
+/// @param level the level we're currently parsing
+QVariant BasePListParser::readNextPlistType( int level )
 {
     if( readNextElement("",level) ) {
         // reads a dictionary
@@ -140,16 +158,17 @@ bool BasePListParser::readNextElement( const QString& name, int level )
     return false;
 }
 
-/// Reads the element text
+
+/// Reads the element text contents
 QString BasePListParser::readElementText()
 {
     QString result = xml_->readElementText();
-//qlog_info() << "* readElementText:"  << result;
     if( !elementStack_.isEmpty() ) { elementStack_.pop(); }
     return result;
 }
 
-// returns the current stack-level
+
+/// returns the current stack-level
 int BasePListParser::currentStackLevel()
 {
     return elementStack_.size();

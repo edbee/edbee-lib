@@ -18,18 +18,26 @@
 
 namespace edbee {
 
+
+/// constructs the keymapparser
 KeyMapParser::KeyMapParser()
     : parser_(0)
 {
     parser_ = new JsonParser();
 }
 
+
+/// destructs the keymapparser
 KeyMapParser::~KeyMapParser()
 {
     delete parser_;
 }
 
+
 /// loads the given keymap file returns true on  success
+/// @param filename the file to parse
+/// @param keyMap the keymapfile to put the results in
+/// @return true on success
 bool KeyMapParser::parse(const QString& filename , TextEditorKeyMap* keyMap)
 {
     if( parser_->parse( filename ) ) {
@@ -38,6 +46,7 @@ bool KeyMapParser::parse(const QString& filename , TextEditorKeyMap* keyMap)
     buildErrorMessageFromParser();
     return false;
 }
+
 
 bool KeyMapParser::parse(QIODevice* device, TextEditorKeyMap* keyMap)
 {
@@ -48,6 +57,7 @@ bool KeyMapParser::parse(QIODevice* device, TextEditorKeyMap* keyMap)
     return false;
 }
 
+
 bool KeyMapParser::parse(const QByteArray& bytes, TextEditorKeyMap* keyMap)
 {
     if( parser_->parse( bytes) ) {
@@ -56,6 +66,7 @@ bool KeyMapParser::parse(const QByteArray& bytes, TextEditorKeyMap* keyMap)
     buildErrorMessageFromParser();
     return false;
 }
+
 
 /// Parsers the variant map so the keymapManager is filled
 /// @param variant the variant to parse
@@ -84,6 +95,12 @@ bool KeyMapParser::parse(const QVariant& variant, TextEditorKeyMap* keyMap)
 
 }
 
+
+/// Returns the error message
+QString KeyMapParser::errorMessage() const
+{
+    return errorMessage_;
+}
 
 
 void KeyMapParser::buildErrorMessageFromParser()

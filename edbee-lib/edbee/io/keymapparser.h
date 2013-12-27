@@ -52,7 +52,7 @@ public:
     bool parse( const QByteArray& bytes, TextEditorKeyMap* keyMap );
     bool parse( const QVariant& variant, TextEditorKeyMap* keyMap );
 
-    QString errorMessage() { return errorMessage_; }
+    QString errorMessage() const;
 
 
 private:

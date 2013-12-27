@@ -20,8 +20,11 @@
 
 namespace edbee {
 
+/// The edbee instance singleton
 static Edbee* theInstance=0;
 
+
+/// The constructor
 Edbee::Edbee()
     : inited_(false)
     , defaultCommandMap_(0)
@@ -33,6 +36,8 @@ Edbee::Edbee()
 {
 }
 
+
+/// The edbee destructors destroys the different managers
 Edbee::~Edbee()
 {
     delete keyMapManager_;
@@ -43,12 +48,38 @@ Edbee::~Edbee()
     delete defaultCommandMap_;
 }
 
+
 /// The singleton instance getter
 Edbee* Edbee::instance()
 {
     if( !theInstance ) { theInstance = new Edbee(); }
     return theInstance;
 }
+
+
+/// sets the path where to find the keymap files
+/// @param keyMapPath the path with keymap files
+void Edbee::setKeyMapPath( const QString& keyMapPath )
+{
+    keyMapPath_ = keyMapPath;
+}
+
+
+/// Sets the grammar path
+/// @param grammarPath the path with the grammar files
+void Edbee::setGrammarPath( const QString& grammarPath )
+{
+    grammarPath_ = grammarPath;
+}
+
+
+/// Setst the path where to find the theme files
+/// @param themePath the path to find the themes
+void Edbee::setThemePath( const QString& themePath )
+{
+    themePath_ = themePath;
+}
+
 
 /*
 static void initKeyMap( TextEditorKeyMap& km )
@@ -140,9 +171,7 @@ void Edbee::init()
     grammarManager_     = new TextGrammarManager();
     keyMapManager_      = new TextKeyMapManager();
 
-
     qRegisterMetaType<edbee::TextBufferChange>("edbee::TextBufferChange");
-
 
     if( !grammarPath_.isEmpty() ) {
         grammarManager_->readAllGrammarFilesInPath( grammarPath_ );
@@ -159,12 +188,14 @@ void Edbee::init()
     inited_ = true;
 }
 
+
 /// destroys the texteditor manager and all related class
 void Edbee::shutdown()
 {
     delete theInstance;
     theInstance = 0;
 }
+
 
 /// Call this method to automaticly shutdown the texteditor manager on shutdown
 /// (This method listens to the qApp::aboutToQuit signal
@@ -173,42 +204,63 @@ void Edbee::autoShutDownOnAppExit()
     connect( qApp, SIGNAL(aboutToQuit()),this,SLOT(shutdown()) );
 }
 
-/// returns the editor keymap
+
+/// returns the default editor keymap
 TextEditorKeyMap* Edbee::defaultKeyMap()
 {
     return keyMapManager()->get("");
 }
 
-TextCodecManager *Edbee::codecManager()
+
+/// Returns the default editor command map. This is the default command map that's used
+/// by the editor components
+/// @return the default command map
+TextEditorCommandMap* Edbee::defaultCommandMap()
+{
+    return defaultCommandMap_;
+}
+
+
+/// Returns the codec-manager for Edbee
+TextCodecManager* Edbee::codecManager()
 {
     Q_ASSERT(inited_);
     return codecManager_;
 }
 
-TextScopeManager *Edbee::scopeManager()
+
+/// Returns the scope manager. The scope manager is a general class to share scope names and identifiers between different editors
+TextScopeManager* Edbee::scopeManager()
 {
     Q_ASSERT(inited_);
     return scopeManager_;
 }
 
-TextGrammarManager *Edbee::grammarManager()
+
+/// Returns the grammar manager used by all editors
+/// The grammar manager is used for sharing the different grammar definitions between the different editors
+TextGrammarManager* Edbee::grammarManager()
 {
     Q_ASSERT(inited_);
     return grammarManager_;
 }
 
-TextThemeManager *Edbee::themeManager()
+
+/// Returns the theme manager
+/// The theme manager is used to share themes between the different editors
+TextThemeManager* Edbee::themeManager()
 {
     Q_ASSERT(inited_);
     return themeManager_;
 }
 
-TextKeyMapManager *Edbee::keyMapManager()
+
+/// Returns the keymap manager
+TextKeyMapManager* Edbee::keyMapManager()
 {
     Q_ASSERT(inited_);
     return keyMapManager_;
 }
-
 
 
 } // edbee

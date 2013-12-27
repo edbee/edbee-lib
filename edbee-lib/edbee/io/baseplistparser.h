@@ -22,7 +22,7 @@ public:
     BasePListParser();
     virtual ~BasePListParser();
 
-    QString lastErrorMessage() { return lastErrorMessage_; }
+    QString lastErrorMessage();
 
 
 

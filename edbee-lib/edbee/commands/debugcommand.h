@@ -9,6 +9,8 @@
 
 namespace edbee {
 
+
+/// A debug command, for simply suppling/dumping some editor state information to the console
 class DebugCommand : public TextEditorCommand
 {
 public:

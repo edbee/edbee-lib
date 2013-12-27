@@ -15,6 +15,8 @@
 
 namespace edbee {
 
+
+/// Constructs the jsonparser
 JsonParser::JsonParser()
     : errorMessage_()
     , errorOffset_(0)
@@ -24,11 +26,16 @@ JsonParser::JsonParser()
 
 }
 
+
+/// The parser destructor
 JsonParser::~JsonParser()
 {
 }
 
+
 /// loads the given keymap file returns true on  success
+/// @param filename the filename to parse
+/// @return true if the file was parsed
 bool JsonParser::parse(const QString& fileName )
 {
     clearErrors();
@@ -41,9 +48,12 @@ bool JsonParser::parse(const QString& fileName )
         errorMessage_ = file.errorString();
         return false;
     }
-
 }
 
+
+/// Parses the given QIODevice
+/// @param device the device to parse the json data
+/// @return true if the file was successfully parsed
 bool JsonParser::parse( QIODevice* device )
 {
     clearErrors();
@@ -61,7 +71,10 @@ bool JsonParser::parse( QIODevice* device )
     return result;
 }
 
+
 /// opens the given bytes as a json document
+/// @param bytesIn the bytes of the Json document
+/// @return true if the data was succeeful parsed
 bool JsonParser::parse(const QByteArray& bytesIn)
 {
     clearErrors();
@@ -88,6 +101,13 @@ bool JsonParser::parse(const QByteArray& bytesIn)
 }
 
 
+/// Returns the result of the json parsing
+QVariant JsonParser::result()
+{
+    return result_;
+}
+
+
 /// Clears the error flags/variables
 void JsonParser::clearErrors()
 {
@@ -95,8 +115,30 @@ void JsonParser::clearErrors()
     errorOffset_ = errorLine_ = errorColumn_ = 0;
 }
 
+
+/// Returns the errormessage
+QString JsonParser::errorMessage() const
+{
+    return errorMessage_;
+}
+
+
+/// returns the line number of the error
+int JsonParser::errorLine() const
+{
+    return errorLine_;
+}
+
+
+/// Returns the error column
+int JsonParser::errorColumn() const
+{
+    return errorColumn_;
+}
+
+
 /// Returns the full eror message
-QString JsonParser::fullErrorMessage()
+QString JsonParser::fullErrorMessage() const
 {
     if( !errorLine() ) return errorMessage();
     return QObject::tr("%1 @ line %2").arg(errorMessage()).arg(errorLine());

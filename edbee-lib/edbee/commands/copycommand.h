@@ -21,14 +21,9 @@ public:
     static const QString EDBEE_TEXT_TYPE;
 
 public:
-    CopyCommand();
-
-    /// This method should return the command identifier
-    virtual int commandId();
-
-
     virtual void execute( TextEditorController* controller );
     virtual QString toString();
 };
+
 
 } // edbee

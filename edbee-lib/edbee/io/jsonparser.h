@@ -24,15 +24,15 @@ public:
     bool parse( QIODevice* device );
     bool parse( const QByteArray& bytesIn );
 
-    QVariant result() { return result_; }
+    QVariant result();
 
     void clearErrors();
 
-    QString errorMessage() { return errorMessage_; }
-    int errorLine() { return errorLine_; }
-    int errorColumn() { return errorColumn_; }
+    QString errorMessage() const;
+    int errorLine() const;
+    int errorColumn() const;
 
-    QString fullErrorMessage();
+    QString fullErrorMessage() const;
 
 protected:
 
@@ -40,10 +40,10 @@ protected:
 
 private:
 
-    QString errorMessage_;        ///< The error message
-    int errorOffset_;
-    int errorLine_;
-    int errorColumn_;
+    QString errorMessage_;      ///< The error message
+    int errorOffset_;           ///< The character offset of the error
+    int errorLine_;             ///< The line number of the error
+    int errorColumn_;           ///< The column number of the error
 
     QVariant result_;           ///< variant is the easiest format to play around with in Qt. The result will be QVariantMap (no hash!) or QVariantArray
 

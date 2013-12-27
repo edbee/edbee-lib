@@ -285,7 +285,7 @@ public:
 
     QString toString();
 
-    TextDocumentScopes* textDocumentScopes() { return textDocumentScopesRef_; }
+    TextDocumentScopes* textDocumentScopes();
 
 private:
 

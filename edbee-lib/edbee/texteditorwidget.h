@@ -26,7 +26,9 @@ class TextRenderer;
 class TextSelection;
 
 
-/// Warning the text-editor widget needs a fix-width font
+/// This is the general edbee widget
+/// This core functionality of this widget is divided in several seperate
+/// compnents. (TextEditorComponent: the main editor, TextMarginComponent: the sidebar with line numbers)
 class TextEditorWidget : public QWidget
 {
     Q_OBJECT
@@ -51,7 +53,6 @@ public:
 
     void resetCaretTime();
     void fullUpdate();
-
 
     QScrollBar* horizontalScrollBar() const;
     QScrollBar* verticalScrollBar() const;
@@ -89,7 +90,7 @@ public slots:
 
 private:
 
-    TextEditorController* controller_;  ///< This method returns the controller
+    TextEditorController* controller_;      ///< This method returns the controller
 
     TextEditorScrollArea* scrollAreaRef_;   ///< The scrollarea of the widget
     TextEditorComponent* editCompRef_;      ///< The editor ref

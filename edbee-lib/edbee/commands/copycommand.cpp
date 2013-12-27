@@ -21,18 +21,6 @@ namespace edbee {
 const QString CopyCommand::EDBEE_TEXT_TYPE("application/vnd.edbee.text-type");
 
 
-CopyCommand::CopyCommand()
-{
-}
-
-
-/// Returns the coalescing-command id
-int CopyCommand::commandId()
-{
-     return CoalesceId_None;
-}
-
-
 /// Copies the current selection to the clipboard
 void CopyCommand::execute(TextEditorController* controller)
 {

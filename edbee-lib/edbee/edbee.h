@@ -30,9 +30,9 @@ private:
 public:
     static Edbee* instance();
 
-    void setKeyMapPath( const QString& keyMapPath ) { keyMapPath_ = keyMapPath; }
-    void setGrammarPath( const QString& grammarPath ) { grammarPath_ = grammarPath; }
-    void setThemePath( const QString& themePath ) { themePath_ = themePath; }
+    void setKeyMapPath( const QString& keyMapPath );
+    void setGrammarPath( const QString& grammarPath );
+    void setThemePath( const QString& themePath );
 
 public slots:
     void init();
@@ -42,7 +42,7 @@ public slots:
 public:
 
     TextEditorKeyMap* defaultKeyMap();
-    TextEditorCommandMap* defaultCommandMap() { return defaultCommandMap_; }
+    TextEditorCommandMap* defaultCommandMap();
 
     TextCodecManager* codecManager();
     TextScopeManager* scopeManager();

@@ -85,6 +85,8 @@ TextEditorWidget::TextEditorWidget( QWidget* parent)
     editCompRef_->installEventFilter(this);     // recieve events for the ability to emit focus events
 }
 
+
+/// The editor constructor
 TextEditorWidget::~TextEditorWidget()
 {
     // we need to perform manual deletion to force the deletion order
@@ -207,6 +209,7 @@ QScrollBar* TextEditorWidget::horizontalScrollBar() const
 }
 
 
+/// returns the vertical scrollbar
 QScrollBar* TextEditorWidget::verticalScrollBar() const
 {
     return scrollAreaRef_->verticalScrollBar();
@@ -215,20 +218,26 @@ QScrollBar* TextEditorWidget::verticalScrollBar() const
 
 /// Use this method to change a scrollbar. By using this method listeners of the scrollbar
 /// well be informed the scrollbar has been changed
+/// @param scrollBar the scrollbar to use
 void TextEditorWidget::setVerticalScrollBar(QScrollBar* scrollBar)
 {
     scrollAreaRef_->setVerticalScrollBar(scrollBar);
     emit verticalScrollBarChanged( scrollBar );
 }
 
-/// Use this method to change the horizontal scrollar
-void TextEditorWidget::setHorizontalScrollBar(QScrollBar *scrollBar)
+
+/// Use this method to change the horizontal scrollbar.  By using this method listeners of the scrollbar
+/// well be informed the scrollbar has been changed
+/// @param scrollBar the scrollbar to use
+void TextEditorWidget::setHorizontalScrollBar(QScrollBar* scrollBar)
 {
     scrollAreaRef_->setHorizontalScrollBar(scrollBar);
     emit verticalScrollBarChanged( scrollBar );
 }
 
 
+/// This mehtod is called when a resize happens
+/// @param event the event of the editor widget
 void TextEditorWidget::resizeEvent(QResizeEvent* event)
 {
     QWidget::resizeEvent(event);
@@ -236,7 +245,9 @@ void TextEditorWidget::resizeEvent(QResizeEvent* event)
 }
 
 
-/// a basic event-filter for recieving focus-events of the ditor
+/// a basic event-filter for recieving focus-events of the editor
+/// @param obj the object to filter the events for
+/// @param event the event to filter
 bool TextEditorWidget::eventFilter(QObject* obj, QEvent* event)
 {
     if( obj == editCompRef_) {
@@ -255,12 +266,14 @@ bool TextEditorWidget::eventFilter(QObject* obj, QEvent* event)
 // protected slots
 //=================================================================================
 
-/// Connects the scrollbars
+/// Connects the vertical scrollbar so it updates the rendering viewport
 void TextEditorWidget::connectVerticalScrollBar()
 {
     connect( verticalScrollBar(), SIGNAL(valueChanged(int)), SLOT(updateRendererViewport()) );
 }
 
+
+/// Connects the horizontal scrollbar so it updates the rendering viewport
 void TextEditorWidget::connectHorizontalScrollBar()
 {
     connect( horizontalScrollBar(), SIGNAL(valueChanged(int)), SLOT(updateRendererViewport()) );
@@ -273,6 +286,7 @@ void TextEditorWidget::connectHorizontalScrollBar()
 
 
 /// updates the given line so it will be repainted
+/// @Param offset the offset of the line that needs repainting
 void TextEditorWidget::updateLineAtOffset(int offset)
 {
     editCompRef_->updateLineAtOffset(offset);
@@ -281,13 +295,18 @@ void TextEditorWidget::updateLineAtOffset(int offset)
 
 
 /// updates the character before and at the given offest
+/// @param offset the offset of the area to repaint.
+/// @param width the width of the area to update (default is 8 pixels)
 void TextEditorWidget::updateAreaAroundOffset(int offset, int width )
 {
     editCompRef_->updateAreaAroundOffset(offset,width);
     marginCompRef_->updateLineAtOffset(offset);
 }
 
+
 /// This method repaints the given lines
+/// @param line the line that updates the given line
+/// @param length the number of lines to update. (default is 1 line)
 void TextEditorWidget::updateLine(int line, int length)
 {
     editCompRef_->updateLine(line,length);
@@ -295,18 +314,24 @@ void TextEditorWidget::updateLine(int line, int length)
 
 }
 
+
+/// Calls update on all components
 void TextEditorWidget::updateComponents()
 {
     editCompRef_->update();
     marginCompRef_->update();
 }
 
+
+/// Updates the geometry for all components
 void TextEditorWidget::updateGeometryComponents()
 {
     editCompRef_->updateGeometry();
     marginCompRef_->updateGeometry();
 }
 
+
+/// Updates the renderer viewport.
 void TextEditorWidget::updateRendererViewport()
 {
     QRect rect( horizontalScrollBar()->value(), this->verticalScrollBar()->value(), scrollAreaRef_->viewport()->width(), scrollAreaRef_->height() );
