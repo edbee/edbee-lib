@@ -83,7 +83,9 @@ SOURCES += \
     edbee/models/changes/selectionchange.cpp \
     edbee/models/changes/textchange.cpp \
     edbee/models/changes/textchangewithcaret.cpp \
-    edbee/models/changes/mergablechangegroup.cpp
+    edbee/models/changes/mergablechangegroup.cpp \
+    edbee/commands/commentcommand.cpp \
+    edbee/util/rangesetlineiterator.cpp
 
 HEADERS += \
     util/logging.h \
@@ -153,7 +155,9 @@ HEADERS += \
     edbee/models/changes/selectionchange.h \
     edbee/models/changes/textchange.h \
     edbee/models/changes/textchangewithcaret.h \
-    edbee/models/changes/mergablechangegroup.h
+    edbee/models/changes/mergablechangegroup.h \
+    edbee/commands/commentcommand.h \
+    edbee/util/rangesetlineiterator.h
     
 message($$INCLUDEPATH)
 
