@@ -26,7 +26,13 @@ private:
     QString line_;              ///< The current line
     const QChar* lineRef_;      ///< A reference to the given line
 
+
+    /// clears the error message
     void clearError() { error_.clear(); }
+
+
+    /// fills the error with the given code. It retrives the onig_error_code if requried
+    /// @param code the ONIG error code
     void fillError( int code )
     {
         if( code == ONIG_NORMAL ) {
@@ -38,6 +44,8 @@ private:
         }
     }
 
+
+    /// deletes the current regon
     void deleteRegion()
     {
         if( region_ ) { onig_region_free(region_, 1 ); }  // 1:free self, 0:free contents only);
@@ -47,6 +55,10 @@ private:
 
 public:
 
+    /// Constructs the OnigRegExp engine
+    /// @param pattern the regular expression pattern
+    /// @param caseSensitive is the regexp case senstitive
+    /// @param syntax the syntax to use
     OnigRegExpEngine( const QString& pattern, bool caseSensitive, RegExp::Syntax syntax )
         : reg_(0)
         , region_(0)
@@ -66,17 +78,30 @@ public:
         fillError( result );
     }
 
+
+    /// destructs the regular expression engine
     virtual ~OnigRegExpEngine()
     {
         deleteRegion();
         onig_free(reg_);
     }
 
+
+    /// returns the pattern used
     virtual QString pattern() { return pattern_; }
+
+    /// returns true if the supplied regular expression was valid
     virtual bool isValid() { return valid_; }
+
+    /// returns the error message
     virtual QString error() { return error_; }
 
 
+    /// returns the index of the given QChar array in the given text
+    /// @param charPtr the pointer to the string data
+    /// @param offset the offset to start searching
+    /// @param length the length of the string data
+    /// @param reverse should the search be reversed?
     int indexIn( const QChar* charPtr, int offset, int length, bool reverse )
     {
         // invalid reg-exp don't use it!
@@ -102,71 +127,47 @@ public:
         if ( result >= 0) {
             Q_ASSERT(result%2==0);
             return result>>1;
+
         } else if (result == ONIG_MISMATCH) {
             return -1;
+
         } else { // error
             fillError(result);
             return -2;
+
         }
     }
 
 
-    /// returns the position of the given match or -1 if not found. -2 on error
+    /// returns the position of the given match or returns an error code
+    /// @param str the string to the search in
+    /// @param offset the offset in the string to start the search
+    /// @return the position of the given match (-1 if not found, -2 on error)
     virtual int indexIn( const QString& str, int offset )
     {
-        // line_ = str;
-        // lineRef_ = line_.data();
-        // return indexIn( lineRef_, offset, line_.length() );
-
         line_ = str;
         int length = line_.length(); // very scary, calling line_.length() invalidates the line_.data() pointer :S
         lineRef_ = line_.data();
 
         return indexIn( lineRef_, offset, length, false );
-
-        /*
-        // invalid reg-exp don't use it!
-        if( !valid_ ) { return -2; }
-
-        // delete old regenion an make a new one
-        deleteRegion();
-        region_ = onig_region_new();
-
-        const QChar* charPtr = lineRef_; //line_.data();
-        OnigUChar* stringStart  = (OnigUChar*)charPtr;
-        OnigUChar* stringEnd    = (OnigUChar*)(charPtr+str.length());
-        OnigUChar* stringOffset = (OnigUChar*)(charPtr+offset);
-        OnigUChar* stringRange  = (OnigUChar*)stringEnd;
-
-        clearError();
-
-        int result = onig_search(reg_, stringStart, stringEnd, stringOffset, stringRange, region_, ONIG_OPTION_NONE);
-        if ( result >= 0) {
-            Q_ASSERT(result%2==0);
-            // int i;
-            // fprintf(stderr, "match at %d\n", r);
-            // for (i = 0; i < region->num_regs; i++) {
-            // fprintf(stderr, "%d: (%d-%d)\n", i, region->beg[i], region->end[i]);
-            return result>>1;
-
-        } else if (result == ONIG_MISMATCH) {
-            return -1;
-        } else { // error
-            fillError(result);
-            return -2;
-        }
-        */
     }
 
-    /// returns the position of the given match or -1 if not found. -2 on error
+
+    /// returns the position of the given match or returns an error code
     /// @param str the pointer to the line
     /// @param offset the offset to start searching
     /// @param length the total length of the str pointer
+    /// @return the position of the given match (-1 if not found, -2 on error)
     virtual int indexIn( const QChar* charPtr, int offset, int length )
     {
         return indexIn( charPtr, offset, length, false );
     }
 
+
+    /// returns the last index of the given string
+    /// @param str the string to search in
+    /// @param offset the offset of the start of the search
+    /// @return the index of the match (-1 if not found, -2 on error)
     virtual int lastIndexIn( const QString& str, int offset )
     {
         line_ = str;
@@ -175,6 +176,12 @@ public:
         return lastIndexIn( lineRef_, offset, length);
     }
 
+
+    /// returns the last index of the given string
+    /// @param str the string to search in
+    /// @param offset the offset of the start of the search
+    /// @param length the length of the supplied string data
+    /// @return the index of the match (-1 if not found, -2 on error)
     virtual int lastIndexIn( const QChar* str, int offset, int length )
     {
         if( offset < 0 ) {
@@ -185,7 +192,8 @@ public:
     }
 
 
-    /// returns the offset
+    /// returns the offset of the given match
+    /// @param nth the given match
     virtual int pos( int nth ) const
     {
         if( !region_ ) { return -1; } // no region
@@ -210,7 +218,8 @@ public:
     }
 
 
-    /// returns the length of the given position.
+    /// returns the length of the nth match
+    /// @param nth the match number
     virtual int len( int nth ) const
     {
         if( !region_ ) { return -1; } // no region
@@ -220,30 +229,19 @@ public:
             return result >> 1;
         }
         return -1;
-//       for (int i = 0; i < region_->num_regs; i++) {
-//         qlog_info() << QString("%1: (%2-%3)").arg(i).arg(region_->beg[i]).arg(region_->end[i] );
-//       }
     }
 
 
-    /// returns the captureat the given index
+    /// returns the capture at the given index
+    /// @param nth the position of the match
+    /// @return the match ath the given position
     virtual QString cap( int nth = 0 ) const
     {
         int p = pos(nth);
         int l = len(nth);
         if( p < 0 || l < 0 ) return QString();
         return QString( lineRef_+p,l);
-//        return  line_.mid(p,l);
     }
-
-
-//    virtual QString cap( int nth= 0 ) const
-//    {
-//int lengte = len(nth);
-//if( lengte <= 0 ) return QString();
-//        qlog_warn() << "TODO: Implement cap !!";
-//        return QString("a").repeated(lengte);
-//    }
 
 };
 
@@ -252,11 +250,17 @@ public:
 
 
 /// The Qt regexp-engine
+/// A pretty dumb wrapper around the QRegExp Class
 class QtRegExpEngine : public RegExpEngine
 {
-    QRegExp* reg_;
+    QRegExp* reg_;      ///< The Qt QRegExp objet
 
 public:
+
+    /// constructs the QRegExp engine
+    /// @param pattern the pattern to match
+    /// @param caseSensitive is the match case sensitive
+    /// @param syntax the used syntadx
     QtRegExpEngine( const QString& pattern, bool caseSensitive, RegExp::Syntax syntax )
         : reg_(0)
     {
@@ -265,23 +269,40 @@ public:
 
         reg_= new QRegExp( pattern, caseSensitive ? Qt::CaseSensitive : Qt::CaseInsensitive, regExpSyntax);
     }
+
+
+    /// destructs the QtRegExpEngine
     virtual ~QtRegExpEngine()
     {
         delete reg_;
     }
 
+
+    /// Returns the supplied pattern
     virtual QString pattern() { return reg_->pattern(); }
 
+    /// Returns true if the given regular expression was valid
     virtual bool isValid() { return reg_->isValid(); }
 
+    /// returns the error message
     virtual QString error() { return reg_->errorString(); }
 
+
+    /// returns the index of the regexp in the given string
+    /// @param str the string to search in
+    /// @param offset the start offset of the search
+    /// @return the index of the given match or < 0 if no match was found
     virtual int indexIn( const QString& str, int offset )
     {
         return reg_->indexIn( str, offset );
     }
 
+
     /// Warning index in with char pointers creates a string from the string
+    /// @param str the pointer to the given string
+    /// @param offset the offset to start searching
+    /// @param length the length of the given string
+    /// @return the index of the given match or < 0 if no match was found
     virtual int indexIn( const QChar* str, int offset, int length )
     {
         QString realString( str+offset, length );
@@ -289,11 +310,21 @@ public:
     }
 
 
+    /// Returns the last match of this regexp in the given string
+    /// @param str the string to search in
+    /// @param offset the offset to start searching from
+    /// @return the matched index or < 0 if not found
     virtual int lastIndexIn( const QString& str, int offset )
     {
         return reg_->lastIndexIn( str, offset );
     }
 
+
+    /// Returns the last match of this regexp in the given string
+    /// @param str the string to search in
+    /// @param offset the offset to start searching from
+    /// @param length the length of the given string
+    /// @return the matched index or < 0 if not found
     virtual int lastIndexIn( const QChar* str, int offset, int length )
     {
         QString realString( str+offset, length );
@@ -301,8 +332,21 @@ public:
     }
 
 
+    /// returns the position of the nth group match
+    /// @param nth the group number to return
+    /// @return the position of the nth match
     virtual int pos( int nth = 0 ) const { return reg_->pos(nth); }
+
+
+    /// returns the length of the nth group match
+    /// @param nth the group number to return
+    /// @return the length of the nth match
     virtual int len( int nth = 0 ) const { return reg_->cap(nth).length(); }
+
+
+    /// returns the nth group
+    /// @param nth the group number to return
+    /// @return the content of the given match
     virtual QString cap( int nth= 0 ) const { return reg_->cap(nth); }
 
 };
@@ -311,7 +355,12 @@ public:
 //====================================================================================================================
 
 
-RegExp::RegExp(  const QString& pattern, bool caseSensitive, Syntax syntax, Engine engine)
+/// Constructs the regular expression matcher
+/// @param pattern the pattern of the regular expression
+/// @param caseSensitive should the match be case sensitive
+/// @param syntax the syntax of th given regular expression (SyntaxDefault(default) or SyntaxFixedString)
+/// @param engine the engine to use (EngineOniguruma(default) or EngineQRegExp)
+RegExp::RegExp( const QString& pattern, bool caseSensitive, Syntax syntax, Engine engine)
     : d_(0)
 {
     switch( engine ) {
@@ -320,16 +369,19 @@ RegExp::RegExp(  const QString& pattern, bool caseSensitive, Syntax syntax, Engi
             break;
         default:
             Q_ASSERT(false);
-            qlog_warn() << "Invalid engine supplied to RegExp";
+            qlog_warn() << "Invalid engine supplied to RegExp. Falling back to EngineOniguruma";
         case EngineOniguruma:
             d_ = new OnigRegExpEngine(pattern, caseSensitive, syntax);
     }
 }
 
+
+/// destructs the regular expression object
 RegExp::~RegExp()
 {
     delete d_;
 }
+
 
 /// escapes a string with every regexp special character escaped
 /// we currently always use QRegExp::escape.. For the future we added an engine parameter
@@ -340,47 +392,65 @@ QString RegExp::escape(const QString& str, RegExp::Engine engine)
     return QRegExp::escape(str);
 }
 
+
+/// returns true if the supplied regular expression was valid
 bool RegExp::isValid() const
 {
     return d_->isValid();
 }
 
+
+/// returns the error message of the regular expression
 QString RegExp::errorString() const
 {
     return d_->error();
 }
 
+
+/// returns th supplied pattern
 QString RegExp::pattern() const
 {
     return d_->pattern();
 }
 
-/// matches th
+
 /// Attempts to find a match in str from position offset (0 by default). If offset is -1, the search starts at the last character; if -2, at the next to last character; etc.
 /// Returns the position of the first match, or -1 if there was no match.
 /// The caretMode parameter can be used to instruct whether ^ should match at index 0 or at offset.
 /// You might prefer to use QString::indexOf(), QString::contains(), or even QStringList::filter(). To replace matches use QString::replace().
-///
-/// Although const, this function sets matchedLength(), capturedTexts() and pos().
-/// If the QRegExp is a wildcard expression (see setPatternSyntax()) and want to test a string against the whole wildcard expression, use exactMatch() instead of this function.
-///
-/// Currently we ignore the caretMode
 int RegExp::indexIn(const QString& str, int offset)  // const
 {
     return d_->indexIn( str, offset );
 }
 
+
+/// Searchers for the regular expression in the given string
+/// @param str the string to search in
+/// @param offset the offset to start searching
+/// @param length the length of the supplied string
+/// @return the found index of the regular expression
 int RegExp::indexIn(const QChar* str, int offset, int length)
 {
     return d_->indexIn( str, offset, length );
 }
 
+
+
+/// Searcher for the last match of the regular expression in the given string
+/// @param str the string to search in
+/// @param offset the offset to start searching
+/// @return the found index of the regular expression
 int RegExp::lastIndexIn(const QString &str, int offset)
 {
     return d_->lastIndexIn( str, offset );
 }
 
 
+/// Searchers for the last match of the regular expression in the given string
+/// @param str the string to search in
+/// @param offset the offset to start searching
+/// @param length the length of the supplied string
+/// @return the found index of the regular expression
 int RegExp::lastIndexIn(const QChar *str, int offset, int length)
 {
     return d_->lastIndexIn( str, offset, length );
@@ -393,17 +463,18 @@ int RegExp::pos(int nth) const
     return d_->pos(nth);
 }
 
+
 /// The length of nth element
 int RegExp::len(int nth) const
 {
     return d_->len(nth);
 }
 
+
 /// This method returns the given matched length
 QString RegExp::cap(int nth) const
 {
     return d_->cap(nth);
 }
-
 
 } // edbee

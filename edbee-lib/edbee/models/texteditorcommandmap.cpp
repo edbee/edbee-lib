@@ -5,6 +5,7 @@
 
 #include "texteditorcommandmap.h"
 
+#include "edbee/commands/commentcommand.h"
 #include "edbee/commands/copycommand.h"
 #include "edbee/commands/cutcommand.h"
 #include "edbee/commands/debugcommand.h"
@@ -80,6 +81,7 @@ TextEditorCommandMap::TextEditorCommandMap(QObject* parent)
 
     // special text entry commands
     give( "duplicate", new DuplicateCommand() );
+    give( "toggle_comment", new CommentCommand() );
 
     // tab entry
     //give( "tab", new ReplaceSelectionCommand( "\t", CoalesceId_InsertTab ));
@@ -117,6 +119,7 @@ TextEditorCommandMap::TextEditorCommandMap(QObject* parent)
 
     give( "select_under_expand", new FindCommand( FindCommand::SelectUnderExpand ));
     give( "select_all_under", new FindCommand( FindCommand::SelectAllUnder ));
+
 }
 
 

@@ -111,7 +111,6 @@ public:
     /// And the newlines are already added to the newline list!
     virtual void rawAppendEnd() = 0;
 
-
     /// This method returns the raw data buffer.
     /// WARNING this method CAN be slow because when using a gapvector the gap is moved to the end to make a full buffer
     /// Modifying the content of the data will mess up the line-offset-vector and other dependent classes. For reading it's ok :-)
