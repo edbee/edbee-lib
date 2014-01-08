@@ -28,7 +28,15 @@ class TextLineDataManager;
 class TextRangeSet;
 class TextUndoStack;
 
-/// this is the base and abstract class of a text document
+/// This is the base and abstract class of a text document
+/// A TextDocument is the model part of the editor.
+///
+/// It's the main owner of the following objects:
+/// - A textbuffer, which holds the character data. Currently there's only a CharTextBuffer, a gap-vectored buffer.
+/// - An undostack, a stack which holds the undo-operations of the editor
+/// - the textdocument scopes, these are the language-dependent scopes found in the current document
+/// - A textlexer, which is used for (re-)building the textdocument scopes.
+///
 class TextDocument : public QObject
 {
 

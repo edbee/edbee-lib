@@ -335,6 +335,14 @@ TextSearcher *TextEditorController::textSearcher()
 }
 
 
+/// this method returns the dynamic variables object for this controller
+/// The current implementation simply returns the application-wide environment variables
+DynamicVariables* TextEditorController::dynamicVariables() const
+{
+    return Edbee::instance()->environmentVariables();
+}
+
+
 //==========================================================================================
 // Slots
 //==========================================================================================

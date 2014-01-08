@@ -39,7 +39,8 @@ SOURCES += \
     edbee/models/changes/linedatalistchangetest.cpp \
     edbee/models/changes/textchangetest.cpp \
     edbee/models/changes/mergablechangegrouptest.cpp \
-    edbee/util/rangesetlineiteratortest.cpp
+    edbee/util/rangesetlineiteratortest.cpp \
+    edbee/models/dynamicvariablestest.cpp
 
 HEADERS += \
 	edbee/commands/replaceselectioncommandtest.h \
@@ -65,7 +66,8 @@ HEADERS += \
     edbee/models/changes/linedatalistchangetest.h \
     edbee/models/changes/textchangetest.h \
     edbee/models/changes/mergablechangegrouptest.h \
-    edbee/util/rangesetlineiteratortest.h
+    edbee/util/rangesetlineiteratortest.h \
+    edbee/models/dynamicvariablestest.h
 
 #OTHER_FILES += ../edbee-data/config/*
 #OTHER_FILES += ../edbee-data/keymaps/*

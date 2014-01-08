@@ -820,6 +820,7 @@ void TextDocumentScopes::removeScopesAfterOffset(int offset)
     }
 }
 
+
 /// This method retursn the default scoped textrange
 /// Currently this is done very dirty, by retrieving the defaultscoped range the begin and end is set tot he complete document
 /// a better solution would be a subclass that always returns 0 for an anchor and the documentlength for the caret
@@ -828,6 +829,7 @@ MultiLineScopedTextRange& TextDocumentScopes::defaultScopedRange()
     defaultScopedRange_.set(0,textDocument()->length() );   // make sure this is always set like this
     return defaultScopedRange_;
 }
+
 
 /// This method returns all scope-ranges at the given offset-ranges
 QVector<MultiLineScopedTextRange*> TextDocumentScopes::scopedRangesBetweenOffsets(int offsetBegin, int offsetEnd)
@@ -848,9 +850,9 @@ QVector<MultiLineScopedTextRange*> TextDocumentScopes::scopedRangesBetweenOffset
 
 
 /// returns all scopes between the given offsets
-QVector<TextScope *> TextDocumentScopes::scopesAtOffset( int offset )
+TextScopeList TextDocumentScopes::scopesAtOffset( int offset )
 {
-    QVector<TextScope*> result;
+    TextScopeList result;
 
 //    qlog_info() << "";
 //    qlog_info() <<  "------------[ scopesAtOffset("<<offset<<") ] --------";

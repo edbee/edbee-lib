@@ -5,9 +5,11 @@
 
 #include "commentcommand.h"
 
+#include "edbee/models/dynamicvariables.h"
 #include "edbee/models/texteditorconfig.h"
 #include "edbee/models/textbuffer.h"
 #include "edbee/models/textdocument.h"
+#include "edbee/models/textdocumentscopes.h"
 #include "edbee/views/textselection.h"
 #include "edbee/texteditorcontroller.h"
 #include "edbee/util/rangesetlineiterator.h"
@@ -124,7 +126,18 @@ static void insertLineComments( TextEditorController* controller, const QString&
 /// @param controller the controller this command is executed for
 void CommentCommand::execute(TextEditorController* controller)
 {
-    QString commentStart = "// ";    // TODO, we need to get this value from the current context (scope)
+
+// TODO: We need to determine the scope per RANGE !!!!!!!!!!!!!
+// Currently we simply take the first one
+    TextDocument* doc = controller->textDocument();
+    TextDocumentScopes* scopes = doc->scopes();
+    TextScopeList list = scopes->scopesAtOffset( controller->textSelection()->range(0).min() );
+
+    // get the comment
+    QString commentStart = controller->dynamicVariables()->value("TM_COMMENT_START", &list ).toString();
+    if( commentStart.isEmpty() ) {
+        return;
+    }
     RegExp commentStartRegExp( QString("^\\s*%1").arg( RegExp::escape(commentStart.trimmed() ) ) );
 
     // Iterate over the lines (TODO, implement this)

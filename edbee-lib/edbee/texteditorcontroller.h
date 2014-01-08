@@ -14,9 +14,10 @@ class QAction;
 
 namespace edbee {
 
+class ChangeGroup;
+class DynamicVariables;
 class TextBufferChange;
 class TextCaretCache;
-class ChangeGroup;
 class TextCommand;
 class TextDocument;
 class TextEditorCommand;
@@ -77,6 +78,7 @@ public:
     TextCaretCache* textCaretCache() const;
     void giveTextSearcher( TextSearcher* searcher );
     TextSearcher* textSearcher();
+    DynamicVariables* dynamicVariables() const;
 
 signals:
 

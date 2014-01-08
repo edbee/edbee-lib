@@ -9,6 +9,7 @@
 
 namespace edbee {
 
+class DynamicVariables;
 class TextCodecManager;
 class TextEditorCommandMap;
 class TextEditorKeyMap;
@@ -49,6 +50,7 @@ public:
     TextGrammarManager* grammarManager();
     TextThemeManager* themeManager();
     TextKeyMapManager* keyMapManager();
+    DynamicVariables* environmentVariables();
 
 
 protected:
@@ -65,6 +67,7 @@ protected:
     TextGrammarManager* grammarManager_;        ///< The grammar manager
     TextThemeManager* themeManager_;            ///< The text theme manager
     TextKeyMapManager* keyMapManager_;          ///< The keymap manager
+    DynamicVariables* environmentVariables_;    ///< The (dynamic) environment variables
 
 };
 
