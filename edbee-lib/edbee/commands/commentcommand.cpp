@@ -51,7 +51,7 @@ static bool areAllLinesCommented( TextEditorController* controller, RegExp& comm
 /// @param commentStart the start of the comment
 static void removeLineComment( TextEditorController* controller, const QString& commentStart  )
 {
-    RegExp regExp( QString("^\\s*(%1[^\S\n]?)").arg( RegExp::escape(commentStart.trimmed() ) ) );
+    RegExp regExp( QString("^\\s*(%1[^\\S\n]?)").arg( RegExp::escape(commentStart.trimmed() ) ) );
 
     TextDocument* doc = controller->textDocument();
     TextBuffer* buf = doc->buffer();
