@@ -51,7 +51,7 @@ static bool areAllLinesCommented( TextEditorController* controller, RegExp& comm
 /// @param commentStart the start of the comment
 static void removeLineComment( TextEditorController* controller, const QString& commentStart  )
 {
-    RegExp regExp( QString("^\\s*(%1\\s?)").arg( RegExp::escape(commentStart.trimmed() ) ) );
+    RegExp regExp( QString("^\\s*(%1[^\S\n]?)").arg( RegExp::escape(commentStart.trimmed() ) ) );
 
     TextDocument* doc = controller->textDocument();
     TextBuffer* buf = doc->buffer();
@@ -61,16 +61,17 @@ static void removeLineComment( TextEditorController* controller, const QString& 
     TextRangeSet* newSelection = new TextRangeSet(controller->textSelection());
 
     RangeSetLineIterator itr( controller->textSelection() );
+    int totalDeleted = 0;
     while( itr.hasNext() ) {
 
         // directly search in the raw data pointer buffer to prevent QString creation
         int line = itr.next();
         int offset = doc->offsetFromLine(line);
 
-        // when there's no comment found at this line return false
-        if( regExp.indexIn( buf->rawDataPointer(), offset, offset + doc->lineLength(line) - 1 ) >= 0 ) {
+        if( regExp.indexIn( buf->rawDataPointer(), offset, offset + doc->lineLength(line) ) >= 0 ) {
             ranges.addRange( regExp.pos(1), regExp.pos(1) + regExp.len(1) );
-            newSelection->changeSpatial( regExp.pos(1), regExp.len(1), 0 );
+            newSelection->changeSpatial( regExp.pos(0)-totalDeleted, regExp.len(1), 0, false);
+            totalDeleted += regExp.len(1);
         }
     }
 
@@ -98,6 +99,7 @@ static void insertLineComments( TextEditorController* controller, const QString&
 
     // iterate over all lines
     RangeSetLineIterator itr( controller->textSelection() );
+    int totalInserted = 0;
     while( itr.hasNext() ) {
 
         // directly search in the raw data pointer buffer to prevent QString creation
@@ -107,7 +109,9 @@ static void insertLineComments( TextEditorController* controller, const QString&
         // when there's no comment found at this line return false
         int wordStart = buf->findCharPosWithinRangeOrClamp( offset, 1, doc->config()->whitespaces(), false, offset, offset + doc->lineLength(line)-1);
         ranges.addRange(wordStart,wordStart);
-        newSelection->changeSpatial( wordStart, 0, str.length() );
+        newSelection->changeSpatial( wordStart+totalInserted, 0, str.length() );
+//totalInserted
+        totalInserted += str.length();
     }
 
     // shouldn't be empty, but just in case
@@ -135,6 +139,7 @@ void CommentCommand::execute(TextEditorController* controller)
 
     // get the comment
     QString commentStart = controller->dynamicVariables()->value("TM_COMMENT_START", &list ).toString();
+    //QString commentEnd = controller->dynamicVariables()->value("TM_COMMENT_END", &list ).toString();
     if( commentStart.isEmpty() ) {
         return;
     }
