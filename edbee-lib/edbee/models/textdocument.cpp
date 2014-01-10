@@ -416,6 +416,15 @@ int TextDocument::lineLength(int line)
 }
 
 
+/// returns the length of the given lilne without the newline
+/// @param line the line number
+/// @return the length of the line excluding the newline character
+int TextDocument::lineLengthWithoutNewline(int line)
+{
+    return buffer()->lineLengthWithoutNewline(line);
+}
+
+
 /// Returns the document text as a QString
 /// @return the complete document context
 QString TextDocument::text()

@@ -120,18 +120,18 @@ public:
 // easy functions
 
     /// Replace the given text.
-    virtual void replaceText( int offset, int length, const QString& text ) { replaceText( offset, length, text.data(), text.length() ); }
+    virtual void replaceText( int offset, int length, const QString& text );
 
-    /// return the given text. Warning this reference is only valid during as long as the document is modified
-    QString text() { return textPart(0, length()); }
-    void setText( const QString& text ) { replaceText( 0, length(), text.data(), text.length() ); }
+    QString text();
+    void setText( const QString& text );
     virtual int columnFromOffsetAndLine( int offset, int line=-1 );
-    virtual void appendText( const QString& text ) { replaceText(length(),0,text.data(), text.length() ); }
+    virtual void appendText( const QString& text );
     virtual int offsetFromLineAndColumn( int line, int col );
     virtual QString line( int line);
     virtual QString lineWithoutNewline( int line );
 
-    virtual int lineLength(int line) { return offsetFromLine(line+1) - offsetFromLine(line); }
+    virtual int lineLength(int line);
+    virtual int lineLengthWithoutNewline(int line);
     virtual void replaceText( const TextRange& range, const QString& text  );
 
     virtual int findCharPos( int offset, int direction, const QString& chars, bool equals );
@@ -142,13 +142,6 @@ public:
     virtual QString lineOffsetsAsString();
 
  signals:
-
-
-//    void textAboutToBeReplaced( int offset, int length, const QChar* data, int dataLength );
-//    void textReplaced( int offset, int length, const QChar* data, int dataLength );
-
-//    void linesAboutToBeReplaced( int line, int lineCount, int newLineCount );
-//    void linesReplaced( int line, int lineCount, int newLineCount );
 
     void textAboutToBeChanged( edbee::TextBufferChange change );
     void textChanged( edbee::TextBufferChange change );

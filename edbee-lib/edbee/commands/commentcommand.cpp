@@ -31,7 +31,14 @@ static bool areAllLinesCommented( TextEditorController* controller, RegExp& comm
     // iterate over all lines
     RangeSetLineIterator itr( controller->textSelection() );
     while( itr.hasNext() ) {
+
         int line = itr.next();
+        int lineLength = doc->lineLengthWithoutNewline(line);
+
+        // when it's the last line and its blank, we must skip it
+        if( !itr.hasNext() && lineLength == 0 ) {
+            continue;
+        }
 
         // directly search in the raw data pointer buffer to prevent QString creation
         int offset = doc->offsetFromLine(line);
@@ -51,7 +58,7 @@ static bool areAllLinesCommented( TextEditorController* controller, RegExp& comm
 /// @param commentStart the start of the comment
 static void removeLineComment( TextEditorController* controller, const QString& commentStart  )
 {
-    RegExp regExp( QString("^\\s*(%1[^\\S\n]?)").arg( RegExp::escape(commentStart.trimmed() ) ) );
+    RegExp regExp( QString("^[^\\S\n]*(%1[^\\S\n]?)").arg( RegExp::escape(commentStart.trimmed() ) ) );
 
     TextDocument* doc = controller->textDocument();
     TextBuffer* buf = doc->buffer();
@@ -105,9 +112,15 @@ static void insertLineComments( TextEditorController* controller, const QString&
         // directly search in the raw data pointer buffer to prevent QString creation
         int line = itr.next();
         int offset = doc->offsetFromLine(line);
+        int lineLength = doc->lineLengthWithoutNewline(line);
+
+        // when it's the last line and its blank, we must skip it
+        if( !itr.hasNext() && lineLength == 0 ) {
+            continue;
+        }
 
         // when there's no comment found at this line return false
-        int wordStart = buf->findCharPosWithinRangeOrClamp( offset, 1, doc->config()->whitespaces(), false, offset, offset + doc->lineLength(line)-1);
+        int wordStart = buf->findCharPosWithinRangeOrClamp( offset, 1, doc->config()->whitespaces(), false, offset, offset + lineLength );
         ranges.addRange(wordStart,wordStart);
         newSelection->changeSpatial( wordStart+totalInserted, 0, str.length() );
 //totalInserted

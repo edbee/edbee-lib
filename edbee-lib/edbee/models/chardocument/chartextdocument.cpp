@@ -77,6 +77,13 @@ CharTextDocument::~CharTextDocument()
 }
 
 
+/// Returns the active textbuffer
+TextBuffer*CharTextDocument::buffer() const
+{
+    return textBuffer_;
+}
+
+
 /// returns the language grammar
 TextGrammar *CharTextDocument::languageGrammar()
 {

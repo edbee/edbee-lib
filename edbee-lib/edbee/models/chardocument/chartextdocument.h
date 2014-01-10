@@ -31,7 +31,7 @@ public:
 
 
     /// This method should return the active textbuffer
-    virtual TextBuffer* buffer() { return textBuffer_; }
+    virtual TextBuffer* buffer() const;
 
     /// this method can be used to give a 'custom' line data item to a given line
     virtual TextLineDataManager* lineDataManager() { return textLineDataManager_; }

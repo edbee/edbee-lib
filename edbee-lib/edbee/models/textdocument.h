@@ -49,7 +49,7 @@ public:
 
     /// This method should return the active textbuffer
     /// Warning you should NEVER directly modify the textbuffer unless you're absolutely sure what you're doing!
-    virtual TextBuffer* buffer() = 0 ;
+    virtual TextBuffer* buffer() const = 0 ;
 
     /// This method can be used to change the number of reserved fields by the document
     /// Increasing the amount will result in a realoc
@@ -140,6 +140,7 @@ public:
     int columnFromOffsetAndLine( int offset, int line=-1 );
     int offsetFromLineAndColumn( int line, int column );
     int lineLength( int line );
+    int lineLengthWithoutNewline( int line );
     QString text();
     QString textPart( int offset, int length );
     QString lineWithoutNewline( int line );
