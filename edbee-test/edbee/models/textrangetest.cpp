@@ -502,4 +502,49 @@ void TextRangeSetTest::testMergeOverlappingRanges()
 }
 
 
+//=================================================================================
+
+
+/// Testing the dynamic rangeset
+void DynamicTextRangeSetTest::testDynamicChanges()
+{
+    TextEditorController controller;
+    TextDocument* doc = controller.textDocument();
+    doc->setText("abcdefg");
+
+    DynamicTextRangeSet set(doc);
+    set.addRange(0,0);
+    set.addRange(1,1);
+    set.addRange(2,3);
+    testEqual( set.rangesAsString(), "0>0,1>1,2>3" );
+//    doc->replace(1,0,"123");
+
+    // insert the string
+    doc->replace(1,0,"123");
+    testEqual( doc->text(), "a123bcdefg" );
+    testEqual( set.rangesAsString(), "0>0,4>4,5>6" );
+
+    // test removing an item
+    set.range(0).set(1,2);
+    testEqual( set.rangesAsString(), "1>2,4>4,5>6" );
+
+    // test if a replace results in the deleton of a range
+    doc->replace(1,3,"");
+    testEqual( doc->text(), "abcdefg" );
+    testEqual( set.rangesAsString(), "1>1,2>3" );
+
+    // in non-sticky mode this should move the caret
+    doc->replace(1,0,"X");
+    testEqual( doc->text(), "aXbcdefg" );
+    testEqual( set.rangesAsString(), "2>2,3>4" );
+
+    // in non-sticky mode this should not move the caret
+    set.setStickyMode(true);
+    doc->replace(2,0,"Y");
+    testEqual( doc->text(), "aXYbcdefg" );
+    testEqual( set.rangesAsString(), "2>2,4>5" );
+
+}
+
+
 } // edbee

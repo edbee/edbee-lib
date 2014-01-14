@@ -923,26 +923,35 @@ void TextRangeSetBase::changeSpatial(int pos, int length, int newLength, bool st
     for( int i=rangeCount()-1; i>=0; --i ) {
 
         TextRange& range = this->range(i);
-//if( &range == rangeToSkip ) { continue; }
 
-        int anchor = range.anchor();
-        int caret  = range.caret();
+        int& min = range.minVar();
+        int& max = range.maxVar();
+
+        // cut 'off' the endpos
+        if( pos <= min && min < endPos ) {
+            min = endPos;
+            // when the range becomes invalid simply remove it
+            if( min > max ) {
+                removeRange(i);
+                continue;
+            }
+        }
 
         // anchor
-        if( pos < anchor && anchor < endPos ) {
-            anchor = newEndPos;
-        } else if( anchor > (pos+stickyDelta) ) {
-            anchor  += delta;
+        if( pos < min && min < endPos ) {
+            min = newEndPos;
+        } else if( min > (pos+stickyDelta) ) {
+            min  += delta;
         }
 
         // caret
-        if( pos < caret && caret < endPos ) {
-            caret  = newEndPos;
-        } else if( caret > (pos+stickyDelta) ) {
-            caret  += delta;
+        if( pos < max && max < endPos ) {
+            max  = newEndPos;
+        } else if( max > (pos+stickyDelta) ) {
+            max  += delta;
         }
 
-        range.set( anchor, caret );
+        range.set( min, max );
     }
     endChanges();
 }
@@ -1047,6 +1056,79 @@ void TextRangeSet::sortRanges()
 {
     qSort(selectionRanges_.begin(), selectionRanges_.end(), TextRange::lessThan );
 }
+
+
+// =====================================
+
+
+
+/// Constructs the dynamic textrange set with a document
+/// @param doc the document to use
+/// @param stickyMode is the stickymode enabled
+/// @param parent the parent owner
+DynamicTextRangeSet::DynamicTextRangeSet(TextDocument* doc, bool stickyMode, QObject* parent)
+    : QObject(parent)
+    , TextRangeSet(doc)
+    , stickyMode_( stickyMode )
+{
+    connect( textDocument(), &TextDocument::textChanged, this, &DynamicTextRangeSet::textChanged );
+}
+
+
+/// Constructs the dynamic textrange set with an existing rangeset
+/// @param sel the text range to copy
+/// @param stickyMode is the stickymode enabled
+/// @param parent the parent owner
+DynamicTextRangeSet::DynamicTextRangeSet(const TextRangeSet& sel, bool stickyMode, QObject* parent)
+    : QObject(parent)
+    , TextRangeSet(sel)
+    , stickyMode_( stickyMode )
+{
+    connect( textDocument(), &TextDocument::textChanged, this, &DynamicTextRangeSet::textChanged );
+}
+
+
+/// constructs the dynamic rangeset
+/// @param sel the text range to copy
+/// @param stickyMode is the stickymode enabled
+/// @param parent the parent owner
+DynamicTextRangeSet::DynamicTextRangeSet(const TextRangeSet* sel, bool stickyMode, QObject* parent)
+    : QObject(parent)
+    , TextRangeSet(sel)
+    , stickyMode_( stickyMode )
+{
+    connect( textDocument(), &TextDocument::textChanged, this, &DynamicTextRangeSet::textChanged );
+}
+
+
+/// destructs the reviever
+DynamicTextRangeSet::~DynamicTextRangeSet()
+{
+    disconnect();
+}
+
+
+/// Is the stickymode enabled
+/// @param mode the mode that is sticky
+void DynamicTextRangeSet::setStickyMode(bool mode)
+{
+    stickyMode_ = mode;
+}
+
+
+/// returns the current stickymode
+bool DynamicTextRangeSet::stickyMode() const
+{
+    return stickyMode_;
+}
+
+
+/// This method is notified if a change happens to the textbuffer
+void DynamicTextRangeSet::textChanged(edbee::TextBufferChange change)
+{
+    changeSpatial( change.offset(), change.length(), change.newTextLength(), stickyMode_ );
+}
+
 
 
 } // edbee

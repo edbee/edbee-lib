@@ -8,6 +8,7 @@
 #include <QObject>
 #include <QVector>
 
+#include "edbee/models/textbuffer.h"
 
 namespace edbee {
 
@@ -91,7 +92,7 @@ private:
 //======================================================================
 
 
-/// This class represents a set of textranges
+/// This abstract class represents a set of textranges
 /// The ranges are kept ordered and will not contain overlapping regions.
 ///
 /// Every method automaticly orders and merges overlapping ranges.
@@ -215,7 +216,36 @@ public:
 private:
 
     QVector<TextRange> selectionRanges_;     ///< A list of selection ranges. After endChanges this array is sorted and non-overlapping!
+};
 
+
+//======================================================================
+
+
+/// A smart QObject implemenation of a TextRangeSet which listens to changes
+/// in the document. When a change happens it's changes the spatial of the ranges
+///
+/// The stickymode is used to change the behavior of the changes the the textChange event.
+/// To put it simple, you should enable stickymode if this selection is the one you are
+/// using to modify the document
+class DynamicTextRangeSet : public QObject, public TextRangeSet
+{
+Q_OBJECT
+
+public:
+    DynamicTextRangeSet( TextDocument* doc, bool stickyMode=false, QObject* parent=0 );
+    DynamicTextRangeSet( const TextRangeSet& sel, bool stickyMode=false, QObject* parent=0 );
+    DynamicTextRangeSet( const TextRangeSet* sel, bool stickyMode=false, QObject* parent=0 );
+    virtual ~DynamicTextRangeSet();
+
+    void setStickyMode( bool mode );
+    bool stickyMode() const;
+
+public slots:
+    void textChanged( edbee::TextBufferChange change );
+
+private:
+    bool stickyMode_;                       ///< Sticky mode means if this rangeset is the current selection (This requires a different approach)
 };
 
 

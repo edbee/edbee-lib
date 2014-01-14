@@ -66,7 +66,19 @@ private:
 };
 
 
+/// Tests the dynamic rangeset
+class DynamicTextRangeSetTest : public edbee::test::TestCase
+{
+    Q_OBJECT
+
+private slots:
+    void testDynamicChanges();
+
+};
+
+
 } // edbee
 
 DECLARE_NAMED_TEST(range, edbee::TextRangeTest);
 DECLARE_TEST(edbee::TextRangeSetTest);
+DECLARE_NAMED_TEST(dynamic,edbee::DynamicTextRangeSetTest);
