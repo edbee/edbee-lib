@@ -20,7 +20,8 @@ class CommentCommand : public TextEditorCommand
 {
 public:
     virtual void execute( TextEditorController* controller );
-    virtual QString toString();
+    virtual QString toString(); 
+
 };
 
 

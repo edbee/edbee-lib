@@ -73,6 +73,7 @@ public:
     void moveCaretToLineBoundary( TextDocument* doc, int amount, const QString& whitespace );
 
     void expandToFullLine( TextDocument* doc, int amount );
+    void deselectTrailingNewLine( TextDocument* doc );
     void expandToWord( TextDocument* doc, const QString& whitespace, const QStringList& characterGroups );
     void expandToIncludeRange( TextRange& range );
 

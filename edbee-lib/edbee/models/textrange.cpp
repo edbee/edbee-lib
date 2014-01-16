@@ -275,6 +275,15 @@ void TextRange::expandToFullLine(TextDocument* doc, int amount)
 }
 
 
+/// This method deselects the last character if it's a newline.
+void TextRange::deselectTrailingNewLine(TextDocument* doc)
+{
+    if( caret_ != anchor_ && doc->charAtOrNull(max()-1)=='\n' ) {
+        --maxVar();
+    }
+}
+
+
 /// Internal method, for finding a character group with the given character
 static QString findCharGroup( QChar c, const QString& whitespace, const QStringList& characterGroups )
 {

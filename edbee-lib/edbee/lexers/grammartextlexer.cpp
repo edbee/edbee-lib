@@ -410,7 +410,7 @@ bool GrammarTextLexer::lexLine( int lineIdx, int& currentDocOffset )
 
     // append the active ranges
     for( int i=0,cnt=activeMultiLineRangesRefList_.size(); i<cnt; ++i ) {
-        ScopedTextRange* range = new ScopedTextRange( *activeMultiLineRangesRefList_.at(i) );
+        MultiLineScopedTextRangeReference* range = new MultiLineScopedTextRangeReference( *activeMultiLineRangesRefList_.at(i) );
         range->setAnchor(0);
         range->setCaret(line.length());
         lineRangeList_->giveRange( range );
@@ -517,7 +517,7 @@ void GrammarTextLexer::lexLines(int lineStart,int lineCount)
 
     // next find all 'active' scoped ranges
     int offsetStart = doc->offsetFromLine(lineStart);
-    activeMultiLineRangesRefList_ = docScopes->scopedRangesBetweenOffsets( offsetStart, offsetStart);
+    activeMultiLineRangesRefList_ = docScopes->multiLineScopedRangesBetweenOffsets( offsetStart, offsetStart);
 
 //    GrammarRule* activeRule = grammarRef_->mainRule();
 //    if( !activeScopedRanges.isEmpty() ) { activeRule = activeScopedRanges.last()->grammarRule(); }

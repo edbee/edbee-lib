@@ -28,12 +28,13 @@ ScopedTextRange::ScopedTextRange(int anchor, int caret, TextScope* scope)
 
 
 /// A constructor for filling with a MultiScopedTextRange
+/*
 ScopedTextRange::ScopedTextRange(const MultiLineScopedTextRange& range)
     : TextRange( range.anchor(), range.caret() )
     , scopeRef_( range.scope() )
 {
 }
-
+*/
 
 /// The default destructor
 ScopedTextRange::~ScopedTextRange()
@@ -49,7 +50,7 @@ void ScopedTextRange::setScope(TextScope* scope)
 
 
 /// returns the scope
-TextScope*ScopedTextRange::scope() const
+TextScope* ScopedTextRange::scope() const
 {
     return scopeRef_;
 }
@@ -59,6 +60,22 @@ TextScope*ScopedTextRange::scope() const
 QString ScopedTextRange::toString() const
 {
     return QString("%1>%2:%3").arg(anchor()).arg(caret()).arg(scopeRef_->name() );
+}
+
+
+//===========================================
+
+
+/// Creates a scoped text range based on a scope textrange
+MultiLineScopedTextRangeReference::MultiLineScopedTextRangeReference(MultiLineScopedTextRange& range)
+    : ScopedTextRange( range.anchor(), range.caret(), range.scope() )
+    , multiScopeRef_( &range )
+{
+}
+
+// the destructor
+MultiLineScopedTextRangeReference::~MultiLineScopedTextRangeReference()
+{
 }
 
 
@@ -832,7 +849,7 @@ MultiLineScopedTextRange& TextDocumentScopes::defaultScopedRange()
 
 
 /// This method returns all scope-ranges at the given offset-ranges
-QVector<MultiLineScopedTextRange*> TextDocumentScopes::scopedRangesBetweenOffsets(int offsetBegin, int offsetEnd)
+QVector<MultiLineScopedTextRange*> TextDocumentScopes::multiLineScopedRangesBetweenOffsets(int offsetBegin, int offsetEnd)
 {
     QVector<MultiLineScopedTextRange*> result;
     result.append( &defaultScopedRange_ );
@@ -874,6 +891,46 @@ TextScopeList TextDocumentScopes::scopesAtOffset( int offset )
         }
     }
 //    qlog_info() << "";
+    return result;
+}
+
+
+/// This method returns all scoped ranges at the given offest
+/// Hmmm this is almost exactly the same implementation as the scopesAtOffset method !? (perhaps we should refactor this)
+///
+/// Warning you MUST destroy (qDeleteAll) the list with scoped textranges returned by this list
+///
+/// @param offset he offset to retrieve the scoped ranges
+/// @return the vector with text scopes. These scopes are document wide
+QVector<ScopedTextRange*> TextDocumentScopes::createScopedRangesAtOffsetList(int offset)
+{
+    QVector<ScopedTextRange*> result;
+
+    // retrieve the line
+    int line = textDocument()->lineFromOffset(offset);
+    int lineOffset = textDocument()->offsetFromLine(line);
+    int offsetInLine = offset-lineOffset;
+
+
+    ScopedTextRangeList* list = scopedRangesAtLine(line);
+    if( list ) {
+        //scopes.reserve( ranges.size() );
+        for( int i=0,cnt=list->size(); i<cnt; ++i ) {
+            ScopedTextRange* range = list->at(i);
+            if( range->min() <= offsetInLine && offsetInLine < range->max() ) {
+
+                // it's a multi-line scope reference
+                MultiLineScopedTextRange* ms = range->multiLineScopedTextRange();
+                if( ms ) {
+                    result.append( new ScopedTextRange( ms->min(), ms->max(), ms->scope() ) );
+
+                // it's a line scope
+                } else {
+                    result.append( new ScopedTextRange( lineOffset + range->min(), lineOffset + range->max(), range->scope() ) );
+                }
+            }
+        }
+    }
     return result;
 }
 
@@ -924,6 +981,7 @@ void TextDocumentScopes::grammarChanged()
 {
     removeScopesAfterOffset(0);
 }
+
 
 
 } // edbee

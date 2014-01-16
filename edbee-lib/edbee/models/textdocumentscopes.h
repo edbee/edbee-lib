@@ -177,24 +177,48 @@ private:
 
 //===========================================
 
+class MultiLineScopedTextRange;
+
+
 /// A base scoped text range
 class ScopedTextRange : public TextRange
 {
 public:
     ScopedTextRange( int anchor, int caret, TextScope* scope );
-    ScopedTextRange( const MultiLineScopedTextRange& range );
+//    ScopedTextRange( const MultiLineScopedTextRange& range );
     virtual ~ScopedTextRange();
 
     void setScope( TextScope* scope );
     TextScope* scope() const;
-
     QString toString() const;
+
+    /// returns the multi-line scoped text range
+    virtual MultiLineScopedTextRange* multiLineScopedTextRange() { return 0; }
 
 
 private:
     TextScope* scopeRef_;      ///< The scope for this range
 
 };
+
+//===========================================
+
+
+/// A line based ScopedText range, that referenes a multi-line text-reference
+class MultiLineScopedTextRangeReference : public ScopedTextRange
+{
+public:
+    MultiLineScopedTextRangeReference( MultiLineScopedTextRange& range );
+    virtual ~MultiLineScopedTextRangeReference();
+
+    /// returns the multi-line scoped text range
+    virtual MultiLineScopedTextRange* multiLineScopedTextRange() { return multiScopeRef_; }
+
+private:
+    MultiLineScopedTextRange* multiScopeRef_;       ///< the reference to the multi-scoped textrange that defined this scope
+};
+
+
 
 //===========================================
 
@@ -324,8 +348,9 @@ public:
     MultiLineScopedTextRange& defaultScopedRange();
 
 
-    QVector<MultiLineScopedTextRange*> scopedRangesBetweenOffsets( int offsetBegin, int offsetEnd );
+    QVector<MultiLineScopedTextRange*> multiLineScopedRangesBetweenOffsets( int offsetBegin, int offsetEnd );
     TextScopeList scopesAtOffset( int offset );
+    QVector<ScopedTextRange*> createScopedRangesAtOffsetList( int offset );
 
     QString toString();
     QStringList scopesAsStringList();

@@ -86,7 +86,8 @@ SOURCES += \
     edbee/models/changes/mergablechangegroup.cpp \
     edbee/commands/commentcommand.cpp \
     edbee/util/rangesetlineiterator.cpp \
-    edbee/models/dynamicvariables.cpp
+    edbee/models/dynamicvariables.cpp \
+    edbee/util/rangelineiterator.cpp
 
 HEADERS += \
     util/logging.h \
@@ -159,7 +160,8 @@ HEADERS += \
     edbee/models/changes/mergablechangegroup.h \
     edbee/commands/commentcommand.h \
     edbee/util/rangesetlineiterator.h \
-    edbee/models/dynamicvariables.h
+    edbee/models/dynamicvariables.h \
+    edbee/util/rangelineiterator.h
     
 message($$INCLUDEPATH)
 

@@ -5,6 +5,7 @@
 
 #include "commentcommand.h"
 
+#include "edbee/edbee.h"
 #include "edbee/models/dynamicvariables.h"
 #include "edbee/models/texteditorconfig.h"
 #include "edbee/models/textbuffer.h"
@@ -12,7 +13,7 @@
 #include "edbee/models/textdocumentscopes.h"
 #include "edbee/views/textselection.h"
 #include "edbee/texteditorcontroller.h"
-#include "edbee/util/rangesetlineiterator.h"
+#include "edbee/util/rangelineiterator.h"
 #include "edbee/util/regexp.h"
 
 #include "debug.h"
@@ -20,16 +21,23 @@
 namespace edbee {
 
 // TODO, we also need to support, block-comments
+// TODO, we need to rewrite this to make it better testable
 
 
-/// this method checks if the selection needs to be added
-static bool areAllLinesCommented( TextEditorController* controller, RegExp& commentStart )
+/// This method checks if all lines are comment
+/// @param doc the document to check
+/// @param range the range for checking all commented lines
+/// @param commentStart the text used as the line comment prefix
+/// @return true if all lines are commented
+static bool areAllLinesCommented( TextDocument* doc, TextRange& range, const QString& commentStart )
 {
-    TextDocument* doc = controller->textDocument();
+    RegExp commentStartRegExp( QString("^\\s*%1").arg( RegExp::escape(commentStart.trimmed() ) ) );
+
+    // we directly check in the buffer for fast regexp without QString creation
     TextBuffer* buf = doc->buffer();
 
     // iterate over all lines
-    RangeSetLineIterator itr( controller->textSelection() );
+    RangeLineIterator itr( doc, range );
     while( itr.hasNext() ) {
 
         int line = itr.next();
@@ -44,69 +52,50 @@ static bool areAllLinesCommented( TextEditorController* controller, RegExp& comm
         int offset = doc->offsetFromLine(line);
 
         /// when there's no comment found at this line return false
-        if( commentStart.indexIn( buf->rawDataPointer(), offset, offset+doc->lineLength(line)-1 ) < 0 ) {
+        if( commentStartRegExp.indexIn( buf->rawDataPointer(), offset, offset+doc->lineLength(line)-1 ) < 0 ) {
             return false;
         }
-
     }
     return true;
 }
 
 
-/// removes all comments
-/// @param controller the controller to operate on
-/// @param commentStart the start of the comment
-static void removeLineComment( TextEditorController* controller, const QString& commentStart  )
+/// removes all line comments from the iven line
+/// @param doc the document to change
+/// @param range the range to remove the comments
+/// @param commentStart the text used as the line comment prefix
+static void removeLineComment( TextDocument* doc, TextRange& range, const QString& commentStart  )
 {
     RegExp regExp( QString("^[^\\S\n]*(%1[^\\S\n]?)").arg( RegExp::escape(commentStart.trimmed() ) ) );
-
-    TextDocument* doc = controller->textDocument();
     TextBuffer* buf = doc->buffer();
 
     // iterate over all lines and build all ranges
-    TextRangeSet ranges(doc);
-    TextRangeSet* newSelection = new TextRangeSet(controller->textSelection());
-
-    RangeSetLineIterator itr( controller->textSelection() );
-    int totalDeleted = 0;
+    RangeLineIterator itr( doc, range );
     while( itr.hasNext() ) {
 
         // directly search in the raw data pointer buffer to prevent QString creation
         int line = itr.next();
         int offset = doc->offsetFromLine(line);
 
+        // perform a regexp to extract the comment that needs to be removed
         if( regExp.indexIn( buf->rawDataPointer(), offset, offset + doc->lineLength(line) ) >= 0 ) {
-            ranges.addRange( regExp.pos(1), regExp.pos(1) + regExp.len(1) );
-            newSelection->changeSpatial( regExp.pos(0)-totalDeleted, regExp.len(1), 0, false);
-            totalDeleted += regExp.len(1);
+            doc->replace( regExp.pos(1), regExp.len(1), "" );
         }
     }
 
-    // shouldn't be empty, but just in case
-    if( ranges.rangeCount() > 0 ) {
-        doc->beginChanges( controller );
-        doc->replaceRangeSet( ranges, "" );
-        doc->giveSelection( controller, newSelection );
-        doc->endChanges(0);
-    } else {
-        delete newSelection;
-    }
 }
 
 
 /// Adds comments on all line starts
-static void insertLineComments( TextEditorController* controller, const QString& str )
+/// @param doc the document to insert the comment
+/// @param range the textrange to insert comments
+/// @param str the comment prefix
+static void insertLineComments( TextDocument* doc, TextRange& range, const QString& str )
 {
-    TextDocument* doc = controller->textDocument();
     TextBuffer* buf = doc->buffer();
 
     // iterate over all lines and build all ranges
-    TextRangeSet ranges(doc);
-    TextRangeSet* newSelection = new TextRangeSet(controller->textSelection());
-
-    // iterate over all lines
-    RangeSetLineIterator itr( controller->textSelection() );
-    int totalInserted = 0;
+    RangeLineIterator itr( doc, range );
     while( itr.hasNext() ) {
 
         // directly search in the raw data pointer buffer to prevent QString creation
@@ -121,21 +110,148 @@ static void insertLineComments( TextEditorController* controller, const QString&
 
         // when there's no comment found at this line return false
         int wordStart = buf->findCharPosWithinRangeOrClamp( offset, 1, doc->config()->whitespaces(), false, offset, offset + lineLength );
-        ranges.addRange(wordStart,wordStart);
-        newSelection->changeSpatial( wordStart+totalInserted, 0, str.length() );
-//totalInserted
-        totalInserted += str.length();
+        doc->replace(wordStart,0,str);
+
+    }
+}
+
+
+/// Removes a block comment if possible
+/// @param controller the controller to perform the operation on
+/// @param range the current textrange
+/// @param commentStart the start of the commment
+/// @param commentEnd the end of the comment
+/// @return this method returns true if the block comment was remoed
+static bool removeBlockComment( TextEditorController* controller, TextRange& range, QString& commentStart, QString& commentEnd )
+{
+    TextDocument* doc = controller->textDocument();
+    TextDocumentScopes* scopes = doc->scopes();
+
+    // it seems that every language in sublime/textmate use the comment.block convention
+    TextScope* blockCommentScope = Edbee::instance()->scopeManager()->refTextScope("comment.block");
+
+    // we only fetch multi-line scoped textranges
+    int middleRange= range.min()+(range.max()-range.min())/2;
+
+    QVector<ScopedTextRange*> scopedRanges = scopes->createScopedRangesAtOffsetList(middleRange);
+    foreach( ScopedTextRange* scopedRange, scopedRanges ) {
+        TextScope* scope = scopedRange->scope();
+
+        // did we found a block comment
+        if( scope->startsWith( blockCommentScope ) ){
+            int min = scopedRange->min();
+            int max = scopedRange->max();
+
+            // when the scope starts and ends with the comment start and end remove it
+            if( doc->textPart(min, commentStart.length() ) == commentStart  &&
+                doc->textPart(max - commentEnd.length(), commentEnd.length() ) == commentEnd ) {
+
+                // * warning! * we cannot use the scoped rangeset directly
+                // when we replace a text, the scoped rangeset could be invalidated and destroyed!
+
+                // next remove the range
+                doc->replace( min, commentStart.length(), "" );
+                doc->replace( max-commentEnd.length() - commentStart.length(), commentEnd.length(), "" );
+
+                qDeleteAll(scopedRanges);
+                return true;
+            }
+        }
+    }
+    qDeleteAll(scopedRanges);
+    return false;
+}
+
+
+/// Insert a block comment
+/// Adds a comment start and end around the current text range.
+/// If the textrange is empty, it first is expanded to a full line
+/// @param controller the controller to insert a comment for
+/// @param range the range to insert a block comment for
+/// @param commentStart the start of the comment
+/// @param commentEnd the end of the comment
+/// @return the last affected range
+static int insertBlockComment( TextEditorController* controller, TextRange& range, QString& commentStart, QString& commentEnd )
+{
+    TextDocument* doc = controller->textDocument();
+
+    // for safety I don't use the range anymore. It's adjusted automaticly, but could in theory vanish
+    int min = range.min();
+    int max = range.max();
+
+    // when the range is 'blank' expand it to a full line
+    if( range.isEmpty() ) {
+        int line = doc->lineFromOffset(min);
+        min = doc->offsetFromLine(line);
+        max = min + doc->lineLengthWithoutNewline(line);
+//        range.expandToFullLine(doc,0);
+//        range.deselectTrailingNewLine(doc);
     }
 
-    // shouldn't be empty, but just in case
-    if( ranges.rangeCount() > 0 ) {
-        doc->beginChanges( controller );
-        doc->replaceRangeSet( ranges, str );
-        doc->giveSelection( controller, newSelection );
-        doc->endChanges(0);
-    } else {
-        delete newSelection;
+
+    doc->replace(min,0, commentStart);
+    doc->replace(max+commentStart.length(),0, commentEnd);
+
+    return max + commentStart.length() + commentEnd.length();
+}
+
+
+
+/// retrieve the comment start and comment for the given range
+/// @return false if no 'block' comment-structure was found
+static bool getCommandStartAndEnd( TextEditorController* controller, TextRange& range, QString& commentStart, QString& commentEnd  )
+{
+    TextDocument* doc = controller->textDocument();
+    TextDocumentScopes* scopes = doc->scopes();
+
+    // retrieve the starting scope
+    TextScopeList startScopeList = scopes->scopesAtOffset( range.min() );
+
+    // retrieve the comment start en end
+    commentStart = controller->dynamicVariables()->value("TM_COMMENT_START", &startScopeList ).toString();
+    commentEnd = controller->dynamicVariables()->value("TM_COMMENT_END", &startScopeList ).toString();
+
+    // return true if the comment isn't empty
+    return !commentStart.isEmpty();
+}
+
+
+/// Comments the given range
+/// @param controller the controller that conatins the controller
+/// @param range the range to comment
+/// @return the last affected offset
+static int commentRange( TextEditorController* controller, TextRange& range )
+{
+    QString commentStart, commentEnd;
+    if( !getCommandStartAndEnd( controller, range, commentStart, commentEnd ) ) {
+        return range.max();
     }
+//qlog_info() << "COMMAND START:" << commentStart;
+//qlog_info()<< "COMMAND END:"<< commentEnd;
+
+    // here we need to remove an active block comment, if there is one
+    if( removeBlockComment( controller, range, commentStart, commentEnd ) ) {
+        return range.max();
+    }
+
+    // no end-comment means a line comment
+    TextDocument* doc = controller->textDocument();
+    if( commentEnd.isEmpty() ) {
+
+        // we need to remove all comments
+        if( areAllLinesCommented( doc, range, commentStart ) ) {
+            removeLineComment( doc, range, commentStart);
+
+        // add comments
+        } else {
+            insertLineComments( doc, range, commentStart );
+        }
+
+    // else it's a block comment
+    } else {
+        return insertBlockComment( controller, range, commentStart, commentEnd );
+    }
+    return range.max();
 }
 
 
@@ -143,33 +259,18 @@ static void insertLineComments( TextEditorController* controller, const QString&
 /// @param controller the controller this command is executed for
 void CommentCommand::execute(TextEditorController* controller)
 {
-
-// TODO: We need to determine the scope per RANGE !!!!!!!!!!!!!
-// Currently we simply take the first one
+    // iterate over all ranges
+    TextRangeSet* selection = new DynamicTextRangeSet( controller->textSelection() );
     TextDocument* doc = controller->textDocument();
-    TextDocumentScopes* scopes = doc->scopes();
-    TextScopeList list = scopes->scopesAtOffset( controller->textSelection()->range(0).min() );
 
-    // get the comment
-    QString commentStart = controller->dynamicVariables()->value("TM_COMMENT_START", &list ).toString();
-    //QString commentEnd = controller->dynamicVariables()->value("TM_COMMENT_END", &list ).toString();
-    if( commentStart.isEmpty() ) {
-        return;
+    // start changing the document
+    doc->beginChanges(controller);
+    for( int i=0,cnt=selection->rangeCount(); i<cnt; ++i ) {
+        TextRange& range = selection->range(i);
+        commentRange( controller, range );
     }
-    RegExp commentStartRegExp( QString("^\\s*%1").arg( RegExp::escape(commentStart.trimmed() ) ) );
-
-    // Iterate over the lines (TODO, implement this)
-    bool removeComments = areAllLinesCommented( controller, commentStartRegExp );
-
-    // we to remove all comments
-    if( removeComments ) {
-        removeLineComment( controller, commentStart);
-
-    // add comments
-    } else {
-        insertLineComments( controller, commentStart );
-
-    }
+    doc->giveSelection( controller, selection );
+    doc->endChanges(0);
 }
 
 

@@ -180,8 +180,8 @@ static void initHardCodedDynamicScopes( DynamicVariables* env )
     env->setAndGiveScopedSelector( tcs2, "/*", "source.c, source.c++, source.objc, source.objc++");
     env->setAndGiveScopedSelector( tce2, "*/", "source.c, source.c++, source.objc, source.objc++");
 
-    env->setAndGiveScopedSelector( tcs2, "/*", "source.css");
-    env->setAndGiveScopedSelector( tce2, "*/", "source.css");
+    env->setAndGiveScopedSelector( tcs, "/*", "source.css");
+    env->setAndGiveScopedSelector( tce, "*/", "source.css");
 
     env->setAndGiveScopedSelector( tcs, "; ", "source.clojure");
 
