@@ -73,6 +73,7 @@ class DynamicTextRangeSetTest : public edbee::test::TestCase
 
 private slots:
     void testDynamicChanges();
+    void testDeleteMode();
 
 };
 

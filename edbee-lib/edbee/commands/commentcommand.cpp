@@ -133,32 +133,40 @@ static bool removeBlockComment( TextEditorController* controller, TextRange& ran
     // we only fetch multi-line scoped textranges
     int middleRange= range.min()+(range.max()-range.min())/2;
 
-    QVector<ScopedTextRange*> scopedRanges = scopes->createScopedRangesAtOffsetList(middleRange);
-    foreach( ScopedTextRange* scopedRange, scopedRanges ) {
-        TextScope* scope = scopedRange->scope();
+    // With this uberdirty for loop, we also check if there's a commentscope
+    // 1 character to the left. (this is required to fix the uncommnt block issue when the caret is next to the comment :)
+    for( int i=0; middleRange&&i<2; ++i) {
 
-        // did we found a block comment
-        if( scope->startsWith( blockCommentScope ) ){
-            int min = scopedRange->min();
-            int max = scopedRange->max();
+        QVector<ScopedTextRange*> scopedRanges = scopes->createScopedRangesAtOffsetList(middleRange);
+        foreach( ScopedTextRange* scopedRange, scopedRanges ) {
+            TextScope* scope = scopedRange->scope();
 
-            // when the scope starts and ends with the comment start and end remove it
-            if( doc->textPart(min, commentStart.length() ) == commentStart  &&
-                doc->textPart(max - commentEnd.length(), commentEnd.length() ) == commentEnd ) {
+            // did we found a block comment
+            if( scope->startsWith( blockCommentScope ) ){
+                int min = scopedRange->min();
+                int max = scopedRange->max();
 
-                // * warning! * we cannot use the scoped rangeset directly
-                // when we replace a text, the scoped rangeset could be invalidated and destroyed!
+                // when the scope starts and ends with the comment start and end remove it
+                if( doc->textPart(min, commentStart.length() ) == commentStart  &&
+                    doc->textPart(max - commentEnd.length(), commentEnd.length() ) == commentEnd ) {
 
-                // next remove the range
-                doc->replace( min, commentStart.length(), "" );
-                doc->replace( max-commentEnd.length() - commentStart.length(), commentEnd.length(), "" );
+                    // * warning! * we cannot use the scoped rangeset directly
+                    // when we replace a text, the scoped rangeset could be invalidated and destroyed!
 
-                qDeleteAll(scopedRanges);
-                return true;
+                    // next remove the range
+                    doc->replace( min, commentStart.length(), "" );
+                    doc->replace( max - commentEnd.length() - commentStart.length(), commentEnd.length(), "" );
+
+                    qDeleteAll(scopedRanges);
+                    return true;
+                }
             }
         }
+        qDeleteAll(scopedRanges);
+
+        // 1 char to the left
+        --middleRange;
     }
-    qDeleteAll(scopedRanges);
     return false;
 }
 
@@ -269,6 +277,7 @@ void CommentCommand::execute(TextEditorController* controller)
         TextRange& range = selection->range(i);
         commentRange( controller, range );
     }
+
     doc->giveSelection( controller, selection );
     doc->endChanges(0);
 }

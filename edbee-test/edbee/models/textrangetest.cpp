@@ -542,7 +542,47 @@ void DynamicTextRangeSetTest::testDynamicChanges()
     set.setStickyMode(true);
     doc->replace(2,0,"Y");
     testEqual( doc->text(), "aXYbcdefg" );
-    testEqual( set.rangesAsString(), "2>2,4>5" );
+    testEqual( set.rangesAsString(), "2>2,4>5" );    
+}
+
+
+/// this method tests if the delete mode works as required
+void DynamicTextRangeSetTest::testDeleteMode()
+{
+    TextEditorController controller;
+    TextDocument* doc = controller.textDocument();
+    doc->setText("abcdefg");
+
+    // when delete mode is enabled the range should be deleted
+    {
+        DynamicTextRangeSet set(doc);
+        set.setDeleteMode(true);
+        set.addRange(0,0);
+        set.addRange(2,2);
+        set.addRange(4,4);
+        testEqual( set.rangesAsString(), "0>0,2>2,4>4" );
+
+        // replace
+        doc->replace(1,2,"");
+        testEqual( doc->text(), "adefg" );
+        testEqual( set.rangesAsString(), "0>0,2>2" );
+    }
+
+    // when delete mode is disabled the range should not be deleted
+    {
+        doc->setText("abcdefg");
+        DynamicTextRangeSet set(doc);
+        set.setDeleteMode(false);
+        set.addRange(0,0);
+        set.addRange(2,2);
+        set.addRange(4,4);
+        testEqual( set.rangesAsString(), "0>0,2>2,4>4" );
+
+        // replace
+        doc->replace(1,2,"");
+        testEqual( doc->text(), "adefg" );
+        testEqual( set.rangesAsString(), "0>0,1>1,2>2" );
+    }
 
 }
 

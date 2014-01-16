@@ -920,7 +920,7 @@ TextDocument*TextRangeSetBase::textDocument() const
 /// @param length the length of the text that's changed
 /// @param newLength the new length of the text
 /// @param sticky, when sticky the caret/anchor is sticky and isn't moved if the change happens at the same location
-void TextRangeSetBase::changeSpatial(int pos, int length, int newLength, bool sticky )
+void TextRangeSetBase::changeSpatial(int pos, int length, int newLength, bool sticky , bool performDelete)
 {
     int stickyDelta = sticky ? 0 : -1;
 
@@ -941,8 +941,13 @@ void TextRangeSetBase::changeSpatial(int pos, int length, int newLength, bool st
             min = endPos;
             // when the range becomes invalid simply remove it
             if( min > max ) {
-                removeRange(i);
-                continue;
+                if( performDelete ) {
+                    removeRange(i);
+                    continue;
+                } else {
+                    range.set(pos,pos);
+                    continue;
+                }
             }
         }
 
@@ -1075,10 +1080,11 @@ void TextRangeSet::sortRanges()
 /// @param doc the document to use
 /// @param stickyMode is the stickymode enabled
 /// @param parent the parent owner
-DynamicTextRangeSet::DynamicTextRangeSet(TextDocument* doc, bool stickyMode, QObject* parent)
+DynamicTextRangeSet::DynamicTextRangeSet(TextDocument* doc, bool stickyMode, bool deleteMode, QObject* parent)
     : QObject(parent)
     , TextRangeSet(doc)
     , stickyMode_( stickyMode )
+    , deleteMode_( deleteMode )
 {
     connect( textDocument(), &TextDocument::textChanged, this, &DynamicTextRangeSet::textChanged );
 }
@@ -1088,10 +1094,11 @@ DynamicTextRangeSet::DynamicTextRangeSet(TextDocument* doc, bool stickyMode, QOb
 /// @param sel the text range to copy
 /// @param stickyMode is the stickymode enabled
 /// @param parent the parent owner
-DynamicTextRangeSet::DynamicTextRangeSet(const TextRangeSet& sel, bool stickyMode, QObject* parent)
+DynamicTextRangeSet::DynamicTextRangeSet(const TextRangeSet& sel, bool stickyMode, bool deleteMode, QObject* parent)
     : QObject(parent)
     , TextRangeSet(sel)
     , stickyMode_( stickyMode )
+    , deleteMode_( deleteMode )
 {
     connect( textDocument(), &TextDocument::textChanged, this, &DynamicTextRangeSet::textChanged );
 }
@@ -1101,10 +1108,11 @@ DynamicTextRangeSet::DynamicTextRangeSet(const TextRangeSet& sel, bool stickyMod
 /// @param sel the text range to copy
 /// @param stickyMode is the stickymode enabled
 /// @param parent the parent owner
-DynamicTextRangeSet::DynamicTextRangeSet(const TextRangeSet* sel, bool stickyMode, QObject* parent)
+DynamicTextRangeSet::DynamicTextRangeSet(const TextRangeSet* sel, bool stickyMode, bool deleteMode, QObject* parent)
     : QObject(parent)
     , TextRangeSet(sel)
     , stickyMode_( stickyMode )
+    , deleteMode_( deleteMode )
 {
     connect( textDocument(), &TextDocument::textChanged, this, &DynamicTextRangeSet::textChanged );
 }
@@ -1132,10 +1140,24 @@ bool DynamicTextRangeSet::stickyMode() const
 }
 
 
+/// Sets the delete mode
+void DynamicTextRangeSet::setDeleteMode(bool mode)
+{
+    deleteMode_ = mode;
+}
+
+
+/// Returns the current delete mode
+bool DynamicTextRangeSet::deleteMode() const
+{
+    return deleteMode_;
+}
+
+
 /// This method is notified if a change happens to the textbuffer
 void DynamicTextRangeSet::textChanged(edbee::TextBufferChange change)
 {
-    changeSpatial( change.offset(), change.length(), change.newTextLength(), stickyMode_ );
+    changeSpatial( change.offset(), change.length(), change.newTextLength(), stickyMode_, deleteMode_ );
 }
 
 

@@ -169,7 +169,7 @@ public:
 
   // changing
     //    void growSelectionAtBegin( int amount );
-    void changeSpatial(int pos, int length, int newLength, bool sticky=false );
+    void changeSpatial(int pos, int length, int newLength, bool sticky=false, bool performDelete=false);
 
     void setRange( int anchor, int caret, int index = 0 );
     void setRange( const TextRange& range , int index = 0 );
@@ -229,24 +229,31 @@ private:
 /// The stickymode is used to change the behavior of the changes the the textChange event.
 /// To put it simple, you should enable stickymode if this selection is the one you are
 /// using to modify the document
+///
+/// The delete mode is used to tell the rangeset if 'deleted' ranges need to be deleted
+/// or simply need to be moved
 class DynamicTextRangeSet : public QObject, public TextRangeSet
 {
 Q_OBJECT
 
 public:
-    DynamicTextRangeSet( TextDocument* doc, bool stickyMode=false, QObject* parent=0 );
-    DynamicTextRangeSet( const TextRangeSet& sel, bool stickyMode=false, QObject* parent=0 );
-    DynamicTextRangeSet( const TextRangeSet* sel, bool stickyMode=false, QObject* parent=0 );
+    DynamicTextRangeSet( TextDocument* doc, bool stickyMode=false, bool deleteMode=false, QObject* parent=0 );
+    DynamicTextRangeSet( const TextRangeSet& sel, bool stickyMode=false, bool deleteMode=false, QObject* parent=0 );
+    DynamicTextRangeSet( const TextRangeSet* sel, bool stickyMode=false, bool deleteMode=false, QObject* parent=0 );
     virtual ~DynamicTextRangeSet();
 
     void setStickyMode( bool mode );
     bool stickyMode() const;
+
+    void setDeleteMode( bool mode );
+    bool deleteMode() const;
 
 public slots:
     void textChanged( edbee::TextBufferChange change );
 
 private:
     bool stickyMode_;                       ///< Sticky mode means if this rangeset is the current selection (This requires a different approach)
+    bool deleteMode_;                       ///< When delete mode is enabled ranges are deleted. If it's false ranges are moved to the left
 };
 
 

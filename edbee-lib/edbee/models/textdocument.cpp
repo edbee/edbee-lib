@@ -246,8 +246,13 @@ Q_ASSERT(false);
 
 
 /// sets the selectioin for the current rangeset
+/// The selection may never be empty
+/// @param controller the controller to given the selection for
+/// @param rangeSet the rangeset with the new selection
 void TextDocument::giveSelection( TextEditorController* controller,  TextRangeSet* rangeSet)
 {
+    Q_ASSERT(rangeSet->rangeCount()>0);
+
     SelectionChange* selChange = new SelectionChange( controller );
     selChange->giveTextRangeSet( rangeSet );
     executeAndGiveChange( selChange, 0 );
