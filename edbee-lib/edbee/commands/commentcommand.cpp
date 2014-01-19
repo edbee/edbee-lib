@@ -20,8 +20,8 @@
 
 namespace edbee {
 
-// TODO, we also need to support, block-comments
 // TODO, we need to rewrite this to make it better testable
+// TODO, we need to check al TM_COMMENT_* variables to get all block and line comment style
 
 
 /// This method checks if all lines are comment
@@ -138,6 +138,7 @@ static bool removeBlockComment( TextEditorController* controller, TextRange& ran
     for( int i=0; middleRange&&i<2; ++i) {
 
         QVector<ScopedTextRange*> scopedRanges = scopes->createScopedRangesAtOffsetList(middleRange);
+
         foreach( ScopedTextRange* scopedRange, scopedRanges ) {
             TextScope* scope = scopedRange->scope();
 

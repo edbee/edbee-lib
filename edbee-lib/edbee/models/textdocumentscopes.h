@@ -16,11 +16,11 @@
 
 namespace edbee {
 
-class TextGrammarRule;
 class MultiLineScopedTextRange;
 class RegExp;
 class ScopedTextRange;
 class TextDocumentScopes;
+class TextGrammarRule;
 class TextScope;
 
 /// This type defines a single scope atom
@@ -36,21 +36,19 @@ typedef short TextScopeAtomId;
 class TextScope
 {
 public:
-
     const QString name();
     int atomCount();
     TextScopeAtomId atomAt(int idx) const;
 
     bool startsWith( TextScope* scope );
-
     int rindexOf( TextScope* scope );
-
 
 private:
     TextScope( const QString& fullScope );
+    TextScope();
     ~TextScope();
 
-    char scopeAtomCount_;              ///< the number of scope-atoms
+    char scopeAtomCount_;                 ///< the number of scope-atoms
     TextScopeAtomId* scopeAtoms_;         ///< the scope atoms
 
     friend class TextScopeManager;
@@ -150,34 +148,30 @@ public:
 
     void reset();
 
-    TextScopeAtomId wildcardId() { return wildCardId_; }
+    TextScopeAtomId wildcardId();
 
     TextScopeAtomId findOrRegisterScopeAtom( const QString& atom );
     TextScope* refTextScope( const QString& scopeString );
+    TextScope* refEmptyScope();
 
     TextScopeList* createTextScopeList(const QString &scopeListString );
 
     const QString& atomName( TextScopeAtomId id );
-//nt registerFullScope( const QString& scope );
-
-
 
 private:
     TextScopeAtomId wildCardId_;                            ///< The atom id reserved for the wildcard '*'
 
     // scope atoms
     QList<QString> atomNameList_;                           ///< All scope-atom names
-    QHash<QString,TextScopeAtomId> atomNameMap_;             ///< the scope atom map
+    QHash<QString,TextScopeAtomId> atomNameMap_;            ///< the scope atom map
 
     // full scopes
     QList<TextScope*> textScopeList_;                       ///< The list of full-scope
-    QHash<QString,TextScope*> textScopeRefMap_;              ///< The full-scope map
+    QHash<QString,TextScope*> textScopeRefMap_;             ///< The full-scope map
 };
 
 
 //===========================================
-
-class MultiLineScopedTextRange;
 
 
 /// A base scoped text range
@@ -201,6 +195,7 @@ private:
 
 };
 
+
 //===========================================
 
 
@@ -212,7 +207,7 @@ public:
     virtual ~MultiLineScopedTextRangeReference();
 
     /// returns the multi-line scoped text range
-    virtual MultiLineScopedTextRange* multiLineScopedTextRange() { return multiScopeRef_; }
+    virtual MultiLineScopedTextRange* multiLineScopedTextRange();
 
 private:
     MultiLineScopedTextRange* multiScopeRef_;       ///< the reference to the multi-scoped textrange that defined this scope
@@ -227,11 +222,13 @@ private:
 /// (Todo, this needs to be optimized)
 class ScopedTextRangeList
 {
+    Q_DISABLE_COPY(ScopedTextRangeList)
 public:
-    ScopedTextRangeList();
+
+    explicit ScopedTextRangeList();
     virtual ~ScopedTextRangeList();
 
-    int size() { return ranges_.size(); }
+    int size() const;
     ScopedTextRange* at( int idx );
     void giveRange( ScopedTextRange* at );
     void giveAndPrependRange(ScopedTextRange* range );
@@ -260,7 +257,7 @@ private:
 class MultiLineScopedTextRange : public ScopedTextRange
 {
 public:
-    MultiLineScopedTextRange( int anchor=0, int caret=0 );
+    MultiLineScopedTextRange(int anchor, int caret, TextScope* scope);
     virtual ~MultiLineScopedTextRange();
 
     void setGrammarRule( TextGrammarRule* rule );
@@ -347,13 +344,14 @@ public:
     void removeScopesAfterOffset( int offset );
     MultiLineScopedTextRange& defaultScopedRange();
 
-
     QVector<MultiLineScopedTextRange*> multiLineScopedRangesBetweenOffsets( int offsetBegin, int offsetEnd );
     TextScopeList scopesAtOffset( int offset );
     QVector<ScopedTextRange*> createScopedRangesAtOffsetList( int offset );
 
     QString toString();
     QStringList scopesAsStringList();
+
+    void dumpScopedLineAddresses( const QString& text = QString() );
 
   // getters
     TextDocument* textDocument();

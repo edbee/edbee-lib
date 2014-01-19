@@ -229,8 +229,7 @@ TextGrammarRule* GrammarTextLexer::findAndApplyNextGrammarRule( int currentDocOf
                 ScopedTextRange* range = new ScopedTextRange(startPos, line.length(), scopeRef );
                 lineRangeList_->giveRange( range );
 
-                MultiLineScopedTextRange* multiRange = new MultiLineScopedTextRange(currentDocOffset+startPos,textScopes()->textDocument()->length());
-                multiRange->setScope( scopeRef );
+                MultiLineScopedTextRange* multiRange = new MultiLineScopedTextRange( currentDocOffset+startPos, textScopes()->textDocument()->length(), scopeRef );
                 multiRange->setGrammarRule( foundRule );
                 multiRange->giveEndRegExp( createEndRegExp( foundRegExp, foundRule->endRegExpString() ) );
 
@@ -270,7 +269,7 @@ MultiLineScopedTextRange* GrammarTextLexer::activeMultiLineRange()
 
 
 /// Returns the active scoped text range
-ScopedTextRange *GrammarTextLexer::activeScopedTextRange()
+ScopedTextRange* GrammarTextLexer::activeScopedTextRange()
 {
     Q_ASSERT( !activeScopedRangesRefList_.isEmpty() );
     return activeScopedRangesRefList_.last();

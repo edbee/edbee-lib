@@ -110,7 +110,7 @@ public:
         int currentLength=this->length();
         Q_ASSERT( 0 <= offset && ((offset+length) <= currentLength) );
         Q_UNUSED(currentLength);
-        Q_ASSERT(data && "You probably mean fill :)" );
+//        Q_ASSERT(data && "You probably mean fill :)" );
 
 //if( debug ) {
 //qlog_info() << "REPLACE: " << offset << length << newLength;
