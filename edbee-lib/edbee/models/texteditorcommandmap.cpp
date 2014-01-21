@@ -81,7 +81,8 @@ TextEditorCommandMap::TextEditorCommandMap(QObject* parent)
 
     // special text entry commands
     give( "duplicate", new DuplicateCommand() );
-    give( "toggle_comment", new CommentCommand() );
+    give( "toggle_comment", new CommentCommand( false) );
+    give( "toggle_block_comment", new CommentCommand( true) );
 
     // tab entry
     //give( "tab", new ReplaceSelectionCommand( "\t", CoalesceId_InsertTab ));
