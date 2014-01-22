@@ -337,7 +337,6 @@ public:
 
     void giveLineScopedRangeList( int line, ScopedTextRangeList* list);
     ScopedTextRangeList* scopedRangesAtLine( int line );
-    void changeLineDelta( int line, int linesAdded );
     int scopedLineCount();
 
     void giveMultiLineScopedTextRange( MultiLineScopedTextRange* range );

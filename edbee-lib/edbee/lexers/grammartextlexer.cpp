@@ -354,12 +354,6 @@ void GrammarTextLexer::textChanged( const TextBufferChange& change )
         }
     }
 
-    // change the line delta
-    int lineDiff = change.newLineCount() - change.lineCount();
-    if( lineDiff ) {
-        docScopes->changeLineDelta( change.line(), lineDiff);
-    }
-
     // check if we can simply update the given scoped line
     int idx = 0;
     if( !dependent ) {
@@ -382,10 +376,10 @@ void GrammarTextLexer::textChanged( const TextBufferChange& change )
 
 
     // only remove offset when a non-indepdent offset has been changed
-    if( dependent  ) {
+//    if( dependent  ) {
         int offsetStart = doc->offsetFromLine(change.line()+idx); //lineStart);
         docScopes->removeScopesAfterOffset(offsetStart);
-    }
+//    }
 }
 
 

@@ -28,15 +28,6 @@ ScopedTextRange::ScopedTextRange(int anchor, int caret, TextScope* scope)
 }
 
 
-/// A constructor for filling with a MultiScopedTextRange
-/*
-ScopedTextRange::ScopedTextRange(const MultiLineScopedTextRange& range)
-    : TextRange( range.anchor(), range.caret() )
-    , scopeRef_( range.scope() )
-{
-}
-*/
-
 /// The default destructor
 ScopedTextRange::~ScopedTextRange()
 {
@@ -843,23 +834,6 @@ ScopedTextRangeList* TextDocumentScopes::scopedRangesAtLine(int line)
 }
 
 
-/// changes the delta of the lines
-/// @param line the line to to change
-/// @paran linesAdded the number of lines added or removed
-void TextDocumentScopes::changeLineDelta(int line, int linesAdded)
-{
-    if( linesAdded > 0 ) {
-        lineRangeList_.fill(line, 0, 0, linesAdded );
-    } else {
-        int lineCount = -linesAdded;
-        for( int i=0; i<lineCount; ++i ) {
-            delete lineRangeList_.at(line+i);
-        }
-        lineRangeList_.fill(line, lineCount, 0, 0 );
-    }
-}
-
-
 /// Returns the number of scopes lines in the lineRangeList_
 int TextDocumentScopes::scopedLineCount()
 {
@@ -1023,10 +997,6 @@ QStringList TextDocumentScopes::scopesAsStringList()
         } else {
             result.append( QString(" << null value @ %1>>").arg(i));
         }
-//        for( int listIdx=0,cnt=list->size(); listIdx<cnt; ++listIdx ) {
-//            ScopedTextRange* range = list->at(listIdx);
-//            result.append(range->toString());
-//        }
     }
 
     return result;
