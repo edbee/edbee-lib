@@ -71,23 +71,22 @@ HEADERS += \
     edbee/models/dynamicvariablestest.h \
     edbee/util/rangelineiteratortest.h
 
-#OTHER_FILES += ../edbee-data/config/*
-#OTHER_FILES += ../edbee-data/keymaps/*
-OTHER_FILES += ../edbee-data/syntaxfiles/*
-#OTHER_FILES += ../edbee-data/themes/*
+##OTHER_FILES += ../edbee-data/config/*
+##OTHER_FILES += ../edbee-data/keymaps/*
+#OTHER_FILES += ../edbee-data/syntaxfiles/*
+##OTHER_FILES += ../edbee-data/themes/*
 
 ## Extra data files
 ##==================
 
 ## Install all app data files to the application bundle
 ## TODO: We need to find a way to copy these files next to the exe file on windows (And later we need to check linux)
-APP_DATA_FILES.files = $$files(../edbee-data/*)
-APP_DATA_FILES.path = Contents/Resources
+#APP_DATA_FILES.files = $$files(../edbee-data/*)
+#APP_DATA_FILES.path = Contents/Resources
 
-QMAKE_BUNDLE_DATA += APP_DATA_FILES
+#QMAKE_BUNDLE_DATA += APP_DATA_FILES
 
-
-INCLUDEPATH += $$PWD/../edbee-lib
+#INCLUDEPATH += $$PWD/../edbee-lib
 
 ## Extra dependencies
 ##====================
@@ -97,13 +96,13 @@ include(../vendor/qslog/QsLog.pri)
 ## edbee-lib dependency
 ##=======================
 
-win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../edbee-lib/release/ -ledbee-lib
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../edbee-lib/debug/ -ledbee-lib
-else:unix:!symbian: LIBS += -L$$OUT_PWD/../edbee-lib/ -ledbee-lib
+win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../edbee-lib/release/ -ledbee
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../edbee-lib/debug/ -ledbee
+else:unix:!symbian: LIBS += -L$$OUT_PWD/../edbee-lib/ -ledbee
 
 INCLUDEPATH += $$PWD/../edbee-lib
 DEPENDPATH += $$PWD/../edbee-lib
 
-win32:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../edbee-lib/release/edbee-lib.lib
-else:win32:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../edbee-lib/debug/edbee-lib.lib
-else:unix:!symbian: PRE_TARGETDEPS += $$OUT_PWD/../edbee-lib/libedbee-lib.a
+win32:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../edbee-lib/release/edbee.lib
+else:win32:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../edbee-lib/debug/edbee.lib
+else:unix:!symbian: PRE_TARGETDEPS += $$OUT_PWD/../edbee-lib/libedbee.a

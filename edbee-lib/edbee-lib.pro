@@ -6,7 +6,7 @@
 
 QT += core gui widgets
 
-TARGET = edbee-lib
+TARGET = edbee
 TEMPLATE = lib
 CONFIG += staticlib
 
