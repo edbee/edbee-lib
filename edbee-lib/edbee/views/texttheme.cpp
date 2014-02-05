@@ -250,7 +250,7 @@ void TextThemeStyler::appendFormatRange(QList<QTextLayout::FormatRange> &rangeLi
 
 void TextThemeStyler::textDocumentChanged(edbee::TextDocument *oldDocument, edbee::TextDocument *newDocument)
 {
-    Q_ASSERT(newDocument);
+    Q_UNUSED(newDocument);
     Q_UNUSED(oldDocument);
 }
 

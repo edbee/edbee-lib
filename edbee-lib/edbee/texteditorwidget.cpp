@@ -22,6 +22,7 @@
 #include <QVBoxLayout>
 
 #include "edbee/commands/selectioncommand.h"
+#include "edbee/edbee.h"
 #include "edbee/texteditorcontroller.h"
 #include "edbee/models/change.h"
 #include "edbee/models/textdocument.h"
@@ -51,7 +52,10 @@ TextEditorWidget::TextEditorWidget( QWidget* parent)
     , scrollAreaRef_(0)
     , editCompRef_(0)
 {
+    // auto initialize edbee if this hasn't been done alread
+    Edbee::instance()->autoInit();
 
+    // create the controller
     controller_ = new TextEditorController(this );
 
     // setup the ui

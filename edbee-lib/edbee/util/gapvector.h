@@ -197,8 +197,7 @@ public:
 
     /// This method returns the item at the given index
     T at( int offset ) const {
-        int len = length();
-        Q_ASSERT( 0 <= offset && offset < len );
+        Q_ASSERT( 0 <= offset && offset < length() );
         if( offset < gapBegin_ ) {
             return items_[offset];
         } else {

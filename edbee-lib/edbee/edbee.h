@@ -35,6 +35,8 @@ public:
     void setGrammarPath( const QString& grammarPath );
     void setThemePath( const QString& themePath );
 
+    void autoInit();
+
 public slots:
     void init();
     void shutdown();

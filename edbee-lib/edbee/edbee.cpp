@@ -84,6 +84,16 @@ void Edbee::setThemePath( const QString& themePath )
 }
 
 
+/// This method automaticly initializes the edbee library it this hasn't already been done
+void Edbee::autoInit()
+{
+    if( !inited_ ) {
+        init();
+        autoShutDownOnAppExit();
+    }
+}
+
+
 /*
 static void initKeyMap( TextEditorKeyMap& km )
 {
