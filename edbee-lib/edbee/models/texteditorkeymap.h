@@ -50,8 +50,9 @@ public:
     QList<TextEditorKey*> getAll( const QString& name  ) const;
     bool has( const QString& name ) const;
 
-    void set(const QString& name, TextEditorKey *sequence );
-    void set(const QString& name, const QKeySequence& seq );
+    void add( const QString& command, TextEditorKey *sequence );
+    void add( const QString& command, const QKeySequence& seq );
+    bool add( const QString& command, const QString& seq );
 //    void set( const QString& name, const QKeySequence::StandardKey key );
     void replace(const QString& name, TextEditorKey *sequence );
 
@@ -81,10 +82,11 @@ class TextKeyMapManager
 {
 public:
     TextKeyMapManager();
-    ~TextKeyMapManager();
+    virtual ~TextKeyMapManager();
 
     void loadAllKeyMaps( const QString& path );
     void loadKeyMap( const QString& file );
+    void loadFactoryKeyMap();
 
     TextEditorKeyMap* get( const QString& name="" );
     TextEditorKeyMap* findOrCreate( const QString& name );

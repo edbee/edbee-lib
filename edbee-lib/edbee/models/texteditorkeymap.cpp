@@ -8,9 +8,9 @@
 #include <QDir>
 #include <QKeySequence>
 
+#include "edbee/data/factorykeymap.h"
 #include "edbee/io/keymapparser.h"
 #include "edbee/models/change.h"
-
 #include "edbee/texteditorcontroller.h"
 #include "edbee/models/textdocument.h"
 
@@ -25,11 +25,13 @@ TextEditorKey::TextEditorKey(const QKeySequence& seq)
 {
 }
 
+
 /// Clones the text editor key
 TextEditorKey* TextEditorKey::clone() const
 {
     return new TextEditorKey( sequence_ );
 }
+
 
 /// returns the keysequence
 const QKeySequence& TextEditorKey::sequence()
@@ -56,8 +58,8 @@ TextEditorKeyMap::TextEditorKeyMap(TextEditorKeyMap *parentKeyMap)
 //        set( i.key(), i.value() );
 //    }
 //    maxSequenceLength_ = keyMap.maxSequenceLength_;
-
 //}
+
 
 /// empty the keymap
 TextEditorKeyMap::~TextEditorKeyMap()
@@ -65,13 +67,16 @@ TextEditorKeyMap::~TextEditorKeyMap()
     qDeleteAll( keyMap_ );
 }
 
+
 /// copies the given keys to the other keymap
+/// @param keyMap the keymap to copy the keys from
 void TextEditorKeyMap::copyKeysTo(TextEditorKeyMap* keyMap)
 {
     for( QHash<QString,TextEditorKey*>::const_iterator itr = keyMap_.constBegin(); itr != keyMap_.constEnd(); ++itr ) {
         keyMap->keyMap_.insert( itr.key(), itr.value()->clone() );
     }
 }
+
 
 /// Returns the last inserted keysequence for the given command
 /// It also tries to search the parent keymap if it's available
@@ -85,6 +90,7 @@ TextEditorKey* TextEditorKeyMap::get(const QString& name) const
     return 0;
 }
 
+
 /// Returns the key sequence for the given name
 /// @param name the name of the key sequence
 /// @return a QKeySequence
@@ -94,6 +100,7 @@ QKeySequence TextEditorKeyMap::getSequence(const QString& name) const
     if( !key ){ return QKeySequence(); }
     return key->sequence();
 }
+
 
 /// Returns al list of all keysequences for the given command
 /// This method will also search the parents for the given keysequences
@@ -112,6 +119,7 @@ QList<TextEditorKey*> TextEditorKeyMap::getAll(const QString& name) const
     return result;
 }
 
+
 /// Tests if the keymap has the given action
 /// It will also search the parent key map
 bool TextEditorKeyMap::has(const QString& name) const
@@ -123,17 +131,51 @@ bool TextEditorKeyMap::has(const QString& name) const
     return result;
 }
 
-/// Sets the given key sequence to the keymap
-void TextEditorKeyMap::set(const QString& name, TextEditorKey* sequence)
+
+/// Adds the given key sequence to the keymap
+/// @param command the name of the editor command
+/// @param sequence the keysequence
+void TextEditorKeyMap::add(const QString& command, TextEditorKey* sequence)
 {
-    keyMap_.insertMulti(name,sequence);
+    keyMap_.insertMulti(command,sequence);
 }
 
 
-void TextEditorKeyMap::set(const QString &name, const QKeySequence& seq)
+/// Adds the given key sequence to the keymap
+/// @param name the name of the editor command
+/// @param sequence the keysequence
+void TextEditorKeyMap::add(const QString& command, const QKeySequence& seq)
 {
-    keyMap_.insertMulti(name, new TextEditorKey(seq) );
+    keyMap_.insertMulti(command, new TextEditorKey(seq) );
 }
+
+
+/// Adds a command - key sequence with a string
+/// If first tries to match the string with the standardkey-texts
+/// If this doesn't result in a sequence it assumes it's a keydefinition used by QKeySequence
+/// @param command the command name
+/// @param seq the key sequence definition
+bool TextEditorKeyMap::add(const QString& command, const QString& seq)
+{
+    // when the given keys-string is a 'standard-key' name we use the standard key
+    QKeySequence::StandardKey standardKey = TextEditorKeyMap::standardKeyFromString(seq);
+    if( standardKey != QKeySequence::UnknownKey) {
+        add( command, new TextEditorKey( QKeySequence(standardKey) ) );
+        return true;
+    }
+
+    // When it's not a standard key we try a textual key sequence
+    QKeySequence normalKey = QKeySequence(seq);
+    if( normalKey != QKeySequence::UnknownKey ) {
+        add( command, new TextEditorKey( normalKey ) );
+        return true;
+    }
+
+    // well this didn't go well
+    return false;
+
+}
+
 
 //void TextEditorKeyMap::set(const QString& name, const QKeySequence::StandardKey key)
 //{
@@ -189,6 +231,7 @@ QKeySequence TextEditorKeyMap::joinKeySequences(const QKeySequence seq1, const Q
     }
     return QKeySequence(keys[0],keys[1],keys[2],keys[3]);
 }
+
 
 /// a map of all standard keys
 static QHash<QString,QKeySequence::StandardKey> stringToStandardKey;
@@ -270,6 +313,7 @@ QKeySequence::StandardKey TextEditorKeyMap::standardKeyFromString( const QString
     return h.value(str, QKeySequence::UnknownKey );
 }
 
+
 /// returns all added actions
 QString TextEditorKeyMap::toString() const
 {
@@ -291,10 +335,13 @@ TextKeyMapManager::TextKeyMapManager()
     keyMapHash_.insert("", new TextEditorKeyMap());
 }
 
+
+/// The textkeymap manager destructor
 TextKeyMapManager::~TextKeyMapManager()
 {
     qDeleteAll( keyMapHash_);
 }
+
 
 /// This method loads all keymaps.
 ///
@@ -316,17 +363,34 @@ void TextKeyMapManager::loadKeyMap(const QString& file)
     QString name = fileInfo.baseName();
     if( name == "default" ) { name = ""; }
 
+    // parse the given keymap file
     KeyMapParser parser;
     if( !parser.parse( file, findOrCreate(name) ) ) {
         qlog_warn() << QObject::tr("Error parsing %1: %2 ").arg(file).arg(parser.errorMessage());
+
+        // when there's an error parsing the defaultkeymap, fallback to the factory
+        if( name == "" ) {
+            qlog_warn() << "Error loading default keymap: fallback to the factory keymap!";
+            loadFactoryKeyMap();
+        }
+
     }
 }
+
+
+/// This method loads the internal factory keymap
+void TextKeyMapManager::loadFactoryKeyMap()
+{
+    FactoryKeyMap().fill( findOrCreate("") );
+}
+
 
 /// Returns the given text-editor keymap
 TextEditorKeyMap* TextKeyMapManager::get(const QString& name)
 {
     return keyMapHash_.value(name);
 }
+
 
 /// finds or creates the given keymap
 TextEditorKeyMap* TextKeyMapManager::findOrCreate(const QString& name)

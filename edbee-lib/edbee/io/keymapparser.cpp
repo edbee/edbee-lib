@@ -86,7 +86,7 @@ bool KeyMapParser::parse(const QVariant& variant, TextEditorKeyMap* keyMap)
     foreach( QVariant var, list ) {
         QVariantMap obj = var.toMap();
         if( obj.isEmpty() ) {
-            errorMessage_ = QObject::tr( "Expected object in keymap" );
+            errorMessage_.append( QObject::tr( "Expected object in keymap\n" ) );
         } else {
             parseBindingBlock(obj,keyMap);
         }
@@ -120,14 +120,13 @@ bool KeyMapParser::parseBindingBlock(const QVariantMap& valueObject, TextEditorK
         QVariantMap binding = bindingItem.toMap();
         QString keys = binding.value("keys").toString();
         QString command = binding.value("command").toString();
+
         if( keys.size() > 0 && command.size() > 0 ) {
 
-            // when the given keys-string is a 'standard-key' name we use the standard key
-            QKeySequence::StandardKey standardKey = TextEditorKeyMap::standardKeyFromString(keys);
-            if( standardKey != QKeySequence::UnknownKey) {
-                keyMap->set( command, new TextEditorKey( QKeySequence(standardKey) ) );
-            } else {
-                keyMap->set( command, new TextEditorKey( QKeySequence(keys) ) );
+            /// TODO: add binding to keymap
+
+            if( !keyMap->add( command, keys ) ) {
+                errorMessage_.append( QObject::tr( "Invalid keysequence used %1\n" ).arg(keys) );
             }
         }
     }
