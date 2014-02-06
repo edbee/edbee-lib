@@ -73,7 +73,8 @@ SOURCES += \
 	$$PWD/edbee/util/rangesetlineiterator.cpp \
 	$$PWD/edbee/models/dynamicvariables.cpp \
 	$$PWD/edbee/util/rangelineiterator.cpp \
-	$$PWD/edbee/data/factorykeymap.cpp
+	$$PWD/edbee/data/factorykeymap.cpp \
+	$$PWD/edbee/data/factorycommandmap.cpp
 
 HEADERS += \
 	$$PWD/util/logging.h \
@@ -148,7 +149,8 @@ HEADERS += \
 	$$PWD/edbee/util/rangesetlineiterator.h \
 	$$PWD/edbee/models/dynamicvariables.h \
 	$$PWD/edbee/util/rangelineiterator.h \
-	$$PWD/edbee/data/factorykeymap.h
+	$$PWD/edbee/data/factorykeymap.h \
+	$$PWD/edbee/data/factorycommandmap.h
 
 ## Extra dependencies
 ##====================

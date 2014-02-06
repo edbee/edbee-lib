@@ -174,12 +174,21 @@ void Edbee::init()
 
     qRegisterMetaType<edbee::TextBufferChange>("edbee::TextBufferChange");
 
+    // factory fill the default command map
+    defaultCommandMap_->loadFactoryCommandMap();
+
+
+    // load all grammar definitions
     if( !grammarPath_.isEmpty() ) {
         grammarManager_->readAllGrammarFilesInPath( grammarPath_ );
     }
+
+    // load all themes
     if( !themePath_.isEmpty() ) {
        themeManager_->listAllThemes( themePath_ );
     }
+
+    // load the keymaps or fallback to the factory keymap
     if( !keyMapPath_.isEmpty() ) {
         keyMapManager_->loadAllKeyMaps( keyMapPath_ );
     } else {

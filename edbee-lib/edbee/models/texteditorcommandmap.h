@@ -23,6 +23,8 @@ public:
     explicit TextEditorCommandMap(QObject *parent = 0);
     virtual ~TextEditorCommandMap();
     
+    void loadFactoryCommandMap();
+
     void give( const QString& key, TextEditorCommand* command );
     TextEditorCommand* get( const QString& key );
 
