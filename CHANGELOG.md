@@ -19,6 +19,9 @@ edbee.lib:
 - add #43, Added right-click context-menu support to edbee. With default operations, cut, copy, paste and select all.
 - add #36, Pressing shift-enter now inserts a newline
 - add #31, Textsearching now also works with other ranges then textselection ranges
+- fix #118, The width of the editor component should add an extra spacing so the caret isn't placed agains the right window border
+- fix #117, The last line doesn't show the caret marker in the line-number column
+- fix #116, The linenumber column isn't updated properly when the number of digets increases.
 - fix #114, Added a factory keymap so the editor works out of the box
 - fix #103, Renamed the *TextChange related classes. So it's more clear what the changes represent
 - fix #73, Complete rewrite of coalescing (change-merging) algorithm, so all textchanges are mergable. (Fixes #98,#97,#95,#41,#99,#100,#101)

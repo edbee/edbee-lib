@@ -139,7 +139,8 @@ QSize TextEditorComponent::sizeHint() const
         height -= textRenderer()->lineHeight()*2;   // *2 because we have an extra blank line at the end
     }
 
-    return QSize( ren->totalWidth(), height );
+    // added 1 extra emWidth so there's at least 1 character spacing at the end
+    return QSize( ren->totalWidth() + ren->emWidth() , height );
 }
 
 

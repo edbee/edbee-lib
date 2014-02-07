@@ -27,6 +27,7 @@ namespace edbee {
 static const int LineNumberRightPadding = 10;
 static const int MarginPaddingRight = 5;
 
+/// The default constructor
 TextMarginComponentDelegate::TextMarginComponentDelegate()
     : marginComponentRef_(0)
 {
@@ -99,9 +100,14 @@ void TextMarginComponentDelegate::leaveEvent(QEvent* event)
 }
 
 
+
 //=============================
 
-TextMarginComponent::TextMarginComponent(TextEditorWidget* editor, QWidget *parent)
+
+/// Constructs the textmarginc compnonent.
+/// @param editor the editor this component is connceted to
+/// @param parent the parent widget
+TextMarginComponent::TextMarginComponent(TextEditorWidget* editor, QWidget* parent)
     : QWidget( parent )
     , top_(0)
     , width_(-1)
@@ -113,13 +119,17 @@ TextMarginComponent::TextMarginComponent(TextEditorWidget* editor, QWidget *pare
 {
     this->setFocusPolicy( Qt::NoFocus );
     this->setAutoFillBackground(false);
+    this->setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Expanding );
 }
 
+
+/// The margin component destructor
 TextMarginComponent::~TextMarginComponent()
 {
     delete delegate_;
     delete marginFont_;
 }
+
 
 /// initalizes this component
 void TextMarginComponent::init()
@@ -134,6 +144,8 @@ void TextMarginComponent::init()
     connectScrollBar();
 }
 
+
+/// Returns the required width for this control
 int TextMarginComponent::widthHint() const
 {
     TextDocument* doc = renderer()->textDocument();
@@ -156,6 +168,7 @@ int TextMarginComponent::widthHint() const
     return width_;
 }
 
+
 /// This method returns the size hint
 QSize TextMarginComponent::sizeHint() const
 {
@@ -164,6 +177,7 @@ QSize TextMarginComponent::sizeHint() const
     //return QSize(widthHint(), renderer()->totalHeight() );
 }
 
+
 /// A slow and full update of the control
 void TextMarginComponent::fullUpdate()
 {
@@ -171,10 +185,13 @@ void TextMarginComponent::fullUpdate()
     update();
 }
 
+
+/// Returns the renderer
 TextRenderer* TextMarginComponent::renderer() const
 {
     return editorWidget()->textRenderer();
 }
+
 
 /// This method sets the delegate
 void TextMarginComponent::setDelegate(TextMarginComponentDelegate* delegate)
@@ -231,6 +248,12 @@ void TextMarginComponent::paintEvent(QPaintEvent* event)
 
 }
 
+
+/// Renders the caret markers in the sidebar
+/// @param painter the Qt Painting context
+/// @param startLine the first line to render
+/// @param endLine the last line to render
+/// @param width the width for rendering
 void TextMarginComponent::renderCaretMarkers(QPainter* painter, int startLine, int endLine , int width)
 {
     TextDocument* doc = renderer()->textDocument();
@@ -244,7 +267,7 @@ void TextMarginComponent::renderCaretMarkers(QPainter* painter, int startLine, i
         TextRange& range = sel->range(i);
         int line = doc->lineFromOffset(range.caret());
         if( startLine <= line ) {
-            if( line >= endLine ) { break; }
+            if( line > endLine ) { break; }
             int y = renderer()->yPosForLine(line);
             marginRect.moveTop(y);
             painter->fillRect( marginRect, lineColor );
@@ -252,6 +275,12 @@ void TextMarginComponent::renderCaretMarkers(QPainter* painter, int startLine, i
     }
 }
 
+
+/// Renders the line number in the sidebar
+/// @param painter the Qt Painting context
+/// @param startLine the first line to render
+/// @param endLine the last line to render
+/// @param width the width for rendering
 void TextMarginComponent::renderLineNumber(QPainter* painter, int startLine, int endLine , int width)
 {
     painter->setFont(*marginFont_);
@@ -267,6 +296,7 @@ void TextMarginComponent::renderLineNumber(QPainter* painter, int startLine, int
 }
 
 /// Can be used to track mouse events
+/// This method sends the the mouse movement events to the delegate
 void TextMarginComponent::mouseMoveEvent(QMouseEvent* event)
 {
     int y = event->y() + top_;
@@ -275,7 +305,9 @@ void TextMarginComponent::mouseMoveEvent(QMouseEvent* event)
     QWidget::mouseMoveEvent(event);
 }
 
+
 /// Can be used to track mouse events
+/// This method sends the the mouse movement events to the delegate
 void TextMarginComponent::mousePressEvent(QMouseEvent* event)
 {
     int y = event->y() + top_;
@@ -284,6 +316,7 @@ void TextMarginComponent::mousePressEvent(QMouseEvent* event)
     delegate()->mousePressEvent( line, event );
     QWidget::mousePressEvent(event);
 }
+
 
 /// A double click
 void TextMarginComponent::mouseDoubleClickEvent(QMouseEvent *)
@@ -297,7 +330,8 @@ void TextMarginComponent::leaveEvent(QEvent* event)
     delegate()->leaveEvent(event);
 }
 
-/// forward the mouse wheel event to the hbar
+
+/// forward the mouse wheel event to the scrollbar so you can use the mouse wheel on this component
 void TextMarginComponent::wheelEvent(QWheelEvent* event)
 {
     if( event->orientation() == Qt::Vertical) {
@@ -324,6 +358,7 @@ void TextMarginComponent::updateLine(int line, int length)
 
     update( 0, startY, width(), endY-startY );
 }
+
 
 void TextMarginComponent::topChanged(int value)
 {

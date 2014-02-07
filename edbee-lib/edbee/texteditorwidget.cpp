@@ -86,6 +86,9 @@ TextEditorWidget::TextEditorWidget( QWidget* parent)
     connect( this, SIGNAL(horizontalScrollBarChanged(QScrollBar*)), SLOT(connectHorizontalScrollBar()) );
     connect( this, SIGNAL(verticalScrollBarChanged(QScrollBar*)), SLOT(connectVerticalScrollBar()) );
 
+
+    setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Expanding );
+
     editCompRef_->installEventFilter(this);     // recieve events for the ability to emit focus events
 }
 
@@ -330,8 +333,15 @@ void TextEditorWidget::updateComponents()
 /// Updates the geometry for all components
 void TextEditorWidget::updateGeometryComponents()
 {
-    editCompRef_->updateGeometry();
-    marginCompRef_->updateGeometry();
+    // force size change (ugly)
+    textMarginComponent()->updateGeometry();
+    textEditorComponent()->updateGeometry();
+
+    // this is required to make the container update the size of all components
+    // we need to make this a bit smarter so it only happens
+    layout()->activate();
+    updateGeometry();
+    adjustSize();
 }
 
 
