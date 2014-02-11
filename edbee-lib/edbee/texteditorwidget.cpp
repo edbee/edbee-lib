@@ -334,14 +334,12 @@ void TextEditorWidget::updateComponents()
 void TextEditorWidget::updateGeometryComponents()
 {
     // force size change (ugly)
-    textMarginComponent()->updateGeometry();
     textEditorComponent()->updateGeometry();
 
-    // this is required to make the container update the size of all components
-    // we need to make this a bit smarter so it only happens
-    layout()->activate();
-    updateGeometry();
-    adjustSize();
+    // when a geometry change is required recalculate all widgets
+    if( textMarginComponent()->isGeometryChangeRequired() ) {
+        scrollAreaRef_->layoutMarginWidgets();
+    }
 }
 
 

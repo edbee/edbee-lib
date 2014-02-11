@@ -178,6 +178,13 @@ QSize TextMarginComponent::sizeHint() const
 }
 
 
+/// This emthod is called when the text is changed
+bool TextMarginComponent::isGeometryChangeRequired()
+{
+    return this->widthHint() != this->width();
+}
+
+
 /// A slow and full update of the control
 void TextMarginComponent::fullUpdate()
 {

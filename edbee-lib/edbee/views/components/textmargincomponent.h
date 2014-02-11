@@ -60,6 +60,7 @@ public:
 
     int widthHint() const;
     virtual QSize sizeHint() const;
+    bool isGeometryChangeRequired();
 
     void fullUpdate();
     TextEditorWidget* editorWidget() const { return editorRef_;}

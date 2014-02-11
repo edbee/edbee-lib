@@ -28,7 +28,7 @@ public:
     void setBottomWidget(QWidget* widget);
 
 
-protected:
+public:
 
     void layoutMarginWidgets();
 
