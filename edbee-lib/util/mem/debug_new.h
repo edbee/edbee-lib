@@ -13,6 +13,7 @@
 //#endif
 //#include "memoryleak.h"
 
+
 void* debug_malloc      (size_t size, const char* file, const int line);
 void  debug_free        (void* p,     const char* file, const int line);
 void* operator new      (size_t size, const char* file, const int line);
@@ -22,7 +23,11 @@ void* operator new[]    (size_t size, const char* file, const int line);
 void  operator delete[] (void* p,     const char* file, const int line);
 void  operator delete[] (void* p) throw();
 
-void pause_memleak_detection(bool value);
+namespace edbee {
+
+    void pause_memleak_detection(bool value);
+
+} // edbee
 
 #define debug_new new(__FILE__, __LINE__)
 #define new       debug_new

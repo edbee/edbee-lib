@@ -5,10 +5,12 @@
 
 #include "texttheme.h"
 
-#include <QDir>
-#include <QVector>
-#include <QStack>
+#include <QApplication>
 #include <QDateTime>
+#include <QDir>
+#include <QPalette>
+#include <QStack>
+#include <QVector>
 
 #include "edbee/io/tmthemeparser.h"
 #include "edbee/models/textbuffer.h"
@@ -77,17 +79,17 @@ TextTheme::TextTheme()
 //    , findHighlightForegroundColor_(0xff000000)
 //    , selectionBorderColor_(0xff222218)
 //    , activeGuideColor_(0x9D550FB0)
-
 //    , bracketForegroundColor_(0xF8F8F2A5)
 //    , bracketOptions_("underline")
-
 //    , bracketContentsForegroundColor_(0xF8F8F2A5)
 //    , bracketContentsOptions_("underline")
-
 //    , tagsOptions_("stippled_underline")
 
 {
-
+    QPalette pal = QApplication::palette();
+    backgroundColor_ = pal.color( QPalette::Window);
+    foregroundColor_ = pal.color( QPalette::WindowText );
+    selectionColor_ = pal.color( QPalette::Highlight );
 //    giveThemeRule( new TextThemeRule("Comment","comment", QColor("#75715E") ));
 //    giveThemeRule( new TextThemeRule("String","string", QColor("#E6DB74") ));
 }

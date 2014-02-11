@@ -11,18 +11,21 @@
 
 #include "debug_allocs.h"
 
+namespace edbee {
+
 
 /// The global memory leak object
 static DebugAllocationList allocationList;
 
 
+/// returns the allocation list instance
 DebugAllocationList* DebugAllocationList::instance()
 {
     return &allocationList;
 }
 
 
-
+/// cnostructs the allocation list
 DebugAllocationList::DebugAllocationList()
     : allocationList_()
     , mutex_(0)
@@ -34,6 +37,8 @@ DebugAllocationList::DebugAllocationList()
     checkDelete_ = false;
 }
 
+
+/// The allocation list destructor
 DebugAllocationList::~DebugAllocationList()
 {
     stop();          // check last memory leak
@@ -41,6 +46,7 @@ DebugAllocationList::~DebugAllocationList()
     mutex_ = 0;
     clear();
 }
+
 
 /// clears the debugging allocation list
 void DebugAllocationList::clear()
@@ -53,12 +59,16 @@ void DebugAllocationList::clear()
     allocationList_.clear();
 }
 
-QMutex *DebugAllocationList::mutex()
+
+/// Retuns the mutex for thread-safety
+QMutex* DebugAllocationList::mutex()
 {
     return mutex_;
 }
 
 
+/// Starts the monitoring of allocations
+/// @param checkDelete should the delete operation be checked?
 void DebugAllocationList::start( bool checkDelete )
 {
     clear();
@@ -67,6 +77,8 @@ void DebugAllocationList::start( bool checkDelete )
     started_ = true;
 }
 
+
+/// Stops the monitoring of allocations
 int DebugAllocationList::stop()
 {
     started_ = false;
@@ -89,11 +101,21 @@ int DebugAllocationList::stop()
     return res;
 }
 
+
+/// Finds the given pointer int the allocation list
+/// @param p the pointer to search
+/// @return the allocation object
 DebugAllocation* DebugAllocationList::find(void* p)
 {
     return allocationList_.find(p)->second;
 }
 
+
+/// Adds the given pointer to the allocation list
+/// @param p pointer
+/// @param size the size of the pointer
+/// @param file the source file of the allocation
+/// @param line the line number of the allocation
 DebugAllocation* DebugAllocationList::add(void* p, size_t size, char* file, int line)
 {
     DebugAllocation* info = (DebugAllocation*)std::malloc( sizeof(DebugAllocation) );
@@ -106,6 +128,9 @@ DebugAllocation* DebugAllocationList::add(void* p, size_t size, char* file, int 
     return info;
 }
 
+
+/// removes the given pointer from the allocation list
+/// @param p the pointer
 bool DebugAllocationList::del(void* p)
 {
     std::map<void*,DebugAllocation*>::iterator iter = allocationList_.find(p);
@@ -121,13 +146,10 @@ bool DebugAllocationList::del(void* p)
 }
 
 
+/// returns the state of checkdelete
+bool DebugAllocationList::checkDelete()
+{
+    return checkDelete_;
+}
 
-//void DebugAllocationList::start(bool del_check)
-//{
-//   DebugAllocationList::instance()->_start(del_check);
-//}
-
-//int DebugAllocationList::stop()
-//{
-//  return  DebugAllocationList::instance()->_stop();
-//}
+} // edbee

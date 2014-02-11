@@ -5,17 +5,18 @@
 
 /// Cross Platform Memory Leak Detection.
 /// Original source from: http://www.gilgil.net by Gilbert Lee. All rights reserved
-/// Altered to use QT API and a
+/// Altered to use QT API
 #pragma once
 
 class QMutex;
-
 
 //#if !defined(__APPLE__)
 //#include <malloc>
 //#endif
 #include <cstring> // for size_t
 #include <map>
+
+namespace edbee {
 
 /// This structure is used to 'remember' what is allocated at which place
 struct DebugAllocation
@@ -51,7 +52,7 @@ public:
 
     QMutex* mutex();
 
-protected:
+public:
     void start( bool checkDelete );
     int  stop();
 
@@ -59,6 +60,7 @@ protected:
     DebugAllocation* add (void* p, size_t size, char* file, int line);
     bool del (void* p);
 
+    bool checkDelete();
 
 public:
 
@@ -80,3 +82,4 @@ private:
 };
 
 
+} // edbee
