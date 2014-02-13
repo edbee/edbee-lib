@@ -362,6 +362,13 @@ TextEditorConfig* TextRenderer::config()
 }
 
 
+/// returns a reference to the given controller
+TextEditorController*TextRenderer::controller()
+{
+    return controllerRef_;
+}
+
+
 /// This method returns the widget
 TextEditorWidget *TextRenderer::textWidget()
 {
@@ -409,6 +416,13 @@ void TextRenderer::setCaretVisible(bool visible)
 }
 
 
+/// returns the current theme name
+QString TextRenderer::themeName() const
+{
+    return textThemeStyler_->themeName();
+}
+
+
 /// Returns the active theme
 TextTheme* TextRenderer::theme()
 {
@@ -417,9 +431,17 @@ TextTheme* TextRenderer::theme()
 
 
 /// Selects the active theme name
-void TextRenderer::setThemeName(const QString& name)
+void TextRenderer::setThemeByName(const QString& name)
 {
-    this->textThemeStyler_->setThemeName(name);
+    textThemeStyler_->setThemeByName(name);
+}
+
+
+/// sets the theme
+/// @param theme the them to set
+void TextRenderer::setTheme(TextTheme* theme)
+{
+    textThemeStyler_->setTheme( theme );
 }
 
 

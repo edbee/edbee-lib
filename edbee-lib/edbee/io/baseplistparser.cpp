@@ -27,9 +27,17 @@ BasePListParser::~BasePListParser()
 
 
 /// Returns the last error message of the parsed file
-QString BasePListParser::lastErrorMessage()
+QString BasePListParser::lastErrorMessage() const
 {
     return lastErrorMessage_;
+}
+
+
+/// Sets the last error message.
+/// To correctly set the last error message while parsing please use raiseError
+void BasePListParser::setLastErrorMessage(const QString& str)
+{
+    lastErrorMessage_ = str;
 }
 
 
@@ -66,7 +74,7 @@ bool BasePListParser::endParsing()
 
 
 
-/// Call this method to raise an error
+/// Call this method to raise an error and stop the xml parsing
 /// @param str the error to raise
 void BasePListParser::raiseError( const QString& str )
 {

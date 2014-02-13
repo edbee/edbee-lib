@@ -149,7 +149,9 @@ private:
 };
 
 
+
 //================================
+
 
 /// This class is used to return the style formats for rendering the texts
 class TextThemeStyler : public QObject
@@ -165,9 +167,11 @@ public:
     TextEditorController* controller() { return controllerRef_; }
 
 //    void giveTextTheme( TextTheme* theme );
-    void setThemeName( const QString& themeName );
-    QString themeName() { return themeName_; }
-    TextTheme* theme();
+    void setThemeByName( const QString& themeName );
+    QString themeName() const;
+
+    void setTheme( TextTheme* theme );
+    TextTheme* theme() const;
 
 private:
     QTextCharFormat getTextScopeFormat(QVector<ScopedTextRange *> &activeRanges);
@@ -182,7 +186,8 @@ private slots:
 private:
 
     TextEditorController* controllerRef_;                                     ///< A reference to the controller
-    QString themeName_;                                                       ///< The name of the active theme
+    QString themeName_;                                                       ///< The name of the active theme (when a 'custom' theme active)
+    TextTheme* themeRef_;                                                     ///< The active theme
 
 
 };
@@ -203,18 +208,21 @@ protected:
 public:
     void clear();
 
+    TextTheme* readThemeFile( const QString& fileName, const QString& name=QString() );
     void listAllThemes( const QString& themePath=QString() );
     int themeCount() { return themeNames_.size(); }
     QString themeName( int idx );
     TextTheme* theme( const QString& name );
     TextTheme* fallbackTheme() const { return fallbackTheme_; }
+    QString lastErrorMessage() const;
 
 private:
 
     QString  themePath_;                           ///< The theme path
     QStringList themeNames_;                       ///< All themes
-    QHash<QString,TextTheme*> themeMap_;            ///< A map with all (loaded) themes
+    QHash<QString,TextTheme*> themeMap_;           ///< A map with all (loaded) themes
     TextTheme* fallbackTheme_;                     ///< The fallback theme (this can be used if no themes are found)
+    QString lastErrorMessage_;                     ///< The last error message
 
     friend class Edbee;
 

@@ -22,11 +22,11 @@ public:
     BasePListParser();
     virtual ~BasePListParser();
 
-    QString lastErrorMessage();
-
-
+    QString lastErrorMessage() const;
 
 protected:
+    void setLastErrorMessage( const QString& str );
+
     bool beginParsing( QIODevice* device );
     bool endParsing();
 

@@ -122,17 +122,22 @@ void TextTheme::fillFormatForTextScopeList( const TextScopeList* scopeList, QTex
 //=================================================
 
 
+/// Constructs the theme styler
+/// @param controller the controller to use this styler for
 TextThemeStyler::TextThemeStyler( TextEditorController* controller )
     : controllerRef_( controller )
+    , themeName_()
+    , themeRef_(0)
 {
     connect( controller, SIGNAL(textDocumentChanged(edbee::TextDocument*,edbee::TextDocument*)), SLOT(textDocumentChanged(edbee::TextDocument*,edbee::TextDocument*)) );
-//    textDocumentChanged(0,controller->textDocument());
+    themeRef_ = Edbee::instance()->themeManager()->fallbackTheme();
 }
 
+
+/// The current destructor
 TextThemeStyler::~TextThemeStyler()
 {
 }
-
 
 
 /// This method returns a reference to the given line format.
@@ -210,17 +215,50 @@ QList<QTextLayout::FormatRange> TextThemeStyler::getLineFormatRanges( int lineId
     return formatRangeList;
 }
 
-void TextThemeStyler::setThemeName(const QString &themeName)
+
+
+/// Sets the active theme name
+/// @param themeName
+void TextThemeStyler::setThemeByName(const QString& themeName)
 {
+    // set the theme with the given name
     themeName_ = themeName;
+    themeRef_= Edbee::instance()->themeManager()->theme(themeName_);
+
+    // when no theme is found, fallback to the fallback theme
+    if( !themeRef_) {
+        themeName_ = "";
+        themeRef_= Edbee::instance()->themeManager()->fallbackTheme();
+    }
 }
 
-TextTheme *TextThemeStyler::theme()
+
+/// returns the current active theme name
+/// This method returns "" for the fallback theme
+/// It returns a NullString if the theme is specified manually (without the thememanager)
+QString TextThemeStyler::themeName() const
 {
-    TextTheme* theme = Edbee::instance()->themeManager()->theme(themeName_);
-    if( !theme ) {
-        theme = Edbee::instance()->themeManager()->fallbackTheme();  }
-    return theme;
+    return themeName_;
+}
+
+
+/// Sets the active theme
+/// When supplying 0 this theme applies the fallback theme
+void TextThemeStyler::setTheme(TextTheme* theme)
+{
+    themeName_ = QString();
+    themeRef_ = theme;
+    if( !themeRef_) {
+        themeName_ = "";
+        themeRef_= Edbee::instance()->themeManager()->fallbackTheme();
+    }
+}
+
+
+/// returns the active theme
+TextTheme* TextThemeStyler::theme() const
+{
+    return themeRef_;
 }
 
 
@@ -266,6 +304,8 @@ void TextThemeStyler::invalidateLayouts()
 //=================================================
 
 
+/// Constructs the theme manager
+/// And intialises a fallback theme
 TextThemeManager::TextThemeManager()
     : fallbackTheme_(0)
 {
@@ -274,6 +314,8 @@ TextThemeManager::TextThemeManager()
     fallbackTheme_->setBackgroundColor(0xFFFFFFFF);
 }
 
+
+/// destructs the theme maanger
 TextThemeManager::~TextThemeManager()
 {
     clear();
@@ -288,6 +330,7 @@ void TextThemeManager::clear()
     themeMap_.clear();
     themeNames_.clear();
 }
+
 
 /// This method loads all theme names from the given theme path (*.tmTheme files)
 /// @param the new themePath. if the themepath is blank, the themes of the current path are reloaded
@@ -304,33 +347,71 @@ void TextThemeManager::listAllThemes(const QString& themePath)
     }
 }
 
-/// Returns the theme name
+
+/// Returns the theme name at the given index
+/// @param idx the index of the theme to retrieve
 QString TextThemeManager::themeName(int idx)
 {
     return themeNames_.at(idx);
 }
 
-/// This method gets or loads the theme
-TextTheme *TextThemeManager::theme(const QString& name)
+
+/// This method loads the given theme file.
+/// The theme manager stays owner of the given theme
+/// @param filename the filename of the theme to load
+/// @param name the name of the theme (if the name isn't given the basenaem of the fileName is used (excluding the .tmTheme extension)
+/// @return the loaded theme or 0 if the theme couldn' be loaded
+TextTheme* TextThemeManager::readThemeFile( const QString& fileName, const QString& nameIn )
+{
+    lastErrorMessage_.clear();
+
+    // check if the file exists
+    QFile file(fileName);
+    if( file.exists() && file.open(QIODevice::ReadOnly) ) {
+
+        // parse the theme
+        TmThemeParser parser;
+        TextTheme* theme = parser.readContent(&file);
+        if( theme ) {
+
+            // when the name if blank extract it from the filename
+            QString name = nameIn;
+            if( name.isEmpty() ) {
+                name = QFileInfo(fileName).completeBaseName();
+            }
+
+            // delete a possibly old theme with the given name
+            // add the theme to the map
+            delete themeMap_.value(name);
+            themeMap_.insert(name, theme);
+
+        } else {
+            lastErrorMessage_ = QObject::tr("Error parsing theme %1:%2").arg(file.fileName()).arg( parser.lastErrorMessage());
+        }
+        file.close();
+        return theme;
+    } else {
+        lastErrorMessage_ = QObject::tr("Error theme not found %1.").arg(file.fileName());
+        return 0;
+    }
+
+}
+
+
+/// This method gets or loads the theme.
+/// (The auto loading feature only works if the themepath is supplied)
+///
+/// @param the name of the theme to load
+/// @return the theme with the given name
+TextTheme* TextThemeManager::theme(const QString& name)
 {
     if( name.isEmpty() ) { return 0; }
     TextTheme* theme=themeMap_.value(name);
     if( !theme ) {
-
-        QString fullPath = QString("%1/%2.tmTheme").arg(themePath_).arg(name);
-        QFile file(fullPath);
-        if( file.exists() && file.open(QIODevice::ReadOnly) ) {
-            TmThemeParser parser;
-            theme = parser.readContent(&file);
-            if( theme ) {
-                delete themeMap_.value(name);       // delete the old theme
-            } else {
-                qlog_warn() << "Error parsing theme" << file.fileName() << ":" << parser.lastErrorMessage();
-                theme = new TextTheme();
-            }
-            file.close();
-        } else {
-            qlog_warn() << "Error theme not found" << file.fileName() << ".";
+        QString filename = QString("%1/%2.tmTheme").arg(themePath_).arg(name);
+        TextTheme* theme = readThemeFile( filename );
+        if( !theme ) {
+            qlog_warn() << this->lastErrorMessage();
             theme = new TextTheme();
         }
 
@@ -338,6 +419,13 @@ TextTheme *TextThemeManager::theme(const QString& name)
         themeMap_.insert(name, theme);
     }
     return theme;
+}
+
+
+/// this method returns the last error message
+QString TextThemeManager::lastErrorMessage() const
+{
+    return lastErrorMessage_;
 }
 
 

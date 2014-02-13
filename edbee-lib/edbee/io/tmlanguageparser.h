@@ -12,6 +12,7 @@
 
 #include "baseplistparser.h"
 
+class QFile;
 class QIODevice;
 class QXmlStreamReader;
 
@@ -26,7 +27,9 @@ class TmLanguageParser : public BasePListParser
 {
 public:
     TmLanguageParser();
-    TextGrammar* readContent(  QIODevice* device );
+    TextGrammar* parse( QIODevice* device );
+    TextGrammar* parse(const QFile& file );
+    TextGrammar* parse( const QString& fileName );
 
 protected:
 

@@ -286,6 +286,29 @@ TextGrammarManager::~TextGrammarManager()
 }
 
 
+/// This method reads the given grammar file and adds it to the grammar manager.
+/// The grammar manager stays the owner of the grammar file
+///
+/// @param filename the direct filename to read
+/// @return the TextGrammar file. When an error happend, the errorMessage is set
+TextGrammar* TextGrammarManager::readGrammarFile(const QString& file)
+{
+    lastErrorMessage_.clear();
+
+    // read the file
+    TmLanguageParser parser;
+    TextGrammar* grammar = parser.parse( file );
+    if( grammar ) {
+        giveGrammar( grammar );
+    } else {
+        QFileInfo fileInfo(file);
+        lastErrorMessage_ = QObject::tr("Error reading file %1:%2").arg(fileInfo.absoluteFilePath()).arg(parser.lastErrorMessage());
+        qlog_warn() << lastErrorMessage_;
+    }
+    return grammar;
+}
+
+
 /// reads all grammar files in the given path
 /// @param path the path to read all grammar files from
 void TextGrammarManager::readAllGrammarFilesInPath(const QString& path )
@@ -293,24 +316,9 @@ void TextGrammarManager::readAllGrammarFilesInPath(const QString& path )
 //    qlog_info() << "readAllGrammarFilesInPath(" << path << ")";
     QDir dir(path);
     QStringList filters("*.tmLanguage");
-    TmLanguageParser parser;
     foreach( QFileInfo fileInfo, dir.entryInfoList( filters, QDir::Files, QDir::Name ) ) {
 //        qlog_info() << "- parse" << fileInfo.baseName() << ".";
-        QFile file( fileInfo.absoluteFilePath() );
-
-        // read the file
-        TextGrammar* grammar = 0;
-        if( file.open( QIODevice::ReadOnly) ) {
-            grammar = parser.readContent( &file );           
-            file.close();
-            if( grammar ) {
-                giveGrammar( grammar );
-            } else {
-                qlog_warn() << QObject::tr("Error reading file %1:%2").arg(fileInfo.absoluteFilePath()).arg(parser.lastErrorMessage());
-            }
-        } else {
-            qlog_warn() << QObject::tr("Error reading file %1:%2").arg(fileInfo.absoluteFilePath()).arg(file.errorString());
-        }
+        readGrammarFile( fileInfo.absoluteFilePath());
     }
 }
 
@@ -389,6 +397,14 @@ TextGrammar* TextGrammarManager::detectGrammarWithFilename(const QString& fileNa
         }
     }
     return this->defaultGrammar();
+}
+
+
+/// returns the grammar manager
+/// @return the last error message
+QString TextGrammarManager::lastErrorMessage() const
+{
+    return lastErrorMessage_;
 }
 
 

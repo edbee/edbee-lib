@@ -69,7 +69,7 @@ public:
     TextDocument* textDocument();
     TextSelection *textSelection();
     TextEditorConfig* config();
-    TextEditorController* controller() { return controllerRef_; }
+    TextEditorController* controller();
     TextEditorWidget* textWidget();
 
     void setViewport( const QRect& viewport );
@@ -87,8 +87,11 @@ public:
 
 // theme support
     TextThemeStyler* themeStyler() { return textThemeStyler_; }
+
+    QString themeName() const;
     TextTheme* theme();
-    void setThemeName( const QString& name );
+    void setThemeByName( const QString& name );
+    void setTheme( TextTheme* theme );
 
 
 // temporary getters only valid while rendering!!

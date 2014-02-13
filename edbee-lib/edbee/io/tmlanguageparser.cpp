@@ -23,10 +23,11 @@ TmLanguageParser::TmLanguageParser()
 {
 }
 
+
 /// reads the content of a single file
 /// @param device the device to read from. The device NEEDS to be open!!
 /// @return the language grammar or 0 on error
-TextGrammar* TmLanguageParser::readContent(QIODevice* device)
+TextGrammar* TmLanguageParser::parse(QIODevice* device)
 {
     TextGrammar* result=0;
 
@@ -43,6 +44,24 @@ TextGrammar* TmLanguageParser::readContent(QIODevice* device)
     // returns the language
     return result;
 }
+
+
+/// parses the given grammar file
+/// @param file the file to read
+/// @return the language grammar or 0 on error
+TextGrammar* TmLanguageParser::parse(const QString& fileName)
+{
+    QFile file(fileName);
+    if( file.open( QIODevice::ReadOnly ) ) {
+        TextGrammar* result = parse( &file );
+        file.close();
+        return result;
+    } else {
+        setLastErrorMessage( file.errorString()  );
+        return 0;
+    }
+}
+
 
 /// sets the captures
 void TmLanguageParser::addCapturesToGrammarRule(TextGrammarRule* rule, QHash<QString, QVariant> captures, bool endCapture)
@@ -62,6 +81,7 @@ void TmLanguageParser::addCapturesToGrammarRule(TextGrammarRule* rule, QHash<QSt
     }
 }
 
+
 /// Adds all patterns to the grammar rules
 void TmLanguageParser::addPatternsToGrammarRule(TextGrammarRule* rule, QList<QVariant> patterns)
 {
@@ -70,6 +90,7 @@ void TmLanguageParser::addPatternsToGrammarRule(TextGrammarRule* rule, QList<QVa
         if( childRule ) { rule->giveRule( childRule ); }
     }
 }
+
 
 /// creates a grammar rue
 TextGrammarRule* TmLanguageParser::createGrammarRule( TextGrammar* grammar, const QVariant& data)
@@ -148,9 +169,8 @@ TextGrammarRule* TmLanguageParser::createGrammarRule( TextGrammar* grammar, cons
 //            </dict>
 //        </array>
 //    </dict>
-
-
 }
+
 
 // parses the given language
 TextGrammar* TmLanguageParser::createLanguage(QVariant& data)

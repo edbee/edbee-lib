@@ -11,6 +11,8 @@
 #include <QString>
 #include <QStringList>
 
+class QFile;
+
 namespace edbee {
 
 class RegExp;
@@ -159,6 +161,7 @@ protected:
     virtual ~TextGrammarManager();
 
 public:
+    TextGrammar* readGrammarFile(const QString& file );
     void readAllGrammarFilesInPath(const QString& path );
 
     TextGrammar* get( const QString& name );
@@ -171,10 +174,13 @@ public:
     TextGrammar* defaultGrammar() { return defaultGrammarRef_; }
     TextGrammar* detectGrammarWithFilename( const QString& fileName );
 
+    QString lastErrorMessage() const;
+
 private:
 
     TextGrammar* defaultGrammarRef_;                   ///< A reference to the default grammar
     QMap<QString,TextGrammar*> grammarMap_;            ///< A map with all grammar definitions
+    QString lastErrorMessage_;                             ///< Returns the error message
 
     friend class Edbee;
 };

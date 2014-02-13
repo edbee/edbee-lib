@@ -71,7 +71,7 @@ TextEditorController::TextEditorController( TextEditorWidget* widget, QObject *p
 
     // Now all objects have been created we can init them
     textRenderer_->init();
-    textRenderer_->setThemeName( textDocument()->config()->themeName() );
+    textRenderer_->setThemeByName( textDocument()->config()->themeName() );
 }
 
 
@@ -394,7 +394,7 @@ void TextEditorController::onLineDataChanged(int line, int length, int newLength
 /// A lot of changes don't require an updates, but some do
 void TextEditorController::updateAfterConfigChange()
 {
-    textRenderer()->setThemeName( textDocument()->config()->themeName() );
+    textRenderer()->setThemeByName( textDocument()->config()->themeName() );
 
     // we need to figure out a betrer way to do this
     QFont font = textDocument()->config()->font();
