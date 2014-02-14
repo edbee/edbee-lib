@@ -162,6 +162,9 @@ int TextMarginComponent::widthHint() const
         }
         while( decimalValue <= lineCount );
 
+        // we at least reserve space for 2 decimals
+        decimals = qMax(decimals,2);
+
         width_ = qMax( renderer()->nrWidth(), 10 ) * ( decimals ) + LineNumberRightPadding + MarginPaddingRight;
         width_ += delegate()->widthBeforeLineNumber();
     }
