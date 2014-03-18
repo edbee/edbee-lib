@@ -70,7 +70,9 @@ void FactoryCommandMap::fill(TextEditorCommandMap* cm)
     give( "sel_reset", new SelectionCommand( SelectionCommand::ResetSelection ) );
 
     // line entry
-    give( "ins_newline", new NewlineCommand() );
+    give( "ins_newline", new NewlineCommand( NewlineCommand::NormalNewline ) );
+    give( "ins_newline_before", new NewlineCommand( NewlineCommand::AddLineBefore ) );
+    give( "ins_newline_after", new NewlineCommand( NewlineCommand::AddLineAfter ) );
 
     // remove text at the left
     give( "del_left", new RemoveCommand( RemoveCommand::RemoveChar, RemoveCommand::Left ) );

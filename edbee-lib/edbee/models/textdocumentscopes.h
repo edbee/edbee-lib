@@ -291,6 +291,8 @@ public:
     virtual TextRange& range(int idx);
     virtual const TextRange& constRange(int idx) const;
     virtual void addRange( int anchor, int caret );
+    virtual void addRange(const TextRange& range);
+
     virtual void removeRange( int idx );
     virtual void clear();
     virtual void toSingleRange();

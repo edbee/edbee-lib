@@ -115,6 +115,7 @@ public:
     virtual TextRange& range(int idx) = 0;
     virtual const TextRange& constRange(int idx) const = 0;
     virtual void addRange( int anchor, int caret ) = 0;
+    virtual void addRange( const TextRange& range ) = 0;
     virtual void removeRange( int idx ) = 0;
     virtual void clear() = 0;
     virtual void toSingleRange() = 0;
@@ -145,8 +146,6 @@ public:
 
     void resetAnchors();
     void clearSelection();
-
-    void addRange( const TextRange& range );
 
     void addTextRanges( const TextRangeSetBase& sel);
     void substractTextRanges( const TextRangeSetBase& sel );
@@ -209,6 +208,7 @@ public:
     virtual TextRange& range(int idx);
     virtual const TextRange& constRange(int idx ) const;
     virtual void addRange(int anchor, int caret);
+    virtual void addRange( const TextRange& range );
     virtual void removeRange(int idx);
     virtual void clear();
     virtual void toSingleRange();

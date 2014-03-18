@@ -64,6 +64,10 @@ void FactoryKeyMap::fill( TextEditorKeyMap* km )
     add( "ins_newline", "Return" );
     add( "ins_newline", "Shift+Enter" );
     add( "ins_newline", "Shift+Return" );
+    add( "ins_newline_before", "Ctrl+Shift+Return" );
+    add( "ins_newline_before", "Ctrl+Shift+Enter" );
+    add( "ins_newline_after", "Ctrl+Enter" );
+    add( "ins_newline_after", "Ctrl+Return" );
 
     // deletion left
     add( "del_left", "Backspace" );

@@ -611,13 +611,6 @@ bool TextRangeSetBase::changing() const
 }
 
 
-/// adds a range
-void TextRangeSetBase::addRange(const TextRange& range)
-{
-    addRange( range.anchor(), range.caret() );
-}
-
-
 /// An union operation
 /// This method adds all text selection-items.
 /// Merges all ranges
@@ -1039,6 +1032,15 @@ void TextRangeSet::addRange(int anchor, int caret)
     selectionRanges_.append( TextRange( anchor, caret ) );
     processChangesIfRequired();
 }
+
+
+
+/// adds a range
+void TextRangeSet::addRange(const TextRange& range)
+{
+    addRange( range.anchor(), range.caret() );
+}
+
 
 
 /// this method removes the range

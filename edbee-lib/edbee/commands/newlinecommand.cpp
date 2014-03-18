@@ -18,6 +18,13 @@
 
 namespace edbee {
 
+/// Constructs the newline command
+/// @param metod the method
+NewlineCommand::NewlineCommand(NewlineCommand::NewLineType method)
+    : newLineType_(method)
+{
+
+}
 
 /// This method calculates the required 'smart' indent value at the given positon
 /// @param controller the controller
@@ -65,9 +72,8 @@ QString NewlineCommand::calculateSmartIndent(TextEditorController* controller, T
 }
 
 
-/// Executes the insert newline command
-/// @param controller the controller to execute this command for
-void NewlineCommand::execute(TextEditorController* controller)
+/// Executes a 'normal' newline operation
+void NewlineCommand::executeNormalNewline(TextEditorController* controller)
 {
     TextDocument* doc = controller->textDocument();
     TextEditorConfig* config = doc->config();
@@ -76,10 +82,9 @@ void NewlineCommand::execute(TextEditorController* controller)
     // the current selection is simple replaced by a newline :)
     if( !config->smartTab() )
     {
-        controller->replaceSelection( "\n", CoalesceId_InsertNewLine );
+        controller->replaceSelection( "\n", CoalesceId_InsertNewLine+NormalNewline );
         return;
     }
-
 
     // when we're using smart tab. We're going to indent every next line
     // to the same level as the previous one
@@ -94,9 +99,84 @@ void NewlineCommand::execute(TextEditorController* controller)
     }
 
     // next execute the replace command
-    controller->replaceSelection( texts, CoalesceId_InsertNewLine );
+    controller->replaceSelection( texts, CoalesceId_InsertNewLine+NormalNewline );
+
+}
 
 
+/// Executes a special newline operation. (Inserts a newline before or the current line)
+/// @param controller the controller to execute this operation for
+/// @param nextLine a nextline operation
+void NewlineCommand::executeSpecialNewline(TextEditorController* controller, bool nextLine)
+{
+    TextDocument* doc = controller->textDocument();
+    TextEditorConfig* config = doc->config();
+
+    // we need to insert a newline above every caret
+    bool smart = config->smartTab();
+    doc->beginChanges(controller);
+
+
+    // iterate over the selection via a dynamic rangeset
+    DynamicTextRangeSet sel( controller->textSelection() );
+    TextRangeSet* newSelection = new TextRangeSet(doc);
+    int lastLine = -1;
+    int lineDelta = nextLine ? 1 : 0;
+    for( int i=0; i<sel.rangeCount(); ++i ) {
+
+        // only handle the line if it's another line then the previous
+        TextRange& range = sel.range(i);
+        int line = doc->lineFromOffset( range.caret() );
+        if( line > lastLine ) {
+
+            // create a new range
+            int pos = doc->offsetFromLine(line+lineDelta)-1;
+            TextRange newRange( pos, pos );
+
+            QString text = QString("\n%1").arg( smart ? calculateSmartIndent( controller, newRange ) : "" );
+
+            // replaces the text
+            doc->replace( newRange.caret(), 0, text );
+            newRange.setCaret( pos +text.length()  );
+            newRange.reset();
+
+            // add the range to the selection
+            newSelection->addRange( newRange );
+            lastLine = line;
+        }
+    }
+
+    // give the selection and end the changes
+    doc->giveSelection( controller, newSelection);
+    doc->endChanges(CoalesceId_InsertNewLine + ( nextLine ? AddLineAfter : AddLineBefore ) );
+
+    // the following call shouldn't be necessary
+    controller->update();
+
+}
+
+
+/// Executes the insert newline command
+/// @param controller the controller to execute this command for
+void NewlineCommand::execute(TextEditorController* controller)
+{
+    switch( newLineType_ )
+    {
+        case NormalNewline:
+            executeNormalNewline(controller);
+            break;
+
+        case AddLineBefore:
+            executeSpecialNewline(controller, false);
+            break;
+
+        case AddLineAfter:
+            executeSpecialNewline(controller, true);
+            break;
+
+        default:
+            Q_ASSERT( false && "Invalid newLineType!");
+    }
 }
 
 

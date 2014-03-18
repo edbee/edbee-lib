@@ -654,6 +654,13 @@ void MultiLineScopedTextRangeSet::addRange(int anchor, int caret)
 }
 
 
+///adds the given range
+void MultiLineScopedTextRangeSet::addRange(const TextRange& range)
+{
+    addRange( range.anchor(), range.caret() );
+}
+
+
 ///' removes the given scope
 void MultiLineScopedTextRangeSet::removeRange(int idx)
 {

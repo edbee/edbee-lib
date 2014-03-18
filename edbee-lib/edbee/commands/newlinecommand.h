@@ -18,9 +18,26 @@ class TextRange;
 class NewlineCommand : public TextEditorCommand
 {
 public:
+    enum NewLineType {
+        NormalNewline = 0,
+        AddLineBefore = 1,
+        AddLineAfter = 2
+    };
+
+
+    NewlineCommand( NewLineType method );
+
     QString calculateSmartIndent( TextEditorController* controller, TextRange& range );
+
+    virtual void executeNormalNewline( TextEditorController* controller );
+
+    virtual void executeSpecialNewline( TextEditorController* controller, bool nextLine );
+
     virtual void execute( TextEditorController* controller );
     virtual QString toString();
+
+private:
+    NewLineType newLineType_;       ///< The current newline type
 };
 
 
