@@ -93,7 +93,7 @@ bool TextDocumentSerializer::load( QIODevice* ioDevice )
     ioDevice->close();
 
     // When no line ending could be detected, take the unix line ending
-    if( !detectedLineEnding ) detectedLineEnding = LineEnding::get(LineEnding::Unix); // fallback to unix
+    if( !detectedLineEnding ) detectedLineEnding = LineEnding::get(LineEnding::UnixType); // fallback to unix
     if( !detectedCodec ) {  detectedCodec = TextCodecDetector::globalPreferedCodec();  }
 
     // set the detected items

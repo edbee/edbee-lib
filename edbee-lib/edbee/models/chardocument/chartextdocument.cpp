@@ -46,7 +46,7 @@ CharTextDocument::CharTextDocument(QObject *object)
     textScopes_ = new TextDocumentScopes( this );
 
     textCodecRef_ = Edbee::instance()->codecManager()->codecForName("UTF-8");
-    lineEndingRef_ = LineEnding::unix();
+    lineEndingRef_ = LineEnding::unixType();
 
     // create the text scopes and lexer
     textLexer_ = new GrammarTextLexer( scopes() );

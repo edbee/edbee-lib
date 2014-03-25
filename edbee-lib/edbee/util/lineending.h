@@ -14,9 +14,9 @@ class LineEnding
 public:
 
     enum Type {
-        Unix = 0,
-        Windows = 1,
-        MacClassic = 2,
+        UnixType = 0,
+        WindowsType = 1,
+        MacClassicType = 2,
         TypeCount
     };
 
@@ -31,9 +31,9 @@ public:
     static int typeCount() { return TypeCount; }
     static LineEnding* get( int idx );
 
-    static LineEnding* unix() { return get( Unix ); }
-    static LineEnding* windows() { return get( Windows ); }
-    static LineEnding* macClassic() { return get( MacClassic ); }
+    static LineEnding* unixType();
+    static LineEnding* windowsType();
+    static LineEnding* macClassicType();
 
 
     static LineEnding* detect( const QString& str, LineEnding* unkownEnding=0 );
