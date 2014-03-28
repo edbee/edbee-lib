@@ -250,7 +250,7 @@ QTextLayout *TextRenderer::textLayoutForLine(int line)
 
         // add extra format
         textLayout->setAdditionalFormats( themeStyler()->getLineFormatRanges( line ));
-        QString text = doc->line(line);
+        QString text = doc->lineWithoutNewline(line);
 #ifdef USE_CONTROL_PICTURES
         for( int i=0; i<text.size(); ++i ) {
             QChar c = text.at(i);
