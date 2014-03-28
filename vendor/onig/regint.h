@@ -1,10 +1,11 @@
 #ifndef REGINT_H
 #define REGINT_H
 /**********************************************************************
-  regint.h -  Oniguruma (regular expression library)
+  regint.h -  Onigmo (Oniguruma-mod) (regular expression library)
 **********************************************************************/
 /*-
  * Copyright (c) 2002-2008  K.Kosako  <sndgk393 AT ybb DOT ne DOT jp>
+ * Copyright (c) 2011-2012  K.Takata  <kentkt AT csc DOT jp>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -48,8 +49,7 @@
 #endif
 
 #if defined(__i386) || defined(__i386__) || defined(_M_IX86) || \
-    (defined(__ppc__) && defined(__APPLE__)) || \
-    defined(__x86_64) || defined(__x86_64__) || \
+    defined(__x86_64) || defined(__x86_64__) || defined(_M_AMD64) || \
     defined(__mc68020__)
 #define PLATFORM_UNALIGNED_WORD_ACCESS
 #endif
@@ -58,12 +58,15 @@
 /* spec. config */
 #define USE_NAMED_GROUP
 #define USE_SUBEXP_CALL
+#define USE_PERL_SUBEXP_CALL
+#define USE_CAPITAL_P_NAMED_GROUP
 #define USE_BACKREF_WITH_LEVEL        /* \k<name+n>, \k<name-n> */
 #define USE_MONOMANIAC_CHECK_CAPTURES_IN_ENDLESS_REPEAT  /* /(?:()|())*\2/ */
 #define USE_NEWLINE_AT_END_OF_STRING_HAS_EMPTY_LINE     /* /\n$/ =~ "\n" */
 #define USE_WARNING_REDUNDANT_NESTED_REPEAT_OPERATOR
 /* #define USE_RECOMPILE_API */
 /* !!! moved to regenc.h. */ /* #define USE_CRNL_AS_LINE_TERMINATOR */
+#define USE_NO_INVALID_QUANTIFIER
 
 /* internal config */
 #define USE_PARSE_TREE_NODE_RECYCLE
@@ -71,9 +74,17 @@
 #define USE_QTFR_PEEK_NEXT
 #define USE_ST_LIBRARY
 #define USE_SHARED_CCLASS_TABLE
+#define USE_SUNDAY_QUICK_SEARCH
 
 #define INIT_MATCH_STACK_SIZE                     160
 #define DEFAULT_MATCH_STACK_LIMIT_SIZE              0 /* unlimited */
+
+/* check config */
+#if defined(USE_PERL_SUBEXP_CALL) || defined(USE_CAPITAL_P_NAMED_GROUP)
+#if !defined(USE_NAMED_GROUP) || !defined(USE_SUBEXP_CALL)
+#error USE_NAMED_GROUP and USE_SUBEXP_CALL must be defined.
+#endif
+#endif
 
 #if defined(__GNUC__)
 #  define ARG_UNUSED  __attribute__ ((unused))
@@ -96,11 +107,21 @@
 /* #define USE_COMBINATION_EXPLOSION_CHECK */     /* (X*)* */
 
 /* #define USE_MULTI_THREAD_SYSTEM */
+#ifndef THREAD_SYSTEM_INIT
 #define THREAD_SYSTEM_INIT      /* depend on thread system */
+#endif
+#ifndef THREAD_SYSTEM_END
 #define THREAD_SYSTEM_END       /* depend on thread system */
+#endif
+#ifndef THREAD_ATOMIC_START
 #define THREAD_ATOMIC_START     /* depend on thread system */
+#endif
+#ifndef THREAD_ATOMIC_END
 #define THREAD_ATOMIC_END       /* depend on thread system */
+#endif
+#ifndef THREAD_PASS
 #define THREAD_PASS             /* depend on thread system */
+#endif
 #define xmalloc     malloc
 #define xrealloc    realloc
 #define xcalloc     calloc
@@ -170,7 +191,7 @@
 #include <stdlib.h>
 #endif
 
-#if defined(HAVE_ALLOCA_H) && !defined(__GNUC__)
+#if defined(HAVE_ALLOCA_H) && (defined(_AIX) || !defined(__GNUC__))
 #include <alloca.h>
 #endif
 
@@ -187,6 +208,14 @@
 #endif
 #endif
 
+#ifdef HAVE_STDINT_H
+# include <stdint.h>
+#endif
+
+#ifdef STDC_HEADERS
+# include <stddef.h>
+#endif
+
 #ifdef __BORLANDC__
 #include <malloc.h>
 #endif
@@ -194,6 +223,19 @@
 #ifdef ONIG_DEBUG
 # include <stdio.h>
 #endif
+
+#ifdef _WIN32
+#if defined(_MSC_VER) && (_MSC_VER < 1300)
+#ifndef _INTPTR_T_DEFINED
+#define _INTPTR_T_DEFINED
+typedef int intptr_t;
+#endif
+#ifndef _UINTPTR_T_DEFINED
+#define _UINTPTR_T_DEFINED
+typedef unsigned int uintptr_t;
+#endif
+#endif
+#endif /* _WIN32 */
 
 #include "regenc.h"
 
@@ -211,6 +253,8 @@
 #define CHECK_NULL_RETURN(p)          if (IS_NULL(p)) return NULL
 #define CHECK_NULL_RETURN_MEMERR(p)   if (IS_NULL(p)) return ONIGERR_MEMORY
 #define NULL_UCHARP                   ((UChar* )0)
+
+#define ONIG_LAST_CODE_POINT    (~((OnigCodePoint )0))
 
 #ifdef PLATFORM_UNALIGNED_WORD_ACCESS
 
@@ -231,13 +275,13 @@
 
 #define GET_ALIGNMENT_PAD_SIZE(addr,pad_size) do {\
   (pad_size) = WORD_ALIGNMENT_SIZE \
-               - ((unsigned int )(addr) % WORD_ALIGNMENT_SIZE);\
+               - ((uintptr_t )(addr) % WORD_ALIGNMENT_SIZE);\
   if ((pad_size) == WORD_ALIGNMENT_SIZE) (pad_size) = 0;\
 } while (0)
 
 #define ALIGNMENT_RIGHT(addr) do {\
   (addr) += (WORD_ALIGNMENT_SIZE - 1);\
-  (addr) -= ((unsigned int )(addr) % WORD_ALIGNMENT_SIZE);\
+  (addr) -= ((uintptr_t )(addr) % WORD_ALIGNMENT_SIZE);\
 } while (0)
 
 #endif /* PLATFORM_UNALIGNED_WORD_ACCESS */
@@ -251,9 +295,11 @@
 #define ONIG_OPTIMIZE_NONE              0
 #define ONIG_OPTIMIZE_EXACT             1   /* Slow Search */
 #define ONIG_OPTIMIZE_EXACT_BM          2   /* Boyer Moore Search */
-#define ONIG_OPTIMIZE_EXACT_BM_NOT_REV  3   /* BM   (but not simple match) */
+#define ONIG_OPTIMIZE_EXACT_BM_NOT_REV  3   /* BM (applied to a multibyte string) */
 #define ONIG_OPTIMIZE_EXACT_IC          4   /* Slow Search (ignore case) */
 #define ONIG_OPTIMIZE_MAP               5   /* char map */
+#define ONIG_OPTIMIZE_EXACT_BM_IC         6 /* BM (ignore case) */
+#define ONIG_OPTIMIZE_EXACT_BM_NOT_REV_IC 7 /* BM (applied to a multibyte string) (ignore case) */
 
 /* bit status */
 typedef unsigned int  BitStatusType;
@@ -295,7 +341,13 @@ typedef unsigned int  BitStatusType;
           (ONIG_OPTION_FIND_LONGEST | ONIG_OPTION_FIND_NOT_EMPTY))
 #define IS_NOTBOL(option)         ((option) & ONIG_OPTION_NOTBOL)
 #define IS_NOTEOL(option)         ((option) & ONIG_OPTION_NOTEOL)
+#define IS_NOTBOS(option)         ((option) & ONIG_OPTION_NOTBOS)
+#define IS_NOTEOS(option)         ((option) & ONIG_OPTION_NOTEOS)
 #define IS_POSIX_REGION(option)   ((option) & ONIG_OPTION_POSIX_REGION)
+#define IS_ASCII_RANGE(option)    ((option) & ONIG_OPTION_ASCII_RANGE)
+#define IS_POSIX_BRACKET_ALL_RANGE(option)  ((option) & ONIG_OPTION_POSIX_BRACKET_ALL_RANGE)
+#define IS_WORD_BOUND_ALL_RANGE(option)     ((option) & ONIG_OPTION_WORD_BOUND_ALL_RANGE)
+#define IS_NEWLINE_CRLF(option)   ((option) & ONIG_OPTION_NEWLINE_CRLF)
 
 /* OP_SET_OPTION is required for these options.
 #define IS_DYNAMIC_OPTION(option) \
@@ -313,7 +365,7 @@ typedef unsigned int  BitStatusType;
 /* bitset */
 #define BITS_PER_BYTE      8
 #define SINGLE_BYTE_SIZE   (1 << BITS_PER_BYTE)
-#define BITS_IN_ROOM       (sizeof(Bits) * BITS_PER_BYTE)
+#define BITS_IN_ROOM       ((int )sizeof(Bits) * BITS_PER_BYTE)
 #define BITSET_SIZE        (SINGLE_BYTE_SIZE / BITS_IN_ROOM)
 
 #ifdef PLATFORM_UNALIGNED_WORD_ACCESS
@@ -324,15 +376,15 @@ typedef unsigned char  Bits;
 typedef Bits           BitSet[BITSET_SIZE];
 typedef Bits*          BitSetRef;
 
-#define SIZE_BITSET        sizeof(BitSet)
+#define SIZE_BITSET        (int )sizeof(BitSet)
 
 #define BITSET_CLEAR(bs) do {\
   int i;\
-  for (i = 0; i < (int )BITSET_SIZE; i++) { (bs)[i] = 0; }	\
+  for (i = 0; i < BITSET_SIZE; i++) { (bs)[i] = 0; }	\
 } while (0)
 
-#define BS_ROOM(bs,pos)            (bs)[pos / BITS_IN_ROOM]
-#define BS_BIT(pos)                (1 << (pos % BITS_IN_ROOM))
+#define BS_ROOM(bs,pos)            (bs)[(int )(pos) / BITS_IN_ROOM]
+#define BS_BIT(pos)                (1 << ((int )(pos) % BITS_IN_ROOM))
 
 #define BITSET_AT(bs, pos)         (BS_ROOM(bs,pos) & BS_BIT(pos))
 #define BITSET_SET_BIT(bs, pos)     BS_ROOM(bs,pos) |= BS_BIT(pos)
@@ -371,7 +423,7 @@ typedef struct _BBuf {
 } while (0)
 
 #define BBUF_WRITE(buf,pos,bytes,n) do{\
-  int used = (pos) + (n);\
+  int used = (pos) + (int )(n);\
   if ((buf)->alloc < (unsigned int )used) BBUF_EXPAND((buf),used);\
   xmemcpy((buf)->p + (pos), (bytes), (n));\
   if ((buf)->used < (unsigned int )used) (buf)->used = used;\
@@ -380,7 +432,7 @@ typedef struct _BBuf {
 #define BBUF_WRITE1(buf,pos,byte) do{\
   int used = (pos) + 1;\
   if ((buf)->alloc < (unsigned int )used) BBUF_EXPAND((buf),used);\
-  (buf)->p[(pos)] = (byte);\
+  (buf)->p[(pos)] = (UChar )(byte);\
   if ((buf)->used < (unsigned int )used) (buf)->used = used;\
 } while (0)
 
@@ -439,6 +491,8 @@ typedef struct _BBuf {
 #define ANCHOR_ANYCHAR_STAR     (1<<14)   /* ".*" optimize info */
 #define ANCHOR_ANYCHAR_STAR_ML  (1<<15)   /* ".*" optimize info (multi-line) */
 
+#define ANCHOR_KEEP             (1<<16)
+
 /* operation code */
 enum OpCode {
   OP_FINISH = 0,        /* matching process terminator (no more alternative) */
@@ -482,12 +536,20 @@ enum OpCode {
   OP_WORD_BEGIN,
   OP_WORD_END,
 
+  OP_ASCII_WORD,
+  OP_NOT_ASCII_WORD,
+  OP_ASCII_WORD_BOUND,
+  OP_NOT_ASCII_WORD_BOUND,
+  OP_ASCII_WORD_BEGIN,
+  OP_ASCII_WORD_END,
+
   OP_BEGIN_BUF,
   OP_END_BUF,
   OP_BEGIN_LINE,
   OP_END_LINE,
   OP_SEMI_END_BUF,
   OP_BEGIN_POSITION,
+  OP_BEGIN_POS_OR_LINE,   /* used for implicit anchor optimization */
 
   OP_BACKREF1,
   OP_BACKREF2,
@@ -503,6 +565,8 @@ enum OpCode {
   OP_MEMORY_END_PUSH_REC, /* push back-tracker to stack */
   OP_MEMORY_END,
   OP_MEMORY_END_REC,      /* push marker to stack */
+
+  OP_KEEP,
 
   OP_FAIL,               /* pop stack and move */
   OP_JUMP,
@@ -534,6 +598,8 @@ enum OpCode {
   OP_CALL,                 /* \g<name> */
   OP_RETURN,
 
+  OP_CONDITION,
+
   OP_STATE_CHECK_PUSH,         /* combination explosion check and push */
   OP_STATE_CHECK_PUSH_OR_JUMP, /* check ok -> push, else jump  */
   OP_STATE_CHECK,              /* check only */
@@ -554,15 +620,15 @@ typedef short int StateCheckNumType;
 typedef void* PointerType;
 
 #define SIZE_OPCODE           1
-#define SIZE_RELADDR          sizeof(RelAddrType)
-#define SIZE_ABSADDR          sizeof(AbsAddrType)
-#define SIZE_LENGTH           sizeof(LengthType)
-#define SIZE_MEMNUM           sizeof(MemNumType)
-#define SIZE_STATE_CHECK_NUM  sizeof(StateCheckNumType)
-#define SIZE_REPEATNUM        sizeof(RepeatNumType)
-#define SIZE_OPTION           sizeof(OnigOptionType)
-#define SIZE_CODE_POINT       sizeof(OnigCodePoint)
-#define SIZE_POINTER          sizeof(PointerType)
+#define SIZE_RELADDR          (int )sizeof(RelAddrType)
+#define SIZE_ABSADDR          (int )sizeof(AbsAddrType)
+#define SIZE_LENGTH           (int )sizeof(LengthType)
+#define SIZE_MEMNUM           (int )sizeof(MemNumType)
+#define SIZE_STATE_CHECK_NUM  (int )sizeof(StateCheckNumType)
+#define SIZE_REPEATNUM        (int )sizeof(RepeatNumType)
+#define SIZE_OPTION           (int )sizeof(OnigOptionType)
+#define SIZE_CODE_POINT       (int )sizeof(OnigCodePoint)
+#define SIZE_POINTER          (int )sizeof(PointerType)
 
 
 #define GET_RELADDR_INC(addr,p)    PLATFORM_GET_INC(addr,   p, RelAddrType)
@@ -614,6 +680,7 @@ typedef void* PointerType;
 #define SIZE_OP_FAIL_LOOK_BEHIND_NOT    SIZE_OPCODE
 #define SIZE_OP_CALL                   (SIZE_OPCODE + SIZE_ABSADDR)
 #define SIZE_OP_RETURN                  SIZE_OPCODE
+#define SIZE_OP_CONDITION              (SIZE_OPCODE + SIZE_MEMNUM + SIZE_RELADDR)
 
 #ifdef USE_COMBINATION_EXPLOSION_CHECK
 #define SIZE_OP_STATE_CHECK            (SIZE_OPCODE + SIZE_STATE_CHECK_NUM)
@@ -688,7 +755,7 @@ typedef struct {
   BBuf*  mbuf;   /* multi-byte info or NULL */
 } CClassNode;
 
-typedef long OnigStackIndex;
+typedef intptr_t OnigStackIndex;
 
 typedef struct _OnigStackType {
   unsigned int type;
@@ -700,6 +767,7 @@ typedef struct _OnigStackType {
 #ifdef USE_COMBINATION_EXPLOSION_CHECK
       unsigned int state_check;
 #endif
+      UChar *pkeep;      /* keep pattern position */
     } state;
     struct {
       int   count;       /* for OP_REPEAT_INC, OP_REPEAT_INC_NG */
@@ -712,7 +780,7 @@ typedef struct _OnigStackType {
     struct {
       int num;           /* memory num */
       UChar *pstr;       /* start/end position */
-      /* Following information is setted, if this stack type is MEM-START */
+      /* Following information is set, if this stack type is MEM-START */
       OnigStackIndex start;  /* prev. info (for backtrack  "(...)*" ) */
       OnigStackIndex end;    /* prev. info (for backtrack  "(...)*" ) */
     } mem;
@@ -732,12 +800,13 @@ typedef struct _OnigStackType {
 
 typedef struct {
   void* stack_p;
-  int   stack_n;
+  size_t stack_n;
   OnigOptionType options;
   OnigRegion*    region;
-  const UChar* start;   /* search start position (for \G: BEGIN_POSITION) */
+  const UChar* start;   /* search start position */
+  const UChar* gpos;    /* global position (for \G: BEGIN_POSITION) */
 #ifdef USE_FIND_LONGEST_SEARCH_ALL_OF_RANGE
-  int    best_len;      /* for ONIG_OPTION_FIND_LONGEST */
+  OnigPosition best_len;  /* for ONIG_OPTION_FIND_LONGEST */
   UChar* best_s;
 #endif
 #ifdef USE_COMBINATION_EXPLOSION_CHECK
@@ -754,7 +823,7 @@ typedef struct {
 
 typedef struct {
   short int opcode;
-  char*     name;
+  const char* name;
   short int arg_type;
 } OnigOpInfoType;
 
@@ -768,9 +837,9 @@ extern void onig_print_statistics P_((FILE* f));
 #endif
 #endif
 
-extern UChar* onig_error_code_to_format P_((int code));
+extern UChar* onig_error_code_to_format P_((OnigPosition code));
 extern void  onig_snprintf_with_pattern PV_((UChar buf[], int bufsize, OnigEncoding enc, UChar* pat, UChar* pat_end, const UChar *fmt, ...));
-extern int  onig_bbuf_init P_((BBuf* buf, int size));
+extern int  onig_bbuf_init P_((BBuf* buf, OnigDistance size));
 extern int  onig_compile P_((regex_t* reg, const UChar* pattern, const UChar* pattern_end, OnigErrorInfo* einfo));
 extern void onig_chain_reduce P_((regex_t* reg));
 extern void onig_chain_link_add P_((regex_t* to, regex_t* add));
@@ -780,7 +849,7 @@ extern int  onig_is_code_in_cc_len P_((int enclen, OnigCodePoint code, CClassNod
 
 /* strend hash */
 typedef void hash_table_type;
-typedef unsigned long hash_data_type;
+typedef uintptr_t hash_data_type;
 
 extern hash_table_type* onig_st_init_strend_table_with_size P_((int size));
 extern int onig_st_lookup_strend P_((hash_table_type* table, const UChar* str_key, const UChar* end_key, hash_data_type *value));
@@ -804,5 +873,8 @@ extern int onigenc_property_list_add_property P_((UChar* name, const OnigCodePoi
 typedef int (*ONIGENC_INIT_PROPERTY_LIST_FUNC_TYPE)(void);
 
 extern int onigenc_property_list_init P_((ONIGENC_INIT_PROPERTY_LIST_FUNC_TYPE));
+
+extern size_t onig_memsize P_((const regex_t *reg));
+extern size_t onig_region_memsize P_((const struct re_registers *regs));
 
 #endif /* REGINT_H */

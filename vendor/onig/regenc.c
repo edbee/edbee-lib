@@ -1,8 +1,9 @@
 /**********************************************************************
-  regenc.c -  Oniguruma (regular expression library)
+  regenc.c -  Onigmo (Oniguruma-mod) (regular expression library)
 **********************************************************************/
 /*-
  * Copyright (c) 2002-2007  K.Kosako  <sndgk393 AT ybb DOT ne DOT jp>
+ * Copyright (c) 2011       K.Takata  <kentkt AT csc DOT jp>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -29,12 +30,11 @@
 
 #include "regint.h"
 
-OnigEncoding OnigEncDefaultCharEncoding = 0; //ONIG_ENCODING_INIT_DEFAULT;  (moved it to onigenc_init, the win compiler doesn't like this)
+OnigEncoding OnigEncDefaultCharEncoding = ONIG_ENCODING_INIT_DEFAULT;
 
 extern int
 onigenc_init(void)
 {
-  OnigEncDefaultCharEncoding = ONIG_ENCODING_INIT_DEFAULT;
   return 0;
 }
 
@@ -113,7 +113,7 @@ onigenc_strlen(OnigEncoding enc, const UChar* p, const UChar* end)
 {
   int n = 0;
   UChar* q = (UChar* )p;
-  
+
   while (q < end) {
     q += ONIGENC_MBC_ENC_LEN(enc, q);
     n++;
@@ -126,7 +126,7 @@ onigenc_strlen_null(OnigEncoding enc, const UChar* s)
 {
   int n = 0;
   UChar* p = (UChar* )s;
-  
+
   while (1) {
     if (*p == '\0') {
       UChar* q;
@@ -639,6 +639,15 @@ onigenc_always_false_is_allowed_reverse_match(const UChar* s   ARG_UNUSED,
   return FALSE;
 }
 
+extern int
+onigenc_ascii_is_code_ctype(OnigCodePoint code, unsigned int ctype)
+{
+  if (code < 128)
+    return ONIGENC_IS_ASCII_CODE_CTYPE(code, ctype);
+  else
+    return FALSE;
+}
+
 extern OnigCodePoint
 onigenc_mbn_mbc_to_code(OnigEncoding enc, const UChar* p, const UChar* end)
 {
@@ -729,7 +738,7 @@ onigenc_mb2_code_to_mbc(OnigEncoding enc, OnigCodePoint code, UChar *buf)
   if (enclen(enc, buf) != (p - buf))
     return ONIGERR_INVALID_CODE_POINT_VALUE;
 #endif
-  return p - buf;
+  return (int )(p - buf);
 }
 
 extern int
@@ -752,13 +761,13 @@ onigenc_mb4_code_to_mbc(OnigEncoding enc, OnigCodePoint code, UChar *buf)
   if (enclen(enc, buf) != (p - buf))
     return ONIGERR_INVALID_CODE_POINT_VALUE;
 #endif
-  return p - buf;
+  return (int )(p - buf);
 }
 
 extern int
 onigenc_minimum_property_name_to_ctype(OnigEncoding enc, UChar* p, UChar* end)
 {
-  static PosixBracketEntryType PBS[] = {
+  static const PosixBracketEntryType PBS[] = {
     { (UChar* )"Alnum",  ONIGENC_CTYPE_ALNUM,  5 },
     { (UChar* )"Alpha",  ONIGENC_CTYPE_ALPHA,  5 },
     { (UChar* )"Blank",  ONIGENC_CTYPE_BLANK,  5 },
@@ -776,13 +785,13 @@ onigenc_minimum_property_name_to_ctype(OnigEncoding enc, UChar* p, UChar* end)
     { (UChar* )NULL, -1, 0 }
   };
 
-  PosixBracketEntryType *pb;
+  const PosixBracketEntryType *pb;
   int len;
 
   len = onigenc_strlen(enc, p, end);
   for (pb = PBS; IS_NOT_NULL(pb->name); pb++) {
     if (len == pb->len &&
-        onigenc_with_ascii_strncmp(enc, p, end, pb->name, pb->len) == 0)
+        onigenc_with_ascii_strnicmp(enc, p, end, pb->name, pb->len) == 0)
       return pb->ctype;
   }
 
@@ -838,11 +847,32 @@ onigenc_with_ascii_strncmp(OnigEncoding enc, const UChar* p, const UChar* end,
   return 0;
 }
 
+extern int
+onigenc_with_ascii_strnicmp(OnigEncoding enc, const UChar* p, const UChar* end,
+                            const UChar* sascii /* ascii */, int n)
+{
+  int x, c;
+
+  while (n-- > 0) {
+    if (p >= end) return (int )(*sascii);
+
+    c = (int )ONIGENC_MBC_TO_CODE(enc, p, end);
+    if (ONIGENC_IS_ASCII_CODE(c))
+      c = ONIGENC_ASCII_CODE_TO_LOWER_CASE(c);
+    x = ONIGENC_ASCII_CODE_TO_LOWER_CASE(*sascii) - c;
+    if (x) return x;
+
+    sascii++;
+    p += enclen(enc, p);
+  }
+  return 0;
+}
+
 /* Property management */
 static int
 resize_property_list(int new_size, const OnigCodePoint*** plist, int* psize)
 {
-  int size;
+  size_t size;
   const OnigCodePoint **list = *plist;
 
   size = sizeof(OnigCodePoint*) * new_size;

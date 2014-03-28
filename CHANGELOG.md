@@ -20,6 +20,7 @@ edbee.lib:
 - add #43, Added right-click context-menu support to edbee. With default operations, cut, copy, paste and select all.
 - add #36, Pressing shift-enter now inserts a newline
 - add #31, Textsearching now also works with other ranges then textselection ranges
+- fix #123, Updated oniguruma to 5.13.5 to solve a segfault on Ubuntu 13 (64bits)
 - fix #122, Library can't be compiled on Linux, unix  is a predefined word on unix
 - fix #118, The width of the editor component should add an extra spacing so the caret isn't placed agains the right window border
 - fix #117, The last line doesn't show the caret marker in the line-number column
