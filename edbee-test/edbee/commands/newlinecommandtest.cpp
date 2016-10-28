@@ -21,7 +21,7 @@ namespace edbee {
 void NewlineCommandTest::init()
 {
     widget_ = new TextEditorWidget();
-    command_ = new NewlineCommand();
+    command_ = new NewlineCommand( NewlineCommand::NormalNewline);
 }
 
 

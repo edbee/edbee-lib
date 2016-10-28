@@ -456,7 +456,7 @@ public:
         QChar* data = new QChar[length];
         copyRange( data, offset, length );
         QString str( data, length );
-        delete data;
+        delete[] data;
 
 //qlog_info() << "mid(" << offset << "," << length << ") => " << str.replace("\n","|")  << "  // " << getUnitTestString().replace("\n","|");
         return str;
