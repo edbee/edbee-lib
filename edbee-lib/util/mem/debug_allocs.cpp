@@ -8,6 +8,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <cstdlib>
 
 #include "debug_allocs.h"
 
@@ -107,7 +108,10 @@ int DebugAllocationList::stop()
 /// @return the allocation object
 DebugAllocation* DebugAllocationList::find(void* p)
 {
-    return allocationList_.find(p)->second;
+    std::map< void *, DebugAllocation*>::iterator itr = allocationList_.find(p);
+    if( itr != allocationList_.end() )
+        return itr->second;
+    return 0;
 }
 
 

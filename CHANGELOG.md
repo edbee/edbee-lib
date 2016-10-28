@@ -20,6 +20,7 @@ edbee.lib:
 - add #43, Added right-click context-menu support to edbee. With default operations, cut, copy, paste and select all.
 - add #36, Pressing shift-enter now inserts a newline
 - add #31, Textsearching now also works with other ranges then textselection ranges
+- fix, memory leak detection contained an incorrect iterator->second dereference. Causing crashes (Thanks Blackstar)
 - fix #124, Line breaks (\n) are rendered with QTextLayout, which results in a strange character on a Linux environment (github issue 2)
 - fix #123, Updated oniguruma to 5.13.5 to solve a segfault on Ubuntu 13 (64bits)
 - fix #122, Library can't be compiled on Linux, unix  is a predefined word on unix
@@ -46,7 +47,6 @@ edbee.lib:
 - fix #21, Improved fallback pallette when a theme cannot be loaded. (fixes complete black screen)
 - fix #16, linespacing issue, the space always was at least 1 pixel
 - fix #2, made it possible to configure TextEditorConfig. (was hardcoded)
-
 
 ## v0.1.0 Initial Release
 
