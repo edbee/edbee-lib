@@ -37,7 +37,7 @@
 #include "edbee/views/textselection.h"
 #include "edbee/views/texttheme.h"
 
-#include "debug.h"
+#include "edbee/debug.h"
 
 
 //#define DEBUG_DRAW_RENDER_CLIPPING_RECTANGLE 1

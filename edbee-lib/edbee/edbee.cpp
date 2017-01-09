@@ -17,7 +17,7 @@
 #include "edbee/views/texttheme.h"
 
 
-#include "debug.h"
+#include "edbee/debug.h"
 
 namespace edbee {
 

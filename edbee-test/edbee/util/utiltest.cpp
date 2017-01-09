@@ -9,7 +9,7 @@
 
 #include "edbee/util/util.h"
 
-#include "debug.h"
+#include "edbee/debug.h"
 
 namespace edbee {
 

@@ -5,7 +5,7 @@
 
 #include "texteditorconfig.h"
 
-#include "debug.h"
+#include "edbee/debug.h"
 
 namespace edbee {
 

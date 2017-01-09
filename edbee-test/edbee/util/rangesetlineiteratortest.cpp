@@ -9,7 +9,7 @@
 #include "edbee/models/textrange.h"
 #include "edbee/util/rangesetlineiterator.h"
 
-#include "debug.h"
+#include "edbee/debug.h"
 
 namespace edbee {
 

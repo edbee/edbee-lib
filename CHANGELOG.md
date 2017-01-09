@@ -2,6 +2,8 @@
 
 edbee.lib:
 
+- BREAKING CHANGE, moved all source/headers files under the folder 'edbee/' to prevent filename collisions when embedding it in other projects.
+
 - add #121, Insert line before and insert line after commands
 - add #108, #111, Added a DynamicTextRangeSet, a change aware rangeset, that automatically gets adjusted when the document changes.
 - add #107, Implemented scoped/unscoped environment variable support

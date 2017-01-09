@@ -13,9 +13,9 @@
 #include "edbee/views/texttheme.h"
 #include "edbee/views/textselection.h"
 #include "edbee/views/textrenderer.h"
-#include "util/simpleprofiler.h"
+#include "edbee/util/simpleprofiler.h"
 
-#include "debug.h"
+#include "edbee/debug.h"
 
 
 namespace edbee {

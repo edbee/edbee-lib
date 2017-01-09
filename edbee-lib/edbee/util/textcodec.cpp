@@ -8,7 +8,7 @@
 
 #include "textcodec.h"
 
-#include "debug.h"
+#include "edbee/debug.h"
 
 namespace edbee {
 

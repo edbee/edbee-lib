@@ -11,7 +11,7 @@
 #include "edbee/models/changes/textchange.h"
 #include "edbee/models/chardocument/chartextdocument.h"
 
-#include "debug.h"
+#include "edbee/debug.h"
 
 namespace edbee {
 

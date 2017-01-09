@@ -9,7 +9,7 @@
 #include "edbee/models/chardocument/chartextdocument.h"
 #include "edbee/models/textlinedata.h"
 
-#include "debug.h"
+#include "edbee/debug.h"
 
 namespace edbee {
 

@@ -9,7 +9,7 @@
 #define ONIG_EXTERN extern
 #include "oniguruma.h"
 #include "regexp.h"
-#include "debug.h"
+#include "edbee/debug.h"
 
 namespace edbee {
 

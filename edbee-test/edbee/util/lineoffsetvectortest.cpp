@@ -8,7 +8,7 @@
 #include "edbee/models/textbuffer.h"
 #include "edbee/util/lineoffsetvector.h"
 
-#include "debug.h"
+#include "edbee/debug.h"
 
 
 namespace edbee {

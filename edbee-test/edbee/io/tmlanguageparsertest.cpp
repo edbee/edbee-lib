@@ -7,7 +7,7 @@
 
 #include "edbee/io/tmlanguageparser.h"
 
-#include "debug.h"
+#include "edbee/debug.h"
 
 namespace edbee {
 

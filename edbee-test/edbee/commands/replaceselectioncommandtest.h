@@ -3,7 +3,7 @@
  * Author Rick Blommers
  */
 
-#include "util/test.h"
+#include "edbee/util/test.h"
 
 namespace edbee {
 

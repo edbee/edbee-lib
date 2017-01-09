@@ -11,7 +11,7 @@
 #include "edbee/models/textdocument.h"
 #include "edbee/io/textdocumentserializer.h"
 
-#include "debug.h"
+#include "edbee/debug.h"
 
 namespace edbee {
 

@@ -11,10 +11,10 @@
 #include <QsLog.h>
 #include <QsLogDest.h>
 
-#include "util/test.h"
+#include "edbee/util/test.h"
 #include "edbee/edbee.h"
 
-#include "debug.h"
+#include "edbee/debug.h"
 
 
 /// the main entry method of the test

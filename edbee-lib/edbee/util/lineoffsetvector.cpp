@@ -7,7 +7,7 @@
 
 #include "edbee/models/textbuffer.h"
 
-#include "debug.h"
+#include "edbee/debug.h"
 
 namespace edbee {
 

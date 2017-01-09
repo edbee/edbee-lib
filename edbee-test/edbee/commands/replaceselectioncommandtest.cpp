@@ -14,7 +14,7 @@
 #include "edbee/models/textrange.h"
 #include "edbee/models/textundostack.h"
 
-#include "debug.h"
+#include "edbee/debug.h"
 
 //#include "texteditor/commands/undoablereplaceselectionbytextcommand.h"
 

@@ -7,7 +7,7 @@
 
 #include <QString>
 
-#include "debug.h"
+#include "edbee/debug.h"
 
 namespace edbee {
 

@@ -8,7 +8,7 @@
 #include "edbee/models/textgrammar.h"
 #include "edbee/models/textdocumentscopes.h"
 
-#include "debug.h"
+#include "edbee/debug.h"
 
 namespace edbee {
 

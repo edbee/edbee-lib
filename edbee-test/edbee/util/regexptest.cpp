@@ -7,7 +7,7 @@
 
 #include "edbee/util/regexp.h"
 
-#include "debug.h"
+#include "edbee/debug.h"
 
 namespace edbee {
 

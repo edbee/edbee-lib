@@ -14,7 +14,7 @@
 #include "edbee/texteditorcontroller.h"
 #include "edbee/texteditorwidget.h"
 
-#include "debug.h"
+#include "edbee/debug.h"
 
 namespace edbee {
 

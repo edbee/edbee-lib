@@ -7,7 +7,7 @@
 
 #include "textdocument.h"
 #include "textrange.h"
-#include "debug.h"
+#include "edbee/debug.h"
 
 namespace edbee {
 

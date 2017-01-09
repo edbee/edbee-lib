@@ -13,7 +13,7 @@
 #include "edbee/models/textlinedata.h"
 #include "edbee/models/textrange.h"
 
-#include "debug.h"
+#include "edbee/debug.h"
 
 namespace edbee {
 

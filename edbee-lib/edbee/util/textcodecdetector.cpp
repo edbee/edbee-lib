@@ -10,7 +10,7 @@
 
 #include "textcodec.h"
 #include "edbee/edbee.h"
-#include "debug.h"
+#include "edbee/debug.h"
 
 namespace edbee {
 

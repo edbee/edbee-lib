@@ -14,7 +14,7 @@
 #include "edbee/models/textlexer.h"
 #include "edbee/edbee.h"
 
-#include "debug.h"
+#include "edbee/debug.h"
 
 namespace edbee {
 

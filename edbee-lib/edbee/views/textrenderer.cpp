@@ -10,7 +10,7 @@
 #include <QPainter>
 #include <QTextLayout>
 
-#include "util/simpleprofiler.h"
+#include "edbee/util/simpleprofiler.h"
 
 #include "edbee/models/textdocument.h"
 #include "edbee/models/texteditorconfig.h"
@@ -20,7 +20,7 @@
 #include "edbee/texteditorcontroller.h"
 #include "edbee/texteditorwidget.h"
 
-#include "debug.h"
+#include "edbee/debug.h"
 
 
 /// Using control picutres makes it possible to show the control characters (rquires a special font)

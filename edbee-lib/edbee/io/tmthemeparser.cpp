@@ -7,7 +7,7 @@
 #include "edbee/views/texttheme.h"
 #include "tmthemeparser.h"
 
-#include "debug.h"
+#include "edbee/debug.h"
 
 namespace edbee {
 

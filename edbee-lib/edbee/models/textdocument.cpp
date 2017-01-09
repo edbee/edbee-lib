@@ -18,7 +18,7 @@
 #include "edbee/models/textrange.h"
 #include "edbee/models/textundostack.h"
 
-#include "debug.h"
+#include "edbee/debug.h"
 
 namespace edbee {
 

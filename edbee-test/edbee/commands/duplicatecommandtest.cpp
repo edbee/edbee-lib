@@ -10,7 +10,7 @@
 #include "edbee/texteditorwidget.h"
 #include "edbee/views/textselection.h"
 
-#include "debug.h"
+#include "edbee/debug.h"
 
 namespace edbee {
 

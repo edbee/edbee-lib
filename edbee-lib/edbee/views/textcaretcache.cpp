@@ -10,7 +10,7 @@
 #include "edbee/views/textrenderer.h"
 #include "edbee/models/textrange.h"
 
-#include "debug.h"
+#include "edbee/debug.h"
 
 //#define STRICT_CHECK_ON_CACHE
 

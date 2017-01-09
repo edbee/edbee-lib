@@ -7,7 +7,7 @@
 #include <QMetaMethod>
 #include <QDebug>
 
-#include "util/test.h"
+#include "edbee/util/test.h"
 
 namespace edbee { namespace test {
 

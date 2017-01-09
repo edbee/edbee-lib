@@ -9,7 +9,7 @@
 #include "edbee/texteditorcommand.h"
 #include "edbee/models/textdocument.h"
 
-#include "debug.h"
+#include "edbee/debug.h"
 
 //#define DUMP_UNDO_STACK
 

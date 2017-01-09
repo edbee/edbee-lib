@@ -6,7 +6,7 @@
 #pragma once
 
 #include <QList>
-#include "util/test.h"
+#include "edbee/util/test.h"
 
 namespace edbee {
 

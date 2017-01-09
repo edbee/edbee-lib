@@ -21,7 +21,7 @@
 #include "edbee/commands/undocommand.h"
 #include "edbee/models/texteditorcommandmap.h"
 
-#include "debug.h"
+#include "edbee/debug.h"
 
 
 namespace edbee {

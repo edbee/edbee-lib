@@ -8,7 +8,7 @@
 #include "edbee/models/textbuffer.h"
 #include "edbee/models/textdocument.h"
 
-#include "debug.h"
+#include "edbee/debug.h"
 
 namespace edbee {
 

@@ -8,7 +8,7 @@
 #include "edbee/models/textdocumentscopes.h"
 #include "edbee/models/dynamicvariables.h"
 
-#include "debug.h"
+#include "edbee/debug.h"
 
 namespace edbee {
 

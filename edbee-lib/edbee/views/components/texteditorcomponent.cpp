@@ -24,7 +24,7 @@
 #include "edbee/views/textrenderer.h"
 #include "edbee/views/textselection.h"
 
-#include "debug.h"
+#include "edbee/debug.h"
 
 namespace edbee {
 

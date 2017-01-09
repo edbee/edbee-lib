@@ -8,7 +8,7 @@
 #include "edbee/data/factorycommandmap.h"
 #include "edbee/texteditorcommand.h"
 
-#include "debug.h"
+#include "edbee/debug.h"
 
 namespace edbee {
 

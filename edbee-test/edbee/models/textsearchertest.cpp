@@ -11,7 +11,7 @@
 #include "edbee/models/textrange.h"
 #include "edbee/models/textsearcher.h"
 
-#include "debug.h"
+#include "edbee/debug.h"
 
 
 namespace edbee {

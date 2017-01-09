@@ -2,9 +2,9 @@
 INCLUDEPATH += $$PWD
 
 SOURCES += \
-	$$PWD/util/mem/debug_new.cpp \
-	$$PWD/util/mem/debug_allocs.cpp \
-	$$PWD/util/simpleprofiler.cpp \
+	$$PWD/edbee/util/mem/debug_new.cpp \
+	$$PWD/edbee/util/mem/debug_allocs.cpp \
+	$$PWD/edbee/util/simpleprofiler.cpp \
 	$$PWD/edbee/util/textcodecdetector.cpp \
 	$$PWD/edbee/util/lineending.cpp \
 	$$PWD/edbee/texteditorwidget.cpp \
@@ -35,7 +35,7 @@ SOURCES += \
 	$$PWD/edbee/commands/cutcommand.cpp \
 	$$PWD/edbee/commands/pastecommand.cpp \
 	$$PWD/edbee/io/textdocumentserializer.cpp \
-	$$PWD/util/test.cpp \
+	$$PWD/edbee/util/test.cpp \
 	$$PWD/edbee/util/textcodec.cpp \
 	$$PWD/edbee/io/tmlanguageparser.cpp \
 	$$PWD/edbee/commands/debugcommand.cpp \
@@ -77,10 +77,10 @@ SOURCES += \
 	$$PWD/edbee/data/factorycommandmap.cpp
 
 HEADERS += \
-	$$PWD/util/logging.h \
-	$$PWD/util/mem/debug_new.h \
-	$$PWD/util/mem/debug_allocs.h \
-	$$PWD/util/simpleprofiler.h \
+	$$PWD/edbee/util/logging.h \
+	$$PWD/edbee/util/mem/debug_new.h \
+	$$PWD/edbee/util/mem/debug_allocs.h \
+	$$PWD/edbee/util/simpleprofiler.h \
 	$$PWD/edbee/util/textcodecdetector.h \
 	$$PWD/edbee/util/lineending.h \
 	$$PWD/edbee/texteditorwidget.h \
@@ -110,9 +110,9 @@ HEADERS += \
 	$$PWD/edbee/commands/cutcommand.h \
 	$$PWD/edbee/commands/pastecommand.h \
 	$$PWD/edbee/models/textdocumentfilter.h \
-	$$PWD/debug.h \
+	$$PWD/edbee/debug.h \
 	$$PWD/edbee/io/textdocumentserializer.h \
-	$$PWD/util/test.h \
+	$$PWD/edbee/util/test.h \
 	$$PWD/edbee/util/textcodec.h \
 	$$PWD/edbee/io/tmlanguageparser.h \
 	$$PWD/edbee/commands/debugcommand.h \

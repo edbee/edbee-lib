@@ -14,7 +14,7 @@
 #include "edbee/util/textcodecdetector.h"
 #include "edbee/util/textcodec.h"
 
-#include "debug.h"
+#include "edbee/debug.h"
 
 namespace edbee {
 
