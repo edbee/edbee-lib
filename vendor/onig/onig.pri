@@ -51,12 +51,6 @@ SOURCES += $$PWD/regcomp.c \
 # $$PWD/enc/mktable.c \
 
 
-HEADERS += $$PWD/QSLogDest.h \
-    $$PWD/QsLog.h \
-    $$PWD/QsDebugOutput.h \
-    $$PWD/QsLogLevel.h
-
-
 HEADERS += $$PWD/config.h \
            $$PWD/oniggnu.h \
            $$PWD/onigposix.h \

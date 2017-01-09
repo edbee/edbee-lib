@@ -2,6 +2,8 @@
 
 edbee.lib:
 
+- fix, onig.pri, it contained strange references to qslog 
+- fix, edbee-lib.pri (correct references to vendor .pri's)
 - BREAKING CHANGE, moved all source/headers files under the folder 'edbee/' to prevent filename collisions when embedding it in other projects.
 
 - add #121, Insert line before and insert line after commands

@@ -1,4 +1,5 @@
 
+
 INCLUDEPATH += $$PWD
 
 SOURCES += \
@@ -154,6 +155,6 @@ HEADERS += \
 
 ## Extra dependencies
 ##====================
-include(../vendor/qslog/QsLog.pri)
-include(../vendor/onig/onig.pri)
+include($$PWD/../vendor/QsLog/QsLog.pri)
+include($$PWD/../vendor/onig/onig.pri)
 
