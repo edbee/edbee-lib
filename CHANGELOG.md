@@ -2,6 +2,7 @@
 
 edbee.lib:
 
+- fix, Syntax highlighting didn't work on the last line of the document. (First highlight after the first enter) 
 - fix, onig.pri, it contained strange references to qslog 
 - fix, edbee-lib.pri (correct references to vendor .pri's)
 - BREAKING CHANGE, moved all source/headers files under the folder 'edbee/' to prevent filename collisions when embedding it in other projects.

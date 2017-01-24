@@ -868,8 +868,9 @@ void TextDocumentScopes::removeScopesAfterOffset(int offset)
         setLastScopedOffset(offset);
     }
 
-    // delete/remove all line ranges
-    int line = this->textDocument()->lineFromOffset(offset);
+
+    // delete/remove all line ranges (after this line)
+    int line = this->textDocument()->lineFromOffset(offset) + 1;
     if( line < lineRangeList_.length() ) {
         for( int i=line,cnt=lineRangeList_.length(); i<cnt; ++i ) {
             delete lineRangeList_.at(i);
