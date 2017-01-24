@@ -2,6 +2,7 @@
 
 edbee.lib:
 
+- fix, moveCaret after the last character didn't work correctly on the if the last line didn't end with a newline
 - fix, Syntax highlighting didn't work on the last line of the document. (First highlight after the first enter) 
 - fix, onig.pri, it contained strange references to qslog 
 - fix, edbee-lib.pri (correct references to vendor .pri's)

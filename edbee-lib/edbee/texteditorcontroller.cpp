@@ -618,7 +618,9 @@ void TextEditorController::moveCaretTo(int line, int col, bool keepAnchors )
     if( col < 0 ){
         col = lineLength + col;
     }
-    offset += qBound(0, col, lineLength-1 );
+
+    int minusNewLineChar = textDocument()->lineCount()-1 == line ? 0 : 1;
+    offset += qBound(0, col, lineLength-minusNewLineChar );
 
 //textDocument()->offsetFromLineAndColumn(line,col)
 
