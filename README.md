@@ -86,6 +86,20 @@ widget->textDocument()->setLanguagGrammar( grammar );
 
 ```
 
+Tips and Tricks
+----------------
+
+### Object-name conflicts
+
+When you're QT projects uses for example util.cpp you can get an object-file collission. (Makefile: Warning: overriding commands for target util.o). A workaround for this is appending the following lines in your 
+(OBJECTS_DIR is optional, but prevents a warning when running QMAKE)
+
+```
+CONFIG += object_parallel_to_source in your .pro file
+OBJECTS_DIR = objects
+```
+
+
 Known Issues and Missing Features
 ---------------------------------
 
