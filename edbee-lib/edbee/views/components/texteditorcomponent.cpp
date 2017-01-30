@@ -407,6 +407,7 @@ void TextEditorComponent::mouseDoubleClickEvent( QMouseEvent* event )
         } else {
             controller()->executeCommand( &selectWord  );
         }
+        return;
     }
     QWidget::mouseDoubleClickEvent(event);
 }
