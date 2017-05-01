@@ -2,7 +2,7 @@
 
 edbee.lib:
 
-- fix, removed config.h reference from simpleprofiler.h (Which prevent compilation, refs issue #1)
+- fix, removed config.h reference from simpleprofiler.h (Which caused compilation via to fail, refs issue #1)
 - fix, mouse double click didn't select wordt anymore. (Issue with newer Qt version??)
 - fix, moveCaret after the last character didn't work correctly on the if the last line didn't end with a newline
 - fix, Syntax highlighting didn't work on the last line of the document. (First highlight after the first enter) 
