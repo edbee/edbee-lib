@@ -7,7 +7,7 @@
 
 // This is required for windows, to prevent linkage errors (somehow the sources of oniguruma assumes we're linking with a dll)
 #define ONIG_EXTERN extern
-#include "oniguruma.h"
+#include "onigmo.h"
 #include "regexp.h"
 #include "edbee/debug.h"
 
@@ -48,7 +48,8 @@ private:
     /// deletes the current regon
     void deleteRegion()
     {
-        if( region_ ) { onig_region_free(region_, 1 ); }  // 1:free self, 0:free contents only);
+        if( region_ ) {
+            onig_region_free(region_, 1 ); }  // 1:free self, 0:free contents only);
         region_ = 0;
     }
 
@@ -66,8 +67,8 @@ public:
     {
         const QChar* patternChars = pattern.constData();
 
-        OnigSyntaxType* onigSyntax = ONIG_SYNTAX_DEFAULT;
-        if( syntax == RegExp::SyntaxFixedString ) { onigSyntax = ONIG_SYNTAX_ASIS; }
+        const OnigSyntaxType* onigSyntax = &OnigSyntaxRuby;
+        if( syntax == RegExp::SyntaxFixedString ) { onigSyntax = &OnigSyntaxASIS; }
 
 
         OnigOptionType onigOptions = ONIG_OPTION_NONE|ONIG_OPTION_CAPTURE_GROUP;

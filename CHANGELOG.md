@@ -2,6 +2,7 @@
 
 edbee.lib:
 
+- fix, updated Onigmo (Oniguruma-mod) library to version 6.1.1 (Fixes memory corruption with lexing)
 - fix, removed config.h reference from simpleprofiler.h (Which caused compilation via to fail, refs issue #1)
 - fix, mouse double click didn't select wordt anymore. (Issue with newer Qt version??)
 - fix, moveCaret after the last character didn't work correctly on the if the last line didn't end with a newline
