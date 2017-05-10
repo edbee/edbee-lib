@@ -8,11 +8,12 @@ CONFIG += staticlib
 DEPENDPATH += $$PWD $$PWD/enc $$PWD/win32
 INCLUDEPATH += $$PWD
 
-QMAKE_CXXFLAGS += \
-             -Wall
-
 QMAKE_CFLAGS += \
              -Wall \
+             -Wno-unused-parameter \
+             -Wno-missing-field-initializers
+
+QMAKE_CFLAGS_WARN_ON += \
              -Wno-unused-parameter \
              -Wno-missing-field-initializers
 
