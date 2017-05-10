@@ -9,20 +9,12 @@ DEPENDPATH += $$PWD $$PWD/enc $$PWD/win32
 INCLUDEPATH += $$PWD
 
 QMAKE_CXXFLAGS += \
-             -Wall \
-             -Wno-missing-field-initializers \
-             -Wno-sized-deallocation \
-             -Wno-delete-incomplete \
-             -Wno-unused-but-set-variable \
-             -Wno-deprecated-declarations \
-             -Wno-terminate
+             -Wall
 
 QMAKE_CFLAGS += \
              -Wall \
-             -Wno-missing-field-initializers \
-             -Wno-unused-but-set-variable \
-             -Wno-deprecated-declarations \
-             -Wno-unused-parameter
+             -Wno-unused-parameter \
+             -Wno-missing-field-initializers
 
 # Input
 include("./onig.pri")
