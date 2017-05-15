@@ -34,4 +34,5 @@ script:
   - cd build
   - qmake ../edbee-lib.pro && make -j2
   - cd edbee-test
+  - if [ "${TRAVIS_OS_NAME}" = "osx" ]; then cd edbee-test.app/Contents/MacOS/; fi
   - ./edbee-test
