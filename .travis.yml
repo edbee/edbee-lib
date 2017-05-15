@@ -12,6 +12,7 @@ addons:
     - qt56base
     - qt56multimedia
     - qt56tools
+    - xvfb
 compiler:
   - gcc
   - clang
@@ -22,6 +23,10 @@ matrix:
 before_install: ./CI/travis.before_install.sh
 install: ./CI/travis.install.sh
 before_script:
+  - "export DISPLAY=:99.0"
+  - if [ "${TRAVIS_OS_NAME}" = "linux" ]; then sh -e /etc/init.d/xvfb start; fi
+  - if [ "${TRAVIS_OS_NAME}" = "osx" ]; then ( sudo Xvfb :99 -ac -screen 0 1024x768x8; echo ok ) & fi
+  - sleep 3 # give xvfb some time to start
   - if [ "${TRAVIS_OS_NAME}" = "osx" ]; then PATH="/usr/local/opt/qt5/bin:$PATH"; fi
   - if [ "${TRAVIS_OS_NAME}" = "linux" ]; then source /opt/qt56/bin/qt56-env.sh; fi
   - mkdir build
