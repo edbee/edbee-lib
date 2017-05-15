@@ -2,6 +2,7 @@
 
 edbee.lib:
 
+- fix #4, QT5.8 Ambiguity Errors. 
 - fix #6, Theme Manager only attempts to load a theme if a theme path has been set.
 - fix, updated Onigmo (Oniguruma-mod) library to version 6.1.1 (Fixes memory corruption with lexing)
 - fix, removed config.h reference from simpleprofiler.h (Which caused compilation via to fail, refs issue #1)
