@@ -2,6 +2,7 @@
 
 edbee.lib:
 
+- fix #6, Theme Manager only attempts to load a theme if a theme path has been set.
 - fix, updated Onigmo (Oniguruma-mod) library to version 6.1.1 (Fixes memory corruption with lexing)
 - fix, removed config.h reference from simpleprofiler.h (Which caused compilation via to fail, refs issue #1)
 - fix, mouse double click didn't select wordt anymore. (Issue with newer Qt version??)
@@ -10,6 +11,9 @@ edbee.lib:
 - fix, onig.pri, it contained strange references to qslog 
 - fix, edbee-lib.pri (correct references to vendor .pri's)
 - BREAKING CHANGE, moved all source/headers files under the folder 'edbee/' to prevent filename collisions when embedding it in other projects.
+
+Issues numbers below are issues from the old tracker.
+All lines above refer to github-issue numbers
 
 - add #121, Insert line before and insert line after commands
 - add #108, #111, Added a DynamicTextRangeSet, a change aware rangeset, that automatically gets adjusted when the document changes.
