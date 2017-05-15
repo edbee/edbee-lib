@@ -2,6 +2,12 @@
 
 edbee.lib:
 
+- fix #5, Incorrect memory access after coalescing in TextDocument::ReplaceRangeSet. (Crash on Linux/Windows)
+	This fix, changed the API interfaces of: (return type is now: Change*)
+    - TextDocument::executeAndGiveChange
+	- TextDocument::giveChangeWithoutFilter
+	- CharTextDocument::giveChangeWithoutFilter
+	- TextUndoStack::giveChange
 - fix #4, QT5.8 Ambiguity Errors. 
 - fix #6, Theme Manager only attempts to load a theme if a theme path has been set.
 - fix, updated Onigmo (Oniguruma-mod) library to version 6.1.1 (Fixes memory corruption with lexing)
