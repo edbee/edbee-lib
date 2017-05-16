@@ -7,20 +7,26 @@
 
 // This is required for windows, to prevent linkage errors (somehow the sources of oniguruma assumes we're linking with a dll)
 
-#pragma clang diagnostic push
-#pragma GCC diagnostic push
+#ifdef __clang__
+  #pragma clang diagnostic push
+#else
+  #pragma GCC diagnostic push
+#endif
 #ifdef _MSC_VER
-#pragma warning( push )
+  #pragma warning( push )
 #endif
 
 #define ONIG_EXTERN extern
 #include "onigmo.h"
 
 #ifdef _MSC_VER
-#pragma warning( pop )
+  #pragma warning( pop )
+#endif
+
+#ifdef __clang__
+  #pragma clang diagnostic pop
 #else
-#pragma GCC diagnostic pop
-#pragma clang diagnostic pop
+  #pragma GCC diagnostic pop
 #endif
 
 #include "regexp.h"
