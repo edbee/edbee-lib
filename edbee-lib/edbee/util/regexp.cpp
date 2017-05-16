@@ -6,8 +6,23 @@
 #include <QRegExp>
 
 // This is required for windows, to prevent linkage errors (somehow the sources of oniguruma assumes we're linking with a dll)
+
+#pragma clang diagnostic push
+#pragma GCC diagnostic push
+#ifdef _MSC_VER
+#pragma warning( push )
+#endif
+
 #define ONIG_EXTERN extern
 #include "onigmo.h"
+
+#ifdef _MSC_VER
+#pragma warning( pop )
+#else
+#pragma GCC diagnostic pop
+#pragma clang diagnostic pop
+#endif
+
 #include "regexp.h"
 #include "edbee/debug.h"
 

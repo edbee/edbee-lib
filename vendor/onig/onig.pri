@@ -73,7 +73,8 @@ HEADERS += $$PWD/config.h \
            $$PWD/regint.h \
            $$PWD/regparse.h \
            $$PWD/st.h \
-           $$PWD/win32/config.h
+           $$PWD/win32/config.h \
+           $$PWD/config-onig-edbee.h
 
 
 ######################################################################

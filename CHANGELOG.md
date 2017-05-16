@@ -2,6 +2,7 @@
 
 edbee.lib:
 
+- fix, Fixed build warnings via een #pragma for the onig library. (When updating vendor/onig, include "config-onig-edbee.h" in "config.h")
 - fix #5, Incorrect memory access after coalescing in TextDocument::ReplaceRangeSet. (Crash on Linux/Windows)
 	This fix, changed the API interfaces of: (return type is now: Change*)
     - TextDocument::executeAndGiveChange
