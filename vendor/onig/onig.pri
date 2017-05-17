@@ -54,8 +54,12 @@ SOURCES += $$PWD/regcomp.c \
            $$PWD/enc/windows_1252.c \
            $$PWD/enc/windows_1253.c \
            $$PWD/enc/windows_1254.c \
-           $$PWD/enc/windows_1257.c \
-           $$PWD/enc/windows_31j.c 
+           $$PWD/enc/windows_1257.c
+
+
+## Temporary diabled windows_31j encoding  (see: https://github.com/edbee/edbee-lib/issues/9)
+# SOURCES +=  $$PWD/enc/windows_31j.c
+
 
 # $$PWD/testc.c \
 # $$PWD/testu.c \
@@ -75,6 +79,7 @@ HEADERS += $$PWD/config.h \
            $$PWD/st.h \
            $$PWD/win32/config.h \
            $$PWD/config-onig-edbee.h
+
 
 
 ######################################################################
