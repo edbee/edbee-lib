@@ -54,11 +54,11 @@ SOURCES += $$PWD/regcomp.c \
            $$PWD/enc/windows_1252.c \
            $$PWD/enc/windows_1253.c \
            $$PWD/enc/windows_1254.c \
-           $$PWD/enc/windows_1257.c
+           $$PWD/enc/windows_1257.c \
+           $$PWD/enc/windows_31j.c
 
 
 ## Temporary diabled windows_31j encoding  (see: https://github.com/edbee/edbee-lib/issues/9)
-# SOURCES +=  $$PWD/enc/windows_31j.c
 
 
 # $$PWD/testc.c \
