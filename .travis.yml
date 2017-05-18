@@ -16,6 +16,10 @@ addons:
 compiler:
   - gcc
   - clang
+env:
+  matrix:
+  - Q_OR_C_MAKE=cmake
+  - Q_OR_C_MAKE=qmake
 matrix:
   exclude:
   - os: osx
@@ -32,8 +36,8 @@ before_script:
   - mkdir build
 script:
   - cd build
-  - if [ "${CC}" = "clang" ] && [ "${TRAVIS_OS_NAME}" = "linux" ]; then SPEC="-spec linux-clang"; fi
-  - qmake ${SPEC} ../edbee-lib.pro && make -j2
+  - if [ "${CC}" = "clang" ] && [ "${TRAVIS_OS_NAME}" = "linux" ] && [ "${Q_OR_C_MAKE}" = "qmake" ] ; then SPEC="-spec linux-clang"; fi
+  - if [ "${Q_OR_C_MAKE}" = "qmake" ]; then qmake -v; qmake ../edbee-lib.pro && make -j2; else cmake --version; cmake .. && make -j2; fi
   - cd edbee-test
-  - if [ "${TRAVIS_OS_NAME}" = "osx" ]; then cd edbee-test.app/Contents/MacOS/; fi
+  - if [ "${TRAVIS_OS_NAME}" = "osx" ] && [ "${Q_OR_C_MAKE}" = "qmake" ]; then cd edbee-test.app/Contents/MacOS/; fi
   - ./edbee-test
