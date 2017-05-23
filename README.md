@@ -38,7 +38,7 @@ edbee::Edbee* tm = edbee::Edbee::instance();
 
 // configure your paths
 tm->setKeyMapPath( "location/of/your/keymap/");
-tm->setGrammarPath(  "location/of/your/syntaxfiles/"" );
+tm->setGrammarPath(  "location/of/your/syntaxfiles/" );
 tm->setThemePath( "location/of/your/themes/" );
 
 // initialize the library
