@@ -2,6 +2,7 @@
 
 edbee.lib:
 
+- fix #13, Added a method to disable the scrollarea shadows: widget->textScrollArea()->enableShadowWidget(bool)
 - fix #9, Updated onigmo library. Fixes compilation/linkage issue on Mac OS X (enc/windows_31j.c)
 - fix, Fixed build warnings via een #pragma for the onig library. (When updating vendor/onig, include "config-onig-edbee.h" in "config.h")
 - fix #5, Incorrect memory access after coalescing in TextDocument::ReplaceRangeSet. (Crash on Linux/Windows)

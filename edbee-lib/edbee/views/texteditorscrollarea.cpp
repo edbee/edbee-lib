@@ -138,7 +138,6 @@ TextEditorScrollArea::TextEditorScrollArea(QWidget* parent)
     , shadowWidgetRef_(0)
 {
     shadowWidgetRef_ = new PrivateShadowWidget(this);
-    leftWidgetRef_  = shadowWidgetRef_ ;
     setFrameShape(QFrame::NoFrame);
     setFocusPolicy(Qt::NoFocus);
 }
@@ -180,7 +179,9 @@ void TextEditorScrollArea::layoutMarginWidgets()
     setViewportMargins( left, top, right, bottom );
 
     // overlay the shadow over the viewport
-    this->shadowWidgetRef_->setGeometry( viewport()->geometry() );
+    if( shadowWidgetRef_ ) {
+        this->shadowWidgetRef_->setGeometry( viewport()->geometry() );
+    }
 
     // set the widget
     if( leftWidgetRef_) {
@@ -203,6 +204,11 @@ void TextEditorScrollArea::layoutMarginWidgets()
         bottomWidgetRef_->setGeometry(rect);
     }
 
+}
+
+void TextEditorScrollArea::enableShadowWidget(bool enabled)
+{
+    shadowWidgetRef_->setVisible(enabled);
 }
 
 

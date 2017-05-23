@@ -27,21 +27,13 @@ public:
     void setRightWidget(QWidget* widget);
     void setBottomWidget(QWidget* widget);
 
-
 public:
 
     void layoutMarginWidgets();
-
+    void enableShadowWidget(bool enabled);
 
 protected:
     virtual void resizeEvent(QResizeEvent* event);
-
-public:
-    void renderShade(QPaintEvent *event, QPainter* painter );
-
-
-signals:    
-public slots:
 
 private:
 
@@ -50,7 +42,6 @@ private:
     QWidget* rightWidgetRef_;              ///< The right widget
     QWidget* bottomWidgetRef_;             ///< The bottom widget
     PrivateShadowWidget* shadowWidgetRef_; ///< The private shadow widget
-
 
 };
 
