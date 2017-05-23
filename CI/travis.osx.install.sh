@@ -1,6 +1,6 @@
 #!/bin/bash
 set -ev
-BREWS="qt5"
+BREWS="qt5 cmake"
 for i in $BREWS; do
   brew outdated | grep -q $i && brew upgrade $i
 done
