@@ -7,7 +7,7 @@
 
 #include "edbee/util/logging.h"
 
-#ifdef QT_DEBUG
+#if defined(QT_DEBUG) && !defined(__MINGW32__)
     #include "edbee/util/mem/debug_new.h"
     /// This assert requires the inclusion of QApplication an QThread
     #define Q_ASSERT_GUI_THREAD Q_ASSERT(  qApp->thread() == QThread::currentThread( ) )

@@ -2,6 +2,7 @@
 
 edbee.lib:
 
+- fix #14, MinGW compatibility: Disabled memoryLeak detection and fixed mingw compilation (different library-name is generated for mingw)
 - fix #13, Added a method to disable the scrollarea shadows: widget->textScrollArea()->enableShadowWidget(bool)
 - fix #9, Updated onigmo library. Fixes compilation/linkage issue on Mac OS X (enc/windows_31j.c)
 - fix, Fixed build warnings via een #pragma for the onig library. (When updating vendor/onig, include "config-onig-edbee.h" in "config.h")

@@ -106,7 +106,10 @@ else:unix:!symbian: LIBS += -L$$OUT_PWD/../edbee-lib/ -ledbee
 INCLUDEPATH += $$PWD/../edbee-lib
 DEPENDPATH += $$PWD/../edbee-lib
 
-win32:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../edbee-lib/release/edbee.lib
-else:win32:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../edbee-lib/debug/edbee.lib
-else:unix:!symbian: PRE_TARGETDEPS += $$OUT_PWD/../edbee-lib/libedbee.a
+win32-msvc*:LIBNAME=edbee.lib
+else:LIBNAME=libedbee.a
+
+win32:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../edbee-lib/release/$$LIBNAME
+else:win32:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../edbee-lib/debug/$$LIBNAME
+else:unix:!symbian: PRE_TARGETDEPS += $$OUT_PWD/../edbee-lib/$$LIBNAME
 
