@@ -405,9 +405,9 @@ TextTheme* TextThemeManager::readThemeFile( const QString& fileName, const QStri
 /// @return the theme with the given name
 TextTheme* TextThemeManager::theme(const QString& name)
 {
-    if( name.isEmpty() || themePath_.isEmpty() ) { return 0; }
+    if( name.isEmpty() ) { return 0; }
     TextTheme* theme=themeMap_.value(name);
-    if( !theme ) {
+    if( !theme && !themePath_.isEmpty()) {
         QString filename = QString("%1/%2.tmTheme").arg(themePath_).arg(name);
         TextTheme* theme = readThemeFile( filename );
         if( !theme ) {
