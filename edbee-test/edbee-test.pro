@@ -113,3 +113,8 @@ win32:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../edbee-lib/r
 else:win32:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../edbee-lib/debug/$$LIBNAME
 else:unix:!symbian: PRE_TARGETDEPS += $$OUT_PWD/../edbee-lib/$$LIBNAME
 
+win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../vendor/onig/release/ -lonig
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../vendor/onig/debug/ -lonig
+else:unix: LIBS += -L$$OUT_PWD/../vendor/onig/ -lonig
+
+
