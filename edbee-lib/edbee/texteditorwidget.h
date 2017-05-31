@@ -8,6 +8,7 @@
 //#include <QAbstractScrollArea>
 #include <QStringList>
 #include <QWidget>
+#include "views/texteditorscrollarea.h"
 
 class QResizeEvent;
 class QScrollBar;
