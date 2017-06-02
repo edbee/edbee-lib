@@ -100,7 +100,7 @@ void TextDocument::endUndoGroup( int coalesceId, bool flatten)
 
 
 /// Ends the undo group and discards all recorded information
-/// Warning it doesn NOT undo all made changes!!!
+/// Warning it does NOT undo all made changes!!!
 void TextDocument::endUndoGroupAndDiscard()
 {
     textUndoStack()->endUndoGroupAndDiscard();
