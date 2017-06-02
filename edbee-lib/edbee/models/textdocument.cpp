@@ -182,7 +182,7 @@ TextDocumentFilter* TextDocument::documentFilter()
 }
 
 
-/// Start the changesa
+/// Start the changes
 void TextDocument::beginChanges(TextEditorController* controller)
 {
     beginUndoGroup( new MergableChangeGroup( controller) );
