@@ -114,6 +114,7 @@ void FactoryCommandMap::fill(TextEditorCommandMap* cm)
     give( "debug_dump_scopes", new DebugCommand( DebugCommand::DumpScopes ) );
     give( "debug_rebuild_scopes", new DebugCommand( DebugCommand::RebuildScopes ) );
     give( "debug_dump_undo_stack", new DebugCommand( DebugCommand::DumpUndoStack ) );
+    give( "debug_dump_character_codes", new DebugCommand( DebugCommand::DumpCharacterCodes ) );
 
     // find items
     give( "find_use_sel", new FindCommand( FindCommand::UseSelectionForFind ) );

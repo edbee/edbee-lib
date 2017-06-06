@@ -275,6 +275,24 @@ void TextRangeTest::testMoveCaretToLineBoundary()
 
 }
 
+void TextRangeTest::testMoveNonBmpCharacters()
+{
+    bufRef_->appendText("a😂aa");
+
+    TextRange range(0,0);
+    range.setCaret(0);
+
+    range.moveCaret(doc_,1);
+    testEqual( range.caret(), 1 );
+
+    range.moveCaret(doc_,1);
+    testEqual( range.caret(), 3 );
+
+    range.moveCaret(doc_,-1);
+    testEqual( range.caret(), 1 );
+
+}
+
 
 //=================================================================================
 

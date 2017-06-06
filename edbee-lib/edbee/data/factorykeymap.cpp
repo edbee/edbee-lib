@@ -109,6 +109,7 @@ void FactoryKeyMap::fill( TextEditorKeyMap* km )
     add( "debug_dump_scopes", "Ctrl+Shift+X,S" );
     add( "debug_rebuild_scopes", "Ctrl+Shift+X,R" );
     add( "debug_dump_undo_stack", "Ctrl+Shift+X,U" );
+    add( "debug_dump_character_codes", "Ctrl+Shift+X,C" );
 
     // find commands
     add( "find_use_sel", "Ctrl+E" );

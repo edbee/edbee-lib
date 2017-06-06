@@ -31,6 +31,8 @@ private slots:
     void testMoveCaretByCharGroup();
     void testMoveCaretToLineBoundary();
 
+    void testMoveNonBmpCharacters();
+
 private:
     TextDocument* doc_;
     TextBuffer* bufRef_;

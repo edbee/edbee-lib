@@ -8,10 +8,13 @@
 #include "edbee/models/textdocument.h"
 #include "edbee/models/textdocumentscopes.h"
 #include "edbee/models/textlexer.h"
+#include "edbee/models/textrange.h"
 #include "edbee/models/textundostack.h"
 #include "edbee/texteditorcontroller.h"
+#include "edbee/views/textselection.h"
 
 #include "edbee/debug.h"
+
 
 namespace edbee {
 
@@ -26,6 +29,7 @@ void DebugCommand::execute(TextEditorController* controller)
         case DumpScopes: dumpScopes( controller ); break;
         case RebuildScopes: rebuildScopes( controller ); break;
         case DumpUndoStack: dumpUndoStack( controller ); break;
+        case DumpCharacterCodes: dumpCharacterCodes( controller ); break;
     }
 
 }
@@ -68,5 +72,34 @@ void DebugCommand::dumpUndoStack(TextEditorController* controller)
 {
     qlog_info() << controller->textDocument()->textUndoStack()->dumpStack();
 }
+
+
+/// dumps the character codes (around the FIRST caret)
+void DebugCommand::dumpCharacterCodes(TextEditorController *controller)
+{
+    static int count = 3;       // 2 chars before caret and 2 chars after caret
+
+    // get the current range
+    TextSelection* sel = controller->textSelection();
+    TextRange range = sel->range(0);
+
+    QString line;
+
+    // iterate over the characters
+    int start = qMax(range.caret() - count, 0);
+    int end = qMin(range.caret() + count, controller->textDocument()->length()-1 );
+    for( int i=start; i<=end; ++i ) {
+        QChar c = controller->textDocument()->charAt(i);
+        if( i == range.caret() ) {
+            line.append("| ");
+        }
+
+        line.append( QString::number((int)c.unicode(), 16) );
+        line.append(" ");
+    }
+
+    qlog_info() << "charcodes: " <<  line;
+}
+
 
 } // edbee

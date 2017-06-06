@@ -44,6 +44,8 @@ public:
 
     inline int length() const { return qAbs(caret_ - anchor_ ); }
 
+    void fixCaretForUnicode(TextDocument* doc, int direction );
+
 
     void setAnchor( int anchor ) { anchor_ = anchor; }
     void setAnchorBounded( TextDocument* doc, int anchor );

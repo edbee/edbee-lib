@@ -18,7 +18,8 @@ public:
     enum DebugCommandType {
         DumpScopes,
         RebuildScopes,
-        DumpUndoStack
+        DumpUndoStack,
+        DumpCharacterCodes
     };
 
     DebugCommand( DebugCommandType command );
@@ -32,7 +33,7 @@ protected:
     void rebuildScopes( TextEditorController* controller );
 
     void dumpUndoStack( TextEditorController* controller );
-
+    void dumpCharacterCodes( TextEditorController* controller );
 private:
 
     DebugCommandType command_;      ///< the command to execute

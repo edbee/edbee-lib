@@ -18,6 +18,24 @@ bool TextRange::lessThan(TextRange &r1, TextRange &r2)
 }
 
 
+/// Makes sure the caret isn't in-between a unicode boundary
+/// refs #19 - Dirty hack to improve caret-movement by skipping non-BMP characters
+void TextRange::fixCaretForUnicode(TextDocument *doc, int direction)
+{
+    if( caret_ >= doc->length() ) return;
+
+    // unicode-emoji hack (Really really dirty!!)
+    int code = doc->charAt(caret_).unicode();
+//qlog_info() << "fixCaretForUnicode: >> " << caret_ << " : " << code <<  "(" << direction << ")";
+    if( 0xDC00 <= code && code <= 0xDFFF ) {
+        if( direction > 0 ) {
+            setCaretBounded( doc, caret_ + 1 );
+        } else {
+            setCaretBounded( doc, caret_ - 1 );
+        }
+    }
+}
+
 /// Sets the anchor to the given location, and forces the anchor to say between the document bounds
 /// @param doc document to set the anchor for
 /// @param anchor the anchor location to set
@@ -58,6 +76,7 @@ QString TextRange::toString() const
 void TextRange::moveCaret(TextDocument* doc, int amount )
 {
     setCaretBounded( doc, caret_ + amount );
+    fixCaretForUnicode(doc,amount);
 }
 
 
@@ -79,6 +98,7 @@ void TextRange::moveCaretOrDeselect(TextDocument* doc, int amount)
     } else {
         setCaretBounded( doc, caret_ + amount );
     }
+    fixCaretForUnicode(doc,amount);
 }
 
 
