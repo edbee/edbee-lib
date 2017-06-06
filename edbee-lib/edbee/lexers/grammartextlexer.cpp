@@ -340,46 +340,13 @@ TextGrammarRule* GrammarTextLexer::findIncludeGrammarRule(TextGrammarRule* base)
 //void GrammarTextLexer::textReplaced( int offset, int length, int newLength )
 void GrammarTextLexer::textChanged( const TextBufferChange& change )
 {
-    // find the beginning of the given line
     TextDocument* doc = textDocument();
     TextDocumentScopes* docScopes = textScopes();
 
-    // first check the first dependent line
-    bool dependent = false;
-    for( int idx=0; idx<change.lineCount(); ++idx) {
-        ScopedTextRangeList* list =  docScopes->scopedRangesAtLine( change.line()+idx );
-        if( list && list->isIndependent() ) {
-            dependent = true;
-            break;
-        }
-    }
+    int offsetStart = doc->offsetFromLine(change.line());
+    docScopes->removeScopesAfterOffset(offsetStart);
 
-    // check if we can simply update the given scoped line
-    int idx = 0;
-    if( !dependent ) {
-        int cnt = change.newLineCount()+1;
-        while( idx < cnt ) {
-            int line = change.line() + idx;
-            ScopedTextRangeList* range = docScopes->scopedRangesAtLine( line );
-            if( !range || !range->isIndependent() ) {
-                dependent = true;
-                break;
-            }
-            ++idx;
-        }
-
-        // just lex the simple lines
-        if( idx > 0 ) {
-            lexLines( change.line(), idx );
-        }
-    }
-
-
-    // only remove offset when a non-indepdent offset has been changed
-//    if( dependent  ) {
-        int offsetStart = doc->offsetFromLine(change.line()+idx); //lineStart);
-        docScopes->removeScopesAfterOffset(offsetStart);
-//    }
+    /// TODO: rebuild an optimized scope-rebuilding algorithm
 }
 
 

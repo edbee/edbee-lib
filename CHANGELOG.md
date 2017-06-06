@@ -2,7 +2,8 @@
 
 edbee.lib:
 
-- refs #19 Workaround-hack for non-bmp-unicode character movement. (experimental)
+- refs #23, Scope invaldating optimization wasn't working correctly. Removed optimization for now
+- refs #19, Workaround-hack for non-bmp-unicode character movement. (experimental)
 - Added DebugCommand::DumpCharacterCodes (for dumping hex-character codes)
 - fix #14, MinGW compatibility: Disabled memoryLeak detection and fixed mingw compilation (different library-name is generated for mingw)
 - fix #13, Added a method to disable the scrollarea shadows: widget->textScrollArea()->enableShadowWidget(bool)
