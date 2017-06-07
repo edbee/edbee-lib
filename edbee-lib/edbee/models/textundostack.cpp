@@ -38,26 +38,26 @@ TextUndoStack::TextUndoStack( TextDocument* doc, QObject *parent)
 TextUndoStack::~TextUndoStack()
 {
     disconnect();   // disconnect so no signals are emitted
-    destruct();
+    clearHistoryLists();
+    controllerIndexMap_.clear();
 }
 
 
 /// deletes all created objects
-void TextUndoStack::destruct()
+void TextUndoStack::clearHistoryLists()
 {
     qDeleteAll(changeList_);
     changeList_.clear();
     qDeleteAll( undoGroupStack_ );
     undoGroupStack_.clear();
     lastCoalesceIdStack_.clear();
-    controllerIndexMap_.clear();
 }
 
 
 /// clears both stacks
 void TextUndoStack::clear()
 {
-    destruct();
+    clearHistoryLists();
     lastCoalesceIdStack_.push(0);   // always 1 item
 
     // point all the indices to BLANK
@@ -82,6 +82,13 @@ void TextUndoStack::registerContoller(TextEditorController* controller)
 void TextUndoStack::unregisterController(TextEditorController* controller)
 {
     controllerIndexMap_.remove(controller);
+}
+
+
+/// Checks if the given controller is registered
+bool TextUndoStack::isControllerRegistered(TextEditorController *controller)
+{
+    return controllerIndexMap_.contains(controller);
 }
 
 
@@ -574,7 +581,7 @@ void TextUndoStack::clearRedo(TextEditorController* controller)
         if( controllerIndexMap_.contains(controller) ) {
             idx = this->controllerIndexMap_.value(controller);
         } else {
-            Q_ASSERT(false);    // warning view isn't registered!
+            Q_ASSERT(false && "The current controller isn't registered with the undostack!");    // warning view isn't registered!
         }
 
         // remove all items from the stack AFTER the given index

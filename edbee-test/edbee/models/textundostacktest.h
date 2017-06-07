@@ -15,7 +15,8 @@ Q_OBJECT
 
 private slots:
     void testMultiCaretUndoIssue196();
-
+    void testClearUndoStackCrashIssue24();
+    void testClearUndoStackShouldnotUnregisterTheControllerIssue24();
 
 };
 

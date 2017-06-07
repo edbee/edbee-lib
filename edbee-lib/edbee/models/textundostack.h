@@ -64,6 +64,7 @@ public:
 
     void registerContoller( TextEditorController* controller );
     void unregisterController( TextEditorController* controller );
+    bool isControllerRegistered( TextEditorController* controller );
 
     void beginUndoGroup( ChangeGroup* group );
     ChangeGroup* currentGroup();
@@ -139,7 +140,7 @@ signals:
 
 
 private:
-    void destruct();
+    void clearHistoryLists();
 
 
     TextDocument* documentRef_;                           ///< A reference to the textdocument

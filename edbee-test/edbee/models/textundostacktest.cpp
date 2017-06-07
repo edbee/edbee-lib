@@ -80,7 +80,6 @@ void TextUndoStackTest::testMultiCaretUndoIssue196()
 
 /*
 
-
 ==== after 1 delete ===
 
   1a|2b|3c4d =>  1a|b|c4d
@@ -121,6 +120,38 @@ UndoStack
 */
 
 
+}
+
+void TextUndoStackTest::testClearUndoStackCrashIssue24()
+{
+    TextEditorWidget widget;
+    TextDocument* doc = widget.textDocument();
+    TextEditorController* controller = widget.controller();
+
+    controller->replace(0,0,"1a2b3c4d",0);
+    testEqual(doc->text(),"1a2b3c4d");
+
+    // clear the undo stack
+    doc->textUndoStack()->clear();
+    testEqual(doc->text(),"1a2b3c4d");
+
+    // move the caret (this seems to crash the undostack)
+    controller->moveCaretTo(0,4,false);
+}
+
+
+void TextUndoStackTest::testClearUndoStackShouldnotUnregisterTheControllerIssue24()
+{
+    TextEditorWidget widget;
+    TextDocument* doc = widget.textDocument();
+    TextEditorController* controller = widget.controller();
+
+    testTrue( doc->textUndoStack()->isControllerRegistered(controller));
+
+    // clearing the undo stack should NOT unregister a c
+    doc->textUndoStack()->clear();
+
+    testTrue( doc->textUndoStack()->isControllerRegistered(controller));
 }
 
 
