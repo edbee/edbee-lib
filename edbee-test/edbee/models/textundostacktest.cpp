@@ -148,7 +148,7 @@ void TextUndoStackTest::testClearUndoStackShouldnotUnregisterTheControllerIssue2
 
     testTrue( doc->textUndoStack()->isControllerRegistered(controller));
 
-    // clearing the undo stack should NOT unregister a c
+    // clearing the undo stack should NOT unregister a controller
     doc->textUndoStack()->clear();
 
     testTrue( doc->textUndoStack()->isControllerRegistered(controller));
