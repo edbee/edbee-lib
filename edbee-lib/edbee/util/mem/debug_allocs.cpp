@@ -96,7 +96,7 @@ int DebugAllocationList::stop()
     }
 
     if( !res ) {
-        printf("memory ok :-D\n");
+        //printf("memory ok :-D\n");
     }
 
     return res;

@@ -130,7 +130,8 @@ TextThemeStyler::TextThemeStyler( TextEditorController* controller )
     , themeRef_(0)
 {
     connect( controller, SIGNAL(textDocumentChanged(edbee::TextDocument*,edbee::TextDocument*)), SLOT(textDocumentChanged(edbee::TextDocument*,edbee::TextDocument*)) );
-    themeRef_ = Edbee::instance()->themeManager()->fallbackTheme();
+    connect( Edbee::instance()->themeManager(), SIGNAL(themePointerChanged(QString,TextTheme*,TextTheme*)), SLOT(themePointerChanged(QString,TextTheme*,TextTheme*)) );
+    themeRef_ = Edbee::instance()->themeManager()->fallbackTheme();    
 }
 
 
@@ -297,7 +298,19 @@ void TextThemeStyler::textDocumentChanged(edbee::TextDocument *oldDocument, edbe
 /// invalidates all layouts
 void TextThemeStyler::invalidateLayouts()
 {
-//    formateRangeListCache_.clear();
+    //    formateRangeListCache_.clear();
+}
+
+void TextThemeStyler::themePointerChanged(const QString& name, TextTheme* oldTheme, TextTheme *newTheme)
+{
+    if( name == themeName_ ) {
+        themeRef_ = newTheme;
+    } else {
+        if( oldTheme == themeRef_ ) {
+            Q_ASSERT(false && "The old theme is deleted but it's not the same theme name. This shouldn't happen");
+            // If it happens a solution is to set the fallback theme
+        }
+    }
 }
 
 
@@ -380,10 +393,7 @@ TextTheme* TextThemeManager::readThemeFile( const QString& fileName, const QStri
                 name = QFileInfo(fileName).completeBaseName();
             }
 
-            // delete a possibly old theme with the given name
-            // add the theme to the map
-            delete themeMap_.value(name);
-            themeMap_.insert(name, theme);
+            setTheme(name,theme);
 
         } else {
             lastErrorMessage_ = QObject::tr("Error parsing theme %1:%2").arg(file.fileName()).arg( parser.lastErrorMessage());
@@ -428,5 +438,12 @@ QString TextThemeManager::lastErrorMessage() const
     return lastErrorMessage_;
 }
 
+void TextThemeManager::setTheme(const QString &name, TextTheme *theme)
+{
+    TextTheme* oldTheme = themeMap_.value(name);
+    themeMap_.insert(name,theme);
+    emit themePointerChanged(name, oldTheme, theme);
+    delete oldTheme;
+}
 
 } // edbee

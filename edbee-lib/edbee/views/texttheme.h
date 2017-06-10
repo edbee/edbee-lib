@@ -181,6 +181,7 @@ private slots:
 
     void textDocumentChanged(edbee::TextDocument* oldDocument, edbee::TextDocument* newDocument);
     void invalidateLayouts();
+    void themePointerChanged( const QString& name, TextTheme* oldTheme, TextTheme* newTheme );
 
 
 private:
@@ -199,8 +200,10 @@ private:
 /// This class is used to manage load 'themes'.
 /// This method loads only loads a theme if requested.
 /// It will list all available theme when
-class TextThemeManager
+class TextThemeManager : public QObject
 {
+Q_OBJECT
+
 protected:
     TextThemeManager();
     virtual ~TextThemeManager();
@@ -215,6 +218,11 @@ public:
     TextTheme* theme( const QString& name );
     TextTheme* fallbackTheme() const { return fallbackTheme_; }
     QString lastErrorMessage() const;
+    void setTheme( const QString& name, TextTheme* theme );
+
+signals:
+    void themePointerChanged( const QString& name, TextTheme* oldTheme, TextTheme* newTheme );
+
 
 private:
 
