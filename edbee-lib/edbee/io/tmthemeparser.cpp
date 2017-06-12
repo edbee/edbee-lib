@@ -16,6 +16,22 @@ TmThemeParser::TmThemeParser()
 }
 
 
+/// parses theme color
+QColor TmThemeParser::parseThemeColor(const QString &rgba) const
+{
+    // check if there's an alpha component
+    if( rgba.length() == 9 ) {
+        QString argb = "#";
+        argb.append(rgba.right(2)); // append the alpha part
+        argb.append(rgba.mid(1,6)); // append the color part
+        return QColor(argb);
+    // return the color
+    } else {
+        return QColor(rgba);
+    }
+}
+
+
 
 /// reads the content of a single file
 /// @param device the device to read from. The device NEEDS to be open!!
@@ -41,19 +57,28 @@ TextTheme* TmThemeParser::readContent(QIODevice *device)
 /// fetches the settings from the hashmap and puts them in the theme file
 void TmThemeParser::fillRuleSettings(TextTheme* theme, const QHash<QString, QVariant> &settings)
 {
-    theme->setBackgroundColor( QColor( settings.value("background").toString() ) );
-    theme->setForegroundColor( QColor( settings.value("foreground").toString() ) );
-    theme->setCaretColor( QColor( settings.value("caret").toString() ) );
-    theme->setInvisiblesColor( QColor( settings.value("invisibles").toString() ) );
-    theme->setLineHighlightColor( QColor( settings.value("lineHighlight").toString() ) );
-    theme->setSelectionColor( QColor( settings.value("selection").toString() ) );
-    theme->setFindHighlightForegroundColor( QColor( settings.value("findHighlightForeground").toString() ) );
-    theme->setFindHighlightBackgroundColor( QColor( settings.value("findHighlight").toString() ) );
-    theme->setSelectionBorderColor( QColor( settings.value("selectionBorder").toString() ) );
-    theme->setActiveGuideColor( QColor( settings.value("activeGuide").toString() ) );
-    theme->setBracketForegroundColor( QColor( settings.value("bracketsForeground").toString() ) );
+    // force an opaque background color
+    QColor background = parseThemeColor( settings.value("background").toString() );
+    if( background.alphaF() < 1.0 ) {
+        background.setRedF( background.redF()*background.alphaF() );
+        background.setGreenF( background.greenF()*background.alphaF() );
+        background.setBlueF( background.blueF()*background.alphaF() );
+        background.setAlphaF(1.0);
+    }
+    theme->setBackgroundColor( background );
+
+    theme->setForegroundColor( parseThemeColor( settings.value("foreground").toString() ) );
+    theme->setCaretColor( parseThemeColor( settings.value("caret").toString() ) );
+    theme->setInvisiblesColor( parseThemeColor( settings.value("invisibles").toString() ) );
+    theme->setLineHighlightColor( parseThemeColor( settings.value("lineHighlight").toString() ) );
+    theme->setSelectionColor( parseThemeColor( settings.value("selection").toString() ) );
+    theme->setFindHighlightForegroundColor( parseThemeColor( settings.value("findHighlightForeground").toString() ) );
+    theme->setFindHighlightBackgroundColor( parseThemeColor( settings.value("findHighlight").toString() ) );
+    theme->setSelectionBorderColor( parseThemeColor( settings.value("selectionBorder").toString() ) );
+    theme->setActiveGuideColor( parseThemeColor( settings.value("activeGuide").toString() ) );
+    theme->setBracketForegroundColor( parseThemeColor( settings.value("bracketsForeground").toString() ) );
     theme->setBracketOptions( settings.value("bracketsOptions").toString() );
-    theme->setBracketContentsForegroundColor( QColor( settings.value("bracketContentsForeground").toString() ) );
+    theme->setBracketContentsForegroundColor( parseThemeColor( settings.value("bracketContentsForeground").toString() ) );
     theme->setBracketContentsOptions( settings.value("bracketContentsOptions").toString() );
     theme->setTagsOptions( settings.value("tagsOptions").toString() );
 }
@@ -72,8 +97,8 @@ void TmThemeParser::parseRules(TextTheme *theme, const QList<QVariant> &rules)
         if( name.isEmpty() && scope.isEmpty() ) {
             fillRuleSettings( theme, settings);      // yes it's true settings/settings !
         } else {
-            QColor foreground( settings.value("foreground").toString());
-            QColor background( settings.value("background").toString());
+            QColor foreground = parseThemeColor( settings.value("foreground").toString());
+            QColor background= parseThemeColor( settings.value("background").toString());
             QString fontStyle( settings.value("fontStyle").toString());
             bool bold = fontStyle.contains("bold");
             bool italic = fontStyle.contains("italic");

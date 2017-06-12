@@ -228,6 +228,7 @@ void TextThemeStyler::setThemeByName(const QString& themeName)
 
     // when no theme is found, fallback to the fallback theme
     if( !themeRef_) {
+        qlog_warn() << "Theme not set:" << themeName_;
         themeName_ = "";
         themeRef_= Edbee::instance()->themeManager()->fallbackTheme();
     }
@@ -394,7 +395,6 @@ TextTheme* TextThemeManager::readThemeFile( const QString& fileName, const QStri
             }
 
             setTheme(name,theme);
-
         } else {
             lastErrorMessage_ = QObject::tr("Error parsing theme %1:%2").arg(file.fileName()).arg( parser.lastErrorMessage());
         }
@@ -419,14 +419,14 @@ TextTheme* TextThemeManager::theme(const QString& name)
     TextTheme* theme=themeMap_.value(name);
     if( !theme && !themePath_.isEmpty()) {
         QString filename = QString("%1/%2.tmTheme").arg(themePath_).arg(name);
-        TextTheme* theme = readThemeFile( filename );
+        theme = readThemeFile( filename );
         if( !theme ) {
             qlog_warn() << this->lastErrorMessage();
-            theme = new TextTheme();
-        }
 
-        // add the theme to the map
-        themeMap_.insert(name, theme);
+            // add the theme to the map
+            theme = new TextTheme();
+            themeMap_.insert(name, theme);
+        }
     }
     return theme;
 }

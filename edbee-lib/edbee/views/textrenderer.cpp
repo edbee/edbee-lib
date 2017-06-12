@@ -434,6 +434,7 @@ TextTheme* TextRenderer::theme()
 void TextRenderer::setThemeByName(const QString& name)
 {
     textThemeStyler_->setThemeByName(name);
+    invalidateCaches();
 }
 
 
@@ -442,6 +443,7 @@ void TextRenderer::setThemeByName(const QString& name)
 void TextRenderer::setTheme(TextTheme* theme)
 {
     textThemeStyler_->setTheme( theme );
+    invalidateCaches();
 }
 
 

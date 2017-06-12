@@ -20,6 +20,8 @@ class TmThemeParser : public BasePListParser
 public:
     TmThemeParser();
 
+    QColor parseThemeColor(const QString& color) const;
+
     TextTheme* readContent(QIODevice* device);
 
 protected:

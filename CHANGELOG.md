@@ -2,7 +2,12 @@
 
 edbee.lib:
 
-- ref #26, Changing a theme in the ThemeManager, now updates the ThemePointer used by the renderer. (Fixes corruption on theme reloading)
+- ref #27, Theme loading/handling bugfixes
+	- Theme-colors with alpha channels are parsed correctly. (QColor expects #AARRGGBB, theme uses #RRGGBBAA)
+	- Transparent main background color is changed to opaque to fix rendering issues. 
+	- Bugfixes TextThemeManager::theme, local scope shadowed returned theme value and double insert. 
+	- Setting the theme in Textrender now invalidates some caches 
+- fix #26, Changing a theme in the ThemeManager, now updates the ThemePointer used by the renderer. (Fixes corruption on theme reloading)
 - fix #25, Removed the 'memory ok :-D' message
 - fix #24, Clearing the undostack unregistered all controllers incorrectly
 - fix #23, Scope invaldating optimization wasn't working correctly. Removed optimization for now
