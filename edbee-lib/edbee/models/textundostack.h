@@ -26,6 +26,8 @@ class ChangeGroup;
 /// When a view-performs a view-specific undo (soft-undo) it's own pointer is stepped back. Only view-specific commands are undone
 /// When a view performs a document undo. ALL view-pointers a are undone to the point of the document undo.
 ///
+/// ~~~~
+///
 /// 7 |       |  <= controllerIndexMap_(v1)
 ///   +-------+
 /// 6 |  v1   |  <= controllerIndexMap_(v2)
@@ -42,6 +44,8 @@ class ChangeGroup;
 ///   +-------+
 /// 0 |  v2   |
 ///   +-------+
+///
+/// ~~~~
 
 class TextUndoStack : public QObject
 {
