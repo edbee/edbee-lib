@@ -36,11 +36,15 @@ void CopyCommand::execute(TextEditorController* controller)
     } else {
 
         str = sel->getSelectedTextExpandedToFullLines();
+
+        // we don't want to detect a memory leak because Qt is going to delete our mime data
+        edbee::pause_memleak_detection(true);
         QMimeData* mimeData = new QMimeData();
+        edbee::pause_memleak_detection(false);
         mimeData->setText( str );
         mimeData->setData( EDBEE_TEXT_TYPE, "line" );
         clipboard->setMimeData( mimeData );
-        delete mimeData;
+//        delete mimeData;
     }
 }
 

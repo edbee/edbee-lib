@@ -2,6 +2,7 @@
 
 edbee.lib:
 
+- ref #30, Edbee crashes when you cut/copy with nothing selected. (Bug in clipboard operation)
 - ref #27, Theme loading/handling bugfixes
 	- Theme-colors with alpha channels are parsed correctly. (QColor expects #AARRGGBB, theme uses #RRGGBBAA)
 	- Transparent main background color is changed to opaque to fix rendering issues. 
