@@ -15,7 +15,9 @@
 #else
     #define Q_ASSERT_GUI_THREAD
     #define Q_ASSERT_NOT_GUI_THREAD
-    #define pause_memleak_detection(value)
+    namespace edbee {
+        inline void pause_memleak_detection(bool) {}
+    }
 #endif
 
 

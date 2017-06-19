@@ -49,7 +49,7 @@ void PasteCommand::execute(TextEditorController* controller)
     TextRangeSet* sel    = controller->textSelection();
 
     // a line-based paste
-    if( mimeData->hasFormat( CopyCommand::EDBEE_TEXT_TYPE ) ) {
+    if( mimeData && mimeData->hasFormat( CopyCommand::EDBEE_TEXT_TYPE ) ) {
         TextRangeSet newRanges(doc);
         for( int i=0,cnt=sel->rangeCount(); i<cnt; ++i ) {
             TextRange& range = sel->range(i);
