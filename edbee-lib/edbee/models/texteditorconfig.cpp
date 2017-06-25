@@ -380,7 +380,10 @@ int TextEditorConfig::showWhitespaceMode() const
 /// @param mode the whitespace mode to set. Can be one of the enumeration values. (Or another integer if you build your own renderer)
 void TextEditorConfig::setShowWhitespaceMode(int mode)
 {
-    showWhitespaceMode_ = mode;
+    if( showWhitespaceMode_ != mode ) {
+        showWhitespaceMode_ = mode;
+        notifyChange();
+    }
 }
 
 
@@ -389,9 +392,16 @@ void TextEditorConfig::setShowWhitespaceMode(int mode)
 /// @param str the whitespace mode "show" or "hide" for now. (When invalid hide is used)
 void TextEditorConfig::setShowWhitespaceMode(const QString& str)
 {
-    showWhitespaceMode_ = HideWhitespaces;  //
     if( str == "show" ) {
-        showWhitespaceMode_ = ShowWhitespaces;
+        if( showWhitespaceMode_ != ShowWhitespaces ) {
+            showWhitespaceMode_ = ShowWhitespaces;
+            notifyChange();
+        }
+    } else {
+        if( showWhitespaceMode_ != HideWhitespaces ) {
+            showWhitespaceMode_ = HideWhitespaces;
+            notifyChange();
+        }
     }
 }
 
