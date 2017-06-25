@@ -24,6 +24,7 @@ public:
     virtual void render(QPainter* painter);
     virtual void renderLineBackground(QPainter *painter, int line);
     virtual void renderLineSelection(QPainter *painter, int line);
+    virtual void renderLineBorderedRanges(QPainter *painter, int line);
     virtual void renderLineSeparator(QPainter *painter, int line);
     virtual void renderLineText(QPainter *painter, int line);
     virtual void renderCarets(QPainter *painter);

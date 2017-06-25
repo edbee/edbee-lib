@@ -2,8 +2,9 @@
 
 edbee.lib:
 
-- ref #30, Edbee crashes when you cut/copy with nothing selected. (Bug in clipboard operation)
-- ref #27, Theme loading/handling bugfixes
+- add #31, Support for rendering borderedTextRanges. These are textranges rendered with borders, that aren't selected. TextEditorController has a member 'borderedTextRanges()'. Altering this rangeset (and updating the view controller::update) renderes borders aroudn the given ranges
+- fix #30, Edbee crashes when you cut/copy with nothing selected. (Bug in clipboard operation)
+- fix #27, Theme loading/handling bugfixes
 	- Theme-colors with alpha channels are parsed correctly. (QColor expects #AARRGGBB, theme uses #RRGGBBAA)
 	- Transparent main background color is changed to opaque to fix rendering issues. 
 	- Bugfixes TextThemeManager::theme, local scope shadowed returned theme value and double insert. 

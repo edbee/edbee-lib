@@ -57,6 +57,7 @@ TextEditorController::TextEditorController( TextEditorWidget* widget, QObject *p
     , textCaretCache_(0)
     , textSearcher_(0)
     , autoScrollToCaret_(AutoScrollAlways)
+    , borderedTextRanges_(0)
 {
 
     // create the keymap
@@ -78,6 +79,7 @@ TextEditorController::TextEditorController( TextEditorWidget* widget, QObject *p
 /// Destroys the controller and associated objects
 TextEditorController::~TextEditorController()
 {
+    delete borderedTextRanges_;
     delete textSearcher_;
     delete textRenderer_;
     delete textCaretCache_;
@@ -139,6 +141,10 @@ void TextEditorController::setTextDocument(TextDocument* doc)
         textCaretCache_ = new TextCaretCache( textDocumentRef_, textRenderer_ ); // warning the cache needs to be created BEFORE the selection!!!
         textSelection_ = new TextSelection( this );
         textSelection_->addRange(0,0);  // add at least one cursor :-)
+
+        delete borderedTextRanges_;
+        borderedTextRanges_ = new DynamicTextRangeSet(textDocument());
+
 
         textDocumentRef_->textUndoStack()->registerContoller(this);
 
@@ -243,7 +249,15 @@ TextSelection* TextEditorController::textSelection() const
 /// Returns the current text renderer
 TextRenderer*TextEditorController::textRenderer() const
 {
-     return textRenderer_;
+    return textRenderer_;
+}
+
+
+/// returns the bordered textranges
+/// These are textranges that are rendered with a border, but aren't truely selected
+TextRangeSet *TextEditorController::borderedTextRanges() const
+{
+    return borderedTextRanges_;
 }
 
 

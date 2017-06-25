@@ -41,6 +41,7 @@ TextRenderer::TextRenderer(TextEditorController* controller)
 {
     connect( controller, SIGNAL(textDocumentChanged(edbee::TextDocument*,edbee::TextDocument*)), this, SLOT(textDocumentChanged(edbee::TextDocument*,edbee::TextDocument*)));
     textThemeStyler_ = new TextThemeStyler( controller );
+
 }
 
 

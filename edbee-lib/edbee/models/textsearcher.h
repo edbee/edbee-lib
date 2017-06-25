@@ -55,6 +55,7 @@ public:
     bool selectNext( TextRangeSet* selection );
     bool selectPrev( TextRangeSet* selection );
     bool selectAll( TextRangeSet* selection );
+    void markAll( TextRangeSet* rangeset );
 
 public slots:
 

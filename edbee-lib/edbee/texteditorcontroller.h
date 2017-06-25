@@ -68,6 +68,8 @@ public:
     TextDocument* textDocument() const;
     TextSelection* textSelection() const;
     TextRenderer* textRenderer() const;
+    TextRangeSet* borderedTextRanges() const;
+
     void setKeyMap( TextEditorKeyMap* keyMap );
     void giveKeyMap( TextEditorKeyMap* keyMap );
     TextEditorKeyMap* keyMap() const;
@@ -147,6 +149,7 @@ private:
     TextDocument* textDocumentRef_;           ///< The reference to the text-document
 
     TextSelection* textSelection_;            ///< The text selection
+
     TextEditorKeyMap* keyMap_;                ///< The ownership of the keymap
     TextEditorKeyMap* keyMapRef_;             ///< A reference to the keymap
     TextEditorCommandMap* commandMap_;        ///< the ownership
@@ -157,6 +160,10 @@ private:
     TextSearcher* textSearcher_;              ///< The text-searcher
     
     AutoScrollToCaret autoScrollToCaret_;     ///< This flags tells the editor to automaticly scrol to the caret
+
+
+    // extra highlight text
+    TextRangeSet* borderedTextRanges_;       ///< Extra marked text ranges
 };
 
 } // edbee

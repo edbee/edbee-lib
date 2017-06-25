@@ -25,6 +25,7 @@ class TextDocument;
 class TextEditorConfig;
 class TextEditorController;
 class TextEditorWidget;
+class TextRangeSet;
 class TextSelection;
 class TextTheme;
 class TextThemeStyler;
@@ -92,7 +93,6 @@ public:
     TextTheme* theme();
     void setThemeByName( const QString& name );
     void setTheme( TextTheme* theme );
-
 
 // temporary getters only valid while rendering!!
     const QRect* clipRect() { return clipRectRef_; }                ///< This method is valid only while rendering!

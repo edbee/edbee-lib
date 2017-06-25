@@ -219,20 +219,7 @@ bool TextSearcher::selectAll( TextRangeSet* selection )
 {
     TextRange oldRange = selection->range(0);
 
-    // clear the selection and add all matches
-    bool oldReverse = reverse_;     // we must NOT reverse find
-    bool oldWrapAround = wrapAround_;
-    reverse_ = false;
-    wrapAround_ = false;
-    selection->clear();
-    TextRange range = findNextRange(selection);
-    while( !range.isEmpty() )
-    {
-        selection->addRange(range.anchor(), range.caret());
-        range = findNextRange( selection );
-    }
-    wrapAround_ = oldWrapAround;
-    reverse_ = oldReverse;
+    markAll(selection);
 
     // no selection, we MUST place a caret
     if( selection->rangeCount() == 0 ) {
@@ -240,6 +227,26 @@ bool TextSearcher::selectAll( TextRangeSet* selection )
         return false;
     }
     return true;
+}
+
+/// Put all found items in the ranges
+/// @param rangeset the rangeset to search for
+void TextSearcher::markAll(TextRangeSet *rangeset)
+{
+    // clear the selection and add all matches
+    bool oldReverse = reverse_;     // we must NOT reverse find
+    bool oldWrapAround = wrapAround_;
+    reverse_ = false;
+    wrapAround_ = false;
+    rangeset->clear();
+    TextRange range = findNextRange(rangeset);
+    while( !range.isEmpty() )
+    {
+        rangeset->addRange(range.anchor(), range.caret());
+        range = findNextRange( rangeset );
+    }
+    wrapAround_ = oldWrapAround;
+    reverse_ = oldReverse;
 }
 
 

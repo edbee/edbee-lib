@@ -10,6 +10,7 @@
 
 #include "edbee/models/textdocument.h"
 #include "edbee/models/texteditorconfig.h"
+#include "edbee/texteditorcontroller.h"
 #include "edbee/views/texttheme.h"
 #include "edbee/views/textselection.h"
 #include "edbee/views/textrenderer.h"
@@ -60,6 +61,7 @@ void TextEditorRenderer::render(QPainter *painter)
         renderLineSelection( painter, line );
         renderLineSeparator( painter, line );
         renderLineText( painter, line );
+        renderLineBorderedRanges( painter, line );
     }
 
     renderCarets(painter);
@@ -106,6 +108,48 @@ void TextEditorRenderer::renderLineSelection(QPainter *painter,int line)
             if( range.length() > 0 && endColumn+1 >= lastLineColumn) endX += 3;
 
             painter->fillRect(startX, line*lineHeight + rect.top(), endX - startX, rect.height(),  themeRef_->selectionColor() ); //QColor::fromRgb(0xDD, 0x88, 0xEE) );
+        }
+    }
+//PROF_END
+}
+
+
+void TextEditorRenderer::renderLineBorderedRanges(QPainter *painter,int line)
+{
+//PROF_BEGIN_NAMED("render-selection")
+    TextDocument* doc = renderer()->textDocument();
+    TextRangeSet* sel = renderer()->controller()->borderedTextRanges();
+    int lineHeight = renderer()->lineHeight();
+
+    QPen pen(themeRef_->foregroundColor(), 0.5);
+
+
+    int firstRangeIdx=0;
+    int lastRangeIdx=0;
+/// TODO: iprove ranges at line by calling rangesForOffsets first for only the visible offsets!
+    if( sel->rangesAtLine( line, firstRangeIdx, lastRangeIdx ) ) {
+
+        QTextLayout* textLayout = renderer()->textLayoutForLine(line);
+        QRectF rect = textLayout->boundingRect();
+        QTextLine textLine = textLayout->lineAt(0);
+
+        int lastLineColumn = doc->lineLength(line);
+
+        // draw all 'ranges' on this line
+        for( int rangeIdx = firstRangeIdx; rangeIdx <= lastRangeIdx; ++rangeIdx ) {
+            TextRange& range = sel->range(rangeIdx);
+            int startColumn = doc->columnFromOffsetAndLine( range.min(), line );
+            int endColumn   = doc->columnFromOffsetAndLine( range.max(), line );
+
+            int startX = textLine.cursorToX( startColumn );
+            int endX   = textLine.cursorToX( endColumn );
+
+            if( range.length() > 0 && endColumn+1 >= lastLineColumn) endX += 3;
+
+            QPainterPath path;
+            path.addRoundedRect(startX, line*lineHeight + rect.top(), endX - startX, rect.height(),5,5);
+            painter->strokePath(path, pen);
+//            painter->strok(startX, line*lineHeight + rect.top(), endX - startX, rect.height(),  themeRef_->selectionColor() ); //QColor::fromRgb(0xDD, 0x88, 0xEE) );
         }
     }
 //PROF_END
