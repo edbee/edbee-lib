@@ -63,7 +63,7 @@ void CutCommand::execute(TextEditorController* controller)
         mimeData->setText( str );
         mimeData->setData( CopyCommand::EDBEE_TEXT_TYPE, "line" );
         clipboard->setMimeData( mimeData );
-        delete mimeData;
+        //delete mimeData;
 
         // remove the selection
         controller->replaceRangeSet( newSel, "", coalesceId );
