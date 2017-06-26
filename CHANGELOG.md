@@ -2,6 +2,7 @@
 
 edbee.lib:
 
+- fix #32, Changing showWhiteSpace option does not trigger a redraw
 - add #31, Support for rendering borderedTextRanges. These are textranges rendered with borders, that aren't selected. TextEditorController has a member 'borderedTextRanges()'. Altering this rangeset (and updating the view controller::update) renderes borders aroudn the given ranges
 - fix #30, Edbee crashes when you cut/copy with nothing selected. (Bug in clipboard operation)
 - fix #27, Theme loading/handling bugfixes
