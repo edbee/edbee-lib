@@ -13,24 +13,27 @@
 //#endif
 //#include "memoryleak.h"
 
+#if defined(QT_DEBUG) && !defined(__MINGW32__)
 
-void* debug_malloc      (size_t size, const char* file, const int line);
-void  debug_free        (void* p,     const char* file, const int line);
-void* operator new      (size_t size, const char* file, const int line);
-void  operator delete   (void* p,     const char* file, const int line);
-void  operator delete   (void* p) throw();
-void* operator new[]    (size_t size, const char* file, const int line);
-void  operator delete[] (void* p,     const char* file, const int line);
-void  operator delete[] (void* p) throw();
+    #define EDBEE_DEBUG_NEW_ACTIVE
+
+    void* debug_malloc      (size_t size, const char* file, const int line);
+    void  debug_free        (void* p,     const char* file, const int line);
+    void* operator new      (size_t size, const char* file, const int line);
+    void  operator delete   (void* p,     const char* file, const int line);
+    void  operator delete   (void* p) throw();
+    void* operator new[]    (size_t size, const char* file, const int line);
+    void  operator delete[] (void* p,     const char* file, const int line);
+    void  operator delete[] (void* p) throw();
+
+    #define debug_new new(__FILE__, __LINE__)
+    #define new       debug_new
+    #define malloc(A) debug_malloc((A), __FILE__, __LINE__)
+    #define free(A)   debug_free((A), __FILE__, __LINE__)
+#endif
+
 
 namespace edbee {
-
     void pause_memleak_detection(bool value);
-
 } // edbee
-
-#define debug_new new(__FILE__, __LINE__)
-#define new       debug_new
-#define malloc(A) debug_malloc((A), __FILE__, __LINE__)
-#define free(A)   debug_free((A), __FILE__, __LINE__)
 

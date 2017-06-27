@@ -7,17 +7,16 @@
 
 #include "edbee/util/logging.h"
 
-#if defined(QT_DEBUG) && !defined(__MINGW32__)
-    #include "edbee/util/mem/debug_new.h"
+#include "edbee/util/mem/debug_new.h"
+
+#if defined(QT_DEBUG)
     /// This assert requires the inclusion of QApplication an QThread
     #define Q_ASSERT_GUI_THREAD Q_ASSERT(  qApp->thread() == QThread::currentThread( ) )
     #define Q_ASSERT_NOT_GUI_THREAD Q_ASSERT(  qApp->thread() != QThread::currentThread( ) )
 #else
     #define Q_ASSERT_GUI_THREAD
     #define Q_ASSERT_NOT_GUI_THREAD
-    namespace edbee {
-        inline void pause_memleak_detection(bool) {}
-    }
 #endif
+
 
 

@@ -120,7 +120,9 @@ namespace edbee {
 /// pauses the memoryleak detection
 void pause_memleak_detection(bool value)
 {
+#ifdef EDBEE_DEBUG_NEW_ACTIVE
     DebugAllocationList::instance()->pause(value);
+#endif
 }
 
 
