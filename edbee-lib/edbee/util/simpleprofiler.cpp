@@ -102,9 +102,9 @@ void SimpleProfiler::dumpResults()
         }
 
         foreach( ProfilerItem* item, items ) {
-            double durationPercentage = 100.0 * item->duration() / totalDuration;
-            double callCountPercentage = 100.0 * item->callCount() / totalCallCount;
-            double durationWithoutChildsPercenage = 100.0 * item->durationWithoutChilds() / totalDurationWitoutChilds;
+            double durationPercentage = totalDuration > 0 ? 100.0 * item->duration() / totalDuration : 100;
+            double callCountPercentage = totalCallCount > 0 ? 100.0 * item->callCount() / totalCallCount : 100;
+            double durationWithoutChildsPercenage = totalDurationWitoutChilds > 0 ? 100.0 * item->durationWithoutChilds() / totalDurationWitoutChilds : 100;
 
             QString line = QString("%1x(%2%) %3ms(%4%) %5ms(%6%) |  %7:%8 %9")
                .arg(item->callCount(),8).arg( callCountPercentage, 6, 'f', 2 )

@@ -397,8 +397,10 @@ QString MergableChangeGroup::toSingleTextChangeTestString()
     QString result;
     foreach( AbstractRangedChange* abstractChange, textChangeList_ ) {
         TextChange* change = dynamic_cast<TextChange*>(abstractChange);
-        if( !result.isEmpty() ) result.append(",");
-        result.append( QString("%1:%2:%3").arg(change->offset()).arg(change->docLength()).arg(change->storedText()) );
+        if( change ) {
+            if( !result.isEmpty() ) result.append(",");
+            result.append( QString("%1:%2:%3").arg(change->offset()).arg(change->docLength()).arg(change->storedText()) );
+        }
     }
     return result;
 }

@@ -38,6 +38,10 @@ TextRenderer::TextRenderer(TextEditorController* controller)
     , totalWidthCache_(0)
     , textThemeStyler_(0)
     , clipRectRef_(0)
+    , startOffset_(0)
+    , endOffset_(0)
+    , startLine_(0)
+    , endLine_(0)
 {
     connect( controller, SIGNAL(textDocumentChanged(edbee::TextDocument*,edbee::TextDocument*)), this, SLOT(textDocumentChanged(edbee::TextDocument*,edbee::TextDocument*)));
     textThemeStyler_ = new TextThemeStyler( controller );

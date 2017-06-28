@@ -85,6 +85,7 @@ public:
         : reg_(0)
         , region_(0)
         , pattern_(pattern)
+        , lineRef_(0)
     {
         const QChar* patternChars = pattern.constData();
 
@@ -389,11 +390,14 @@ RegExp::RegExp( const QString& pattern, bool caseSensitive, Syntax syntax, Engin
         case EngineQRegExp:
             d_ = new QtRegExpEngine(pattern, caseSensitive, syntax);
             break;
+        case EngineOniguruma:
+            d_ = new OnigRegExpEngine(pattern, caseSensitive, syntax);
+            break;
         default:
             Q_ASSERT(false);
             qlog_warn() << "Invalid engine supplied to RegExp. Falling back to EngineOniguruma";
-        case EngineOniguruma:
             d_ = new OnigRegExpEngine(pattern, caseSensitive, syntax);
+            break;
     }
 }
 

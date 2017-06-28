@@ -26,6 +26,7 @@ static const int ShadowWidth=5;
 
 TextEditorRenderer::TextEditorRenderer( TextRenderer *renderer )
     : rendererRef_(renderer)
+    , themeRef_(0)
     , shadowGradient_(0)
 {
     shadowGradient_ = new QLinearGradient( 0, 0, ShadowWidth, 0 );

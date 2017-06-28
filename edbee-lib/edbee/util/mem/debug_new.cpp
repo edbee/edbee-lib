@@ -102,7 +102,7 @@ void* operator new[] (size_t size, const char* file, const int line)
 /// the delete array operator
 void operator delete[] (void* p, const char* file, const int line)
 {
-    delete[] p;
+//    delete[] p;  << This is strange!!
     return debug_free(p, file, line);
 }
 

@@ -63,6 +63,7 @@ bool JsonParser::parse( QIODevice* device )
             errorMessage_ = device->errorString();
             return false;
         }
+        opened = true;
     }
 
     QByteArray bytesIn = device->readAll();

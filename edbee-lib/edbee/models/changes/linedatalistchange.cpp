@@ -89,6 +89,8 @@ void LineDataListChange::revert(TextDocument* doc)
 void LineDataListChange::mergeStoredData(AbstractRangedChange* change)
 {
     LineDataListChange* lineTextChange = dynamic_cast<LineDataListChange*>(change);
+    Q_ASSERT(lineTextChange );  // this shouldn't happen
+    if( !lineTextChange ) return;
 
     // calculate the new size
     int newOldListSize = getMergedStoredLength( change);// qlog_info() << "CALCULATED: " << newOldListSize ;
