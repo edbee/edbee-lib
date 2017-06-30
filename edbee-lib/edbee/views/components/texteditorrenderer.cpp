@@ -123,11 +123,11 @@ void TextEditorRenderer::renderLineBorderedRanges(QPainter *painter,int line)
     int lineHeight = renderer()->lineHeight();
 
     QPen pen(themeRef_->foregroundColor(), 0.5);
-
+    painter->setRenderHint(QPainter::Antialiasing);
 
     int firstRangeIdx=0;
     int lastRangeIdx=0;
-/// TODO: iprove ranges at line by calling rangesForOffsets first for only the visible offsets!
+/// TODO: improve ranges at line by calling rangesForOffsets first for only the visible offsets!
     if( sel->rangesAtLine( line, firstRangeIdx, lastRangeIdx ) ) {
 
         QTextLayout* textLayout = renderer()->textLayoutForLine(line);
