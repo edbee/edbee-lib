@@ -11,8 +11,10 @@
 #include <QScrollBar>
 #include <QWheelEvent>
 
+#include "edbee/models/texteditorconfig.h"
 #include "edbee/models/textbuffer.h"
 #include "edbee/models/textdocument.h"
+#include "edbee/views/components/texteditorcomponent.h"
 #include "edbee/views/texteditorscrollarea.h"
 #include "edbee/views/textrenderer.h"
 #include "edbee/views/texttheme.h"
@@ -43,7 +45,7 @@ QString TextMarginComponentDelegate::lineText(int line)
 /// The default implemenation returns 0
 int TextMarginComponentDelegate::widthBeforeLineNumber()
 {
-    return 0;
+    return 5;
 }
 
 /// Custom rendering before the line-numbers etc are drawn
@@ -135,13 +137,25 @@ TextMarginComponent::~TextMarginComponent()
 void TextMarginComponent::init()
 {
     giveDelegate( new TextMarginComponentDelegate() );
+    updateMarginFont();
+    connect( editorRef_->textRenderer(), SIGNAL(themeChanged(TextTheme*)), SLOT(updateFont()));
+    connect( editorRef_->config(), SIGNAL(configChanged()), SLOT(updateFont()));
+    connectScrollBar();
+}
+
+
+/// Updates the margin font
+void TextMarginComponent::updateMarginFont()
+{
+    delete marginFont_;
     if( renderer()->textWidget() ) {
-        marginFont_ = new QFont( editorWidget()->font().family(), 10 );
+        const QFont& font = editorWidget()->font();
+        marginFont_ = new QFont( editorWidget()->font().family());
+        if( font.pointSizeF() > 0 ) marginFont_->setPointSizeF( font.pointSizeF() );
+        if( font.pixelSize() > 0 ) marginFont_->setPixelSize( font.pixelSize() );
     } else {
         marginFont_ = new QFont( QFont().family(), 10 ); // fallback for test-suite
     }
-    connect( editorRef_, SIGNAL(verticalScrollBarChanged(QScrollBar*)), SLOT(connectScrollBar()));
-    connectScrollBar();
 }
 
 
@@ -294,7 +308,9 @@ void TextMarginComponent::renderCaretMarkers(QPainter* painter, int startLine, i
 void TextMarginComponent::renderLineNumber(QPainter* painter, int startLine, int endLine , int width)
 {
     painter->setFont(*marginFont_);
-    painter->setPen(renderer()->theme()->foregroundColor());
+    QColor penColor = renderer()->theme()->foregroundColor();
+    penColor.setAlphaF(0.5f);
+    painter->setPen(penColor);
     int lineHeight = renderer()->lineHeight();
 
     int textWidth =  width-LineNumberRightPadding-MarginPaddingRight - delegate()->widthBeforeLineNumber();
@@ -381,6 +397,11 @@ void TextMarginComponent::topChanged(int value)
 void TextMarginComponent::connectScrollBar()
 {
     connect( editorRef_->verticalScrollBar(), SIGNAL(valueChanged(int)), this, SLOT(topChanged(int)) );
+}
+
+void TextMarginComponent::updateFont()
+{
+    updateMarginFont();
 }
 
 

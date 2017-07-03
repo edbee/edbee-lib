@@ -250,7 +250,7 @@ QTextLayout *TextRenderer::textLayoutForLine(int line)
         }
 
           textLayout->setFont( textWidget()->font() );
-//qlog_info() << "font: " <<   textWidget()->();
+//qlog_info() << "font: " <<   textWidget()->font().pointSizeF();
         textLayout->setTextOption( option );
 
         // add extra format
@@ -440,6 +440,7 @@ void TextRenderer::setThemeByName(const QString& name)
 {
     textThemeStyler_->setThemeByName(name);
     invalidateCaches();
+    emit themeChanged(textThemeStyler_->theme());
 }
 
 
@@ -449,6 +450,7 @@ void TextRenderer::setTheme(TextTheme* theme)
 {
     textThemeStyler_->setTheme( theme );
     invalidateCaches();
+    emit themeChanged(theme);
 }
 
 

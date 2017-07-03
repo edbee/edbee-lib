@@ -18,6 +18,7 @@ namespace edbee {
 class TextEditorWidget;
 class TextMarginComponent;
 class TextRenderer;
+class TextTheme;
 
 /// The textmargin component delegate
 /// You can override the methods in the class for adding functionality to the text-margin component
@@ -57,6 +58,7 @@ public:
     virtual ~TextMarginComponent();
 
     void init();
+    void updateMarginFont();
 
     int widthHint() const;
     virtual QSize sizeHint() const;
@@ -90,6 +92,7 @@ protected slots:
 
     virtual void topChanged(int value);
     virtual void connectScrollBar();
+    virtual void updateFont();
 
 private:
 

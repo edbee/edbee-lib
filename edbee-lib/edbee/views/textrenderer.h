@@ -116,6 +116,10 @@ public slots:
     void invalidateTextLayoutCaches(int fromLine=0);
     void invalidateCaches();
 
+signals:
+    void themeChanged( TextTheme* theme );
+
+
 private:
 
     TextEditorController* controllerRef_;    ///< A reference to the widget it is rendering

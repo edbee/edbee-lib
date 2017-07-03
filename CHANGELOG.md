@@ -2,6 +2,7 @@
 
 edbee.lib:
 
+- ref #38, Margin line-number font size is now set to the font size of the editor. It also renders number with an opacity of 0.5. 
 - fix #32, Changing showWhiteSpace option does not trigger a redraw
 - add #31, Support for rendering borderedTextRanges. These are textranges rendered with borders, that aren't selected. TextEditorController has a member 'borderedTextRanges()'. Altering this rangeset (and updating the view controller::update) renderes borders aroudn the given ranges
 - fix #30, Edbee crashes when you cut/copy with nothing selected. (Bug in clipboard operation)
