@@ -84,7 +84,7 @@ void TextMarginComponentDelegate::mouseMoveEvent(int line, QMouseEvent* event)
             TextEditorController* controller = marginComponent()->editorWidget()->controller();
             if( line < startLine_ ) {
                 controller->moveCaretTo(startLine_+1,0,false);
-                controller->moveCaretTo(line+1,0,true);
+                controller->moveCaretTo(line,0,true);
             } else {
                 controller->moveCaretTo(line+1,0,true);
             }
