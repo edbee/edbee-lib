@@ -483,6 +483,15 @@ bool TextRangeSetBase::rangesAtLine(int line, int& firstIndex, int& lastIndex)
     return rangesBetweenOffsets( offsetBegin, offsetEnd, firstIndex, lastIndex );
 }
 
+/// Returns the range indices that are being used on the given line (Excluding the last offset)
+bool TextRangeSetBase::rangesAtLineExclusiveEnd(int line, int &firstIndex, int &lastIndex)
+{
+    TextDocument* doc = textDocument();
+    int offsetBegin = doc->offsetFromLine(line);
+    int offsetEnd   = doc->offsetFromLine(line+1)-1;
+    return rangesBetweenOffsetsExlusiveEnd( offsetBegin, offsetEnd, firstIndex, lastIndex );
+}
+
 
 /// This method checks if there's a selection available
 /// A selection is an range with a different anchor then it's caret

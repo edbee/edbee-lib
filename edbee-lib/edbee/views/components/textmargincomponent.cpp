@@ -326,8 +326,8 @@ void TextMarginComponent::renderLineNumber(QPainter* painter, int startLine, int
         int y = renderer()->yPosForLine(line);
 
         // highlight the selected lines
-        int firstIndex, lastIndex;
-        if( renderer()->textSelection()->rangesAtLine(line, firstIndex, lastIndex) ) {
+        int firstIndex=0, lastIndex=0;
+        if( renderer()->textSelection()->rangesAtLineExclusiveEnd(line, firstIndex, lastIndex) ) {
             painter->setPen(selectedPenColor);
         } else {
             painter->setPen(penColor);

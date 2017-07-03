@@ -130,6 +130,7 @@ public:
     bool rangesBetweenOffsets( int offsetBegin, int offsetEnd, int& firstIndex, int& lastIndex );
     bool rangesBetweenOffsetsExlusiveEnd( int offsetBegin, int offsetEnd, int& firstIndex, int& lastIndex );
     bool rangesAtLine( int line, int& firstIndex, int& lastIndex );
+    bool rangesAtLineExclusiveEnd( int line, int& firstIndex, int& lastIndex );
     bool hasSelection();
     bool equals( TextRangeSetBase& sel );
     void replaceAll( const TextRangeSetBase& base );
