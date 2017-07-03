@@ -43,7 +43,8 @@ public:
     void setMarginCompenent( TextMarginComponent* comp ) { marginComponentRef_ = comp; }
 
 private:
-    TextMarginComponent* marginComponentRef_;           /// A reference to the margincomponent
+    TextMarginComponent* marginComponentRef_;           ///< A reference to the margincomponent
+    int startLine_;                                     ///< The line which starts the selection
 };
 
 

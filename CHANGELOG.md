@@ -2,6 +2,9 @@
 
 edbee.lib:
 
+- ref #39, Margin-component bugfixes/improvements
+	- Clicking/dragging changed so it behaves as expected. (Especially dragging up)
+	- Line numbers of lines with selection are rendered with 100% opacity
 - ref #38, Margin line-number font size is now set to the font size of the editor. It also renders number with an opacity of 0.5. 
 - fix #32, Changing showWhiteSpace option does not trigger a redraw
 - add #31, Support for rendering borderedTextRanges. These are textranges rendered with borders, that aren't selected. TextEditorController has a member 'borderedTextRanges()'. Altering this rangeset (and updating the view controller::update) renderes borders aroudn the given ranges

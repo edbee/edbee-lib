@@ -32,6 +32,7 @@ static const int MarginPaddingRight = 5;
 /// The default constructor
 TextMarginComponentDelegate::TextMarginComponentDelegate()
     : marginComponentRef_(0)
+    , startLine_(0)
 {
 }
 
@@ -81,7 +82,12 @@ void TextMarginComponentDelegate::mouseMoveEvent(int line, QMouseEvent* event)
     if( event->buttons() & Qt::LeftButton ) {
         if( line >= 0 ) {
             TextEditorController* controller = marginComponent()->editorWidget()->controller();
-            controller->moveCaretTo(line+1,0,true);
+            if( line < startLine_ ) {
+                controller->moveCaretTo(startLine_+1,0,false);
+                controller->moveCaretTo(line+1,0,true);
+            } else {
+                controller->moveCaretTo(line+1,0,true);
+            }
         }
     }
 }
@@ -93,6 +99,7 @@ void TextMarginComponentDelegate::mousePressEvent(int line, QMouseEvent* event)
         TextEditorController* controller = marginComponent()->editorWidget()->controller();
         controller->moveCaretTo(line,0,false);
         controller->moveCaretTo(line+1,0,true);
+        startLine_ = line;
     }
 }
 
@@ -308,15 +315,24 @@ void TextMarginComponent::renderCaretMarkers(QPainter* painter, int startLine, i
 void TextMarginComponent::renderLineNumber(QPainter* painter, int startLine, int endLine , int width)
 {
     painter->setFont(*marginFont_);
-    QColor penColor = renderer()->theme()->foregroundColor();
+    QColor selectedPenColor = renderer()->theme()->foregroundColor();
+    QColor penColor( selectedPenColor);
     penColor.setAlphaF(0.5f);
-    painter->setPen(penColor);
-    int lineHeight = renderer()->lineHeight();
 
+    int lineHeight = renderer()->lineHeight();
     int textWidth =  width-LineNumberRightPadding-MarginPaddingRight - delegate()->widthBeforeLineNumber();
 
     for( int line=startLine; line<=endLine; ++line ) {
         int y = renderer()->yPosForLine(line);
+
+        // highlight the selected lines
+        int firstIndex, lastIndex;
+        if( renderer()->textSelection()->rangesAtLine(line, firstIndex, lastIndex) ) {
+            painter->setPen(selectedPenColor);
+        } else {
+            painter->setPen(penColor);
+        }
+
         painter->drawText( delegate()->widthBeforeLineNumber(), y+2, textWidth, lineHeight, Qt::AlignRight, delegate()->lineText( line) );
     }
 }
