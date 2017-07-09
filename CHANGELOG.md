@@ -2,6 +2,7 @@
 
 edbee.lib:
 
+- fix #41, Added LUA comments to the hardcoded list of comments
 - ref #39, Margin-component bugfixes/improvements
 	- Clicking/dragging changed so it behaves as expected. (Especially dragging up)
 	- Line numbers of lines with selection are rendered with 100% opacity
