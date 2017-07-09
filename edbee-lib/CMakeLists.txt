@@ -81,6 +81,7 @@ SET(SOURCES
    edbee/util/rangelineiterator.cpp 
    edbee/data/factorykeymap.cpp 
    edbee/data/factorycommandmap.cpp
+   edbee/views/textrenderwordwraphandler.cpp
 )
 
 SET(HEADERS
@@ -158,6 +159,7 @@ SET(HEADERS
    edbee/util/rangelineiterator.h 
    edbee/data/factorykeymap.h 
    edbee/data/factorycommandmap.h
+   edbee/views/textrenderwordwraphandler.h
 ) 
 
 FIND_PACKAGE(Qt5Core REQUIRED)

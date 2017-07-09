@@ -9,6 +9,7 @@
 #include <QObject>
 #include <QHash>
 #include <QRect>
+#include <QVector>
 
 
 #include "edbee/models/textbuffer.h"
@@ -29,6 +30,7 @@ class TextRangeSet;
 class TextSelection;
 class TextTheme;
 class TextThemeStyler;
+class TextRendererWordwrapHandler;
 
 /// A class for rendering the text
 /// TODO: Currently this class is also used for positioning text. This probably should be moved in a class of its own
@@ -43,7 +45,8 @@ public:
     virtual void reset();
 
 // calculation functions
-    int lineHeight();
+    int lineHeight(int line);
+    int lineHeightSingleLine();
     int rawLineIndexForYpos( int y );
     int lineIndexForYpos( int y );
     int totalWidth();
@@ -74,6 +77,8 @@ public:
     TextEditorWidget* textWidget();
 
     void setViewport( const QRect& viewport );
+    bool wordWrap();
+    void setWordWrap(bool enabled);
 
     void resetCaretTime();
     bool shouldRenderCaret();
@@ -131,7 +136,11 @@ private:
     QRect viewport_;                                ///< The current (total) viewport. (This is updated from the window)
     int totalWidthCache_;                           ///< The total width cache
 
+    TextRendererWordwrapHandler* wordwrapHandler_;   ///< The wordwrap handler
+
+
     TextThemeStyler* textThemeStyler_;              ///< The current theme styler
+    bool wordWrap_;                            ///< Wordwrap mode
 
     // temporary variables only valid the int the current context
     const QRect* clipRectRef_;                ///< A reference to the clipping rectangle

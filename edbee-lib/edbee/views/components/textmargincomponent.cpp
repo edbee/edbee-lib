@@ -290,9 +290,9 @@ void TextMarginComponent::renderCaretMarkers(QPainter* painter, int startLine, i
     TextDocument* doc = renderer()->textDocument();
     TextSelection* sel = renderer()->textSelection();
     QColor lineColor = renderer()->theme()->lineHighlightColor();
-    int lineHeight = renderer()->lineHeight();
+//    int lineHeight = renderer()->lineHeight();
 
-    QRect marginRect(0,0,width-MarginPaddingRight,lineHeight);
+    QRect marginRect(0,0,width-MarginPaddingRight,1);
     for( int i=0,cnt=sel->rangeCount(); i<cnt; ++i ) {
 
         TextRange& range = sel->range(i);
@@ -301,6 +301,7 @@ void TextMarginComponent::renderCaretMarkers(QPainter* painter, int startLine, i
             if( line > endLine ) { break; }
             int y = renderer()->yPosForLine(line);
             marginRect.moveTop(y);
+            marginRect.setHeight( renderer()->lineHeight(line));
             painter->fillRect( marginRect, lineColor );
         }
     }
@@ -319,7 +320,7 @@ void TextMarginComponent::renderLineNumber(QPainter* painter, int startLine, int
     QColor penColor( selectedPenColor);
     penColor.setAlphaF(0.5f);
 
-    int lineHeight = renderer()->lineHeight();
+    int lineHeightSingleLine = renderer()->lineHeightSingleLine();
     int textWidth =  width-LineNumberRightPadding-MarginPaddingRight - delegate()->widthBeforeLineNumber();
 
     for( int line=startLine; line<=endLine; ++line ) {
@@ -333,7 +334,7 @@ void TextMarginComponent::renderLineNumber(QPainter* painter, int startLine, int
             painter->setPen(penColor);
         }
 
-        painter->drawText( delegate()->widthBeforeLineNumber(), y+2, textWidth, lineHeight, Qt::AlignRight, delegate()->lineText( line) );
+        painter->drawText( delegate()->widthBeforeLineNumber(), y+2, textWidth, lineHeightSingleLine, Qt::AlignRight, delegate()->lineText( line) );
     }
 }
 
@@ -386,8 +387,8 @@ void TextMarginComponent::wheelEvent(QWheelEvent* event)
 void TextMarginComponent::updateLineAtOffset(int offset)
 {
     int yPos = renderer()->yPosForOffset( offset ) - top_;
-
-    update( 0,  yPos, width(), renderer()->lineHeight()  );
+    int line = renderer()->lineIndexForYpos(yPos + top_ );
+    update( 0,  yPos, width(), renderer()->lineHeight(line) );
 }
 
 

@@ -83,7 +83,7 @@ void TextEditorRenderer::renderLineSelection(QPainter *painter,int line)
 //PROF_BEGIN_NAMED("render-selection")
     TextDocument* doc = renderer()->textDocument();
     TextSelection* sel = renderer()->textSelection();
-    int lineHeight = renderer()->lineHeight();
+    int lineHeight = renderer()->lineHeight(line);
 
 
     int firstRangeIdx=0;
@@ -120,7 +120,7 @@ void TextEditorRenderer::renderLineBorderedRanges(QPainter *painter,int line)
 //PROF_BEGIN_NAMED("render-selection")
     TextDocument* doc = renderer()->textDocument();
     TextRangeSet* sel = renderer()->controller()->borderedTextRanges();
-    int lineHeight = renderer()->lineHeight();
+//    int lineHeight = renderer()->lineHeight(line);
 
     QPen pen(themeRef_->foregroundColor(), 0.5);
     painter->setRenderHint(QPainter::Antialiasing);
@@ -148,7 +148,7 @@ void TextEditorRenderer::renderLineBorderedRanges(QPainter *painter,int line)
             if( range.length() > 0 && endColumn+1 >= lastLineColumn) endX += 3;
 
             QPainterPath path;
-            path.addRoundedRect(startX, line*lineHeight + rect.top(), endX - startX, rect.height(),5,5);
+            path.addRoundedRect(startX, renderer()->yPosForLine(line) + rect.top(), endX - startX, rect.height(),5,5);
             painter->strokePath(path, pen);
 //            painter->strok(startX, line*lineHeight + rect.top(), endX - startX, rect.height(),  themeRef_->selectionColor() ); //QColor::fromRgb(0xDD, 0x88, 0xEE) );
         }
@@ -162,7 +162,7 @@ void TextEditorRenderer::renderLineSeparator(QPainter *painter,int line)
 {
 //PROF_BEGIN_NAMED("render-selection")
     TextEditorConfig* config = renderer()->config();
-    int lineHeight = renderer()->lineHeight();
+//    int lineHeight = renderer()->lineHeight();
 //    int viewportX = renderer()->viewportX();
 //    int viewportWidth = renderer()->vie\wportWidth();
     QRect visibleRect( renderer()->viewport() );
@@ -170,7 +170,7 @@ void TextEditorRenderer::renderLineSeparator(QPainter *painter,int line)
     if( config->useLineSeparator() ) {
         const QPen& pen = config->lineSeparatorPen();
         painter->setPen( pen );
-        int y = (line+1)*lineHeight; // - pen.width();
+        int y = renderer()->yPosForLine(line+1); // - pen.width();
 //        p.drawLine( viewportX(), y, viewportWidth(), y );
         painter->drawLine( visibleRect.left(), y, visibleRect.right(), y ); // draw from 0 to allow correct rendering of dotted lines
     }
@@ -184,7 +184,7 @@ void TextEditorRenderer::renderLineText(QPainter *painter, int line)
     QTextLayout* textLayout = renderer()->textLayoutForLine(line);
 
     // draw the text layout
-    QPoint lineStartPos(0, line*renderer()->lineHeight() );
+    QPoint lineStartPos(0, renderer()->yPosForLine(line) );
 //PROF_BEGIN_NAMED("fetch-formats")
 //    QVector<QTextLayout::FormatRange>& formats = renderer()->themeStyler()->getLineFormatRanges( line );
     QVector<QTextLayout::FormatRange> formats;

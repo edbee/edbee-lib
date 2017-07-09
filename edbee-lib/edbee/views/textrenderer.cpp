@@ -15,6 +15,7 @@
 #include "edbee/models/textdocument.h"
 #include "edbee/models/texteditorconfig.h"
 #include "edbee/models/textlexer.h"
+#include "edbee/views/textrenderwordwraphandler.h"
 #include "edbee/views/textselection.h"
 #include "edbee/views/texttheme.h"
 #include "edbee/texteditorcontroller.h"
@@ -29,6 +30,7 @@
 namespace edbee {
 
 
+
 /// The default textrenderer constructor
 TextRenderer::TextRenderer(TextEditorController* controller)
     : QObject( 0 )
@@ -36,7 +38,9 @@ TextRenderer::TextRenderer(TextEditorController* controller)
     , caretTime_(0)
     , caretBlinkRate_(0)
     , totalWidthCache_(0)
+    , wordwrapHandler_(0)
     , textThemeStyler_(0)
+    , wordWrap_(false)
     , clipRectRef_(0)
     , startOffset_(0)
     , endOffset_(0)
@@ -45,13 +49,14 @@ TextRenderer::TextRenderer(TextEditorController* controller)
 {
     connect( controller, SIGNAL(textDocumentChanged(edbee::TextDocument*,edbee::TextDocument*)), this, SLOT(textDocumentChanged(edbee::TextDocument*,edbee::TextDocument*)));
     textThemeStyler_ = new TextThemeStyler( controller );
-
+    wordwrapHandler_ = new TextRendererWordwrapHandler(this);
 }
 
 
 /// the destructor
 TextRenderer::~TextRenderer()
 {
+    delete wordwrapHandler_;
     delete textThemeStyler_;
     cachedTextLayoutList_.clear();
 //    qDeleteAll(cachedTextLayoutList_);
@@ -75,10 +80,19 @@ void TextRenderer::reset()
 
 
 /// This method returns the (maximum) line-height in pixels
-int TextRenderer::lineHeight()
+int TextRenderer::lineHeight(int line)
 {
+    if( wordWrap() ) {
+        return wordwrapHandler_->lineHeight(line);
+    }
+    return lineHeightSingleLine();
+}
 
-/// TODO: cache the height :-)
+
+/// returnst the lineheigt for a single line
+int TextRenderer::lineHeightSingleLine()
+{
+    /// TODO: cache the height :-)
     QFontMetrics fm = textWidget()->fontMetrics();
     return fm.ascent() + fm.descent() + fm.leading() + config()->extraLineSpacing(); // (the 1 is for the base line).
 }
@@ -89,7 +103,10 @@ int TextRenderer::lineHeight()
 /// @param y the y position
 int TextRenderer::rawLineIndexForYpos(int y)
 {
-    return y / lineHeight();
+    if( wordWrap() ) {
+        wordwrapHandler_->lineIndexForYpos(y);
+    }
+    return y / lineHeight(0);
 }
 
 
@@ -107,6 +124,10 @@ int TextRenderer::lineIndexForYpos(int y)
 /// This method takes the maximum line length and multiplies it with the widest character.
 int TextRenderer::totalWidth()
 {
+    if( wordWrap() ) {
+        return viewport_.width();
+    }
+
     if( !totalWidthCache_ ) {
         for( int line=0,cnt=textDocument()->lineCount(); line<cnt; ++line ) {
             QTextLayout* layout = textLayoutForLine( line );
@@ -137,7 +158,11 @@ int TextRenderer::totalWidth()
 /// This method returns the total height
 int TextRenderer::totalHeight()
 {
-    return textDocument()->lineCount() * lineHeight() + lineHeight();
+    if( wordWrap() ) {
+        // todo improve this
+        return yPosForLine( textDocument()->lineCount());
+    }
+    return textDocument()->lineCount() * lineHeight(0) + lineHeight(0);
 }
 
 
@@ -159,7 +184,12 @@ int TextRenderer::nrWidth()
 /// This method returns the number of lines
 int TextRenderer::viewHeightInLines()
 {
-    int result = viewportHeight() / lineHeight() -1;
+    if( wordWrap() ) {
+        int amount = this->endLine() - this->startLine();
+        if( amount < 1 ) amount = 1;    // minimal a line
+        return amount;
+    }
+    int result = viewportHeight() / lineHeight(0) -1;
     return result;
 }
 
@@ -167,7 +197,10 @@ int TextRenderer::viewHeightInLines()
 /// This method returns the first visible line
 int TextRenderer::firstVisibleLine()
 {
-    return viewportY() / lineHeight();
+    if( wordWrap() ) {
+      return lineIndexForYpos(viewportY());
+    }
+    return viewportY() / lineHeight(0);
 }
 
 
@@ -215,7 +248,11 @@ int TextRenderer::xPosForOffset(int offset)
 /// This method returns the y position for the given line
 int TextRenderer::yPosForLine(int line)
 {
-    return line * lineHeight();
+    if( wordWrap() ) {
+        return this->wordwrapHandler_->yPosForLine(line);
+
+    }
+    return line * lineHeight(0);
 }
 
 
@@ -244,6 +281,7 @@ QTextLayout *TextRenderer::textLayoutForLine(int line)
 
         QTextOption option;
         option.setTabStop( config()->indentSize() * tabWidth );
+        option.setWrapMode( QTextOption::WrapAtWordBoundaryOrAnywhere );
 
         if( config()->showWhitespaceMode() == TextEditorConfig::ShowWhitespaces ) {
             option.setFlags( QTextOption::ShowTabsAndSpaces );        /// TODO: Make an option to show spaces and tabs
@@ -278,8 +316,16 @@ QTextLayout *TextRenderer::textLayoutForLine(int line)
 
         textLayout->setText( text );
         textLayout->beginLayout();
-        QTextLine textline = textLayout->createLine();
-        Q_UNUSED(textline);
+        QTextLine textline;
+        int y =0 ;
+        while(true) {
+            textline = textLayout->createLine();
+            if( !textline.isValid() || !wordWrap() ) break;
+            textline.setLineWidth( viewport_.width() );
+            textline.setPosition(QPointF(0, y));
+            y += lineHeightSingleLine();
+            /// TODO: Is this safe? Maybe an endless loop is possible
+        }
         textLayout->endLayout();
 
         // update the width cache
@@ -308,16 +354,16 @@ void TextRenderer::renderBegin( const QRect& rect )
     int y = rect.y();
 
     // the first line to render
+    int calculatedBeginLine_ = rawLineIndexForYpos( y );
     int calculatedEndLine = rawLineIndexForYpos( y + rect.height() ) + 1;   // add 1 line extra (for half visible lines)
+
 
     // assign the 'work' variables
     int lineCount = doc->lineCount();
-    startLine_   = qBound( 0, rawLineIndexForYpos( y ), lineCount-1 );
+    startLine_   = qBound( 0, calculatedBeginLine_, lineCount-1 );
     endLine_     = qBound( 0, calculatedEndLine, lineCount-1 );
-
     Q_ASSERT( startLine_ <= endLine_ );
 
-//    qlog_info() << ">> render startLine" << startLine_ << " t/m endLine=" << endLine_  << "  ==> " << ( endLine_ - startLine_ ) << " y="<<y<<",height="<<rect.height()<<"-------------------" ;
     startOffset_ = doc->offsetFromLine(startLine_);
     endOffset_   = doc->offsetFromLine(endLine_+1);
 
@@ -328,6 +374,9 @@ void TextRenderer::renderBegin( const QRect& rect )
         textLayoutForLine( line );  // make sure the cache is filled
     }
 //PROF_END
+
+//    qlog_info() << ">> render startLine" << startLine_ << " t/m endLine=" << endLine_  << "  ==> " << ( endLine_ - startLine_ ) << " y="<<y<<",height="<<rect.height()<<"-------------------" ;
+//    qlog_info() << " == " << this->wordwrapLineYOffsetCache_;
 
 /// TODO: move this lexing stuff to the controller
     // prepare the style
@@ -385,6 +434,22 @@ TextEditorWidget *TextRenderer::textWidget()
 void TextRenderer::setViewport(const QRect& viewport)
 {
     viewport_ = viewport;
+
+    // only required when wordwrapping is available
+    if( wordWrap() ) {
+        invalidateTextLayoutCaches(0);
+    }
+}
+
+bool TextRenderer::wordWrap()
+{
+    return wordWrap_;
+}
+
+void TextRenderer::setWordWrap(bool enabled)
+{
+    wordWrap_ = enabled;
+    invalidateCaches();
 }
 
 
@@ -514,8 +579,11 @@ void TextRenderer::invalidateTextLayoutCaches(int fromLine)
                 cachedTextLayoutList_.remove(key);
             }
         }
+
+        this->wordwrapHandler_->invalidateFromLine(fromLine);
     } else {
         cachedTextLayoutList_.clear();
+        this->wordwrapHandler_->invalidateFromLine(0);
     }
 }
 
@@ -525,7 +593,7 @@ void TextRenderer::invalidateCaches()
 {
 //qlog_info() << "** invalidateCaches() **";
     totalWidthCache_ = 0;
-    cachedTextLayoutList_.clear();
+    invalidateTextLayoutCaches(0);
 }
 
 

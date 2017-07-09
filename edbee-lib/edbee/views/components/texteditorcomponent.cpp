@@ -136,7 +136,7 @@ QSize TextEditorComponent::sizeHint() const
     if( config()->scrollPastEnd() ) {
         int viewPortHeight = controllerRef_->widget()->textScrollArea()->size().height();
         height += viewPortHeight;
-        height -= textRenderer()->lineHeight()*2;   // *2 because we have an extra blank line at the end
+        height -= textRenderer()->lineHeightSingleLine()*2;   // *2 because we have an extra blank line at the end
     }
 
     // added 1 extra emWidth so there's at least 1 character spacing at the end
@@ -508,13 +508,16 @@ void TextEditorComponent::updateLineAtOffset(int offset)
 {
     TextRenderer* renderer = textRenderer();
     int yPos = renderer->yPosForOffset( offset ) - textEditorRenderer_->extraPixelsToUpdateAroundLines();
+    int line = renderer->lineIndexForYpos(yPos);
 
 // the text-only line:
 //    viewport()->update( renderer->viewportX(), yPos - renderer->viewportY(), renderer->viewportWidth(), renderer->lineHeight()  );
 
     // the full line inclusive sidebars
 //    viewport()->update( renderer->totalViewportX(), yPos - renderer->totalViewportY(), renderer->totalViewportWidth(), renderer->lineHeight()  );
-    update( 0,  yPos - renderer->viewportY(), renderer->viewportWidth(), renderer->lineHeight() + textEditorRenderer_->extraPixelsToUpdateAroundLines()*2  );
+
+//    update( 0,  yPos - renderer->viewportY(), renderer->viewportWidth(), renderer->lineHeight() + textEditorRenderer_->extraPixelsToUpdateAroundLines()*2  );
+    update( 0,  yPos - renderer->viewportY(), renderer->viewportWidth(), renderer->lineHeight(line) + textEditorRenderer_->extraPixelsToUpdateAroundLines()*2  );
 }
 
 
@@ -522,7 +525,10 @@ void TextEditorComponent::updateLineAtOffset(int offset)
 void TextEditorComponent::updateAreaAroundOffset(int offset, int width )
 {
     TextRenderer* ren = textRenderer();
-    update( ren->xPosForOffset(offset)-width/2, ren->yPosForOffset(offset)-textEditorRenderer_->extraPixelsToUpdateAroundLines(), width, ren->lineHeight()+textEditorRenderer_->extraPixelsToUpdateAroundLines()*2 );
+    int line = textDocument()->lineFromOffset(offset);
+
+//    update( ren->xPosForOffset(offset)-width/2, ren->yPosForOffset(offset)-textEditorRenderer_->extraPixelsToUpdateAroundLines(), width, ren->lineHeight()+textEditorRenderer_->extraPixelsToUpdateAroundLines()*2 );
+    update( ren->xPosForOffset(offset)-width/2, ren->yPosForOffset(offset)-textEditorRenderer_->extraPixelsToUpdateAroundLines(), width, ren->lineHeight(line)+textEditorRenderer_->extraPixelsToUpdateAroundLines()*2 );
 /*
     int yPos = renderer->yPosToWidgetY( renderer->yPosForOffset( offset ) );
     int xPos = renderer->xPosToWidgetX( renderer->xPosForOffset( offset ) - width/2 );
