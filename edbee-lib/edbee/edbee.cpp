@@ -113,7 +113,7 @@ static void initHardCodedDynamicScopes( DynamicVariables* env )
 
     env->setAndGiveScopedSelector( tcs, "-- ", "source.lua");
     env->setAndGiveScopedSelector( tcs2, "--[[", "source.lua");
-    env->setAndGiveScopedSelector( tce2, "]]--", "source.lua");
+    env->setAndGiveScopedSelector( tce2, "]]", "source.lua");
 
     env->setAndGiveScopedSelector( tcs, "/*", "source.css");
     env->setAndGiveScopedSelector( tce, "*/", "source.css");
