@@ -21,6 +21,9 @@ public:
     int lineHeight(int line);
     void invalidateFromLine(int fromLine);
 
+    /// debugging purposes only:
+    QVector<int>& wordwrapLineYOffsetCache() { return wordwrapLineYOffsetCache_; }
+
 protected:
 
     TextRenderer* renderRef_;

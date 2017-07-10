@@ -28,9 +28,13 @@ TextDocument* TextRendererWordwrapHandler::textDocument()
 
 int TextRendererWordwrapHandler::yPosForLine( int line )
 {
+    line = qMax(0,line); //make sure it within the document range
+
     if( line < wordwrapLineYOffsetCache_.length() ) {
         return wordwrapLineYOffsetCache_.at(line);
     }
+
+// UNDO: inefficient implementation
 #if 1
     // calculate line-heights
     wordwrapLineYOffsetCache_.clear();
@@ -41,7 +45,7 @@ int TextRendererWordwrapHandler::yPosForLine( int line )
         if( layout ) {
            y += layout->boundingRect().height();
         } else {
-qDebug() << "SINGLE LINE HEIGHT";
+qlog_info() << "No layout for for line: " << i << "(Single Line Height)";
            y += renderRef_->lineHeightSingleLine();
         }
         wordwrapLineYOffsetCache_.append(y);
@@ -51,6 +55,7 @@ qDebug() << "SINGLE LINE HEIGHT";
     } else {
       return  wordwrapLineYOffsetCache_.last();
     }
+// TODO:  more efficient implementation (but not YET correct)
 #else
 
     // else calculate the y position of the given line
@@ -108,13 +113,15 @@ int TextRendererWordwrapHandler::lineIndexForYpos( int y )
     // within current caching range
     if( wordwrapLineYOffsetCache_.length() > 0 && y <= wordwrapLineYOffsetCache_.last() ) {
         QVector<int>::iterator itr = qUpperBound(wordwrapLineYOffsetCache_.begin(), wordwrapLineYOffsetCache_.end(), y);
-        return (itr - wordwrapLineYOffsetCache_.begin());
+        int lineIndex = (itr - wordwrapLineYOffsetCache_.begin()) -1;
+        return qMax(0,lineIndex);
     }
 
     // else we need to find the position
-    for( int line=wordwrapLineYOffsetCache_.length(), cnt = textDocument()->lineCount()-1; line<cnt; ++line ) {
+    Q_ASSERT(textDocument());
+    for( int line=qMax(0,wordwrapLineYOffsetCache_.length()-1), cnt = textDocument()->lineCount()-1; line<cnt; ++line ) {
         if( yPosForLine(line) > y ) {
-            return line;
+            return qMax(0,line-1);
         }
     }
     return textDocument()->lineCount();

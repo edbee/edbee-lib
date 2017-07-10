@@ -40,7 +40,7 @@ TextRenderer::TextRenderer(TextEditorController* controller)
     , totalWidthCache_(0)
     , wordwrapHandler_(0)
     , textThemeStyler_(0)
-    , wordWrap_(false)
+    , wordWrap_(true)
     , clipRectRef_(0)
     , startOffset_(0)
     , endOffset_(0)
@@ -104,7 +104,7 @@ int TextRenderer::lineHeightSingleLine()
 int TextRenderer::rawLineIndexForYpos(int y)
 {
     if( wordWrap() ) {
-        wordwrapHandler_->lineIndexForYpos(y);
+        return wordwrapHandler_->lineIndexForYpos(y);
     }
     return y / lineHeight(0);
 }
@@ -125,7 +125,7 @@ int TextRenderer::lineIndexForYpos(int y)
 int TextRenderer::totalWidth()
 {
     if( wordWrap() ) {
-        return viewport_.width();
+        return viewport_.width() - emWidth();
     }
 
     if( !totalWidthCache_ ) {
@@ -352,21 +352,29 @@ void TextRenderer::renderBegin( const QRect& rect )
     clipRectRef_ = &rect;
 
     int y = rect.y();
+    int y2 = y + rect.height();
+
+qlog_info() << "------------";
+qlog_info() << this->wordwrapHandler_->wordwrapLineYOffsetCache();
 
     // the first line to render
-    int calculatedBeginLine_ = rawLineIndexForYpos( y );
-    int calculatedEndLine = rawLineIndexForYpos( y + rect.height() ) + 1;   // add 1 line extra (for half visible lines)
+    int calculatedBeginLine = rawLineIndexForYpos( y );
+    int calculatedEndLine = rawLineIndexForYpos( y2 ) + 1;   // add 1 line extra (for half visible lines)
+qlog_info() << "[" << calculatedEndLine << "] y2= " << y2 << rawLineIndexForYpos( y2 );
 
+qlog_info() << ">> RENDER: y=" << y << " - " << y2 <<
+                " => calc lines: " << calculatedBeginLine << " t/m endLine=" << calculatedEndLine;
 
-    // assign the 'work' variables
+// assign the 'work' variables
     int lineCount = doc->lineCount();
-    startLine_   = qBound( 0, calculatedBeginLine_, lineCount-1 );
+    startLine_   = qBound( 0, calculatedBeginLine, lineCount-1 );
     endLine_     = qBound( 0, calculatedEndLine, lineCount-1 );
     Q_ASSERT( startLine_ <= endLine_ );
 
     startOffset_ = doc->offsetFromLine(startLine_);
     endOffset_   = doc->offsetFromLine(endLine_+1);
 
+qlog_info() << "   clamp: " << startLine_ << " t/m endLine=" << endLine_;
 
     // Make sure  the cache-data is filled
 //PROF_BEGIN_NAMED("layouts")

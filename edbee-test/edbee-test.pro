@@ -45,7 +45,8 @@ SOURCES += \
     edbee/util/rangesetlineiteratortest.cpp \
     edbee/models/dynamicvariablestest.cpp \
     edbee/util/rangelineiteratortest.cpp \
-    edbee/views/textthememanagertest.cpp
+    edbee/views/textthememanagertest.cpp \
+    edbee/views/textrenderwordwraphandlertest.cpp
 
 HEADERS += \
 	edbee/commands/replaceselectioncommandtest.h \
@@ -74,7 +75,8 @@ HEADERS += \
     edbee/util/rangesetlineiteratortest.h \
     edbee/models/dynamicvariablestest.h \
     edbee/util/rangelineiteratortest.h \
-    edbee/views/textthememanagertest.h
+    edbee/views/textthememanagertest.h \
+    edbee/views/textrenderwordwraphandlertest.h
 
 ##OTHER_FILES += ../edbee-data/config/*
 ##OTHER_FILES += ../edbee-data/keymaps/*

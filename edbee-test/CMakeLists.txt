@@ -35,7 +35,8 @@ SET(SOURCES
   edbee/util/rangesetlineiteratortest.cpp 
   edbee/models/dynamicvariablestest.cpp 
   edbee/util/rangelineiteratortest.cpp
-  edbee/views/textthememanagertest.cpp    
+  edbee/views/textthememanagertest.cpp
+  edbee/views/textrenderwordwraphandlertest.cpp      
 )
 
 SET(HEADERS
@@ -66,6 +67,7 @@ SET(HEADERS
   edbee/models/dynamicvariablestest.h 
   edbee/util/rangelineiteratortest.h
   edbee/views/textthememanagertest.h
+  edbee/views/textrenderwordwraphandlertest.h
 )
 
 FIND_PACKAGE(Qt5Core REQUIRED)
