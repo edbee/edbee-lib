@@ -82,6 +82,7 @@ SET(SOURCES
    edbee/data/factorykeymap.cpp 
    edbee/data/factorycommandmap.cpp
    edbee/views/textrenderwordwraphandler.cpp
+   edbee/util/cachewithrefcount.h
 )
 
 SET(HEADERS

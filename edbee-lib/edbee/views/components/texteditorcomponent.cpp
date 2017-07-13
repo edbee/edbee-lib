@@ -161,7 +161,7 @@ void TextEditorComponent::resetCaretTime()
 /// A slow and full update of the control
 void TextEditorComponent::fullUpdate()
 {
-//    qlog_info() << "**** fullUpdate!!! **** ";
+qlog_info() << "**** fullUpdate!!! **** ";
     controller()->textRenderer()->invalidateCaches();
     updateGeometry();
     update();

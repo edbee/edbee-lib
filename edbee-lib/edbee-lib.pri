@@ -76,7 +76,8 @@ SOURCES += \
 	$$PWD/edbee/util/rangelineiterator.cpp \
 	$$PWD/edbee/data/factorykeymap.cpp \
 	$$PWD/edbee/data/factorycommandmap.cpp \
-    $$PWD/edbee/views/textrenderwordwraphandler.cpp
+    $$PWD/edbee/views/textrenderwordwraphandler.cpp \
+    $$PWD/edbee/util/cachewithrefcount.h
 
 HEADERS += \
 	$$PWD/edbee/util/logging.h \

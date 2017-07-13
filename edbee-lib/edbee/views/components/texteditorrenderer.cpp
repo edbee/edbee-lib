@@ -90,9 +90,11 @@ void TextEditorRenderer::renderLineSelection(QPainter *painter,int line)
     int lastRangeIdx=0;
 /// TODO: iprove ranges at line by calling rangesForOffsets first for only the visible offsets!
     if( sel->rangesAtLine( line, firstRangeIdx, lastRangeIdx ) ) {
+        int lineStartPos = renderer()->yPosForLine(line);
 
-        QTextLayout* textLayout = renderer()->textLayoutForLine(line);
+        QTextLayout* textLayout = renderer()->aquireTextLayoutForLine(line);
         QRectF rect = textLayout->boundingRect();
+
         QTextLine textLine = textLayout->lineAt(0);
 
         int lastLineColumn = doc->lineLength(line);
@@ -108,8 +110,11 @@ void TextEditorRenderer::renderLineSelection(QPainter *painter,int line)
 
             if( range.length() > 0 && endColumn+1 >= lastLineColumn) endX += 3;
 
-            painter->fillRect(startX, line*lineHeight + rect.top(), endX - startX, rect.height(),  themeRef_->selectionColor() ); //QColor::fromRgb(0xDD, 0x88, 0xEE) );
+            painter->fillRect(startX, lineStartPos + rect.top(), endX - startX, rect.height(),  themeRef_->selectionColor() ); //QColor::fromRgb(0xDD, 0x88, 0xEE) );
         }
+
+        // release the layout
+        renderer()->releaseTextLayoutForLine(line);
     }
 //PROF_END
 }
@@ -181,7 +186,6 @@ void TextEditorRenderer::renderLineSeparator(QPainter *painter,int line)
 void TextEditorRenderer::renderLineText(QPainter *painter, int line)
 {
 //PROF_BEGIN_NAMED("render-line-text")
-    QTextLayout* textLayout = renderer()->textLayoutForLine(line);
 
     // draw the text layout
     QPoint lineStartPos(0, renderer()->yPosForLine(line) );
@@ -199,7 +203,10 @@ void TextEditorRenderer::renderLineText(QPainter *painter, int line)
 
 //PROF_BEGIN_NAMED("draw-texts")
     painter->setPen( themeRef_->foregroundColor() );
-    textLayout->draw( painter, lineStartPos, formats, *renderer()->clipRect() );
+    QRect rect = *renderer()->clipRect() ;
+
+    QTextLayout* textLayout = renderer()->textLayoutForLine(line);
+    textLayout->draw( painter, lineStartPos, formats, rect);
 //PROF_END
 
 //PROF_END
@@ -223,7 +230,7 @@ void TextEditorRenderer::renderCarets(QPainter *painter)
 
             QPoint lineStartPos(0, renderer()->yPosForLine(line));
 
-            QTextLayout* textLayout = renderer()->textLayoutForLine(line);
+            QTextLayout* textLayout = renderer()->aquireTextLayoutForLine(line);
             for( int caret = 0, rangeCount=sel->rangeCount(); caret < rangeCount; ++caret ) {
                 TextRange& range = sel->range(caret);
                 int caretLine = doc->lineFromOffset( range.caret() );
@@ -232,6 +239,7 @@ void TextEditorRenderer::renderCarets(QPainter *painter)
                     textLayout->drawCursor( painter, lineStartPos, caretCol, caretWidth );
                 }
             }
+            renderer()->releaseTextLayoutForLine(line);
         }
     }
 //PROF_END

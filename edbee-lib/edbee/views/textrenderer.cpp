@@ -8,6 +8,7 @@
 #include <QDateTime>
 #include <QRect>
 #include <QPainter>
+#include <QScrollBar>
 #include <QTextLayout>
 
 #include "edbee/util/simpleprofiler.h"
@@ -16,6 +17,7 @@
 #include "edbee/models/texteditorconfig.h"
 #include "edbee/models/textlexer.h"
 #include "edbee/views/textrenderwordwraphandler.h"
+#include "edbee/views/texteditorscrollarea.h"
 #include "edbee/views/textselection.h"
 #include "edbee/views/texttheme.h"
 #include "edbee/texteditorcontroller.h"
@@ -125,7 +127,7 @@ int TextRenderer::lineIndexForYpos(int y)
 int TextRenderer::totalWidth()
 {
     if( wordWrap() ) {
-        return viewport_.width() - emWidth();
+        return viewport_.width(); // - this->textWidget()->textScrollArea()->verticalScrollBar()->width();
     }
 
     if( !totalWidthCache_ ) {
@@ -265,7 +267,27 @@ int TextRenderer::yPosForOffset(int offset)
 
 
 
+/// Aquire the given line
+QTextLayout *TextRenderer::aquireTextLayoutForLine(int line)
+{
+    QTextLayout* layout = textLayoutForLine(line);  // make sure the textlayout line is generated
+    return cachedTextLayoutList_.aquire(line);
+}
+
+
+/// release the given line
+void TextRenderer::releaseTextLayoutForLine(int line)
+{
+    cachedTextLayoutList_.release(line);
+}
+
+
+
 /// This method returns the textlayout for the given line
+/// WARNING, the TextLayout is valid until this method is called again
+/// or the caches are cleaned.
+///
+/// To handle multiple TextLayouts at once use aquireTextLayoutForLine and releaseTextLayout
 QTextLayout *TextRenderer::textLayoutForLine(int line)
 {
     Q_ASSERT( line >= 0 );
@@ -275,6 +297,7 @@ QTextLayout *TextRenderer::textLayoutForLine(int line)
     if( line >= doc->lineCount() ) return 0;
     QTextLayout* textLayout = cachedTextLayoutList_.object(line);
     if( !textLayout ) {
+//qDebug() << "** CALC: " << line;
         textLayout = new QTextLayout();
         textLayout->setCacheEnabled(true);
         int tabWidth = controllerRef_->widget()->fontMetrics().charWidth("M",0);
@@ -318,10 +341,13 @@ QTextLayout *TextRenderer::textLayoutForLine(int line)
         textLayout->beginLayout();
         QTextLine textline;
         int y =0 ;
+
+        int lineWidth = qMax(totalWidth(),100); // minimal 100
+
         while(true) {
             textline = textLayout->createLine();
             if( !textline.isValid() || !wordWrap() ) break;
-            textline.setLineWidth( viewport_.width() );
+            textline.setLineWidth( lineWidth );
             textline.setPosition(QPointF(0, y));
             y += lineHeightSingleLine();
             /// TODO: Is this safe? Maybe an endless loop is possible
@@ -332,12 +358,12 @@ QTextLayout *TextRenderer::textLayoutForLine(int line)
         totalWidthCache_ = qMax( totalWidthCache_, qRound(textLayout->boundingRect().width()+0.5));
 
         // add to the cache
-        cachedTextLayoutList_.insert( line, textLayout );
-
+        if( !cachedTextLayoutList_.insert( line, textLayout )) {
+            Q_ASSERT(false && "Oops insert faild!?!?");
+        }
 //qlog_info() << "Cache Line: " << line;
 
     }
-
     return textLayout;
 }
 
@@ -354,16 +380,16 @@ void TextRenderer::renderBegin( const QRect& rect )
     int y = rect.y();
     int y2 = y + rect.height();
 
-qlog_info() << "------------";
-qlog_info() << this->wordwrapHandler_->wordwrapLineYOffsetCache();
+//qlog_info() << "------------";
+//qlog_info() << this->wordwrapHandler_->wordwrapLineYOffsetCache();
 
     // the first line to render
     int calculatedBeginLine = rawLineIndexForYpos( y );
     int calculatedEndLine = rawLineIndexForYpos( y2 ) + 1;   // add 1 line extra (for half visible lines)
-qlog_info() << "[" << calculatedEndLine << "] y2= " << y2 << rawLineIndexForYpos( y2 );
+//qlog_info() << "[" << calculatedEndLine << "] y2= " << y2 << rawLineIndexForYpos( y2 );
 
-qlog_info() << ">> RENDER: y=" << y << " - " << y2 <<
-                " => calc lines: " << calculatedBeginLine << " t/m endLine=" << calculatedEndLine;
+//qlog_info() << ">> RENDER: y=" << y << " - " << y2 <<
+//                " => calc lines: " << calculatedBeginLine << " t/m endLine=" << calculatedEndLine;
 
 // assign the 'work' variables
     int lineCount = doc->lineCount();
@@ -374,7 +400,7 @@ qlog_info() << ">> RENDER: y=" << y << " - " << y2 <<
     startOffset_ = doc->offsetFromLine(startLine_);
     endOffset_   = doc->offsetFromLine(endLine_+1);
 
-qlog_info() << "   clamp: " << startLine_ << " t/m endLine=" << endLine_;
+//qlog_info() << "   clamp: " << startLine_ << " t/m endLine=" << endLine_;
 
     // Make sure  the cache-data is filled
 //PROF_BEGIN_NAMED("layouts")
@@ -441,11 +467,14 @@ TextEditorWidget *TextRenderer::textWidget()
 /// Sets the current viewport of the renderer
 void TextRenderer::setViewport(const QRect& viewport)
 {
+    int oldWidth = viewport_.width();
     viewport_ = viewport;
 
     // only required when wordwrapping is available
     if( wordWrap() ) {
-        invalidateTextLayoutCaches(0);
+        if( viewport_.width() != oldWidth ) {
+            invalidateTextLayoutCaches(0);
+        }
     }
 }
 
@@ -579,15 +608,18 @@ void TextRenderer::lastScopedOffsetChanged(int previousOffset, int newOffset)
 /// Invalidates the QTextLayout caches
 void TextRenderer::invalidateTextLayoutCaches(int fromLine)
 {
-//qlog_info() << "** invalidateTextLayoutCache("<<fromLine<<") **";
+qlog_info() << "** invalidateTextLayoutCache("<<fromLine<<") **";
     if( fromLine ) {
-        QList<int> keys = cachedTextLayoutList_.keys();
-        foreach( int key, keys ) {
-            if( key >= fromLine) {
-                cachedTextLayoutList_.remove(key);
+        if( fromLine == 0 ) {
+            cachedTextLayoutList_.clear();
+        } else {
+            QList<int> keys = cachedTextLayoutList_.keys();
+            foreach( int key, keys ) {
+                if( key >= fromLine) {
+                    cachedTextLayoutList_.remove(key);
+                }
             }
         }
-
         this->wordwrapHandler_->invalidateFromLine(fromLine);
     } else {
         cachedTextLayoutList_.clear();
@@ -599,7 +631,7 @@ void TextRenderer::invalidateTextLayoutCaches(int fromLine)
 /// call this method to invalidate all caches!
 void TextRenderer::invalidateCaches()
 {
-//qlog_info() << "** invalidateCaches() **";
+qlog_info() << "** invalidateCaches() **";
     totalWidthCache_ = 0;
     invalidateTextLayoutCaches(0);
 }

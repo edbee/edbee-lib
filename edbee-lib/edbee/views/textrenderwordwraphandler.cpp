@@ -26,6 +26,9 @@ TextDocument* TextRendererWordwrapHandler::textDocument()
     return renderRef_->textDocument();
 }
 
+
+/// Returns the y-position for the given line
+/// This method CAN invalidate the TextLayout Caches
 int TextRendererWordwrapHandler::yPosForLine( int line )
 {
     line = qMax(0,line); //make sure it within the document range
@@ -35,7 +38,7 @@ int TextRendererWordwrapHandler::yPosForLine( int line )
     }
 
 // UNDO: inefficient implementation
-#if 1
+#if 0
     // calculate line-heights
     wordwrapLineYOffsetCache_.clear();
     wordwrapLineYOffsetCache_.append(0);
@@ -64,7 +67,7 @@ qlog_info() << "No layout for for line: " << i << "(Single Line Height)";
     }
 
     int y = wordwrapLineYOffsetCache_.last();
-    int idx = wordwrapLineYOffsetCache_.length();
+    int idx = wordwrapLineYOffsetCache_.length()-1;
 
     int toLine = qMin(line,textDocument()->lineCount()+1);
 

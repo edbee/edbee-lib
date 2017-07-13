@@ -108,6 +108,9 @@ TextEditorWidget::~TextEditorWidget()
 /// @param yPosIn the position in text-editor 'coordinates'
 void TextEditorWidget::scrollPositionVisible(int xPosIn, int yPosIn)
 {
+    if( this->textRenderer()->wordWrap() ) {
+        xPosIn = 0; // HACK to never sroll to the right  (Better is to fix the viewport so it doesn't has a horizontal scrollbar)
+    }
     scrollAreaRef_->ensureVisible( xPosIn, yPosIn );
 }
 

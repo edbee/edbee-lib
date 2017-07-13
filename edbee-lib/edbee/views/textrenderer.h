@@ -13,6 +13,7 @@
 
 
 #include "edbee/models/textbuffer.h"
+#include "edbee/util/cachewithrefcount.h"
 
 class QPainter;
 class QRect;
@@ -63,6 +64,8 @@ public:
     int yPosForOffset( int offset );
 
 // caching
+    QTextLayout* aquireTextLayoutForLine( int line );
+    void releaseTextLayoutForLine( int line );
     QTextLayout* textLayoutForLine( int line );
 
 // rendering
@@ -131,7 +134,7 @@ private:
     qint64 caretTime_;                      ///< The current time of the caret. -1 means that the caret is disabled
     qint64 caretBlinkRate_;                 ///< The caret blink rate
 
-    QCache<int,QTextLayout> cachedTextLayoutList_;  ///< A list of cached text layouts
+    CacheWithRefCount<int,QTextLayout> cachedTextLayoutList_;  ///< A list of cached text layouts
 
     QRect viewport_;                                ///< The current (total) viewport. (This is updated from the window)
     int totalWidthCache_;                           ///< The total width cache
