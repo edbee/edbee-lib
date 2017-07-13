@@ -2,8 +2,8 @@
 TEMPLATE = subdirs
 
 if( $$EDBEE_SANITIZE ) {
-  QMAKE_CXXFLAGS+=-fsanitize=address -fsanitize=bound
-  QMAKE_LFLAGS+=-fsanitize=address -fsanitize=bounds  
+  QMAKE_CXXFLAGS+=-fsanitize=address -fsanitize=bound -fsanitize-undefined-trap-on-error
+  QMAKE_LFLAGS+=-fsanitize=address -fsanitize=bounds -fsanitize-undefined-trap-on-error
 }
 
 src_lib.subdir = edbee-lib
