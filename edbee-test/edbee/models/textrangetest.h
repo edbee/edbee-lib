@@ -19,6 +19,9 @@ class TextRangeSet;
 class TextRangeTest : public edbee::test::TestCase
 {
     Q_OBJECT
+public:
+    TextRangeTest();
+
 
 private slots:
     void init();

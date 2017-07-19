@@ -173,7 +173,7 @@ QString ScopedTextRangeList::toString()
 MultiLineScopedTextRange::MultiLineScopedTextRange(int anchor, int caret, TextScope* scope )
     : ScopedTextRange(anchor,caret,scope)
     , endRegExp_(0)
-//    , ruleRef_(0)
+    , ruleRef_(0)
 {
 }
 

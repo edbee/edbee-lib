@@ -19,6 +19,8 @@ class TextLineDataManager;
 class LineDataListChangeTest: public edbee::test::TestCase
 {
     Q_OBJECT
+public:
+    LineDataListChangeTest();
 
 private slots:
     void init();

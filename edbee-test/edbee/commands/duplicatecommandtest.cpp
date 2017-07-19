@@ -15,6 +15,11 @@
 namespace edbee {
 
 
+DuplicateCommandTest::DuplicateCommandTest()
+    : widget_(0)
+{
+}
+
 /// Initialization for every test case
 void DuplicateCommandTest::init()
 {

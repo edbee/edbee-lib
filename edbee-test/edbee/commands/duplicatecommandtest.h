@@ -19,6 +19,8 @@ class TextSelection;
 class DuplicateCommandTest : public edbee::test::TestCase
 {
     Q_OBJECT
+public:
+    DuplicateCommandTest();
 
 private slots:
 

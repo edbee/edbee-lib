@@ -15,6 +15,8 @@ class RemoveCommand;
 class RemoveCommandTest : public edbee::test::TestCase
 {
     Q_OBJECT
+public:
+    RemoveCommandTest();
 
 private slots:
 

@@ -17,6 +17,11 @@ static const int TEST_FIELD_INDEX = PredefinedFieldCount;
 
 typedef BasicTextLineData<QString> TestLineData;
 
+LineDataListChangeTest::LineDataListChangeTest()
+    : doc_(0)
+{
+}
+
 /// constructs the basic textdocument
 void LineDataListChangeTest::init()
 {
@@ -178,7 +183,10 @@ QString LineDataListChangeTest::data2str( LineDataListChange* change )
         if( list[i] ) {
             TextLineData* lineData = list[i]->at(manager(),TEST_FIELD_INDEX);
             if( lineData ) {
-                result.append( dynamic_cast<TestLineData*>(lineData)->value() );
+                TestLineData* testLineData = dynamic_cast<TestLineData*>(lineData);
+                if( testLineData ) {
+                    result.append( testLineData->value() );
+                }
             } else {
                 result.append(".");
             }

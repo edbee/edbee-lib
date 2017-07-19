@@ -17,7 +17,14 @@
 namespace edbee {
 
 
-/// initializes thje test
+NewlineCommandTest::NewlineCommandTest()
+    : widget_(0)
+    , command_(0)
+{
+}
+
+
+/// initializes the test
 void NewlineCommandTest::init()
 {
     widget_ = new TextEditorWidget();

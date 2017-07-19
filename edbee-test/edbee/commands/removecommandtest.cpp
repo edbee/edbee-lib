@@ -14,6 +14,12 @@
 namespace edbee {
 
 
+RemoveCommandTest::RemoveCommandTest()
+    : command_(0)
+{
+}
+
+
 /// test the remove command operation
 void RemoveCommandTest::init()
 {

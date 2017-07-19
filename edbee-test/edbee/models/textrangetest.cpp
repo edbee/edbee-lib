@@ -44,6 +44,13 @@ static void addRanges( TextRangeSet* sel, const QString& definition )
 
 
 /// Inializes this testcase
+TextRangeTest::TextRangeTest()
+    : doc_(0)
+    ,bufRef_(0)
+{
+
+}
+
 void TextRangeTest::init()
 {
     doc_ = new CharTextDocument();

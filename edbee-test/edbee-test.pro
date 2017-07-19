@@ -6,9 +6,12 @@ QT  += widgets
 TARGET = edbee-test
 TEMPLATE = app
 
-#QMAKE_CXXFLAGS+=-fsanitize=address -fsanitize=bounds
-#QMAKE_LFLAGS+=-fsanitize=address -fsanitize=bounds
-
+# DEFINE 'EDBEE_SANITIZE' to enable santitize bounds checks
+EDBEE_SANITIZE = $$(EDBEE_SANITIZE)
+!isEmpty( EDBEE_SANITIZE ) {
+  QMAKE_CXXFLAGS+=-fsanitize=address -fsanitize=bounds -fsanitize-undefined-trap-on-error
+  QMAKE_LFLAGS+=-fsanitize=address -fsanitize=bounds -fsanitize-undefined-trap-on-error
+}
 
 # This seems to be required for Windows
 INCLUDEPATH += $$PWD

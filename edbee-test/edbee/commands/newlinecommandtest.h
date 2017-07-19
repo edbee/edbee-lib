@@ -20,6 +20,8 @@ class TextEditorWidget;
 class NewlineCommandTest : public edbee::test::TestCase
 {
     Q_OBJECT
+public:
+    NewlineCommandTest();
 
 private slots:
 
