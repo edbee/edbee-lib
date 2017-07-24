@@ -5,6 +5,8 @@
 
 #include "texteditorcomponent.h"
 
+#include <QApplication>
+#include <QClipboard>
 #include <QMenu>
 #include <QPainter>
 #include <QPaintEvent>
@@ -365,7 +367,7 @@ QVariant TextEditorComponent::inputMethodQuery( Qt::InputMethodQuery p ) const
 /// @param event the mouse event
 void TextEditorComponent::mousePressEvent(QMouseEvent* event)
 {
-    if( event->button() == Qt::LeftButton ) {
+    if( event->button() == Qt::LeftButton || event->button() == Qt::MidButton ) {
         TextRenderer* renderer = textRenderer();
 
 //        int x = renderer->widgetXToXpos( event->x() + horizontalScrollBar()->value() );
@@ -376,13 +378,40 @@ void TextEditorComponent::mousePressEvent(QMouseEvent* event)
         int line = renderer->rawLineIndexForYpos( y );
         int col = renderer->columnIndexForXpos( line, x );
 
-        if( event->modifiers()&Qt::ControlModifier ) {
-            controller()->addCaretAt( line, col );
-        } else {
-            controller()->moveCaretTo( line, col, event->modifiers()&Qt::ShiftModifier );
+        if( event->button() == Qt::LeftButton ) {
+            if( event->modifiers()&Qt::ControlModifier ) {
+                controller()->addCaretAt( line, col );
+            } else {
+                controller()->moveCaretTo( line, col, event->modifiers()&Qt::ShiftModifier );
+            }
+        }
+        if( QApplication::clipboard()->supportsSelection() && event->button() == Qt::MidButton ) { // X11 / linux support middle button paste
+            controller()->moveCaretTo( line, col, false ); // clear actual selection and put cursor under mouse
+            controller()->replaceSelection( QApplication::clipboard()->text(QClipboard::Selection), CoalesceId_Paste );
+            controller()->updateStatusText();
         }
     }
     QWidget::mousePressEvent(event);
+}
+
+
+/// A mouse release happens
+///
+/// Only used to copy selection to selection clipboard for X11 / linux systems
+///
+/// @param event the mouse event
+void TextEditorComponent::mouseReleaseEvent(QMouseEvent *event)
+{
+    if( QApplication::clipboard()->supportsSelection() && event->button() == Qt::LeftButton ) {
+        if( controller()->textSelection()->rangeCount() == 1 ) {
+            QString selection;
+            selection = controller()->textSelection()->getSelectedText();
+            if( !selection.isEmpty() ) {
+                QApplication::clipboard()->setText(selection, QClipboard::Selection);
+            }
+        }
+    }
+    QWidget::mouseReleaseEvent(event);
 }
 
 
