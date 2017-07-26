@@ -2,6 +2,7 @@
 
 edbee.lib:
 
+- ref #43, Added loadWithoutOpening and saveWithoutOpening to TextDocumentSerializer. For serializing without opening and closing an QIODevice (To enable the usage of QSaveFile).
 - fix #41, Added LUA comments to the hardcoded list of comments
 - ref #39, Margin-component bugfixes/improvements
 	- Clicking/dragging changed so it behaves as expected. (Especially dragging up)

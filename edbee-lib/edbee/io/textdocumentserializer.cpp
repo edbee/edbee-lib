@@ -26,18 +26,11 @@ TextDocumentSerializer::TextDocumentSerializer( TextDocument* textDocument )
 }
 
 
-/// executes the file loading for the given (unopened) ioDevice
+/// loads the file data for the given (opened) ioDevice
 /// @return true on success,
-bool TextDocumentSerializer::load( QIODevice* ioDevice )
+bool TextDocumentSerializer::loadWithoutOpening( QIODevice* ioDevice )
 {
     errorString_.clear();
-
-    // open the device
-    if( !ioDevice->open( QIODevice::ReadOnly ) ) {
-        errorString_ = ioDevice->errorString();
-        return false;
-
-    }
 
     // start raw appending
     textDocumentRef_->rawAppendBegin();
@@ -90,8 +83,6 @@ bool TextDocumentSerializer::load( QIODevice* ioDevice )
         if( bytesRead <= 0 ) break;
     }
 
-    ioDevice->close();
-
     // When no line ending could be detected, take the unix line ending
     if( !detectedLineEnding ) detectedLineEnding = LineEnding::get(LineEnding::UnixType); // fallback to unix
     if( !detectedCodec ) {  detectedCodec = TextCodecDetector::globalPreferedCodec();  }
@@ -114,23 +105,37 @@ bool TextDocumentSerializer::load( QIODevice* ioDevice )
     return true;
 }
 
-/// Saves the given document to the iodevice
-bool TextDocumentSerializer::save(QIODevice* ioDevice)
+
+
+/// executes the file loading for the given (unopened) ioDevice
+/// @return true on success,
+bool TextDocumentSerializer::load( QIODevice* ioDevice )
+{
+    errorString_.clear();
+
+    // open the device
+    if( !ioDevice->open( QIODevice::ReadOnly ) ) {
+        errorString_ = ioDevice->errorString();
+        return false;
+
+    }
+    bool result = loadWithoutOpening( ioDevice );
+    ioDevice->close();
+
+    return result;
+}
+
+
+/// loads the file data for the given (opened) ioDevice
+/// @return true on success
+bool TextDocumentSerializer::saveWithoutOpening(QIODevice *ioDevice)
 {
     errorString_.clear();
 
     // get the codec en encoder
     TextCodec* codec = textDocumentRef_->encoding();
-
-    // open the device
-    if( !ioDevice->open( QIODevice::WriteOnly ) ) {
-        errorString_ = ioDevice->errorString();
-        return false;
-    }
-
     QTextEncoder* encoder = codec->makeEncoder();
     QString lineEnding( textDocumentRef_->lineEnding()->chars() );
-
 
     // work via a buffer
     QByteArray buffer;
@@ -165,9 +170,27 @@ bool TextDocumentSerializer::save(QIODevice* ioDevice)
         }
         buffer.clear();
     }
-    ioDevice->close();
     delete encoder;
     return errorString_.isEmpty();
+}
+
+
+/// Saves the given document to the iodevice
+/// This method opens and closes the ioDevice..
+bool TextDocumentSerializer::save(QIODevice* ioDevice)
+{
+    errorString_.clear();
+
+    // open the device
+    if( !ioDevice->open( QIODevice::WriteOnly ) ) {
+        errorString_ = ioDevice->errorString();
+        return false;
+    }
+
+    bool result = saveWithoutOpening(ioDevice);
+    ioDevice->close();
+
+    return result;
 }
 
 

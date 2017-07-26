@@ -32,7 +32,10 @@ class TextDocumentSerializer
 public:
     TextDocumentSerializer( TextDocument* textDocument );
 
+    bool loadWithoutOpening( QIODevice* ioDevice );
     bool load( QIODevice* ioDevice );
+
+    bool saveWithoutOpening( QIODevice* ioDevice );
     bool save( QIODevice* ioDevice );
 
 
