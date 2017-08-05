@@ -240,7 +240,6 @@ void TextEditorComponent::keyPressEvent(QKeyEvent* event)
     // unkown key return or control key
     if( key == Qt::Key_unknown ) { return; }
     if(key == Qt::Key_Control || key == Qt::Key_Shift || key == Qt::Key_Alt || key == Qt::Key_Meta) { return; }
-
     // convert the key to a string
     Qt::KeyboardModifiers modifiers = event->modifiers();
     if(modifiers & Qt::ShiftModifier)    key += Qt::SHIFT;
@@ -281,9 +280,11 @@ void TextEditorComponent::keyPressEvent(QKeyEvent* event)
     // not partial, not found, clear the mark
     lastKeySequence_ = QKeySequence();
 
+
     // else replace the selection if there's a text
     QString text = event->text();
-    bool specialKey =(modifiers&(Qt::MetaModifier|Qt::ControlModifier));
+    bool specialKey = (modifiers&(Qt::MetaModifier|Qt::ControlModifier))
+                  && ((modifiers!=(Qt::AltModifier|Qt::ControlModifier)) || (!text.isEmpty() && text.at(0).isUpper()));
     if( !text.isEmpty() && !specialKey ) {
         // last character is used for "undo-group after" space support
         if( this->config()->undoGroupPerSpace() ) {
