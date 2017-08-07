@@ -1,3 +1,4 @@
+!win32:system($$PWD/configure)
 INCLUDEPATH += $$PWD
 INCLUDEPATH += $$PWD/enc/unicode
 
