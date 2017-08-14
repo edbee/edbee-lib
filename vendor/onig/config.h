@@ -15,8 +15,6 @@
 
 #else
 
-
-
 /* Define to one of `_getb67', `GETB67', `getb67' for Cray-2 and Cray-YMP
    systems. This function is required for `alloca.c' support on those systems.
    */
@@ -84,7 +82,7 @@
 #define PACKAGE_NAME "onigmo"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "onigmo 6.1.1"
+#define PACKAGE_STRING "onigmo 6.1.2"
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "onigmo"
@@ -93,7 +91,7 @@
 #define PACKAGE_URL ""
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "6.1.1"
+#define PACKAGE_VERSION "6.1.2"
 
 /* The size of `int', as computed by sizeof. */
 #define SIZEOF_INT 4
@@ -131,7 +129,7 @@
 /* #undef USE_CRNL_AS_LINE_TERMINATOR */
 
 /* Version number of package */
-#define VERSION "6.1.1"
+#define VERSION "6.1.2"
 
 /* Define to empty if `const' does not conform to ANSI C. */
 /* #undef const */

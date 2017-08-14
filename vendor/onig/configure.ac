@@ -69,5 +69,22 @@ dnl Checks for library functions.
 AC_FUNC_ALLOCA
 AC_FUNC_MEMCMP
 
+dnl Add custom edbee boilerplate start
+AH_TOP([#include "config-onig-edbee.h"
+
+#ifdef _WIN32
+
+    #include "win32/config.h"
+
+    // Rick: added to make it compile on windows
+    #define ONIG_EXTERN extern
+
+    // Rick: added to decrease the numberr of warnings for onig
+    #define _CRT_SECURE_NO_WARNINGS
+
+#else])
 
 AC_OUTPUT([Makefile onigmo-config sample/Makefile], [chmod +x onigmo-config])
+
+dnl Add custom edbee boilerplate end
+AH_BOTTOM([#endif])
