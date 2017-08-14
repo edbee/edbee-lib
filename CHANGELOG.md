@@ -2,12 +2,13 @@
 
 edbee.lib:
 
+- ref #45, Added ctrl-insert and shift-insert for copy paste 
 - ref #43, Added loadWithoutOpening and saveWithoutOpening to TextDocumentSerializer. For serializing without opening and closing an QIODevice (To enable the usage of QSaveFile).
 - fix #41, Added LUA comments to the hardcoded list of comments
-- ref #39, Margin-component bugfixes/improvements
+- fix #39, Margin-component bugfixes/improvements
 	- Clicking/dragging changed so it behaves as expected. (Especially dragging up)
 	- Line numbers of lines with selection are rendered with 100% opacity
-- ref #38, Margin line-number font size is now set to the font size of the editor. It also renders number with an opacity of 0.5. 
+- fix #38, Margin line-number font size is now set to the font size of the editor. It also renders number with an opacity of 0.5. 
 - fix #32, Changing showWhiteSpace option does not trigger a redraw
 - add #31, Support for rendering borderedTextRanges. These are textranges rendered with borders, that aren't selected. TextEditorController has a member 'borderedTextRanges()'. Altering this rangeset (and updating the view controller::update) renderes borders aroudn the given ranges
 - fix #30, Edbee crashes when you cut/copy with nothing selected. (Bug in clipboard operation)

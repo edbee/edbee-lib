@@ -105,6 +105,9 @@ void FactoryKeyMap::fill( TextEditorKeyMap* km )
     add( "cut", "cut" );
     add( "paste", "paste" );
 
+    add( "copy", "Ctrl+Insert" );
+    add( "paste", "Shift+Insert" );
+
     // debug commands
     add( "debug_dump_scopes", "Ctrl+Shift+X,S" );
     add( "debug_rebuild_scopes", "Ctrl+Shift+X,R" );

@@ -141,7 +141,7 @@ void TextEditorConfig::setUseTabChar(bool enable)
 
 
 /// Returns the state of smarttab mode
-/// Smarttab enables the automatic addition of indents
+/// Smarttab enables the automatic addition of indents when inserting a newline.
 bool TextEditorConfig::smartTab() const
 {
     return smartTab_;
