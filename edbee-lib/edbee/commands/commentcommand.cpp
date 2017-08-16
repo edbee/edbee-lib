@@ -338,7 +338,7 @@ static bool getCommentDefinitions( TextEditorController* controller, TextRange& 
     TextDocumentScopes* scopes = doc->scopes();
 
     // retrieve the starting scope
-    TextScopeList startScopeList = scopes->scopesAtOffset( range.min() );
+    TextScopeList startScopeList = scopes->scopesAtOffset( range.min(), true );
 
     // next find all comment definitions
     QString padding = "";
@@ -373,7 +373,6 @@ static bool getCommentDefinitions( TextEditorController* controller, TextRange& 
 static int commentRange( TextEditorController* controller, TextRange& range, bool block )
 {
     CommentDefinition defs;
-
     // retrieve all comment definitions
     if( !getCommentDefinitions( controller, range, defs.list() ) ) {
          return range.max();
@@ -390,7 +389,6 @@ static int commentRange( TextEditorController* controller, TextRange& range, boo
 
     // check if we need to do a block comment
     if( blockDef && ( block || !lineDef ) ) {
-
         return insertBlockComment( controller, range, blockDef->start(), blockDef->end() );
 
     // check if we need to perform a line comment
@@ -405,7 +403,6 @@ static int commentRange( TextEditorController* controller, TextRange& range, boo
         } else {
             insertLineComments( doc, range, lineDef->start() );
         }
-
     }
     return range.max();
 }

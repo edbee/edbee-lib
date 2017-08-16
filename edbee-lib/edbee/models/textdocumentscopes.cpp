@@ -910,7 +910,7 @@ QVector<MultiLineScopedTextRange*> TextDocumentScopes::multiLineScopedRangesBetw
 
 
 /// returns all scopes between the given offsets
-TextScopeList TextDocumentScopes::scopesAtOffset( int offset )
+TextScopeList TextDocumentScopes::scopesAtOffset( int offset, bool includeEnd  )
 {
     TextScopeList result;
 
@@ -926,9 +926,11 @@ TextScopeList TextDocumentScopes::scopesAtOffset( int offset )
             ScopedTextRange* range = list->at(i);
 //QString debug;
 //debug.append( QString("- %1.%5: %2<=%3<%4").arg(i).arg(range->min()).arg(offsetInLine).arg(range->max()).arg(range->scope()->name()) );
-            if( range->min() <= offsetInLine && offsetInLine < range->max() ) {
+            if( range->min() <= offsetInLine ) {
+                if( offsetInLine < range->max() || (includeEnd && offsetInLine <= range->max()) ) {
 //debug.append(" Ok" );
-                result.append(range->scope());
+                   result.append(range->scope());
+                }
             }
 //qlog_info() << debug;
         }

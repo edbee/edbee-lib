@@ -346,7 +346,7 @@ public:
     MultiLineScopedTextRange& defaultScopedRange();
 
     QVector<MultiLineScopedTextRange*> multiLineScopedRangesBetweenOffsets( int offsetBegin, int offsetEnd );
-    TextScopeList scopesAtOffset( int offset );
+    TextScopeList scopesAtOffset(int offset , bool includeEnd=false );
     QVector<ScopedTextRange*> createScopedRangesAtOffsetList( int offset );
 
     QString toString();
