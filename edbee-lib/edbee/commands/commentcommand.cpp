@@ -341,7 +341,7 @@ static bool getCommentDefinitions( TextEditorController* controller, TextRange& 
     TextScopeList startScopeList = scopes->scopesAtOffset( range.min(), true );
 
     // next find all comment definitions
-    QString padding = "";
+    QString padding;
     int index=1;
     do
     {

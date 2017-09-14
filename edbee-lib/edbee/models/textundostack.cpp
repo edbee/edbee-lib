@@ -483,7 +483,7 @@ int TextUndoStack::persistedIndex()
 /// makes a dump of the current stack
 QString TextUndoStack::dumpStack()
 {
-    QString result = "";
+    QString result;
     result += "\n";
     result +="UndoStack\n";
     result += "=====================\n";

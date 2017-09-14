@@ -105,7 +105,7 @@ public slots:
 public slots:
 
     // updates the status text
-    virtual void updateStatusText( const QString& extraText="" );
+    virtual void updateStatusText( const QString& extraText=QString() );
 
     virtual void update();
 

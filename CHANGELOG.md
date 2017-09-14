@@ -2,6 +2,7 @@
 
 edbee.lib:
 
+- fix #54, Use of raw string literal causes issues when QT_NO_CAST_FROM_ASCII defined 
 - fix #44, Commenting shortcut does not work if cursor is on the last character of the last line in the document
 - ref #45, Added ctrl-insert and shift-insert for copy paste 
 - fix #43, Added loadWithoutOpening and saveWithoutOpening to TextDocumentSerializer. For serializing without opening and closing an QIODevice (To enable the usage of QSaveFile).

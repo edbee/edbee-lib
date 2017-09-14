@@ -88,7 +88,7 @@ public:
     void loadKeyMap( const QString& file );
     void loadFactoryKeyMap();
 
-    TextEditorKeyMap* get( const QString& name="" );
+    TextEditorKeyMap* get( const QString& name=QString() );
     TextEditorKeyMap* findOrCreate( const QString& name );
 
 private:
