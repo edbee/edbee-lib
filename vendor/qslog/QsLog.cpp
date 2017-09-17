@@ -116,7 +116,7 @@ Level Logger::loggingLevel() const
 void Logger::Helper::writeToLog()
 {
     const char* const levelName = LevelToText(level);
-    const QString completeMessage(QString("%1 %2 %3")
+    const QString completeMessage(QStringLiteral("%1 %2 %3")
                                   .arg(levelName, 5)
                                   .arg(QDateTime::currentDateTime().toString(fmtDateTime))
                                   .arg(buffer)

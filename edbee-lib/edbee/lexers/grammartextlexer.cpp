@@ -387,9 +387,9 @@ bool GrammarTextLexer::lexLine( int lineIdx, int& currentDocOffset )
     TextGrammarRule* lastFoundRule = 0;
     while( true ) {
 //QString debug;
-//debug.append( QString(" =[%1,%2,%3]= ").arg(lineIdx).arg(offsetInLine).arg(currentDocOffset) );
+//debug.append( QStringLiteral((" =[%1,%2,%3]= ").arg(lineIdx).arg(offsetInLine).arg(currentDocOffset) );
         TextGrammarRule* foundRule = findAndApplyNextGrammarRule( currentDocOffset, line, offsetInLine  );
-//debug.append( QString(" %1  (%2)").arg(foundRule?foundRule->scopeName():"<<null>").arg(offsetInLine) );
+//debug.append( QStringLiteral((" %1  (%2)").arg(foundRule?foundRule->scopeName():"<<null>").arg(offsetInLine) );
 //qlog_info() << debug;
         if( !foundRule ) break;
 

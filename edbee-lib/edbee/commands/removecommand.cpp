@@ -200,7 +200,7 @@ QString RemoveCommand::toString()
     QString dir = direction_ == Left ? "Left" : "Right";
 
     // next returnt he string
-    return QString("RemoveCommand(%1,%2)").arg(mode).arg(dir);
+    return QStringLiteral("RemoveCommand(%1,%2)").arg(mode).arg(dir);
 }
 
 

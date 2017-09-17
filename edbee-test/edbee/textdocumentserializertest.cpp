@@ -19,23 +19,23 @@ void TextDocumentSerializerTest::testLoad()
 {
     CharTextDocument doc;
     TextDocumentSerializer serializer( &doc );
-    testEqual( doc.text(), QString("") );
+    testEqual( doc.text(), QStringLiteral("") );
 
     // load the data
     QByteArray data("Test,\r\nWerkt het?\r\nRick!!");
     QBuffer buffer(&data);
     testTrue( serializer.load(&buffer) );
-    testEqual( doc.text(), QString("Test,\nWerkt het?\nRick!!"));    // windows line endings should be removed
+    testEqual( doc.text(), QStringLiteral("Test,\nWerkt het?\nRick!!"));    // windows line endings should be removed
 
 
     // clear the buffer
     doc.buffer()->setText("");
-    testEqual( doc.text(), QString("") );
+    testEqual( doc.text(), QStringLiteral("") );
 
     data = "Test,\nWerkt het?\nRick!!";
     buffer.setData(data);
     testTrue( serializer.load(&buffer) );
-    testEqual( doc.text(), QString("Test,\nWerkt het?\nRick!!"));    // windows line endings should be ke
+    testEqual( doc.text(), QStringLiteral("Test,\nWerkt het?\nRick!!"));    // windows line endings should be ke
 
 
 

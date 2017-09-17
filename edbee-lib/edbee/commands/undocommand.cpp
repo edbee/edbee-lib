@@ -23,7 +23,7 @@ void UndoCommand::execute( TextEditorController* controller)
 
 QString UndoCommand::toString()
 {
-    return QString("UndoCommand(%1)").arg( soft_ ? "soft" : "hard" );
+    return QStringLiteral("UndoCommand(%1)").arg( soft_ ? "soft" : "hard" );
 }
 
 

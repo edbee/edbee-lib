@@ -271,7 +271,7 @@ QString TextBuffer::lineOffsetsAsString()
     for( int idx=0,cnt=lineCount(); idx<cnt; ++idx  ) {
         int offset = offsetFromLine(idx);
         if( !str.isEmpty() ) str.append(',');
-        str.append( QString("%1").arg(offset) );
+        str.append( QStringLiteral("%1").arg(offset) );
     }
     return str;
 }

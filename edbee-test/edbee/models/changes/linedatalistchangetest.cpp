@@ -208,7 +208,7 @@ QString LineDataListChangeTest::data2ptr( LineDataListChange* change )
         if( list[i] ) {
             TextLineData* lineData = list[i]->at(manager(),TEST_FIELD_INDEX);
             if( lineData ) {
-                result.append( QString("").sprintf("%8p", lineData) );
+                result.append( QStringLiteral("").sprintf("%8p", lineData) );
             } else {
                 result.append(".");
             }

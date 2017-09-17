@@ -320,7 +320,7 @@ QString TextEditorKeyMap::toString() const
     QString str;
     for( QHash<QString,TextEditorKey*>::const_iterator itr = keyMap_.constBegin(); itr != keyMap_.constEnd(); ++itr ) {
         if( !str.isEmpty()) str.append(",");
-        str.append( QString("%1:%2").arg(itr.key()).arg(itr.value()->sequence().toString()) );
+        str.append( QStringLiteral("%1:%2").arg(itr.key()).arg(itr.value()->sequence().toString()) );
     }
     return str;
 }

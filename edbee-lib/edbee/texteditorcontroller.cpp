@@ -432,24 +432,24 @@ void TextEditorController::updateStatusText( const QString& extraText )
 
     // add the ranges
     if( textSelection_->rangeCount() > 1 ) {
-        text.append( QString("%1 ranges").arg(textSelection_->rangeCount() ) );
+        text.append( QObject::tr("%1 ranges").arg(textSelection_->rangeCount() ) );
     } else {
         TextRange& range = textSelection_->range(0);
         int caret = range.caret();
         int line = doc->lineFromOffset( caret ) ;
         int col  = doc->columnFromOffsetAndLine( caret, line ) + 1;
-        text.append( QString("Line %1, Column %2").arg(line+1).arg(col) );
+        text.append( QObject::tr("Line %1, Column %2").arg(line+1).arg(col) );
 
         if( textDocument()->config()->showCaretOffset() ) {
-            text.append( QString(", Offset %1").arg(caret) );
+            text.append( QObject::tr(", Offset %1").arg(caret) );
         }
 
         if( range.length() > 0 ) {
-            text.append( QString(" | %1 chars selected").arg(range.length()) );
+            text.append( QObject::tr(" | %1 chars selected").arg(range.length()) );
 
         // add the current scopes
         } else {
-            text.append(" | scope: " );
+            text.append( QObject::tr(" | scope: ") );
 
             QString str;
             QVector<TextScope*> scopes = textDocument()->scopes()->scopesAtOffset( caret ) ;
@@ -459,7 +459,7 @@ void TextEditorController::updateStatusText( const QString& extraText )
                 str.append(" ");
             }
             text.append( str );
-            text.append( QString(" (%1)").arg( textDocument()->scopes()->lastScopedOffset() ) );
+            text.append( QObject::tr(" (%1)").arg( textDocument()->scopes()->lastScopedOffset() ) );
         }
     }
 

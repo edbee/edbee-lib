@@ -511,17 +511,17 @@ QString TextUndoStack::dumpStack()
         QMap<TextEditorController*, int>::iterator itr;
         for( itr = controllerIndexMap_.begin(); itr != controllerIndexMap_.end(); ++itr ) {
             if( itr.value() == i ) {
-                pointers.append( QString("<=(%1) ").arg( QString::number((quintptr)itr.key(),16) ) );
+                pointers.append( QStringLiteral("<=(%1) ").arg( QString::number((quintptr)itr.key(),16) ) );
             }
         }
         if( changeIndex_ == i ) {
-            pointers.append( QString("<=(DOC) " ));
+            pointers.append( QStringLiteral("<=(DOC) " ));
         }
         if( persistedIndex_ == i ){
-            pointers.append( QString("<=(P) " ));
+            pointers.append( QStringLiteral("<=(P) " ));
         }
 
-        result += QString("-|%1:%2| %3\n").arg(changeName,-30).arg(controllerName,10).arg(pointers);
+        result += QStringLiteral("-|%1:%2| %3\n").arg(changeName,-30).arg(controllerName,10).arg(pointers);
         end=false;
     }
     return result;

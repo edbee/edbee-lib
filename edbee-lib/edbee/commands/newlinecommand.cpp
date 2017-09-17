@@ -58,14 +58,14 @@ QString NewlineCommand::calculateSmartIndent(TextEditorController* controller, T
         if( config->useTabChar() ) {
             int tabs   = column / config->indentSize();
             int spaces = column % config->indentSize();
-            result.append( QString("\t").repeated(tabs));
+            result.append( QStringLiteral("\t").repeated(tabs));
             if( spaces>0 ) {
-                result.append( QString(" ").repeated(spaces));
+                result.append( QStringLiteral(" ").repeated(spaces));
             }
 
         // else we can add spaces to the given column position
         } else {
-            result.append( QString(" ").repeated( column) );
+            result.append( QStringLiteral(" ").repeated( column) );
         }
     }
     return result;
@@ -95,7 +95,7 @@ void NewlineCommand::executeNormalNewline(TextEditorController* controller)
         TextRange& range = sel->range(i);
 
         // add the string to insert
-        texts.push_back( QString("\n%1").arg( calculateSmartIndent( controller, range ) ) );
+        texts.push_back( QStringLiteral("\n%1").arg( calculateSmartIndent( controller, range ) ) );
     }
 
     // next execute the replace command
@@ -133,7 +133,7 @@ void NewlineCommand::executeSpecialNewline(TextEditorController* controller, boo
             int pos = doc->offsetFromLine(line+lineDelta)-1;
             TextRange newRange( pos, pos );
 
-            QString text = QString("\n%1").arg( smart ? calculateSmartIndent( controller, newRange ) : "" );
+            QString text = QStringLiteral("\n%1").arg( smart ? calculateSmartIndent( controller, newRange ) : "" );
 
             // replaces the text
             doc->replace( newRange.caret(), 0, text );

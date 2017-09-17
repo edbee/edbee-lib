@@ -200,7 +200,7 @@ TextLineData *TextLineDataManager::get(int line, int field)
 //    qlog_info() << "GAPVECTOR: ["<<textLineDataList_.gapBegin() << ","<<textLineDataList_.gapEnd()<<">";
 //    for( int i=0; i < textLineDataList_.capacity(); ++i ) {
 //        TextLineDataList* item = textLineDataList_.rawAt(i);
-//        qlog_info() << "-" << i <<  ":" << QString("%1").arg((quintptr)item);
+//        qlog_info() << "-" << i <<  ":" << QStringLiteral("%1").arg((quintptr)item);
 //    }
 //    qlog_info()<<"- done";
 

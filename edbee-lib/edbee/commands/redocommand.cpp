@@ -23,7 +23,7 @@ void RedoCommand::execute( TextEditorController* controller)
 
 QString RedoCommand::toString()
 {
-    return QString("RedoCommand(%1)").arg( soft_ ? "soft" : "hard" );
+    return QStringLiteral("RedoCommand(%1)").arg( soft_ ? "soft" : "hard" );
 }
 
 

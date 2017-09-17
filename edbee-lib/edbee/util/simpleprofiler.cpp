@@ -48,7 +48,7 @@ SimpleProfiler::~SimpleProfiler()
 void SimpleProfiler::begin(const char *file, int line, const char *function, const char* name )
 {
     // build the key
-    QString key = QString("%1:%2").arg(file).arg(line);
+    QString key = QStringLiteral("%1:%2").arg(file).arg(line);
 
     // fetch or create the item
     ProfilerItem *item = statsMap_.value(key,0);
@@ -106,7 +106,7 @@ void SimpleProfiler::dumpResults()
             double callCountPercentage = totalCallCount > 0 ? 100.0 * item->callCount() / totalCallCount : 100;
             double durationWithoutChildsPercenage = totalDurationWitoutChilds > 0 ? 100.0 * item->durationWithoutChilds() / totalDurationWitoutChilds : 100;
 
-            QString line = QString("%1x(%2%) %3ms(%4%) %5ms(%6%) |  %7:%8 %9")
+            QString line = QStringLiteral("%1x(%2%) %3ms(%4%) %5ms(%6%) |  %7:%8 %9")
                .arg(item->callCount(),8).arg( callCountPercentage, 6, 'f', 2 )
                .arg(item->duration(),6).arg( durationPercentage, 6, 'f', 2 )
                .arg(item->durationWithoutChilds(), 6 ).arg( durationWithoutChildsPercenage, 6, 'f', 2 )

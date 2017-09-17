@@ -39,7 +39,7 @@ TextMarginComponentDelegate::TextMarginComponentDelegate()
 /// The default text (of course) is the line-number
 QString TextMarginComponentDelegate::lineText(int line)
 {
-    return QString("%1").arg(line+1);
+    return QStringLiteral("%1").arg(line+1);
 }
 
 /// The extra space required before the line-number

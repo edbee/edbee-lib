@@ -58,7 +58,7 @@ public:
     RegExp* commentStartRegExp()
     {
         if( !commentStartRegExp_ ) {
-            commentStartRegExp_ = new RegExp( QString("^\\s*%1").arg( RegExp::escape( start().trimmed() ) ) );
+            commentStartRegExp_ = new RegExp( QStringLiteral("^\\s*%1").arg( RegExp::escape( start().trimmed() ) ) );
         }
         return commentStartRegExp_;
     }
@@ -67,7 +67,7 @@ public:
     RegExp* removeCommentStartRegeExp()
     {
         if( !removeCommentStartRegeExp_ ) {
-            removeCommentStartRegeExp_ = new RegExp( QString("^[^\\S\n]*(%1[^\\S\n]?)").arg( RegExp::escape( start().trimmed() ) ) );
+            removeCommentStartRegeExp_ = new RegExp( QStringLiteral("^[^\\S\n]*(%1[^\\S\n]?)").arg( RegExp::escape( start().trimmed() ) ) );
         }
         return removeCommentStartRegeExp_;
     }
@@ -167,7 +167,7 @@ static bool areAllLinesCommented( TextDocument* doc, TextRange& range, const QLi
 /// @param commentStart the text used as the line comment prefix
 static void removeLineComment( TextDocument* doc, TextRange& range, const QList<CommentDefinitionItem*>& definitions  )
 {
-//    RegExp regExp( QString("^[^\\S\n]*(%1[^\\S\n]?)").arg( RegExp::escape(commentStart.trimmed() ) ) );
+//    RegExp regExp( QStringLiteral("^[^\\S\n]*(%1[^\\S\n]?)").arg( RegExp::escape(commentStart.trimmed() ) ) );
     TextBuffer* buf = doc->buffer();
 
     // iterate over all lines and build all ranges
@@ -347,16 +347,16 @@ static bool getCommentDefinitions( TextEditorController* controller, TextRange& 
     {
         // retrieve the comment start
         // when there's no comment start then we're done
-        QString commentStart = controller->dynamicVariables()->value( QString("TM_COMMENT_START%1").arg(padding), &startScopeList ).toString();
+        QString commentStart = controller->dynamicVariables()->value( QStringLiteral("TM_COMMENT_START%1").arg(padding), &startScopeList ).toString();
         if( commentStart.isEmpty() ) {  break; }
 
         // when there's a start there could be an ending (for block comments)
-        QString commentEnd = controller->dynamicVariables()->value( QString("TM_COMMENT_END%1").arg(padding), &startScopeList ).toString();
+        QString commentEnd = controller->dynamicVariables()->value( QStringLiteral("TM_COMMENT_END%1").arg(padding), &startScopeList ).toString();
         definitions.push_back( new CommentDefinitionItem( commentStart, commentEnd ) );
 
         // increase the index and change the padding
         ++index;
-        padding = QString("_%1").arg(index);
+        padding = QStringLiteral("_%1").arg(index);
     }
     while( true );
 

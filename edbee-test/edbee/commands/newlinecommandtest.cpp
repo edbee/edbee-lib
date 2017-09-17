@@ -63,34 +63,34 @@ void NewlineCommandTest::testCalculateSmartIndent_useSpaces()
 
     // pressing enter before the start of the indent should stay at the samen column
     range.set(1,1);
-    testEqual( command_->calculateSmartIndent( controller(), range ), QString(" ") );
+    testEqual( command_->calculateSmartIndent( controller(), range ), QStringLiteral(" ") );
 
     // pressing enter at the indent level should stay at the same level
     range.set(2,2);
-    testEqual( command_->calculateSmartIndent( controller(), range ), QString(" ").repeated(2) );
+    testEqual( command_->calculateSmartIndent( controller(), range ), QStringLiteral(" ").repeated(2) );
 
     // pressing enter in the middle of the line should indent to the start of the first nonespace
     range.set(4,4);
-    testEqual( command_->calculateSmartIndent( controller(), range ), QString(" ").repeated(2) );
+    testEqual( command_->calculateSmartIndent( controller(), range ), QStringLiteral(" ").repeated(2) );
 
     // pressing enter at the end of the document should indent to the start of the first nonespace
     range.set( doc()->length(),doc()->length());
-    testEqual( command_->calculateSmartIndent( controller(), range ), QString(" ").repeated(2) );
+    testEqual( command_->calculateSmartIndent( controller(), range ), QStringLiteral(" ").repeated(2) );
 
     // it also should work correctly if the buffer contains a tab
     config()->setIndentSize(4);
     doc()->setText(" \tTest");      // this is equal to 4 spaces
     range.set(2,2);
-    testEqual( command_->calculateSmartIndent( controller(), range ), QString(" ").repeated(4) );
+    testEqual( command_->calculateSmartIndent( controller(), range ), QStringLiteral(" ").repeated(4) );
     range.set(5,5);
-    testEqual( command_->calculateSmartIndent( controller(), range ), QString(" ").repeated(4) );
+    testEqual( command_->calculateSmartIndent( controller(), range ), QStringLiteral(" ").repeated(4) );
 
 
     // make sure multi line (offset > 0 works correctly)
     config()->setIndentSize(4);
     doc()->setText("  Line1\n  Line2");
     range.set(10,10);
-    testEqual( command_->calculateSmartIndent( controller(), range ), QString(" ").repeated(2) );
+    testEqual( command_->calculateSmartIndent( controller(), range ), QStringLiteral(" ").repeated(2) );
 }
 
 
@@ -117,33 +117,33 @@ void NewlineCommandTest::testCalculateSmartIndent_useTabs()
 
     // pressing enter before the start of the indent should stay at the samen column
     range.set(1,1);
-    testEqual( command_->calculateSmartIndent( controller(), range ), QString(" ") );
+    testEqual( command_->calculateSmartIndent( controller(), range ), QStringLiteral(" ") );
 
     // pressing enter at the indent level should stay at the same level
     range.set(2,2);
-    testEqual( command_->calculateSmartIndent( controller(), range ), QString("\t") );
+    testEqual( command_->calculateSmartIndent( controller(), range ), QStringLiteral("\t") );
 
     // pressing enter in the middle of the line should indent to the start of the first nonespace
     range.set(4,4);
-    testEqual( command_->calculateSmartIndent( controller(), range ), QString("\t") );
+    testEqual( command_->calculateSmartIndent( controller(), range ), QStringLiteral("\t") );
 
     // pressing enter at the end of the document should indent to the start of the first nonespace
     range.set( doc()->length(),doc()->length());
-    testEqual( command_->calculateSmartIndent( controller(), range ), QString("\t") );
+    testEqual( command_->calculateSmartIndent( controller(), range ), QStringLiteral("\t") );
 
     // it also should work correctly if the buffer contains a tab
     config()->setIndentSize(4);
     doc()->setText(" \tTest");      // this is equal to 4 spaces
     range.set(2,2);
-    testEqual( command_->calculateSmartIndent( controller(), range ), QString("\t") );
+    testEqual( command_->calculateSmartIndent( controller(), range ), QStringLiteral("\t") );
     range.set(5,5);
-    testEqual( command_->calculateSmartIndent( controller(), range ), QString("\t") );
+    testEqual( command_->calculateSmartIndent( controller(), range ), QStringLiteral("\t") );
 
     doc()->setText("\t Test");      // this is equal to 5 spaces
     range.set(2,2);
-    testEqual( command_->calculateSmartIndent( controller(), range ), QString("\t ") );
+    testEqual( command_->calculateSmartIndent( controller(), range ), QStringLiteral("\t ") );
     range.set(5,5);
-    testEqual( command_->calculateSmartIndent( controller(), range ), QString("\t ") );
+    testEqual( command_->calculateSmartIndent( controller(), range ), QStringLiteral("\t ") );
 
 }
 

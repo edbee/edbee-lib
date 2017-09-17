@@ -49,7 +49,7 @@ void DebugCommand::dumpScopes( TextEditorController* controller )
     dump.append("\nPer Line:---\n");
     for( int i=0; i<scopes->scopedLineCount(); ++i ) {
         ScopedTextRangeList* range = scopes->scopedRangesAtLine(i);
-        dump.append( QString("%1: %2\n").arg(i).arg( range->toString() ) );
+        dump.append( QStringLiteral("%1: %2\n").arg(i).arg( range->toString() ) );
     }
 
     qlog_info() << dump;

@@ -38,7 +38,7 @@ void DuplicateCommand::execute(TextEditorController* controller)
             int line = doc->lineFromOffset( range.caret() );
             range.setCaret( doc->offsetFromLine(line) );
             range.setAnchor( range.caret() );
-            newTexts.append( QString("%1\n").arg(doc->lineWithoutNewline(line)) );
+            newTexts.append( QStringLiteral("%1\n").arg(doc->lineWithoutNewline(line)) );
 
         } else {
 

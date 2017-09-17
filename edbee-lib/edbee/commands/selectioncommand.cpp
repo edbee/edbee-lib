@@ -211,7 +211,7 @@ static QString unitToString( int unit ) {
 /// Converts this command to a strings
 QString SelectionCommand::toString()
 {
-    return QString("SelectionCommand(%1)").arg( unitToString(unit_) );
+    return QStringLiteral("SelectionCommand(%1)").arg( unitToString(unit_) );
 }
 
 } // edbee

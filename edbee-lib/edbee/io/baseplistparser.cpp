@@ -64,7 +64,7 @@ bool BasePListParser::endParsing()
 {
     bool result = !xml_->error();
     if( !result ) {
-        lastErrorMessage_ = QString("line %1: %2").arg(xml_->lineNumber()).arg(xml_->errorString());
+        lastErrorMessage_ = QObject::tr("line %1: %2").arg(xml_->lineNumber()).arg(xml_->errorString());
         result = false;
     }
     delete xml_;

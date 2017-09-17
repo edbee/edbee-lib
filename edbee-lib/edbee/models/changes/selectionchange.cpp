@@ -106,7 +106,7 @@ bool SelectionChange::giveAndMerge( TextDocument* document, Change* textChange)
 /// Convert this change to a string
 QString SelectionChange::toString()
 {
-    return QString("SelectionTextChange(%1)").arg(rangeSet_->rangesAsString());
+    return QStringLiteral("SelectionTextChange(%1)").arg(rangeSet_->rangesAsString());
 }
 
 

@@ -336,7 +336,7 @@ void TextEditorComponent::inputMethodEvent( QInputMethodEvent* m )
     /// TODO: Honer the arguments
     QString str;
     foreach( QInputMethodEvent::Attribute attr, m->attributes() ) {
-        str.append( QString("[%1,%2-%3,%4]").arg(attr.type).arg(attr.start).arg(attr.length).arg(attr.value.toString()) );
+        str.append( QStringLiteral("[%1,%2-%3,%4]").arg(attr.type).arg(attr.start).arg(attr.length).arg(attr.value.toString()) );
     }
 //    qlog_info() << "inputMethodEvent: commitStr=" << m->commitString() << ", preEditStr=" << m->preeditString() << ", start=" << m->replacementStart() << ", length" << m->replacementStart()  << " | " << str;
 */

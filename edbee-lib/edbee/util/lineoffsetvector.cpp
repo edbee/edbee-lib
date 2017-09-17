@@ -35,7 +35,7 @@ void LineOffsetVector::applyChange(TextBufferChange change)
 //QString offsets;
 //for( int i=0; i<change.newLineOffsets().size(); ++i ) {
 //    if( i ) { offsets.append(","); }
-//    offsets.append( QString("%1").arg(change.newLineOffsets().at(i)));
+//    offsets.append( QStringLiteral("%1").arg(change.newLineOffsets().at(i)));
 //    //qlog_info() << "-- " << i << ":" << change.newLineOffsets().at(i);
 //}
 
@@ -136,12 +136,12 @@ QString LineOffsetVector::toUnitTestString()
     QString s;
     for( int i=0,cnt=offsetDeltaIndex_; i<cnt; ++i ) {
         if( i != 0 ) { s.append(","); }
-        s.append( QString("%1").arg( offsetList_[i] ) );
+        s.append( QStringLiteral("%1").arg( offsetList_[i] ) );
     }
-    s.append( QString("[%1>").arg( offsetDelta_ ) );
+    s.append( QStringLiteral("[%1>").arg( offsetDelta_ ) );
     for( int i=offsetDeltaIndex_,cnt=offsetList_.length(); i<cnt; ++i ) {
         if( i != offsetDeltaIndex_ ) { s.append(","); }
-        s.append( QString("%1").arg( offsetList_[i] ) );
+        s.append( QStringLiteral("%1").arg( offsetList_[i] ) );
     }
     return s;
 }

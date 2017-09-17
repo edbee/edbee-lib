@@ -66,7 +66,7 @@ void LineDataChange::applyLineDelta(int line, int length, int newLength)
 /// Returns the debug text
 QString LineDataChange::toString()
 {
-    return QString("LineDataChange(%1,%2)").arg(line_).arg(field_);
+    return QStringLiteral("LineDataChange(%1,%2)").arg(line_).arg(field_);
 }
 
 

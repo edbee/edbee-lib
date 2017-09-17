@@ -22,7 +22,7 @@ TextCodecManager::TextCodecManager()
     foreach( QByteArray enc, encList ) {
         QTextCodec* codec = QTextCodec::codecForName(enc);
         giveTextCodec( new TextCodec( QString(codec->name()), codec, QTextCodec::IgnoreHeader ) );
-        giveTextCodec( new TextCodec( QString("%1 with BOM").arg( QString(codec->name()) ), codec, QTextCodec::DefaultConversion ) );
+        giveTextCodec( new TextCodec( QStringLiteral("%1 with BOM").arg( QString(codec->name()) ), codec, QTextCodec::DefaultConversion ) );
     }
 
     // append the items

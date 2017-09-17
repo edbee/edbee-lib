@@ -390,7 +390,7 @@ public:
         for( int i=0; i<capacity;i++ ) {
             if( i ) { s.append(","); }
             if( gapEnd == i) s.append(">");
-            s.append( QString("%1").arg( "X" ));
+            s.append( QStringLiteral("%1").arg( "X" ));
             if( gapBegin==i ) s.append("[");
         }
         return s;

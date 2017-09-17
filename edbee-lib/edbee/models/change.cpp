@@ -275,7 +275,7 @@ TextEditorController* ChangeGroup::controllerContext()
 QString ChangeGroup::toString()
 {
     QString s;
-    s = QString("%1/%2").arg(size()).arg(recursiveSize());
+    s = QStringLiteral("%1/%2").arg(size()).arg(recursiveSize());
 //    for( int i=0,cnt=changeList_.size(); i<cnt; ++i ) {
 //        s.append( changeList_.at(i)->toString() );
 //        s.append(",");
@@ -284,12 +284,12 @@ QString ChangeGroup::toString()
 
     QString extra;
     for( int i=0,cnt=size(); i<cnt; ++i ) {
-        extra.append( QString(" - %1: ").arg(i));
+        extra.append( QStringLiteral(" - %1: ").arg(i));
         extra.append( at(i)->toString() );
         extra.append("\n");
     }
 
-    return QString("ChangeGroup(%1)\n%2").arg(s).arg(extra);
+    return QStringLiteral("ChangeGroup(%1)\n%2").arg(s).arg(extra);
 }
 
 

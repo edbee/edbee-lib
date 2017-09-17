@@ -230,7 +230,7 @@ public:
                 qlog_warn()<< "pattern:" << pattern_;
                 qlog_warn()<< "";
                  for (int i = 0; i < region_->num_regs; i++) {
-                     qlog_info() << QString(" - %1: (%2,%3)").arg(i).arg(region_->beg[i]).arg(region_->end[i]);
+                     qlog_info() << QStringLiteral(" - %1: (%2,%3)").arg(i).arg(region_->beg[i]).arg(region_->end[i]);
                  }
                 // fprintf(stderr,
                 Q_ASSERT(result%2==0);

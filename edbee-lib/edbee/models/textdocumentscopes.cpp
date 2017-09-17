@@ -52,7 +52,7 @@ TextScope* ScopedTextRange::scope() const
 /// Converts the scoped textrange to a string
 QString ScopedTextRange::toString() const
 {
-    return QString("%1>%2:%3").arg(anchor()).arg(caret()).arg(scopeRef_->name() );
+    return QStringLiteral("%1>%2:%3").arg(anchor()).arg(caret()).arg(scopeRef_->name() );
 }
 
 
@@ -172,8 +172,8 @@ QString ScopedTextRangeList::toString()
 /// @param anchor
 MultiLineScopedTextRange::MultiLineScopedTextRange(int anchor, int caret, TextScope* scope )
     : ScopedTextRange(anchor,caret,scope)
-    , endRegExp_(0)
     , ruleRef_(0)
+    , endRegExp_(0)
 {
 }
 
@@ -925,7 +925,7 @@ TextScopeList TextDocumentScopes::scopesAtOffset( int offset, bool includeEnd  )
         for( int i=0,cnt=list->size(); i<cnt; ++i ) {
             ScopedTextRange* range = list->at(i);
 //QString debug;
-//debug.append( QString("- %1.%5: %2<=%3<%4").arg(i).arg(range->min()).arg(offsetInLine).arg(range->max()).arg(range->scope()->name()) );
+//debug.append( QStringLiteral("- %1.%5: %2<=%3<%4").arg(i).arg(range->min()).arg(offsetInLine).arg(range->max()).arg(range->scope()->name()) );
             if( range->min() <= offsetInLine ) {
                 if( offsetInLine < range->max() || (includeEnd && offsetInLine <= range->max()) ) {
 //debug.append(" Ok" );
@@ -1005,7 +1005,7 @@ QStringList TextDocumentScopes::scopesAsStringList()
         if( list != 0 ) {
             result.append( list->toString() );
         } else {
-            result.append( QString(" << null value @ %1>>").arg(i));
+            result.append( QStringLiteral(" << null value @ %1>>").arg(i));
         }
     }
 

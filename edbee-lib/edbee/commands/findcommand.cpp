@@ -111,7 +111,7 @@ QString FindCommand::toString()
         case SelectUnderExpand: str = "SelectUnderExpand"; break;
         case SelectAllUnder: str = "SelectAllUnder"; break;
     }
-    return QString("FindCommand(%1)").arg(str);
+    return QStringLiteral("FindCommand(%1)").arg(str);
 }
 
 

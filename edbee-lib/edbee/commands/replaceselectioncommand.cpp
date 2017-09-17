@@ -33,7 +33,7 @@ void ReplaceSelectionCommand::execute(TextEditorController* controller)
 /// Converts the current command to a string
 QString ReplaceSelectionCommand::toString()
 {
-    return QString("ReplaceSelectionCommand");
+    return QStringLiteral("ReplaceSelectionCommand");
 }
 
 

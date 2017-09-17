@@ -32,7 +32,7 @@ QString Util::convertTabsToSpaces(const QString& str, int tabSize )
         // when a tab character is used it is converted to the correct column
         if( c == '\t' ) {
             int amount = tabSize - result.length() % tabSize;
-            result.append( QString(" ").repeated(amount) );
+            result.append( QStringLiteral(" ").repeated(amount) );
         } else {
             result.append(c);
         }

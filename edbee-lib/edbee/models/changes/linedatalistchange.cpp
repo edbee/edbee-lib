@@ -174,7 +174,7 @@ bool LineDataListChange::giveAndMerge(TextDocument* document, Change* textChange
 /// Converts this change to a string
 QString LineDataListChange::toString()
 {
-    return QString("LineDataListTextChange(%1,%2,%3)").arg(offset_).arg(contentLength_).arg(docLength_);
+    return QStringLiteral("LineDataListTextChange(%1,%2,%3)").arg(offset_).arg(contentLength_).arg(docLength_);
 }
 
 

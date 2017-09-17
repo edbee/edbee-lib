@@ -22,8 +22,7 @@ RangeLineIterator::RangeLineIterator(TextDocument* doc, const TextRange& range )
     endLine_ = doc->lineFromOffset( range.max() );
 }
 
-
-/// Constructs a line iterator by supplying two offsets
+ /// Constructs a line iterator by supplying two offsets
 /// @param doc the textdocument for this iterator
 /// @param startOffset the start offset for iterating
 /// @param endOffset the endOffset for iterating

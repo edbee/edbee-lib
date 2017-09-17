@@ -28,13 +28,13 @@ void UtilTest::testConvertTabsToSpaces()
     testEqual( Util().convertTabsToSpaces("\t",4), "    " );
 
     // now more complex tests
-    testEqual( Util().convertTabsToSpaces("\t ",4), QString(" ").repeated(5) );
-    testEqual( Util().convertTabsToSpaces(" \t",4), QString(" ").repeated(4) );
-    testEqual( Util().convertTabsToSpaces("  \t",4), QString(" ").repeated(4) );
-    testEqual( Util().convertTabsToSpaces("\t  \t",4), QString(" ").repeated(8) );
+    testEqual( Util().convertTabsToSpaces("\t ",4), QStringLiteral(" ").repeated(5) );
+    testEqual( Util().convertTabsToSpaces(" \t",4), QStringLiteral(" ").repeated(4) );
+    testEqual( Util().convertTabsToSpaces("  \t",4), QStringLiteral(" ").repeated(4) );
+    testEqual( Util().convertTabsToSpaces("\t  \t",4), QStringLiteral(" ").repeated(8) );
 
     // when using a tab character in the middle of the line it should work
-    testEqual( Util().convertTabsToSpaces("12345\t9",4), QString("12345   9") );
+    testEqual( Util().convertTabsToSpaces("12345\t9",4), QStringLiteral("12345   9") );
 }
 
 

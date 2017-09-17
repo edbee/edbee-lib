@@ -248,8 +248,8 @@ void OutputHandler::endTestMethod( TestEngine* engine)
     Q_UNUSED(engine);
 
     // write the result
-    qDebug() << "" << (const char*)QString("%1%2%3").arg(buffer_).arg(failBuffer_).arg(outBuffer_).toLatin1();
-//    qDebug() << QString("%1%2%3\n").arg(buffer_).arg(failBuffer_).arg(outBuffer_);
+    qDebug() << "" << (const char*)QStringLiteral("%1%2%3").arg(buffer_).arg(failBuffer_).arg(outBuffer_).toLatin1();
+//    qDebug() << QStringLiteral("%1%2%3\n").arg(buffer_).arg(failBuffer_).arg(outBuffer_);
 
     buffer_.clear();
     failBuffer_.clear();
@@ -283,12 +283,12 @@ void OutputHandler::testResultAdded( TestEngine* engine, TestResult* testResult)
                 if( !testResult->description().isEmpty() ) failBuffer_.append("      ").append(testResult->description()).append("\n");
                 failBuffer_.append( "      expected: [").append(testResult->expectedValue()).append("]\n");
                 failBuffer_.append( "      actual  : [").append(testResult->actualValue()).append("]\n");
-                failBuffer_.append( "      ").append(testResult->fileName()).append(":").append( QString("%1").arg(testResult->lineNumber()) );//.append("\n");
+                failBuffer_.append( "      ").append(testResult->fileName()).append(":").append( QStringLiteral("%1").arg(testResult->lineNumber()) );//.append("\n");
             } else {
                 failBuffer_.append( "\n" );
                 failBuffer_.append( "    [FAILURE] ").append(testResult->statement()).append("\n");
                 if( !testResult->description().isEmpty() ) failBuffer_.append("      ").append(testResult->description()).append("\n");
-                failBuffer_.append( "      ").append(testResult->fileName()).append(":").append( QString("%1").arg(testResult->lineNumber()) );//.append("\n");
+                failBuffer_.append( "      ").append(testResult->fileName()).append(":").append( QStringLiteral("%1").arg(testResult->lineNumber()) );//.append("\n");
             }
             break;
 

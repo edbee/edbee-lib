@@ -157,8 +157,8 @@ QString TextGrammarRule::toString(bool includePatterns)
 
     if( includePatterns && matchRegExp_ ) { r.append(", begin: ").append( matchRegExp_->pattern() ); }
     if( includePatterns && !endRegExpString_.isEmpty() ) { r.append(", end: ").append( endRegExpString_ ); }
-    r.append( QString(", %1 subrules").arg(ruleCount() ) );
-    r.append( QString(", %1 captures").arg(matchCaptures().size()));
+    r.append( QStringLiteral(", %1 subrules").arg(ruleCount() ) );
+    r.append( QStringLiteral(", %1 captures").arg(matchCaptures().size()));
     return r;
 }
 
@@ -393,7 +393,7 @@ TextGrammar* TextGrammarManager::detectGrammarWithFilename(const QString& fileNa
 {
     foreach( TextGrammar* grammar, grammarMap_.values() ) {
         foreach( QString ext, grammar->fileExtensions() ) {
-            if( fileName.endsWith( QString(".%1").arg(ext) ) ) return grammar;
+            if( fileName.endsWith( QStringLiteral(".%1").arg(ext) ) ) return grammar;
         }
     }
     return this->defaultGrammar();

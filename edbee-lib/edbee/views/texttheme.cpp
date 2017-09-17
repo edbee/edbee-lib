@@ -418,7 +418,7 @@ TextTheme* TextThemeManager::theme(const QString& name)
     if( name.isEmpty() ) { return 0; }
     TextTheme* theme=themeMap_.value(name);
     if( !theme && !themePath_.isEmpty()) {
-        QString filename = QString("%1/%2.tmTheme").arg(themePath_).arg(name);
+        QString filename = QStringLiteral("%1/%2.tmTheme").arg(themePath_).arg(name);
         theme = readThemeFile( filename );
         if( !theme ) {
             qlog_warn() << this->lastErrorMessage();

@@ -17,7 +17,7 @@ namespace edbee {
 void RangeSetLineIteratorTest::testBasicIteration()
 {
     CharTextDocument doc;
-    doc.setText( QString("a1|b2|c3|d4|e5|f6").replace("|","\n"));
+    doc.setText( QStringLiteral("a1|b2|c3|d4|e5|f6").replace("|","\n"));
     TextRangeSet ranges(&doc);
     ranges.addRange(0,0);   // line: 0
     ranges.addRange(1,1);   // line: 0

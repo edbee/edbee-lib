@@ -34,7 +34,7 @@ TextEditorConfig::TextEditorConfig( QObject* parent )
     , scrollPastEnd_(false)
     , showWhitespaceMode_(HideWhitespaces)
 {
-    charGroups_.append( QString("./\\()\"'-:,.;<>~!@#$%^&*|+=[]{}`~?"));
+    charGroups_.append( QStringLiteral("./\\()\"'-:,.;<>~!@#$%^&*|+=[]{}`~?"));
 }
 
 

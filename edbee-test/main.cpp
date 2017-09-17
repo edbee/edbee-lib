@@ -57,9 +57,9 @@ int main(int argc, char* argv[])
 
     // configure the edbee component to use the default paths
     edbee::Edbee* tm = edbee::Edbee::instance();
-    //tm->setKeyMapPath( QString("%1%2").arg(appDataPath).arg("keymaps"));
-    tm->setGrammarPath(  QString("%1%2").arg(appDataPath).arg("syntaxfiles") );
-    //tm->setThemePath( QString("%1%2").arg(appDataPath).arg("themes") );
+    //tm->setKeyMapPath( QStringLiteral("%1%2").arg(appDataPath).arg("keymaps"));
+    tm->setGrammarPath(  QStringLiteral("%1%2").arg(appDataPath).arg("syntaxfiles") );
+    //tm->setThemePath( QStringLiteral("%1%2").arg(appDataPath).arg("themes") );
     tm->init();
 
     // next run all tests

@@ -66,7 +66,7 @@ void TextRange::setLength(int newLength)
 /// This method converts a text-selection range to a string helpfull with debuggin
 QString TextRange::toString() const
 {
-    return QString("%1>%2").arg(anchor_).arg(caret_);
+    return QStringLiteral("%1>%2").arg(anchor_).arg(caret_);
 }
 
 

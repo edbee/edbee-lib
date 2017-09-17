@@ -17,7 +17,7 @@ namespace edbee {
 void RangeLineIteratorTest::testBasicIteration()
 {
     CharTextDocument doc;
-    doc.setText( QString("a1|b2|c3|d4|e5|f6").replace("|","\n"));
+    doc.setText( QStringLiteral("a1|b2|c3|d4|e5|f6").replace("|","\n"));
     TextRange range(4,15);
 
     RangeLineIterator itr( &doc, range);
@@ -41,7 +41,7 @@ void RangeLineIteratorTest::testBasicIteration()
 void RangeLineIteratorTest::testSingleLineIteration()
 {
     CharTextDocument doc;
-    doc.setText( QString("line1|line").replace("|","\n"));
+    doc.setText( QStringLiteral("line1|line").replace("|","\n"));
     TextRange range(1,1);
 
     RangeLineIterator itr( &doc, range);

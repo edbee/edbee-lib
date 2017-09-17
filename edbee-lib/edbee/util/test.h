@@ -39,7 +39,7 @@ class TestCase;
 template <class T>
 QString toQString( const T& obj )
 {
-    return QString("%1").arg(obj);
+    return QStringLiteral("%1").arg(obj);
 }
 
 

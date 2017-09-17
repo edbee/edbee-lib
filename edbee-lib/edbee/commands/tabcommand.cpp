@@ -34,7 +34,7 @@ void TabCommand::indent( TextEditorController* controller )
     TextSelection* sel = controller->textSelection();
     int tabSize = doc->config()->indentSize();
     bool useTab = false; //doc->config()->useTabChar();
-    QString tab = useTab ? "\t" : QString(" ").repeated(tabSize);
+    QString tab = useTab ? "\t" : QStringLiteral(" ").repeated(tabSize);
 
     controller->beginUndoGroup( new MergableChangeGroup( controller ) );
 
@@ -161,7 +161,7 @@ void TabCommand::execute(TextEditorController* controller)
                     if( !spaces ) spaces = tabSize;
 
                     // append the text
-                    texts.push_back( QString(" ").repeated(spaces) );
+                    texts.push_back( QStringLiteral(" ").repeated(spaces) );
                 }
 
                 controller->replaceSelection( texts, CoalesceId_Indent + SubCoalesceId_Indent_InsertSpaces  );

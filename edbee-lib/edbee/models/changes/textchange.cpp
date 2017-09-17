@@ -102,7 +102,7 @@ bool TextChange::giveAndMerge( TextDocument* document, Change* textChange)
 QString TextChange::toString()
 {
 //    return "SingleTextChange";
-    return QString("SingleTextChange:%1").arg(testString());
+    return QStringLiteral("SingleTextChange:%1").arg(testString());
 }
 
 
@@ -175,7 +175,7 @@ const QString TextChange::docText(TextDocument* doc) const
 /// This method returns a string used for testing
 QString TextChange::testString()
 {
-    return QString("%1:%2:%3").arg(offset_).arg(length_).arg(QString(text_).replace("\n","§"));
+    return QStringLiteral("%1:%2:%3").arg(offset_).arg(length_).arg(QString(text_).replace("\n","§"));
 }
 
 
