@@ -2,6 +2,7 @@
 
 edbee.lib:
 
+- fix, Bug in Onig RegExp.cpp caused Ctrl+D to execute a regexp instead of a fixed string.
 - fix #54, Use of raw string literal causes issues when QT_NO_CAST_FROM_ASCII defined 
 - fix #44, Commenting shortcut does not work if cursor is on the last character of the last line in the document
 - ref #45, Added ctrl-insert and shift-insert for copy paste 

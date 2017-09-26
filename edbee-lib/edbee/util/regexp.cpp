@@ -89,14 +89,14 @@ public:
     {
         const QChar* patternChars = pattern.constData();
 
-        const OnigSyntaxType* onigSyntax = &OnigSyntaxRuby;
+        const OnigSyntaxType* onigSyntax = &OnigSyntaxRuby; // ONIG_SYNTAX_DEFAULT
         if( syntax == RegExp::SyntaxFixedString ) { onigSyntax = &OnigSyntaxASIS; }
 
 
         OnigOptionType onigOptions = ONIG_OPTION_NONE|ONIG_OPTION_CAPTURE_GROUP;
         if( !caseSensitive ) { onigOptions = onigOptions | ONIG_OPTION_IGNORECASE;}
 
-        int result = onig_new(&reg_, (OnigUChar*)patternChars, (OnigUChar*)(patternChars + pattern.length()), onigOptions, ONIG_ENCODING_UTF16_LE, ONIG_SYNTAX_DEFAULT, &einfo_);
+        int result = onig_new(&reg_, (OnigUChar*)patternChars, (OnigUChar*)(patternChars + pattern.length()), onigOptions, ONIG_ENCODING_UTF16_LE, onigSyntax, &einfo_);
         valid_ = result == ONIG_NORMAL;
         fillError( result );
     }
