@@ -101,12 +101,12 @@ void FactoryKeyMap::fill( TextEditorKeyMap* km )
     add( "soft_redo", "Ctrl+Shift+U" );
 
     // clipboard operations
+    add( "copy", "Ctrl+Insert" );
+    add( "paste", "Shift+Insert" );
+    
     add( "copy", "copy" );
     add( "cut", "cut" );
     add( "paste", "paste" );
-
-    add( "copy", "Ctrl+Insert" );
-    add( "paste", "Shift+Insert" );
 
     // debug commands
     add( "debug_dump_scopes", "Ctrl+Shift+X,S" );
