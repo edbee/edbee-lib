@@ -2,6 +2,7 @@
 
 edbee.lib:
 
+- add #59, Shift+Delete should perform a cut
 - add #56, Added move line up/down commands.
 - fix #58, Edbee crashes on Ctrl+Shift+Enter
 - Made ChangeGroup non-virtual. Sometimes you need a group of undo-changes in stead of a mergable one (issues with move-line command)

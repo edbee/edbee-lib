@@ -102,6 +102,7 @@ void FactoryKeyMap::fill( TextEditorKeyMap* km )
 
     // clipboard operations
     add( "copy", "Ctrl+Insert" );
+    add( "cut", "Shift+Delete" );
     add( "paste", "Shift+Insert" );
     
     add( "copy", "copy" );
