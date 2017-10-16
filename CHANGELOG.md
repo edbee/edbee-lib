@@ -2,24 +2,25 @@
 
 edbee.lib:
 
+- fix #58, Edbee crashes on Ctrl+Shift+Enter
 - fix, Bug in Onig RegExp.cpp caused Ctrl+D to execute a regexp instead of a fixed string.
-- fix #54, Use of raw string literal causes issues when QT_NO_CAST_FROM_ASCII defined 
+- fix #54, Use of raw string literal causes issues when QT_NO_CAST_FROM_ASCII defined
 - fix #44, Commenting shortcut does not work if cursor is on the last character of the last line in the document
-- ref #45, Added ctrl-insert and shift-insert for copy paste 
+- ref #45, Added ctrl-insert and shift-insert for copy paste
 - fix #43, Added loadWithoutOpening and saveWithoutOpening to TextDocumentSerializer. For serializing without opening and closing an QIODevice (To enable the usage of QSaveFile).
 - fix #41, Added LUA comments to the hardcoded list of comments
 - fix #39, Margin-component bugfixes/improvements
 	- Clicking/dragging changed so it behaves as expected. (Especially dragging up)
 	- Line numbers of lines with selection are rendered with 100% opacity
-- fix #38, Margin line-number font size is now set to the font size of the editor. It also renders number with an opacity of 0.5. 
+- fix #38, Margin line-number font size is now set to the font size of the editor. It also renders number with an opacity of 0.5.
 - fix #32, Changing showWhiteSpace option does not trigger a redraw
 - add #31, Support for rendering borderedTextRanges. These are textranges rendered with borders, that aren't selected. TextEditorController has a member 'borderedTextRanges()'. Altering this rangeset (and updating the view controller::update) renderes borders aroudn the given ranges
 - fix #30, Edbee crashes when you cut/copy with nothing selected. (Bug in clipboard operation)
 - fix #27, Theme loading/handling bugfixes
 	- Theme-colors with alpha channels are parsed correctly. (QColor expects #AARRGGBB, theme uses #RRGGBBAA)
-	- Transparent main background color is changed to opaque to fix rendering issues. 
-	- Bugfixes TextThemeManager::theme, local scope shadowed returned theme value and double insert. 
-	- Setting the theme in Textrender now invalidates some caches 
+	- Transparent main background color is changed to opaque to fix rendering issues.
+	- Bugfixes TextThemeManager::theme, local scope shadowed returned theme value and double insert.
+	- Setting the theme in Textrender now invalidates some caches
 - fix #26, Changing a theme in the ThemeManager, now updates the ThemePointer used by the renderer. (Fixes corruption on theme reloading)
 - fix #25, Removed the 'memory ok :-D' message
 - fix #24, Clearing the undostack unregistered all controllers incorrectly
@@ -36,14 +37,14 @@ edbee.lib:
 	- TextDocument::giveChangeWithoutFilter
 	- CharTextDocument::giveChangeWithoutFilter
 	- TextUndoStack::giveChange
-- fix #4, QT5.8 Ambiguity Errors. 
+- fix #4, QT5.8 Ambiguity Errors.
 - fix #6, Theme Manager only attempts to load a theme if a theme path has been set.
 - fix, updated Onigmo (Oniguruma-mod) library to version 6.1.1 (Fixes memory corruption with lexing)
 - fix, removed config.h reference from simpleprofiler.h (Which caused compilation via to fail, refs issue #1)
 - fix, mouse double click didn't select wordt anymore. (Issue with newer Qt version??)
 - fix, moveCaret after the last character didn't work correctly on the if the last line didn't end with a newline
-- fix, Syntax highlighting didn't work on the last line of the document. (First highlight after the first enter) 
-- fix, onig.pri, it contained strange references to qslog 
+- fix, Syntax highlighting didn't work on the last line of the document. (First highlight after the first enter)
+- fix, onig.pri, it contained strange references to qslog
 - fix, edbee-lib.pri (correct references to vendor .pri's)
 - BREAKING CHANGE, moved all source/headers files under the folder 'edbee/' to prevent filename collisions when embedding it in other projects.
 
@@ -87,7 +88,7 @@ All lines above refer to github-issue numbers
 - fix #69, Plain Text was included twice by the grammar manager
 - fix #57, Tab behaviour didn't work as expected when using space in stead of tab characters
 - fix #48, Improved paste support with multiple lines, making it possible to copy/paste text per caret
-- fix #61, Indent shouldn't indent the line after the text 
+- fix #61, Indent shouldn't indent the line after the text
 - fix #66, Grammar type detection (by filename) detected the wrong grammars. (it forgot to check the '.' )
 - fix #40, text now is by default case insensitive
 - fix #30, #32, Searching selection via the findcommand now result in soft undoable changes
@@ -98,4 +99,4 @@ All lines above refer to github-issue numbers
 
 ## v0.1.0 Initial Release
 
-The initial release on Github. 
+The initial release on Github.
