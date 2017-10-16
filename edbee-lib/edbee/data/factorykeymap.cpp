@@ -123,6 +123,11 @@ void FactoryKeyMap::fill( TextEditorKeyMap* km )
     add( "sel_all_matches", "Ctrl+Shift+Meta+A" );
     add( "select_under_expand", "Ctrl+D" );
     add( "select_all_under", "Alt+F3" );
+
+    // move lines
+    add( "move_lines_up", "Ctrl+Meta+Up");
+    add( "move_lines_down", "Ctrl+Meta+Down");
+
 }
 
 

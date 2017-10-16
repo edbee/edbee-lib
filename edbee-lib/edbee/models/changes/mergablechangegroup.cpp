@@ -266,7 +266,7 @@ void MergableChangeGroup::giveLineDataListTextChange(TextDocument* doc, LineData
 
 
 /// Gives the change
-void MergableChangeGroup::giveChange( TextDocument* doc, Change* change)
+void MergableChangeGroup::giveChange(TextDocument* doc, Change* change)
 {
     // a single text change
     TextChange* textChange = dynamic_cast<TextChange*>(change);

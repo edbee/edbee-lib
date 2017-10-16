@@ -146,8 +146,8 @@ ChangeGroup::ChangeGroup(TextEditorController* controller)
 /// The destructor deletes all added textchanges
 ChangeGroup::~ChangeGroup()
 {
-//    qDeleteAll(changeList_);
-//    changeList_.clear();
+    qDeleteAll(changeList_);
+    changeList_.clear();
 }
 
 
@@ -193,6 +193,11 @@ void ChangeGroup::revert(TextDocument* document)
     }
 }
 
+bool ChangeGroup::giveAndMerge(TextDocument *document, Change *textChange)
+{
+    return false;
+}
+
 
 /// This method flattens the undo-group by expanding all subgroups to local groups
 void ChangeGroup::flatten()
@@ -214,6 +219,35 @@ void ChangeGroup::flatten()
             delete group;
         }
     }
+}
+
+void ChangeGroup::giveChange(TextDocument *doc, Change *change)
+{
+    changeList_.append(change);
+}
+
+Change *ChangeGroup::at(int idx)
+{
+    Q_ASSERT(idx < changeList_.size());
+    return changeList_.at(idx);
+}
+
+Change *ChangeGroup::take(int idx)
+{
+    Change* change = changeList_.at(idx);
+    changeList_.removeAt(idx);
+    return change;
+}
+
+int ChangeGroup::size()
+{
+    return changeList_.size();
+}
+
+void ChangeGroup::clear(bool performDelete)
+{
+    if( performDelete ) qDeleteAll(changeList_);
+    changeList_.clear();
 }
 
 

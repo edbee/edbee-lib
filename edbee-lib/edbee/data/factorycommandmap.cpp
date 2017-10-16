@@ -12,6 +12,7 @@
 #include "edbee/commands/duplicatecommand.h"
 #include "edbee/commands/findcommand.h"
 #include "edbee/commands/pastecommand.h"
+#include "edbee/commands/movelinecommand.h"
 #include "edbee/commands/newlinecommand.h"
 #include "edbee/commands/redocommand.h"
 #include "edbee/commands/removecommand.h"
@@ -126,6 +127,9 @@ void FactoryCommandMap::fill(TextEditorCommandMap* cm)
 
     give( "select_under_expand", new FindCommand( FindCommand::SelectUnderExpand ));
     give( "select_all_under", new FindCommand( FindCommand::SelectAllUnder ));
+
+    give( "move_lines_up", new MoveLineCommand(-1));
+    give( "move_lines_down", new MoveLineCommand(1));
 }
 
 

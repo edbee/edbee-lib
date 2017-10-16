@@ -95,14 +95,14 @@ public:
     virtual void execute( TextDocument* document);
     virtual void revert( TextDocument* document);
 
-    virtual bool giveAndMerge( TextDocument* document, Change* textChange ) = 0;
+    virtual bool giveAndMerge( TextDocument* document, Change* textChange );
     virtual void flatten();
 
-    virtual void giveChange( TextDocument* doc, Change* change ) = 0;
-    virtual Change* at( int idx ) = 0;
-    virtual Change* take( int idx ) = 0;
-    virtual int size() = 0;
-    virtual void clear(bool performDelete=true) = 0;
+    virtual void giveChange( TextDocument* doc, Change* change );
+    virtual Change* at( int idx );
+    virtual Change* take( int idx );
+    virtual int size();
+    virtual void clear(bool performDelete=true);
     Change* last();
     Change* takeLast();
     int recursiveSize();
@@ -114,6 +114,7 @@ public:
 private:
     QList<Change*> changeList_;     ///< A list of all actions
 };
+
 
 
 

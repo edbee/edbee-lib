@@ -699,18 +699,21 @@ void TextEditorController::redo(bool soft)
 
 
 /// Starts an undo group
-/// @param group the undogroup to use
+/// @param group the undogroup to use (defaults to a MergableChangeGroup)
 void TextEditorController::beginUndoGroup( ChangeGroup* group )
 {
+    if( !group ) {
+        group = new ChangeGroup( this );
+    }
     textDocument()->beginUndoGroup(group);
 }
 
 
 /// Ends the undo-group.
 /// @param coalesceId is used to decide if merging of groups is required.
-///                  a value of 0 means NO merging
+///                  a value of 0 means NO merging (default)
 ///                  and id > 0 means if the previous command had the same id, the command is merged
-/// @param flatten when an undogroup is ended and flatten is set to true ALL sub-undo-groups are merged to this group
+/// @param flatten when an undogroup is ended and flatten is set to true ALL sub-undo-groups are merged to this group (default=false)
 void TextEditorController::endUndoGroup(int coalesceId, bool flatten )
 {    
     textDocument()->endUndoGroup(coalesceId,flatten);

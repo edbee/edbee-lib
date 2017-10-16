@@ -40,11 +40,12 @@ private:
     void inverseMergeRemainingOverlappingChanges( QList<AbstractRangedChange*>& changes, TextDocument* doc, int mergedAtIndex, int orgStartOffset, int orgEndOffset , int delta);
 
     void giveChangeToList(  QList<AbstractRangedChange*>& changes, TextDocument* doc, AbstractRangedChange* change );
+    void giveAndMergeChangeToList(  QList<AbstractRangedChange*>& changes, TextDocument* doc, AbstractRangedChange* change );
 
 //TODO:     void giveAbstractRangedTextChange( TextDocument* doc, QList<AbstractRangedTextChange* changeList>& changes, AbstractRangedTextChange* change );
 
 public:
-    void giveSingleTextChange( TextDocument* doc, TextChange* change );
+    void giveSingleTextChange( TextDocument* doc, TextChange* change);
     void giveLineDataListTextChange( TextDocument* doc, LineDataListChange* change );
 
     virtual void giveChange( TextDocument* doc, Change* change );

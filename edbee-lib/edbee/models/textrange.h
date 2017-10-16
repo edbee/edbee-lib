@@ -166,7 +166,7 @@ public:
     void moveCaretsOrDeselect( int amount );
     void moveCaretsByCharGroup( int amount, const QString& whitespace, const QStringList& charGroups );
     void moveCaretsToLineBoundary(int direction, const QString& whitespace  );
-    void moveCaretsByLine( int amount );
+    //    void moveCaretsByLine( int amount );  //< Impossible to do without view when having a flexible font, guess that's why it wasn't implemented
 
 
   // changing

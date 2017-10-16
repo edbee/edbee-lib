@@ -217,7 +217,7 @@ Change* TextUndoStack::giveChange(Change* change, int coalesceId )
     ChangeGroup* group = undoGroupStack_.isEmpty() ? 0 : undoGroupStack_.top();
 
     int lastCoalesceId = lastCoalesceIdAtCurrentLevel();
-    bool merge = lastCoalesceId && lastCoalesceIdStack_.top() == coalesceId;
+    bool merge = lastCoalesceId && lastCoalesceIdStack_.top() == coalesceId && coalesceId != CoalesceId_None;
     setLastCoalesceIdAtCurrentLevel(coalesceId);
     if( coalesceId == CoalesceId_ForceMerge ) { merge = true; }
 

@@ -135,8 +135,8 @@ public slots:
     virtual void redo(bool soft=false);
 
     // command execution
-    virtual void beginUndoGroup( ChangeGroup* group );
-    virtual void endUndoGroup(int coalesceId, bool flatten);
+    virtual void beginUndoGroup( ChangeGroup* group=0 );
+    virtual void endUndoGroup(int coalesceId=0, bool flatten=false);
 
     // low level command execution
     virtual void executeCommand( TextEditorCommand* textCommand );
