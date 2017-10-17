@@ -77,7 +77,6 @@ void FactoryKeyMap::fill( TextEditorKeyMap* km )
 
     // deletion right
     add( "del_right", "Delete" );
-    add( "del_right", "Shift+Delete" );
     add( "del_word_right", "Alt+Delete" );
     add( "del_line_right", "Ctrl+Delete" );
 
