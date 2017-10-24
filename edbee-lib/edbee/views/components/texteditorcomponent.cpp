@@ -217,7 +217,7 @@ bool TextEditorComponent::event(QEvent* event)
 {
     // keypress event
     if( event->type() == QEvent::KeyPress ) {
-        QKeyEvent* keyEvent = dynamic_cast<QKeyEvent*>(event);
+        QKeyEvent* keyEvent = static_cast<QKeyEvent*>(event);
         if( keyEvent ) {
             int key = keyEvent->key();
             if( key == Qt::Key_Tab || key == Qt::Key_Backtab ) {
@@ -295,6 +295,7 @@ void TextEditorComponent::keyPressEvent(QKeyEvent* event)
         lastCharacter_ = text;
         controller()->replaceSelection( text, CoalesceId_AppendChar );
         controller()->updateStatusText();
+        emit textKeyPressed();
     } else {
         QWidget::keyPressEvent(event);
     }

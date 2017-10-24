@@ -16,6 +16,7 @@ namespace edbee {
 class TextGrammar;
 class Change;
 class ChangeGroup;
+class TextAutoCompleteProviderList;
 class TextCodec;
 class TextDocumentFilter;
 class TextDocumentScopes;
@@ -83,6 +84,10 @@ public:
     /// Changes the language grammar.
     /// This method should emit a grammarChanged signal (if the grammar is changed)
     virtual void setLanguageGrammar( TextGrammar* grammar ) = 0;
+
+
+    /// This method should return the autcompletion provider list
+    virtual TextAutoCompleteProviderList* autoCompleteProviderList() = 0;
 
     /// this method should return a reference to the undo stack
     virtual TextUndoStack* textUndoStack() = 0;

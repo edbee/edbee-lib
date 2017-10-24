@@ -51,6 +51,7 @@ SET(SOURCES
    edbee/io/jsonparser.cpp
    edbee/models/textgrammar.cpp
    edbee/models/texteditorcommandmap.cpp
+	 edbee/views/components/texteditorautocompletecomponent.cpp
    edbee/views/components/texteditorcomponent.cpp
    edbee/views/components/texteditorrenderer.cpp
    edbee/views/components/textmargincomponent.cpp
@@ -82,7 +83,7 @@ SET(SOURCES
    edbee/util/rangelineiterator.cpp
    edbee/data/factorykeymap.cpp
    edbee/data/factorycommandmap.cpp
-
+   edbee/models/textautocompleteprovider.cpp
 )
 
 SET(HEADERS
@@ -131,6 +132,7 @@ SET(HEADERS
    edbee/io/jsonparser.h
    edbee/models/textgrammar.h
    edbee/models/texteditorcommandmap.h
+	 edbee/views/components/texteditorautocompletecomponent.h
    edbee/views/components/texteditorcomponent.h
    edbee/views/components/texteditorrenderer.h
    edbee/views/components/textmargincomponent.h
@@ -161,6 +163,7 @@ SET(HEADERS
    edbee/util/rangelineiterator.h
    edbee/data/factorykeymap.h
    edbee/data/factorycommandmap.h
+   edbee/models/textautocompleteprovider.h
 )
 
 FIND_PACKAGE(Qt5Core REQUIRED)

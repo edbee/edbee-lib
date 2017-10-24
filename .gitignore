@@ -34,3 +34,4 @@ CTestTestfile.cmake
 cov-int
 
 edbee-test/edbee-test
+.vscode

@@ -15,6 +15,7 @@ class QScrollBar;
 namespace edbee {
 
 class TextDocument;
+class TextEditorAutoCompleteComponent;
 class TextEditorCommandMap;
 class TextEditorComponent;
 class TextEditorConfig;
@@ -90,11 +91,12 @@ public slots:
 
 private:
 
-    TextEditorController* controller_;      ///< This method returns the controller
+    TextEditorController* controller_;                    ///< This method returns the controller
 
-    TextEditorScrollArea* scrollAreaRef_;   ///< The scrollarea of the widget
-    TextEditorComponent* editCompRef_;      ///< The editor ref
-    TextMarginComponent* marginCompRef_;    ///< The margin components
+    TextEditorScrollArea* scrollAreaRef_;                 ///< The scrollarea of the widget
+    TextEditorComponent* editCompRef_;                    ///< The editor ref
+    TextMarginComponent* marginCompRef_;                  ///< The margin components
+    TextEditorAutoCompleteComponent* autoCompleteCompRef_; ///< The autocomplete list widget
 
 };
 

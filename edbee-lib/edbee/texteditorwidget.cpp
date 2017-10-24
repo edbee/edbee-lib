@@ -30,6 +30,7 @@
 #include "edbee/models/texteditorcommandmap.h"
 #include "edbee/models/texteditorkeymap.h"
 #include "edbee/models/textundostack.h"
+#include "edbee/views/components/texteditorautocompletecomponent.h"
 #include "edbee/views/components/texteditorcomponent.h"
 #include "edbee/views/components/textmargincomponent.h"
 #include "edbee/views/texteditorscrollarea.h"
@@ -51,6 +52,7 @@ TextEditorWidget::TextEditorWidget( QWidget* parent)
     , controller_(0)
     , scrollAreaRef_(0)
     , editCompRef_(0)
+    , autoCompleteCompRef_(0)
 {
     // auto initialize edbee if this hasn't been done alread
     Edbee::instance()->autoInit();
@@ -80,11 +82,17 @@ TextEditorWidget::TextEditorWidget( QWidget* parent)
     setLayout(layout);
     setFocusProxy( editCompRef_ );
 
+    /// TODO: Check if this works.. It could be possible the layout screws this
+    /// If I add this before the setLayout everything hangs :S ...
+    autoCompleteCompRef_ = new TextEditorAutoCompleteComponent(controller_,editCompRef_);
+
+
     marginCompRef_->init();
     connectHorizontalScrollBar();
     connectVerticalScrollBar();
     connect( this, SIGNAL(horizontalScrollBarChanged(QScrollBar*)), SLOT(connectHorizontalScrollBar()) );
     connect( this, SIGNAL(verticalScrollBarChanged(QScrollBar*)), SLOT(connectVerticalScrollBar()) );
+    connect( editCompRef_, SIGNAL(textKeyPressed()), autoCompleteCompRef_, SLOT(textKeyPressed()));
 
 
     setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Expanding );
@@ -97,6 +105,7 @@ TextEditorWidget::TextEditorWidget( QWidget* parent)
 TextEditorWidget::~TextEditorWidget()
 {
     // we need to perform manual deletion to force the deletion order
+    delete autoCompleteCompRef_;
     delete marginCompRef_;
     delete editCompRef_;
     delete controller_;

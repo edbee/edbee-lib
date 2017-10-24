@@ -46,6 +46,7 @@ SOURCES += \
 	$$PWD/edbee/io/jsonparser.cpp \
 	$$PWD/edbee/models/textgrammar.cpp \
 	$$PWD/edbee/models/texteditorcommandmap.cpp \
+	$$PWD/edbee/views/components/texteditorautocompletecomponent.cpp \
 	$$PWD/edbee/views/components/texteditorcomponent.cpp \
 	$$PWD/edbee/views/components/texteditorrenderer.cpp \
 	$$PWD/edbee/views/components/textmargincomponent.cpp \
@@ -76,7 +77,8 @@ SOURCES += \
 	$$PWD/edbee/util/rangelineiterator.cpp \
 	$$PWD/edbee/data/factorykeymap.cpp \
 	$$PWD/edbee/data/factorycommandmap.cpp \
-    $$PWD/edbee/commands/movelinecommand.cpp
+	$$PWD/edbee/commands/movelinecommand.cpp \
+    $$PWD/edbee/models/textautocompleteprovider.cpp
 
 HEADERS += \
 	$$PWD/edbee/util/logging.h \
@@ -124,6 +126,7 @@ HEADERS += \
 	$$PWD/edbee/io/jsonparser.h \
 	$$PWD/edbee/models/textgrammar.h \
 	$$PWD/edbee/models/texteditorcommandmap.h \
+	$$PWD/edbee/views/components/texteditorautocompletecomponent.h \
 	$$PWD/edbee/views/components/texteditorcomponent.h \
 	$$PWD/edbee/views/components/texteditorrenderer.h \
 	$$PWD/edbee/views/components/textmargincomponent.h \
@@ -153,7 +156,8 @@ HEADERS += \
 	$$PWD/edbee/util/rangelineiterator.h \
 	$$PWD/edbee/data/factorykeymap.h \
 	$$PWD/edbee/data/factorycommandmap.h \
-    $$PWD/edbee/commands/movelinecommand.h
+	$$PWD/edbee/commands/movelinecommand.h \
+  $$PWD/edbee/models/textautocompleteprovider.h
 
 ## Extra dependencies
 ##====================

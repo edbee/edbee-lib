@@ -10,6 +10,7 @@
 namespace edbee {
 
 class DynamicVariables;
+class TextAutoCompleteProviderList;
 class TextCodecManager;
 class TextEditorCommandMap;
 class TextEditorKeyMap;
@@ -53,6 +54,7 @@ public:
     TextThemeManager* themeManager();
     TextKeyMapManager* keyMapManager();
     DynamicVariables* environmentVariables();
+    TextAutoCompleteProviderList* autoCompleteProviderList();
 
 
 protected:
@@ -70,7 +72,7 @@ protected:
     TextThemeManager* themeManager_;            ///< The text theme manager
     TextKeyMapManager* keyMapManager_;          ///< The keymap manager
     DynamicVariables* environmentVariables_;    ///< The (dynamic) environment variables
-
+    TextAutoCompleteProviderList* autoCompleteProviderList_;   ///< The global autocomplete providers
 };
 
 

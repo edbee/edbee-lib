@@ -66,6 +66,10 @@ public slots:
     virtual void updateAreaAroundOffset(int offset, int width=8);
     virtual void updateLine( int line, int length );
 
+signals:
+    void textKeyPressed();
+
+
 private:
 
     TextRenderer* textRenderer() const;
@@ -77,6 +81,7 @@ private:
 
     TextEditorController* controllerRef_;       ///< A reference to the controller
     TextEditorRenderer* textEditorRenderer_;    /// A text-editor renderer
+
 };
 
 } // edbee

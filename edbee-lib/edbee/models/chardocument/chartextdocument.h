@@ -66,6 +66,9 @@ public:
     virtual TextGrammar* languageGrammar();
     virtual void setLanguageGrammar( TextGrammar* grammar );
 
+    /// Returns the the autocomplete provider list
+    virtual TextAutoCompleteProviderList* autoCompleteProviderList();
+
     /// returns the text undo stack
     virtual TextUndoStack* textUndoStack() { return textUndoStack_; }
 
@@ -80,19 +83,18 @@ protected slots:
     virtual void textBufferChanged( const edbee::TextBufferChange& change );
 
 private:
-    TextEditorConfig* config_;                          ///< The text editor configuration
-    TextBuffer* textBuffer_;                            ///< The textbuffers
+    TextEditorConfig* config_;                               ///< The text editor configuration
+    TextBuffer* textBuffer_;                                 ///< The textbuffers
 
-    TextLineDataManager* textLineDataManager_;          ///< A class for managing text line data items    
-    TextDocumentScopes* textScopes_;                    ///< The text document scopes
-    TextLexer* textLexer_;                              ///< The lexer used for finding the scopes
+    TextLineDataManager* textLineDataManager_;               ///< A class for managing text line data items
+    TextDocumentScopes* textScopes_;                         ///< The text document scopes
+    TextLexer* textLexer_;                                   ///< The lexer used for finding the scopes
 
-    TextCodec* textCodecRef_;                           ///< The used encoding
-    const edbee::LineEnding* lineEndingRef_;            ///< The used line-ending
+    TextCodec* textCodecRef_;                                ///< The used encoding
+    const edbee::LineEnding* lineEndingRef_;                 ///< The used line-ending
 
-    TextUndoStack* textUndoStack_;                      ///< The text undo stack
-
-
+    TextUndoStack* textUndoStack_;                           ///< The text undo stack
+    TextAutoCompleteProviderList* autoCompleteProviderList_; ///< The Auto Complete Provide list
 };
 
 } // edbee

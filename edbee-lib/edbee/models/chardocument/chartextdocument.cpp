@@ -12,6 +12,7 @@
 #include "chartextbuffer.h"
 #include "edbee/lexers/grammartextlexer.h"
 #include "edbee/models/changes/textchange.h"
+#include "edbee/models/textautocompleteprovider.h"
 #include "edbee/models/textgrammar.h"
 #include "edbee/models/textdocumentscopes.h"
 #include "edbee/models/texteditorconfig.h"
@@ -36,6 +37,7 @@ CharTextDocument::CharTextDocument(QObject *object)
     , textCodecRef_(0)
     , lineEndingRef_(0)
     , textUndoStack_(0)
+    , autoCompleteProviderList_(0)
 {
     Q_ASSERT_GUI_THREAD;
 
@@ -54,6 +56,9 @@ CharTextDocument::CharTextDocument(QObject *object)
     // create the undo stack
     textUndoStack_ = new TextUndoStack(this);
 
+    // create the autocomplete provider (with the global parent provider)
+    autoCompleteProviderList_ = new TextAutoCompleteProviderList( Edbee::instance()->autoCompleteProviderList());
+
     // simply forward the about to change signal
     connect( textBuffer_, SIGNAL(textAboutToBeChanged(edbee::TextBufferChange)), SIGNAL(textAboutToBeChanged(edbee::TextBufferChange)), Qt::DirectConnection );
     connect( textBuffer_, SIGNAL(textChanged(edbee::TextBufferChange)), SLOT(textBufferChanged(edbee::TextBufferChange)), Qt::DirectConnection );
@@ -68,6 +73,7 @@ CharTextDocument::CharTextDocument(QObject *object)
 /// The default constructor
 CharTextDocument::~CharTextDocument()
 {
+    delete autoCompleteProviderList_;
     delete textUndoStack_;
     delete textLexer_;
     delete textScopes_;
@@ -99,6 +105,13 @@ void CharTextDocument::setLanguageGrammar(TextGrammar* grammar)
     if( oldGrammar != grammar ) {
         emit languageGrammarChanged();
     }
+}
+
+
+/// Returns the autocmoplete provider list
+TextAutoCompleteProviderList* CharTextDocument::autoCompleteProviderList()
+{
+    return autoCompleteProviderList_;
 }
 
 

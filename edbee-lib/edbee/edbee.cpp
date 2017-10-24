@@ -7,6 +7,7 @@
 
 #include <QApplication>
 
+#include "edbee/models/textautocompleteprovider.h"
 #include "edbee/models/dynamicvariables.h"
 #include "edbee/models/textbuffer.h"
 #include "edbee/models/texteditorcommandmap.h"
@@ -35,6 +36,7 @@ Edbee::Edbee()
     , themeManager_(0)
     , keyMapManager_(0)
     , environmentVariables_(0)
+    ,autoCompleteProviderList_(0)
 {
 }
 
@@ -42,6 +44,7 @@ Edbee::Edbee()
 /// The edbee destructors destroys the different managers
 Edbee::~Edbee()
 {
+    delete autoCompleteProviderList_;
     delete environmentVariables_;
     delete keyMapManager_;
     delete themeManager_;
@@ -175,6 +178,7 @@ void Edbee::init()
     grammarManager_       = new TextGrammarManager();
     keyMapManager_        = new TextKeyMapManager();
     environmentVariables_ = new DynamicVariables();
+    autoCompleteProviderList_ = new TextAutoCompleteProviderList();
 
     qRegisterMetaType<edbee::TextBufferChange>("edbee::TextBufferChange");
 
@@ -285,6 +289,12 @@ DynamicVariables* Edbee::environmentVariables()
 {
     Q_ASSERT(inited_);
     return environmentVariables_;
+}
+
+TextAutoCompleteProviderList *Edbee::autoCompleteProviderList()
+{
+    Q_ASSERT(autoCompleteProviderList_);
+    return autoCompleteProviderList_;
 }
 
 
