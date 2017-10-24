@@ -1,6 +1,7 @@
 #include "texteditorautocompletecomponent.h"
 
 #include <QApplication>
+#include <QKeyEvent>
 #include <QLayout>
 #include <QListWidget>
 
