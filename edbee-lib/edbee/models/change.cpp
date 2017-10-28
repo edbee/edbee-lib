@@ -193,8 +193,22 @@ void ChangeGroup::revert(TextDocument* document)
     }
 }
 
+
+/// When another group is given, a merge is performed
 bool ChangeGroup::giveAndMerge(TextDocument *document, Change *textChange)
 {
+    if( textChange->isGroup()) {
+
+        // move all changes from the given change-group to the new one
+        ChangeGroup* inGroup = dynamic_cast<ChangeGroup*>(textChange);
+        for( int i=0, cnt=inGroup->size(); i<cnt; ++i ) {
+            giveChange( document, inGroup->at(i));
+        }
+        while( inGroup->takeLast());
+        delete textChange;
+
+        return true;
+    }
     return false;
 }
 

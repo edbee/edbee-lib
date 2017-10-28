@@ -109,7 +109,9 @@ void MoveLineCommand::execute(TextEditorController *controller)
     }
 
     *sel = newCaretSelection; // change the selection
-    controller->endUndoGroup(0,false);
+
+    int coalesceID = CoalesceId_MoveLine + direction_ + 10;
+    controller->endUndoGroup(coalesceID,false);
 }
 
 

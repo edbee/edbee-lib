@@ -218,6 +218,7 @@ Change* TextUndoStack::giveChange(Change* change, int coalesceId )
 
     int lastCoalesceId = lastCoalesceIdAtCurrentLevel();
     bool merge = lastCoalesceId && lastCoalesceIdStack_.top() == coalesceId && coalesceId != CoalesceId_None;
+
     setLastCoalesceIdAtCurrentLevel(coalesceId);
     if( coalesceId == CoalesceId_ForceMerge ) { merge = true; }
 
@@ -242,7 +243,6 @@ Change* TextUndoStack::giveChange(Change* change, int coalesceId )
     // normal operation
     //-----------------
     } else {
-
         // get the optional controller context
         TextEditorController* controller = change->controllerContext();
         clearRedo( controller );
@@ -532,7 +532,7 @@ QString TextUndoStack::dumpStack()
 void TextUndoStack::dumpStackInternal()
 {
 #ifdef DUMP_UNDO_STACK
-    qlog_info() << dumpStack();
+    qDebug().noquote() << this->dumpStack();
 #endif
 }
 

@@ -33,6 +33,7 @@ enum CoalesceId {
     CoalesceId_CutLine       = 8 << 16,
     CoalesceId_Paste         = 9 << 16,
     CoalesceId_Duplicate     = 10 << 16,
+    CoalesceId_MoveLine      = 11 << 16,
 
     CoalesceId_UserDefined   = 100 << 16
 };
