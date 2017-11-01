@@ -1,8 +1,10 @@
 #pragma once
 
+#include <QModelIndex>
 #include <QWidget>
 
 class QListWidget;
+class QListWidgetItem;
 
 namespace edbee {
 
@@ -41,6 +43,8 @@ signals:
 
 public slots:
     void textKeyPressed();
+    void listItemClicked(QListWidgetItem*item);
+    void selectItemOnHover(QModelIndex modelIndex);
 
 private:
     TextEditorController* controllerRef_;       ///< A reference to the controller

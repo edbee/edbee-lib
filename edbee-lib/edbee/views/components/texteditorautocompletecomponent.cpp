@@ -43,6 +43,17 @@ TextEditorAutoCompleteComponent::TextEditorAutoCompleteComponent(TextEditorContr
     listWidgetRef_->setPalette(p);
 
     editorComponentRef_->installEventFilter(this);
+
+    // prevent the widgets from having foxus
+    setFocusPolicy(Qt::NoFocus);
+    listWidgetRef_->setFocusPolicy(Qt::NoFocus);
+    listWidgetRef_->setAttribute(Qt::WA_NoMousePropagation,true);   // do not wheel
+
+    // make clicking in the list word
+    listWidgetRef_->setMouseTracking(true);
+    connect( listWidgetRef_, SIGNAL(itemClicked(QListWidgetItem*)), this, SLOT(listItemClicked(QListWidgetItem*)));
+    connect( listWidgetRef_, SIGNAL(itemDoubleClicked(QListWidgetItem*)), this, SLOT(listItemClicked(QListWidgetItem*)));
+    connect( listWidgetRef_, SIGNAL(entered(QModelIndex)), this, SLOT(selectItemOnHover(QModelIndex)));
 }
 
 
@@ -194,6 +205,18 @@ void TextEditorAutoCompleteComponent::textKeyPressed()
     if( fillAutoCompleteList(doc, range, currentWord_)) {
         show();
     }
+}
+
+
+void TextEditorAutoCompleteComponent::listItemClicked(QListWidgetItem* item)
+{
+    insertCurrentSelectedListItem();
+    hide();
+}
+
+void TextEditorAutoCompleteComponent::selectItemOnHover(QModelIndex modelIndex)
+{
+    listWidgetRef_->selectionModel()->select(modelIndex,QItemSelectionModel::SelectCurrent);
 }
 
 }// edbee
