@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QList>
+#include <QString>
 
 namespace edbee {
 
