@@ -35,3 +35,7 @@ cov-int
 
 edbee-test/edbee-test
 .vscode
+
+.vs/
+edbee-lib/debug/
+edbee-lib/release/
