@@ -79,6 +79,9 @@ TextLineData* TextDocument::getLineData(int line, int field)
 /// @param group the textchange group that groups the undo operations
 void TextDocument::beginUndoGroup(ChangeGroup* group)
 {
+    if( !group ) {
+        group = new ChangeGroup(0);
+    }
 //    if( documentFilter() ) {
 //        documentFilter()->filterBeginGroup( this, group );
 //    }
@@ -283,8 +286,12 @@ Change *TextDocument::executeAndGiveChange(Change* change, int coalesceId )
     if( documentFilter() ) {
         return documentFilter()->filterChange( this, change, coalesceId );
     } else {
+
+        beginUndoGroup();   // automaticly group changes together (when changes happend on emition)
         change->execute( this );
-        return giveChangeWithoutFilter( change, coalesceId );
+        Change* result = giveChangeWithoutFilter( change, coalesceId );
+        endUndoGroup(coalesceId, true);
+        return result;
     }
 }
 

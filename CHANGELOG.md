@@ -2,6 +2,7 @@
 
 edbee.lib:
 
+- ref #66, Automatic grouping of Changes that happen in repond of another event. (Crash in setText())
 - add #60, Basic support for auto complete.
 - add #59, Shift+Delete should perform a cut
 - add #56, Added move line up/down commands.

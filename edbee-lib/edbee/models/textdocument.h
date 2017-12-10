@@ -91,7 +91,7 @@ public:
 
     /// this method should return a reference to the undo stack
     virtual TextUndoStack* textUndoStack() = 0;
-    virtual void beginUndoGroup(ChangeGroup* group);
+    virtual void beginUndoGroup(ChangeGroup* group=0);
     virtual void endUndoGroup(int coalesceId, bool flatten=false );
     virtual void endUndoGroupAndDiscard();
     virtual bool isUndoCollectionEnabled();
