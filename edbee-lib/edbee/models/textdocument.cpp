@@ -291,7 +291,8 @@ Change *TextDocument::executeAndGiveChange(Change* change, int coalesceId )
         change->execute( this );
         Change* result = giveChangeWithoutFilter( change, coalesceId );
         endUndoGroup(coalesceId, true);
-        return result;
+        return textUndoStack()->last();
+//        return result;
     }
 }
 
