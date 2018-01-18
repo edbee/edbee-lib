@@ -1,4 +1,4 @@
-// Copyright (c) 2012, Razvan Petru
+// Copyright (c) 2013, Razvan Petru
 // All rights reserved.
 
 // Redistribution and use in source and binary forms, with or without modification,
@@ -25,81 +25,208 @@
 
 #include "QsLog.h"
 #include "QsLogDest.h"
+#ifdef QS_LOG_SEPARATE_THREAD
+#include <QThread>
+#include <QWaitCondition>
+#include <queue>
+#endif
 #include <QMutex>
-#include <QVector>
 #include <QDateTime>
+#include <QLatin1String>
 #include <QtGlobal>
-#include <cassert>
 #include <cstdlib>
 #include <stdexcept>
+#include <algorithm>
+#include <vector>
 
 namespace QsLogging
 {
-typedef QVector<Destination*> DestinationList;
+using DestinationList = std::vector<DestinationPtrU>;
 
-static const char TraceString[] = "TRACE";
-static const char DebugString[] = "DEBUG";
-static const char InfoString[]  = "INFO";
-static const char WarnString[]  = "WARN";
-static const char ErrorString[] = "ERROR";
-static const char FatalString[] = "FATAL";
-
-// not using Qt::ISODate because we need the milliseconds too
-//static const QString fmtDateTime("yyyy-MM-ddThh:mm:ss.zzz");
-static const QString fmtDateTime("hh:mm:ss.zzz");
-
-static const char* LevelToText(Level theLevel)
+#ifdef QS_LOG_SEPARATE_THREAD
+//! Messages can be enqueued from other threads and will be logged one by one.
+//! Note: std::queue was used instead of QQueue because it accepts types missing operator=.
+class LoggerThread : public QThread
 {
-    switch( theLevel )
+public:
+    void enqueue(const LogMessage& message)
     {
-        case TraceLevel:
-            return TraceString;
-        case DebugLevel:
-            return DebugString;
-        case InfoLevel:
-            return InfoString;
-        case WarnLevel:
-            return WarnString;
-        case ErrorLevel:
-            return ErrorString;
-        case FatalLevel:
-            return FatalString;
-        default:
-        {
-            assert(!"bad log level");
-            return InfoString;
+        QMutexLocker locker(&mutex);
+        messageQueue.push(message);
+        waitCondition.wakeOne();
+    }
+
+    void requestStop()
+    {
+        QMutexLocker locker(&mutex);
+        requestInterruption();
+        waitCondition.wakeOne();
+    }
+
+protected:
+    virtual void run()
+    {
+        while (true) {
+            QMutexLocker locker(&mutex);
+            if (messageQueue.empty() && !isInterruptionRequested()) {
+                waitCondition.wait(&mutex);
+            }
+            if (isInterruptionRequested()) {
+                break;
+            }
+
+            const LogMessage msg = messageQueue.front();
+            messageQueue.pop();
+            locker.unlock();
+            Logger::instance().write(msg);
         }
     }
-}
+
+private:
+    QMutex mutex;
+    QWaitCondition waitCondition;
+    std::queue<LogMessage> messageQueue;
+};
+#endif
+
 
 class LoggerImpl
 {
 public:
-    LoggerImpl() :
-        level(TraceLevel)
-    {
-        //
-        destList.reserve(3);
-    }
+    LoggerImpl();
+    ~LoggerImpl();
+
+#ifdef QS_LOG_SEPARATE_THREAD
+    bool shutDownLoggerThread();
+
+    LoggerThread loggerThread;
+#endif
     QMutex logMutex;
     Level level;
     DestinationList destList;
 };
 
-Logger::Logger() :
-    d(new LoggerImpl)
+LoggerImpl::LoggerImpl()
+    : level(InfoLevel)
 {
+    destList.reserve(2); // assume at least file + console
+#ifdef QS_LOG_SEPARATE_THREAD
+    loggerThread.start(QThread::LowPriority);
+#endif
 }
 
-Logger::~Logger()
+LoggerImpl::~LoggerImpl()
 {
-    delete d;
+#ifdef QS_LOG_SEPARATE_THREAD
+#if defined(Q_OS_WIN) && defined(QSLOG_IS_SHARED_LIBRARY)
+    // Waiting on the thread here is too late and can lead to deadlocks. More details:
+    // * Another reason not to do anything scary in your DllMain:
+    //   https://blogs.msdn.microsoft.com/oldnewthing/20040128-00/?p=40853
+    // * Dynamic Link libraries best practices:
+    //   https://msdn.microsoft.com/en-us/library/windows/desktop/dn633971%28v=vs.85%29.aspx#general_best_practices
+    Q_ASSERT(loggerThread.isFinished());
+    if (!loggerThread.isFinished()) {
+        qCritical("You must shut down the QsLog thread, otherwise deadlocks can occur!");
+    }
+#endif
+    shutDownLoggerThread();
+#endif
 }
 
-void Logger::addDestination(Destination* destination)
+#ifdef QS_LOG_SEPARATE_THREAD
+bool LoggerImpl::shutDownLoggerThread()
 {
-    assert(destination);
-    d->destList.push_back(destination);
+    if (loggerThread.isFinished()) {
+        return true;
+    }
+
+    loggerThread.requestStop();
+    return loggerThread.wait();
+}
+#endif
+
+
+Logger& Logger::instance()
+{
+    static Logger instance;
+    return instance;
+}
+
+// tries to extract the level from a string log message. If available, conversionSucceeded will
+// contain the conversion result.
+Level Logger::levelFromLogMessage(const QString& logMessage, bool* conversionSucceeded)
+{
+    using namespace QsLogging;
+
+    if (conversionSucceeded)
+        *conversionSucceeded = true;
+
+    if (logMessage.startsWith(QLatin1String(LevelName(TraceLevel))))
+        return TraceLevel;
+    if (logMessage.startsWith(QLatin1String(LevelName(DebugLevel))))
+        return DebugLevel;
+    if (logMessage.startsWith(QLatin1String(LevelName(InfoLevel))))
+        return InfoLevel;
+    if (logMessage.startsWith(QLatin1String(LevelName(WarnLevel))))
+        return WarnLevel;
+    if (logMessage.startsWith(QLatin1String(LevelName(ErrorLevel))))
+        return ErrorLevel;
+    if (logMessage.startsWith(QLatin1String(LevelName(FatalLevel))))
+        return FatalLevel;
+
+    if (conversionSucceeded)
+        *conversionSucceeded = false;
+    return OffLevel;
+}
+
+Logger::~Logger() noexcept = default;
+
+#if defined(Q_OS_WIN)
+bool Logger::shutDownLoggerThread()
+{
+#ifdef QS_LOG_SEPARATE_THREAD
+    return d->shutDownLoggerThread();
+#else
+    return true;
+#endif
+}
+#endif
+
+void Logger::addDestination(DestinationPtrU&& destination)
+{
+    Q_ASSERT(destination.get());
+    QMutexLocker lock(&d->logMutex);
+    d->destList.emplace_back(std::move(destination));
+}
+
+DestinationPtrU Logger::removeDestination(const QString &type)
+{
+    QMutexLocker lock(&d->logMutex);
+
+    const auto it = std::find_if(d->destList.begin(), d->destList.end(), [&type](const DestinationPtrU& dest){
+        return dest->type() == type;
+    });
+
+    if (it != d->destList.end()) {
+        auto removed = std::move(*it);
+        d->destList.erase(it);
+        return removed;
+    }
+
+    return DestinationPtrU();
+}
+
+bool Logger::hasDestinationOfType(const char* type) const
+{
+    QMutexLocker lock(&d->logMutex);
+    const QLatin1String latin1Type(type);
+    for (const auto& dest : d->destList) {
+        if (dest->type() == latin1Type) {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 void Logger::setLoggingLevel(Level newLevel)
@@ -112,49 +239,36 @@ Level Logger::loggingLevel() const
     return d->level;
 }
 
-//! creates the complete log message and passes it to the logger
-void Logger::Helper::writeToLog()
+Logger::Helper::~Helper() noexcept
 {
-    const char* const levelName = LevelToText(level);
-    const QString completeMessage(QStringLiteral("%1 %2 %3")
-                                  .arg(levelName, 5)
-                                  .arg(QDateTime::currentDateTime().toString(fmtDateTime))
-                                  .arg(buffer)
-                                  );
-
-    Logger& logger = Logger::instance();
-    QMutexLocker lock(&logger.d->logMutex);
-    logger.write(completeMessage, level);
+    const LogMessage msg(buffer, QDateTime::currentDateTimeUtc(), level);
+    Logger::instance().enqueueWrite(msg);
 }
 
-Logger::Helper::~Helper()
+
+Logger::Logger()
+    : d(new LoggerImpl)
 {
-    try
-    {
-        writeToLog();
-    }
-    catch(std::exception& e)
-    {
-        // you shouldn't throw exceptions from a sink
-        Q_UNUSED(e);
-        assert(!"exception in logger helper destructor");
-        throw;
-    }
+    qRegisterMetaType<LogMessage>("QsLogging::LogMessage");
+}
+
+//! directs the message to the task queue or writes it directly
+void Logger::enqueueWrite(const LogMessage& message)
+{
+#ifdef QS_LOG_SEPARATE_THREAD
+    d->loggerThread.enqueue(message);
+#else
+    write(message);
+#endif
 }
 
 //! Sends the message to all the destinations. The level for this message is passed in case
 //! it's useful for processing in the destination.
-void Logger::write(const QString& message, Level level)
+void Logger::write(const LogMessage& message)
 {
-    for(DestinationList::iterator it = d->destList.begin(),
-        endIt = d->destList.end();it != endIt;++it)
-    {
-        if( !(*it) )
-        {
-            assert(!"null log destination");
-            continue;
-        }
-        (*it)->write(message, level);
+    QMutexLocker lock(&d->logMutex);
+    for (auto& dest : d->destList) {
+        dest->write(message);
     }
 }
 

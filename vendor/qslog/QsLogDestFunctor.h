@@ -1,4 +1,5 @@
-// Copyright (c) 2013, Razvan Petru
+// Copyright (c) 2014, Razvan Petru
+// Copyright (c) 2014, Omar Carey
 // All rights reserved.
 
 // Redistribution and use in source and binary forms, with or without modification,
@@ -23,26 +24,39 @@
 // OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 // OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef QSLOGLEVEL_H
-#define QSLOGLEVEL_H
-class QString;
+#ifndef QSLOGDESTFUNCTOR_H
+#define QSLOGDESTFUNCTOR_H
+
+#include "QsLogDest.h"
+#include <QObject>
 
 namespace QsLogging
 {
-enum Level
+// Offers various types of function-like sinks.
+// This is an advanced destination type. Depending on your configuration, LogFunction might be
+// called from a different thread or even a different binary. You should not access QsLog from
+// inside LogFunction and should not perform any time-consuming operations.
+// logMessageReady is connected through a queued connection and trace messages are not included
+class QSLOG_SHARED_OBJECT FunctorDestination : public QObject, public Destination
 {
-    TraceLevel = 0,
-    DebugLevel,
-    InfoLevel,
-    WarnLevel,
-    ErrorLevel,
-    FatalLevel,
-    OffLevel
+    Q_OBJECT
+public:
+    static const char* const Type;
+
+    explicit FunctorDestination(LogFunction f);
+    FunctorDestination(QObject* receiver, const char* member);
+
+    void write(const LogMessage& message) override;
+    bool isValid() override;
+    QString type() const override;
+
+protected:
+    // int used to avoid registering a new enum type
+    Q_SIGNAL void logMessageReady(const QsLogging::LogMessage& message);
+
+private:
+    LogFunction mLogFunction;
 };
-
-const char* LevelName(Level theLevel);
-QString LocalizedLevelName(Level theLevel);
-
 }
 
-#endif // QSLOGLEVEL_H
+#endif // QSLOGDESTFUNCTOR_H

@@ -23,26 +23,40 @@
 // OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 // OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef QSLOGLEVEL_H
-#define QSLOGLEVEL_H
-class QString;
+#include "QsLogDestConsole.h"
+#include <QString>
+#include <QtGlobal>
 
-namespace QsLogging
+#if defined(Q_OS_UNIX) || defined(Q_OS_WIN) && defined(QS_LOG_WIN_PRINTF_CONSOLE)
+#include <cstdio>
+void QsDebugOutput::output( const QString& message )
 {
-enum Level
+   fprintf(stderr, "%s\n", qPrintable(message));
+   fflush(stderr);
+}
+#elif defined(Q_OS_WIN)
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+void QsDebugOutput::output( const QString& message )
 {
-    TraceLevel = 0,
-    DebugLevel,
-    InfoLevel,
-    WarnLevel,
-    ErrorLevel,
-    FatalLevel,
-    OffLevel
-};
+   OutputDebugStringW(reinterpret_cast<const WCHAR*>(message.utf16()));
+   OutputDebugStringW(L"\n");
+}
+#endif
 
-const char* LevelName(Level theLevel);
-QString LocalizedLevelName(Level theLevel);
+const char* const QsLogging::DebugOutputDestination::Type = "console";
 
+void QsLogging::DebugOutputDestination::write(const LogMessage& message)
+{
+    QsDebugOutput::output(message.formatted);
 }
 
-#endif // QSLOGLEVEL_H
+bool QsLogging::DebugOutputDestination::isValid()
+{
+    return true;
+}
+
+QString QsLogging::DebugOutputDestination::type() const
+{
+    return QString::fromLatin1(Type);
+}
