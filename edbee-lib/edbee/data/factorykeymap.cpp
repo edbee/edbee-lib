@@ -82,7 +82,7 @@ void FactoryKeyMap::fill( TextEditorKeyMap* km )
 
     // tab entry
     add( "tab", "Tab" );
-    add( "tab_back", "Backtab" );
+//    add( "tab_back", "Backtab" );  (Workaround for issue #72)
     add( "tab_back", "Shift+Tab" );
     add( "tab_back", "Shift+Backtab" );
     add( "indent", "Ctrl+]" );
