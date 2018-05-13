@@ -7,8 +7,10 @@
 
 namespace edbee {
 
-TextAutoCompleteItem::TextAutoCompleteItem(const QString &label)
-    : label_(label)
+TextAutoCompleteItem::TextAutoCompleteItem(const QString &label, const QString &usage, const QString &type)
+    : label_(label),
+      usage_(usage),
+      type_(type)
 {
 }
 
@@ -17,6 +19,16 @@ TextAutoCompleteItem::TextAutoCompleteItem(const QString &label)
 QString TextAutoCompleteItem::label() const
 {
     return label_;
+}
+
+QString TextAutoCompleteItem::usage() const
+{
+    return usage_;
+}
+
+QString TextAutoCompleteItem::type() const
+{
+    return type_;
 }
 
 
@@ -29,7 +41,14 @@ int TextAutoCompleteItem::matchLabelScore(TextDocument *document, const TextRang
     /// - https://www.quora.com/How-is-the-fuzzy-search-algorithm-in-Sublime-Text-designed-How-would-you-design-something-similar)
     /// - https://github.com/renstrom/fuzzysearch
     /// We probably need to calculate a score
-    return label_.startsWith(word) ? 1 : 0;
+
+    if ( label_.toLower().startsWith(word.toLower()) ) {
+        return 1;
+    } else if ( label_.toLower().contains(word.toLower()) ) {
+        return 2;
+    } else {
+        return 0;
+    }
 }
 
 
@@ -46,20 +65,22 @@ StringTextAutoCompleteProvider::~StringTextAutoCompleteProvider()
 /// Search auto-complete items in the list
 QList<TextAutoCompleteItem *> StringTextAutoCompleteProvider::findAutoCompleteItemsForRange(TextDocument *document, const TextRange &range, const QString &word)
 {
-    QList<TextAutoCompleteItem *> result;
+    QMultiMap<int, TextAutoCompleteItem *> items;
+
     foreach( TextAutoCompleteItem* item, itemList_ ) {
-        if( item->matchLabelScore(document,range,word)) {
-            result.append(item);
+        int match = item->matchLabelScore(document,range,word);
+        if( match ) {
+            items.insert(match, item);
         }
     }
-    return result;
+    return items.values();
 }
 
 
 /// directly add a label
-void StringTextAutoCompleteProvider::add(const QString &label)
+void StringTextAutoCompleteProvider::add(const QString &label, const QString &usage, const QString &type)
 {
-    itemList_.push_back( new TextAutoCompleteItem(label));
+    itemList_.push_back(new TextAutoCompleteItem(label, usage=="" ? label + "()" : usage, type));
 }
 
 
@@ -82,7 +103,6 @@ TextAutoCompleteProviderList::TextAutoCompleteProviderList(TextAutoCompleteProvi
 TextAutoCompleteProviderList::~TextAutoCompleteProviderList()
 {
     qDeleteAll(providerList_);
-    providerList_.clear();
 }
 
 
