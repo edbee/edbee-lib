@@ -94,6 +94,8 @@ signals:
     void commandToBeExecuted( edbee::TextEditorCommand* command );
     void commandExecuted( edbee::TextEditorCommand* command );
 
+    void backspacePressed();
+
 public slots:
 
     void onTextChanged( edbee::TextBufferChange change );

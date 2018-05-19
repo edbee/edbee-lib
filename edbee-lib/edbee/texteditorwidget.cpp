@@ -93,6 +93,7 @@ TextEditorWidget::TextEditorWidget( QWidget* parent)
     connect( this, SIGNAL(horizontalScrollBarChanged(QScrollBar*)), SLOT(connectHorizontalScrollBar()) );
     connect( this, SIGNAL(verticalScrollBarChanged(QScrollBar*)), SLOT(connectVerticalScrollBar()) );
     connect( editCompRef_, SIGNAL(textKeyPressed()), autoCompleteCompRef_, SLOT(textKeyPressed()));
+    connect( controller_, SIGNAL(backspacePressed()), autoCompleteCompRef_, SLOT(backspacePressed()));
 
 
     setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Expanding );

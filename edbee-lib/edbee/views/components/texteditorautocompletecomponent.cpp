@@ -17,6 +17,7 @@
 #include "edbee/views/components/texteditorcomponent.h"
 #include "edbee/views/textrenderer.h"
 #include "edbee/views/textselection.h"
+#include "edbee/views/texttheme.h"
 
 #include "edbee/debug.h"
 
@@ -25,8 +26,8 @@ namespace edbee {
 TextEditorAutoCompleteComponent::TextEditorAutoCompleteComponent(TextEditorController *controller, TextEditorComponent *parent)
     : QWidget(parent)
     , controllerRef_(controller)
-    , listWidgetRef_(0)
     , editorComponentRef_(parent)
+    , infoTipRef_(0)
     , eventBeingFiltered_(false)
 {
     /// initialize the widget
@@ -85,10 +86,7 @@ TextEditorController *TextEditorAutoCompleteComponent::controller()
 QSize TextEditorAutoCompleteComponent::sizeHint() const
 {
     if(!listWidgetRef_) return QSize();
-    const int itemHeight = 15;
-    const int visibleItems = qMin(listWidgetRef_->count(), 10);
-    const int height = visibleItems * itemHeight;
-    return QSize(350, height);
+    return QSize(350, ( qMin(listWidgetRef_->count(), 10) * 15 ) + 5);
     //return listWidgetRef_->sizeHint();
 }
 
@@ -117,6 +115,56 @@ bool TextEditorAutoCompleteComponent::shouldDisplayAutoComplete(TextRange& range
     return true;
 }
 
+void TextEditorAutoCompleteComponent::showInfoTip()
+{
+    const QModelIndex &current = listWidgetRef_->currentIndex();
+    if( !current.isValid() )
+        return;
+
+    QString infoTip = current.data(Qt::WhatsThisRole).toString();
+    if( infoTip.isEmpty() ) {
+        //delete infoTipRef_.data();
+        infoTip = "No tooltip data found!";
+        //return;
+    }
+
+    if ( infoTipRef_.isNull() )
+        infoTipRef_ = new FakeToolTip(this);
+
+
+    //infoTipRef_->move(listWidgetRef_->x() + listWidgetRef_->width() + 2, listWidgetRef_->y());// (m_completionListView->infoFramePos());
+    infoTipRef_->setText(infoTip);
+    infoTipRef_->update();
+
+    QRect r = listWidgetRef_->visualItemRect(listWidgetRef_->currentItem());
+    int xOffset;
+    if( listWidgetRef_->count() > 10 )
+        xOffset = 22;
+    else
+        xOffset = 5;
+
+    QPoint p(listWidgetRef_->parentWidget()->mapToGlobal(r.topRight()).x() + xOffset, listWidgetRef_->parentWidget()->mapToGlobal(r.topRight()).y());
+
+    infoTipRef_->move(p);
+
+//    infoTipRef_->calculateMaximumWidth();
+    //infoTipRef_->adjustSize();
+    //infoTipRef_->resize(350, 19);
+    QSize tipSize = infoTipRef_->tipText.documentLayout()->documentSize().toSize();
+    //infoTipRef_->tipText.documentLayout()->documentSize()
+    infoTipRef_->resize(tipSize.width(), tipSize.height());
+    //infoTipRef_->resize();
+    infoTipRef_->show();
+    infoTipRef_->raise();
+
+    //m_infoTimer.setInterval(0);
+}
+
+void TextEditorAutoCompleteComponent::hideInfoTip()
+{
+    if ( !infoTipRef_.isNull() )
+        infoTipRef_->hide();
+}
 
 /// Fills the autocomplete list
 bool TextEditorAutoCompleteComponent::fillAutoCompleteList(TextDocument* document, const TextRange& range, const QString& word)
@@ -129,7 +177,7 @@ bool TextEditorAutoCompleteComponent::fillAutoCompleteList(TextDocument* documen
             //wItem->setText(item->usage());
             wItem->setData(Qt::DisplayRole, item->label());
             wItem->setData(Qt::DecorationRole, item->type());
-            wItem->setData(Qt::ToolTipRole, item->usage());
+            wItem->setData(Qt::WhatsThisRole, item->usage());
             //wItem->setToolTip(item->usage());
             listWidgetRef_->addItem(wItem);
             //(item->usage().length() > 0) ? listWidgetRef_->addItem(item->label() + " - " + item->usage()) : listWidgetRef_->addItem(item->label());
@@ -137,6 +185,16 @@ bool TextEditorAutoCompleteComponent::fillAutoCompleteList(TextDocument* documen
         listWidgetRef_->setCurrentIndex(listWidgetRef_->model()->index(0,0) );
         //listWidgetRef_->currentItem()->setToolTip(listWidgetRef_->currentItem()->toolTip());
         //listWidgetRef_->setToolTip(listWidgetRef_->toolTip());
+    }
+    else
+    {
+        hide();
+    }
+    setFixedHeight( ( qMin(listWidgetRef_->count(), 10) * 15 ) + 4 );
+    if( items.length() > 10 ) {
+        listWidgetRef_->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+    } else {
+        listWidgetRef_->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     }
     return items.length() > 0;
 }
@@ -155,11 +213,40 @@ void TextEditorAutoCompleteComponent::positionWidgetForCaretOffset(int offset)
     move(x,y);
 }
 
+/// intercepts hide() calls to inform the tooltip to hide as well
+void TextEditorAutoCompleteComponent::hideEvent(QHideEvent *event)
+{
+    infoTipRef_->hide();
+    event->isAccepted();
+}
+
+void TextEditorAutoCompleteComponent::moveEvent(QMoveEvent *event)
+{
+    //infoTipRef_->hide();
+    /*QRect r = listWidgetRef_->visualItemRect(listWidgetRef_->currentItem());
+    int xOffset;
+    if( listWidgetRef_->count() > 10 )
+        xOffset = 22;
+    else
+        xOffset = 5;
+
+    QPoint p(listWidgetRef_->parentWidget()->mapToGlobal(r.topRight()).x() + xOffset, listWidgetRef_->parentWidget()->mapToGlobal(r.topRight()).y());*/
+
+    //if( !infoTipRef_.isNull() )
+        //infoTipRef_->move(p);
+
+    event->isAccepted();
+}
 
 /// we need to intercept keypresses if the widget is visible
 bool TextEditorAutoCompleteComponent::eventFilter(QObject *obj, QEvent *event)
 {
-    if( obj == editorComponentRef_ && event->type()==QEvent::KeyPress && isVisible() ) {
+    if (event->type() == QEvent::FocusOut) {
+        if (infoTipRef_)
+            infoTipRef_->hide();
+        return true;
+    }
+    else if( obj == editorComponentRef_ && event->type()==QEvent::KeyPress && isVisible() ) {
         QKeyEvent* key = static_cast<QKeyEvent*>(event);
 
         // text keys are allowed
@@ -183,6 +270,9 @@ bool TextEditorAutoCompleteComponent::eventFilter(QObject *obj, QEvent *event)
                 hide();
                 return true;
 
+            case Qt::Key_Backspace:
+                return QObject::eventFilter(obj, event);
+
             case Qt::Key_Shift: //ignore shift, don't hide
                 return false;
 
@@ -196,6 +286,7 @@ bool TextEditorAutoCompleteComponent::eventFilter(QObject *obj, QEvent *event)
                     QApplication::sendEvent(listWidgetRef_, event);
                 }
                 eventBeingFiltered_ = false;
+                showInfoTip();
                 return true;
         }
 
@@ -238,13 +329,37 @@ void TextEditorAutoCompleteComponent::textKeyPressed()
     // fills the autocomplete list with the curent word
     if( fillAutoCompleteList(doc, range, currentWord_)) {
         show();
+        showInfoTip();
     }
 }
 
+/// processes backspaces
+void TextEditorAutoCompleteComponent::backspacePressed()
+{
+    // fetch the current selection
+    TextDocument* doc = controller()->textDocument();
+    TextRange range = controller()->textSelection()->range(0);
+
+    // when the character after
+    if(!shouldDisplayAutoComplete(range, currentWord_)) {
+        hide();
+        return;
+    }
+
+    // position the widget
+    positionWidgetForCaretOffset( qMax(0,range.caret() - currentWord_.length()) );
+
+    // fills the autocomplete list with the curent word
+    if( fillAutoCompleteList(doc, range, currentWord_)) {
+        show();
+        showInfoTip();
+    }
+}
 
 void TextEditorAutoCompleteComponent::listItemClicked(QListWidgetItem* item)
 {
     item->setSelected(true);
+    showInfoTip();
     //item->setToolTip(item->toolTip());
 }
 
@@ -269,11 +384,16 @@ void AutoCompleteDelegate::paint(QPainter *painter, const QStyleOptionViewItem &
 {
     QFont font("Consolas", 9);
     QFontMetrics fm(font);
+    //TextRenderer* renderer = controller()->textRenderer();
+    //TextRenderer* renderer = listWidget
     if (option.state & QStyle::State_Selected)
         painter->fillRect(option.rect, QColor(0, 122, 204));
+        //painter->fillRect(option.rect, renderer->theme()->lineHighlightColor());
     else
         painter->fillRect(option.rect, QColor(37, 37, 38));
+        //painter->fillRect(option.rect, renderer->theme()->backgroundColor());
     painter->save();
+
     painter->setRenderHint(QPainter::Antialiasing, true);
     //painter->setPen(Qt::P);
     if (option.state & QStyle::State_Selected)
@@ -285,7 +405,7 @@ void AutoCompleteDelegate::paint(QPainter *painter, const QStyleOptionViewItem &
     //QString sUsage = str;
     //QString sReturn = index;
     QString sName = index.data(Qt::DisplayRole).toString();
-    QString sUsage = index.data(Qt::ToolTipRole).toString();
+    QString sUsage = index.data(Qt::WhatsThisRole).toString();
     QString sType = index.data(Qt::DecorationRole).toString();
     /*if (str.contains(" = ")) {
         sReturn = str.split(" = ").value(0);
@@ -296,18 +416,19 @@ void AutoCompleteDelegate::paint(QPainter *painter, const QStyleOptionViewItem &
     QRect hyphenRect = option.rect;
     QRect nameRect = option.rect;
     hyphenRect.setX(hyphenRect.x() + fm.width(sName));
-    typeRect.setX(nameRect.x() + fm.width(sName + " : "));
+    //typeRect.setX(nameRect.x() + fm.width(sName + " : "));
+    typeRect.setX(nameRect.x() + nameRect.width() - fm.width(sType) - 1);
     painter->setFont(font);
-    QPen namePen = QPen(QColor(86, 156, 214));
+    QPen typePen = QPen(QColor(86, 156, 214));
     QPen textPen = QPen(QColor(241, 241, 241));
-    QPen parentPen = QPen(QColor(78, 201, 176));
+    QPen namePen = QPen(QColor(78, 201, 176));
     painter->setPen(textPen);
     painter->drawText(nameRect, sName);
     //painter->drawText(option.rect, sUsage);
     if (sType != "void")
     {
-        painter->drawText(hyphenRect, " - ");
-        painter->setPen(parentPen);
+        //painter->drawText(hyphenRect, " - ");
+        painter->setPen(typePen);
         painter->drawText(typeRect, sType);
     }
     painter->restore();
@@ -325,6 +446,9 @@ FakeToolTip::FakeToolTip(QWidget *parent) :
 {
     setFocusPolicy(Qt::NoFocus);
     setAttribute(Qt::WA_DeleteOnClose);
+    setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+
+    tipText.setHtml("");
 
     // Set the window and button text to the tooltip text color, since this
     // widget draws the background as a tooltip.
@@ -339,13 +463,40 @@ FakeToolTip::FakeToolTip(QWidget *parent) :
     setWindowOpacity(style()->styleHint(QStyle::SH_ToolTipLabel_Opacity, 0, this) / 255.0);
 }
 
-void FakeToolTip::paintEvent(QPaintEvent *)
+void FakeToolTip::setText(const QString text)
 {
-    QStylePainter p(this);
-    QStyleOptionFrame opt;
-    opt.init(this);
-    p.drawPrimitive(QStyle::PE_PanelTipLabel, opt);
-    p.end();
+    tipText.setDefaultStyleSheet("p {color:#ffffff}; h1 {color:#ff8888}");
+    tipText.setHtml(QString("<p>%1</p>").arg(text));
+    //tipText.setHtml("<font color=white>" + text + "</font>");
+}
+
+void FakeToolTip::paintEvent(QPaintEvent *e)
+{
+    QStyle *style = this->style();
+    QPainter *p = new QPainter(this);
+    QStyleOptionFrame *opt = new QStyleOptionFrame();
+    QRect labelRect, textRect;
+    opt->init(this);
+    style->drawPrimitive(QStyle::PE_PanelTipLabel, opt, p);
+
+    labelRect = this->rect();
+
+    //labelRect.setX(labelRect.x() + 2);
+    //labelRect.setY(labelRect.y() + 2);
+    //labelRect.setWidth(labelRect.width() - 2 + 250);
+    //labelRect.setHeight(labelRect.height() - 2 + 400);
+
+    labelRect.setX(labelRect.x() + 2);
+    labelRect.setY(labelRect.y() + 2);
+    labelRect.setWidth(labelRect.width() - 2);
+    labelRect.setHeight(labelRect.height() - 2);
+
+    p->fillRect(labelRect, QColor(37, 37, 38));
+
+    p->translate(-1, -1);
+    tipText.drawContents(p, labelRect);
+
+    p->end();
 }
 
 void FakeToolTip::resizeEvent(QResizeEvent *)
@@ -353,8 +504,8 @@ void FakeToolTip::resizeEvent(QResizeEvent *)
     QStyleHintReturnMask frameMask;
     QStyleOption option;
     option.init(this);
-    if (style()->styleHint(QStyle::SH_ToolTip_Mask, &option, this, &frameMask))
-        setMask(frameMask.region);
+    //if (style()->styleHint(QStyle::SH_ToolTip_Mask, &option, this, &frameMask))
+//        setMask(frameMask.region);
 }
 
 }// edbee

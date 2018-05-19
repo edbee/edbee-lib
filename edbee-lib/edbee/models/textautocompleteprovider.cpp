@@ -2,6 +2,7 @@
 
 #include "edbee/models/textdocument.h"
 #include "edbee/models/textdocumentscopes.h"
+#include "edbee/models/textgrammar.h"
 
 #include "edbee/debug.h"
 
@@ -41,7 +42,14 @@ int TextAutoCompleteItem::matchLabelScore(TextDocument *document, const TextRang
     /// - https://www.quora.com/How-is-the-fuzzy-search-algorithm-in-Sublime-Text-designed-How-would-you-design-something-similar)
     /// - https://github.com/renstrom/fuzzysearch
     /// We probably need to calculate a score
-
+    //and       break     do        else      elseif
+    //end       false     for       function  if
+    //in        local     nil       not       or
+    //repeat    return    then      true      until     while
+    //edbee->grammarManager()
+    //if( word.length() < 3 || word.toLower() == "and" || word.toLower() == "break" || word.toLower() == "else" || word.toLower() == "elseif" || word.toLower())
+    if( word.length() < 3 )
+        return 0;
     if ( label_.toLower().startsWith(word.toLower()) ) {
         return 1;
     } else if ( label_.toLower().contains(word.toLower()) ) {

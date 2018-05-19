@@ -182,6 +182,7 @@ void RemoveCommand::execute(TextEditorController* controller)
     doc->replaceRangeSet( *ranges, "" );
     doc->giveSelection( controller, ranges );
     doc->endChanges(coalesceId);
+    emit controller->backspacePressed();
 }
 
 
