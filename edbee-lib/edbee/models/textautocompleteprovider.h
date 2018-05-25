@@ -18,17 +18,19 @@ class TextRange;
 class TextAutoCompleteItem
 {
 public:
-    TextAutoCompleteItem( const QString& label, const QString& usage, const QString& type );
+    TextAutoCompleteItem( const QString& label, const int kind, const QString& detail, const QString& documentation );
     QString label() const;
-    QString usage() const;
-    QString type() const;
+    int kind() const;
+    QString detail() const;
+    QString documentation() const;
 
     int matchLabelScore( TextDocument* document, const TextRange& range, const QString& word );
 
 protected:
     QString label_;
-    QString usage_;
-    QString type_;
+    int kind_;
+    QString detail_;
+    QString documentation_;
 };
 
 
@@ -48,7 +50,7 @@ public:
     virtual ~StringTextAutoCompleteProvider();
     virtual QList<TextAutoCompleteItem*> findAutoCompleteItemsForRange( TextDocument* document, const TextRange& range, const QString& word ) ;
 
-    virtual void add(const QString& label, const QString& usage = "", const QString& type = "void");
+    virtual void add(const QString& label, const int kind, const QString& detail = "", const QString& documentation = "");
     virtual void give(TextAutoCompleteItem* item);
 protected:
     QList<TextAutoCompleteItem*> itemList_;

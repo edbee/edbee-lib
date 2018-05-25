@@ -46,6 +46,8 @@ public:
 
 protected:
     virtual void paintEvent( QPaintEvent* paintEvent );
+    virtual void moveEvent( QMoveEvent* moveEvent );
+    virtual void hideEvent( QHideEvent* hideEvent );
     virtual bool event( QEvent* event );
     virtual void keyPressEvent( QKeyEvent* event );
     virtual void keyReleaseEvent ( QKeyEvent* event );

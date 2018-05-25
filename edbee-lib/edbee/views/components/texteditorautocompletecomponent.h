@@ -49,7 +49,6 @@ public:
     TextEditorController* controller();
 
     QSize sizeHint() const;
-
 protected:
 
     bool shouldDisplayAutoComplete(TextRange& range, QString& word);
@@ -61,12 +60,14 @@ protected:
     bool eventFilter(QObject* obj, QEvent* event);
 
     void hideEvent(QHideEvent *event);
-    void moveEvent(QMoveEvent *event);
+    //void focusOutEvent(QFocusEvent *event);
+    //void moveEvent(QMoveEvent *event);
 
     void insertCurrentSelectedListItem();
 signals:
 
 public slots:
+    void updateList();
     void backspacePressed();
     void textKeyPressed();
     void listItemClicked(QListWidgetItem*item);

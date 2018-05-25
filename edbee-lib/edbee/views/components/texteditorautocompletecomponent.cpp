@@ -8,6 +8,7 @@
 #include <QListWidgetItem>
 #include <QTextEdit>
 #include <QtGui>
+#include <QTime>
 
 #include "edbee/edbee.h"
 #include "edbee/models/textautocompleteprovider.h"
@@ -24,7 +25,7 @@
 namespace edbee {
 
 TextEditorAutoCompleteComponent::TextEditorAutoCompleteComponent(TextEditorController *controller, TextEditorComponent *parent)
-    : QWidget(parent)
+    : QWidget(parent, Qt::ToolTip | Qt::WindowStaysOnTopHint)
     , controllerRef_(controller)
     , editorComponentRef_(parent)
     , infoTipRef_(0)
@@ -35,6 +36,7 @@ TextEditorAutoCompleteComponent::TextEditorAutoCompleteComponent(TextEditorContr
     layout->setSpacing(0);
     layout->setMargin(0);
     listWidgetRef_ = new QListWidget();
+    listWidgetRef_->setObjectName("listWidgetRef");
     layout->addWidget(listWidgetRef_);
     setLayout(layout);
     //this->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
@@ -48,7 +50,7 @@ TextEditorAutoCompleteComponent::TextEditorAutoCompleteComponent(TextEditorContr
     //this->resize(350,150); //this->resize(350,150);
     hide();
 
-    QPalette p = listWidgetRef_->palette();
+    QPalette p = listWidgetRef_->palette();// listWidgetRef_->
     p.setColor(QPalette::Highlight, p.color(QPalette::Highlight));  // prevents the non-focus gray color
     p.setColor(QPalette::HighlightedText, p.color(QPalette::HighlightedText));
     p.setColor(QPalette::Base, QColor(37, 37, 38));
@@ -59,8 +61,13 @@ TextEditorAutoCompleteComponent::TextEditorAutoCompleteComponent(TextEditorContr
     editorComponentRef_->installEventFilter(this);
 
     // prevent the widgets from having foxus
-    setFocusPolicy(Qt::NoFocus);
-    listWidgetRef_->setFocusPolicy(Qt::NoFocus);
+    //setFocusProxy(editorComponentRef_);
+    //setFocusPolicy(Qt::NoFocus);
+    //SSRlistWidgetRef_->setParent(0);
+    //listWidgetRef_->setWindowFlags(Qt::ToolTip);
+    //listWidgetRef_->setFocusPolicy(Qt::NoFocus);
+    listWidgetRef_->setFocusPolicy(Qt::ClickFocus);
+    listWidgetRef_->setFocusProxy(editorComponentRef_);
     listWidgetRef_->setAttribute(Qt::WA_NoMousePropagation,true);   // do not wheel
     listWidgetRef_->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
     listWidgetRef_->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -117,11 +124,14 @@ bool TextEditorAutoCompleteComponent::shouldDisplayAutoComplete(TextRange& range
 
 void TextEditorAutoCompleteComponent::showInfoTip()
 {
+    if( !listWidgetRef_->isVisible() )
+        return;
+
     const QModelIndex &current = listWidgetRef_->currentIndex();
     if( !current.isValid() )
         return;
 
-    QString infoTip = current.data(Qt::WhatsThisRole).toString();
+    QString infoTip = current.data(Qt::UserRole).toString();//Qt::WhatsThisRole).toString();
     if( infoTip.isEmpty() ) {
         //delete infoTipRef_.data();
         infoTip = "No tooltip data found!";
@@ -176,8 +186,9 @@ bool TextEditorAutoCompleteComponent::fillAutoCompleteList(TextDocument* documen
             QListWidgetItem *wItem = new QListWidgetItem();
             //wItem->setText(item->usage());
             wItem->setData(Qt::DisplayRole, item->label());
-            wItem->setData(Qt::DecorationRole, item->type());
-            wItem->setData(Qt::WhatsThisRole, item->usage());
+            wItem->setData(Qt::DecorationRole, item->kind());
+            wItem->setData(Qt::UserRole, item->detail());
+            wItem->setData(Qt::WhatsThisRole, item->documentation());
             //wItem->setToolTip(item->usage());
             listWidgetRef_->addItem(wItem);
             //(item->usage().length() > 0) ? listWidgetRef_->addItem(item->label() + " - " + item->usage()) : listWidgetRef_->addItem(item->label());
@@ -208,45 +219,143 @@ void TextEditorAutoCompleteComponent::positionWidgetForCaretOffset(int offset)
     TextRenderer* renderer = controller()->textRenderer();
     int y = renderer->yPosForOffset(offset) + renderer->lineHeight();
     int x = renderer->xPosForOffset(offset);
+    QPoint newLoc = listWidgetRef_->parentWidget()->parentWidget()->mapToGlobal(QPoint(x, y));
+    //QPoint p(listWidgetRef_->parentWidget()->mapToGlobal(r.topRight()).x() + xOffset, listWidgetRef_->parentWidget()->mapToGlobal(r.topRight()).y());
 
     // TODO: Better position it so it fits no screen
-    move(x,y);
+    move(newLoc.x(), newLoc.y());
 }
 
 /// intercepts hide() calls to inform the tooltip to hide as well
 void TextEditorAutoCompleteComponent::hideEvent(QHideEvent *event)
 {
+//    listWidgetRef_->hide();
     infoTipRef_->hide();
     event->isAccepted();
 }
 
-void TextEditorAutoCompleteComponent::moveEvent(QMoveEvent *event)
+/*void TextEditorAutoCompleteComponent::focusOutEvent(QFocusEvent *event)
 {
+//    listWidgetRef_->hide();
+    qDebug() << "focusOutEvent:" << event->type();
+    infoTipRef_->hide();
+    event->isAccepted();
+}*/
+
+/*void TextEditorAutoCompleteComponent::moveEvent(QMoveEvent *event)
+{
+    TextDocument* doc = controller()->textDocument();
+    TextRange range = controller()->textSelection()->range(0);
+
+    // when the character after
+    if(!shouldDisplayAutoComplete(range, currentWord_)) {
+      hide();
+      return;
+    }
+
+    // position the widget
+    positionWidgetForCaretOffset( qMax(0,range.caret() - currentWord_.length()) )
     //infoTipRef_->hide();
-    /*QRect r = listWidgetRef_->visualItemRect(listWidgetRef_->currentItem());
+    QRect r = listWidgetRef_->visualItemRect(listWidgetRef_->currentItem());
     int xOffset;
     if( listWidgetRef_->count() > 10 )
         xOffset = 22;
     else
         xOffset = 5;
 
-    QPoint p(listWidgetRef_->parentWidget()->mapToGlobal(r.topRight()).x() + xOffset, listWidgetRef_->parentWidget()->mapToGlobal(r.topRight()).y());*/
+    QPoint p(listWidgetRef_->parentWidget()->mapToGlobal(r.topRight()).x() + xOffset, listWidgetRef_->parentWidget()->mapToGlobal(r.topRight()).y());
 
     //if( !infoTipRef_.isNull() )
         //infoTipRef_->move(p);
 
     event->isAccepted();
-}
+}*/
 
 /// we need to intercept keypresses if the widget is visible
 bool TextEditorAutoCompleteComponent::eventFilter(QObject *obj, QEvent *event)
 {
-    if (event->type() == QEvent::FocusOut) {
+    //qDebug() << "event ->" << event;
+    //if( QApplication::focusWidget() )
+        //qDebug() << QApplication::focusWidget()->metaObject()->className();
+    /*if( QApplication::focusWindow() )
+    {
+        qDebug() << " window:" << QApplication::focusWindow()->objectName();
+        qDebug() << "Currentfocus is on obj:" << QApplication::focusObject()->objectName();
+        qDebug() << " widget:" << QApplication::focusWidget()->metaObject()->className();
+    }*/
+    //QEvent::ApplicationDeactivated
+    if( event->type() == QEvent::WindowDeactivate ) {
+        qDebug() << "Window changed! obj:" << obj << " event:" << event;
+        qDebug() << "new window:" << QApplication::focusWindow();
+        if( QApplication::focusObject() == this->window() )
+        {
+            qDebug() << "Interrupting before autocomplete takes focus...";
+            return true;
+        }
+    }
+
+    if( obj == editorComponentRef_ && event->type()==QEvent::FocusOut && isVisible() ) {
+        qDebug() << "FocusOut at" << QTime::currentTime().toString();
+        qDebug() << "obj ->" << obj;
+        //qDebug() << "new focus on:" << QApplication::focusWidget()->metaObject()->className();
+        //qDebug() << "new obj ->" << QApplication::focusWidget();
+        if( QApplication::focusWidget() == listWidgetRef_ ){
+            qDebug() << "Changed obj to listWidget! Intercepting!";
+            parentWidget()->setFocus();
+            //editorComponentRef_->setFocus();
+            //editorComponentRef_->upd
+            //editorComponentRef_->keyboardGrabber()
+            //editorComponentRef_->grabKeyboard();
+            //event->isAccepted();
+            return true;
+        } else if( QApplication::focusWidget() == editorComponentRef_ ) {
+            qDebug() << "Changing obj to editorComponentRef_!";
+            //hide();
+            //close();
+            return true;
+        } else {
+            qDebug() << "Changing obj to something else!";
+            if( QApplication::focusWidget() ){
+                qDebug() << "focusWidget() exists!" << QApplication::focusWidget();
+            }
+            if( QApplication::focusWindow() ){
+                qDebug() << "focusWindow() exists!" << QApplication::focusWindow();
+            }
+            if( QApplication::focusObject() ){
+                qDebug() << "focusObject() exists!" << QApplication::focusObject();
+            }
+            if( QApplication::focusObject() ){
+                if( QApplication::focusObject() == this ){
+                    qDebug() << "clicked 'this'!";
+                    editorComponentRef_->setFocus();
+                    return true;
+                } else {
+                    qDebug() << "clicked something other than 'this'!";
+                    hide();
+                    return false;
+                }
+            }
+            hide();
+            //close();
+            return false;
+        }
+        //qDebug() << "eventFilter fired QEvent::FocusOut. obj:" << obj->metaObject()->className();
+        //abort();
+        //if (d->m_infoFrame)
+            //d->m_infoFrame->close();
+        //close();
+        //return true;
+    }
+    /*if (event->type() == QEvent::FocusOut) {
+        //hide();
+        //if (listWidgetRef_)
+            //listWidgetRef_->hide();
         if (infoTipRef_)
             infoTipRef_->hide();
         return true;
-    }
-    else if( obj == editorComponentRef_ && event->type()==QEvent::KeyPress && isVisible() ) {
+    } else if if( obj == editorComponentRef_ && event->type()==QEvent::KeyPress && isVisible() ) {*/
+    //if( obj == editorComponentRef_ && )
+    if( obj == editorComponentRef_ && event->type()==QEvent::KeyPress && isVisible() ) {
         QKeyEvent* key = static_cast<QKeyEvent*>(event);
 
         // text keys are allowed
@@ -309,9 +418,7 @@ void TextEditorAutoCompleteComponent::insertCurrentSelectedListItem()
     }
 }
 
-
-/// this event is called when a key pressed
-void TextEditorAutoCompleteComponent::textKeyPressed()
+void TextEditorAutoCompleteComponent::updateList()
 {
     // fetch the current selection
     TextDocument* doc = controller()->textDocument();
@@ -333,32 +440,34 @@ void TextEditorAutoCompleteComponent::textKeyPressed()
     }
 }
 
+/// this event is called when a key pressed
+void TextEditorAutoCompleteComponent::textKeyPressed()
+{
+    updateList();
+}
+
 /// processes backspaces
 void TextEditorAutoCompleteComponent::backspacePressed()
 {
-    // fetch the current selection
-    TextDocument* doc = controller()->textDocument();
-    TextRange range = controller()->textSelection()->range(0);
-
-    // when the character after
-    if(!shouldDisplayAutoComplete(range, currentWord_)) {
-        hide();
-        return;
-    }
-
-    // position the widget
-    positionWidgetForCaretOffset( qMax(0,range.caret() - currentWord_.length()) );
-
-    // fills the autocomplete list with the curent word
-    if( fillAutoCompleteList(doc, range, currentWord_)) {
-        show();
-        showInfoTip();
-    }
+    updateList();
 }
 
 void TextEditorAutoCompleteComponent::listItemClicked(QListWidgetItem* item)
 {
     item->setSelected(true);
+    qDebug() << "listItemClicked!";
+    if( QApplication::focusWidget() ){
+        qDebug() << "focusWidget() exists!" << QApplication::focusWidget();
+    }
+    if( QApplication::focusWindow() ){
+        qDebug() << "focusWindow() exists!" << QApplication::focusWindow();
+    }
+    if( QApplication::focusObject() ){
+        qDebug() << "focusObject() exists!" << QApplication::focusObject();
+    }
+    editorComponentRef_->window()->activateWindow();
+    editorComponentRef_->setFocus();
+    //updateList();
     showInfoTip();
     //item->setToolTip(item->toolTip());
 }
@@ -404,18 +513,21 @@ void AutoCompleteDelegate::paint(QPainter *painter, const QStyleOptionViewItem &
     //QString sName = str.split("(").value(0);
     //QString sUsage = str;
     //QString sReturn = index;
-    QString sName = index.data(Qt::DisplayRole).toString();
-    QString sUsage = index.data(Qt::WhatsThisRole).toString();
-    QString sType = index.data(Qt::DecorationRole).toString();
-    /*if (str.contains(" = ")) {
-        sReturn = str.split(" = ").value(0);
-        sUsage = str.split(" = ").value(1);
-    }*/
+
+    QString sLabel = index.data(Qt::DisplayRole).toString();
+    int sKind = index.data(Qt::DecorationRole).toInt();
+    QString sDetail = index.data(Qt::UserRole).toString();
+    QString sDocumentation = index.data(Qt::WhatsThisRole).toString();
+    QString sType = "void";
+    if (sDetail.contains(" = ")) {
+        sType = sDetail.split(" = ").value(0);
+        //sUsage = str.split(" = ").value(1);
+    }
     //font.setBold(true);
     QRect typeRect = option.rect;
     QRect hyphenRect = option.rect;
     QRect nameRect = option.rect;
-    hyphenRect.setX(hyphenRect.x() + fm.width(sName));
+    hyphenRect.setX(hyphenRect.x() + fm.width(sLabel));
     //typeRect.setX(nameRect.x() + fm.width(sName + " : "));
     typeRect.setX(nameRect.x() + nameRect.width() - fm.width(sType) - 1);
     painter->setFont(font);
@@ -423,7 +535,7 @@ void AutoCompleteDelegate::paint(QPainter *painter, const QStyleOptionViewItem &
     QPen textPen = QPen(QColor(241, 241, 241));
     QPen namePen = QPen(QColor(78, 201, 176));
     painter->setPen(textPen);
-    painter->drawText(nameRect, sName);
+    painter->drawText(nameRect, sLabel);
     //painter->drawText(option.rect, sUsage);
     if (sType != "void")
     {

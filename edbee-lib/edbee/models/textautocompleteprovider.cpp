@@ -8,10 +8,11 @@
 
 namespace edbee {
 
-TextAutoCompleteItem::TextAutoCompleteItem(const QString &label, const QString &usage, const QString &type)
+TextAutoCompleteItem::TextAutoCompleteItem(const QString &label, const int kind, const QString &detail, const QString &documentation)
     : label_(label),
-      usage_(usage),
-      type_(type)
+      kind_(kind),
+      detail_(detail),
+      documentation_(documentation)
 {
 }
 
@@ -22,19 +23,29 @@ QString TextAutoCompleteItem::label() const
     return label_;
 }
 
-QString TextAutoCompleteItem::usage() const
+int TextAutoCompleteItem::kind() const
 {
-    return usage_;
+    return kind_;
 }
 
-QString TextAutoCompleteItem::type() const
+QString TextAutoCompleteItem::detail() const
 {
-    return type_;
+    return detail_;
+}
+
+QString TextAutoCompleteItem::documentation() const
+{
+    return documentation_;
 }
 
 
 /// Compares the given text-autocomplete item with the label
-/// This methd should return a match score, where a score of 0 means NO match
+/// This method should return a match score, where a score of 0 means NO match
+/*! \fn int TextAutoCompleteItem::matchLabelScore(TextDocument *document, const TextRange &range, const QString &word)
+    Returns a copy of the \a str string. The given string is converted
+    to Unicode using the fromUtf8() function.
+    \sa fromLatin1(), fromLocal8Bit(), fromUtf8(), QByteArray::fromStdString()
+*/
 int TextAutoCompleteItem::matchLabelScore(TextDocument *document, const TextRange &range, const QString &word)
 {
     /// For now a simple prefix-prefix search. Later fuzzy search.
@@ -42,12 +53,6 @@ int TextAutoCompleteItem::matchLabelScore(TextDocument *document, const TextRang
     /// - https://www.quora.com/How-is-the-fuzzy-search-algorithm-in-Sublime-Text-designed-How-would-you-design-something-similar)
     /// - https://github.com/renstrom/fuzzysearch
     /// We probably need to calculate a score
-    //and       break     do        else      elseif
-    //end       false     for       function  if
-    //in        local     nil       not       or
-    //repeat    return    then      true      until     while
-    //edbee->grammarManager()
-    //if( word.length() < 3 || word.toLower() == "and" || word.toLower() == "break" || word.toLower() == "else" || word.toLower() == "elseif" || word.toLower())
     if( word.length() < 3 )
         return 0;
     if ( label_.toLower().startsWith(word.toLower()) ) {
@@ -86,9 +91,9 @@ QList<TextAutoCompleteItem *> StringTextAutoCompleteProvider::findAutoCompleteIt
 
 
 /// directly add a label
-void StringTextAutoCompleteProvider::add(const QString &label, const QString &usage, const QString &type)
+void StringTextAutoCompleteProvider::add(const QString &label, const int kind, const QString &detail, const QString &documentation)
 {
-    itemList_.push_back(new TextAutoCompleteItem(label, usage=="" ? label + "()" : usage, type));
+    itemList_.push_back(new TextAutoCompleteItem(label, kind, detail=="" ? label + "()" : detail, documentation));
 }
 
 
