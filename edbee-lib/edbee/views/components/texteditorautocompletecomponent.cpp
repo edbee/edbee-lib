@@ -609,6 +609,8 @@ void FakeToolTip::paintEvent(QPaintEvent *e)
     tipText.drawContents(p, labelRect);
 
     p->end();
+    delete p;
+    delete opt;
 }
 
 void FakeToolTip::resizeEvent(QResizeEvent *)

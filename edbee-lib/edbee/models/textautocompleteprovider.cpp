@@ -55,10 +55,13 @@ int TextAutoCompleteItem::matchLabelScore(TextDocument *document, const TextRang
     /// We probably need to calculate a score
     if( word.length() < 3 )
         return 0;
-    if ( label_.toLower().startsWith(word.toLower()) ) {
+    //if ( label_.toLower() == (word.toLower()) ) {
+    if( label_ == word ) {
         return 1;
-    } else if ( label_.toLower().contains(word.toLower()) ) {
+    } else if ( label_.toLower().startsWith(word.toLower()) ) {
         return 2;
+    } else if ( label_.toLower().contains(word.toLower()) ) {
+        return 3;
     } else {
         return 0;
     }
@@ -82,6 +85,10 @@ QList<TextAutoCompleteItem *> StringTextAutoCompleteProvider::findAutoCompleteIt
 
     foreach( TextAutoCompleteItem* item, itemList_ ) {
         int match = item->matchLabelScore(document,range,word);
+        if( match == 1 ) {
+            items.clear();
+            return items.values();
+        }
         if( match ) {
             items.insert(match, item);
         }
