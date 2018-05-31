@@ -162,7 +162,7 @@ void TextEditorAutoCompleteComponent::showInfoTip()
     //infoTipRef_->resize(350, 19);
     QSize tipSize = infoTipRef_->tipText.documentLayout()->documentSize().toSize();
     //infoTipRef_->tipText.documentLayout()->documentSize()
-    infoTipRef_->resize(tipSize.width(), tipSize.height());
+    infoTipRef_->resize(tipSize.width(), tipSize.height() - 2);
     //infoTipRef_->resize();
     infoTipRef_->show();
     infoTipRef_->raise();
@@ -375,9 +375,14 @@ bool TextEditorAutoCompleteComponent::eventFilter(QObject *obj, QEvent *event)
             case Qt::Key_Enter:
             case Qt::Key_Return:
             case Qt::Key_Tab:
-                insertCurrentSelectedListItem();
-                hide();
-                return true;
+                if( currentWord_ == listWidgetRef_->currentItem()->text() ) { // sends normal enter/return/tab if you've typed a full word
+                    hide();
+                    return false;
+                } else {
+                    insertCurrentSelectedListItem();
+                    hide();
+                    return true;
+                }
 
             case Qt::Key_Backspace:
                 return QObject::eventFilter(obj, event);

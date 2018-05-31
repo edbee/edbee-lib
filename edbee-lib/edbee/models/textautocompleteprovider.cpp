@@ -85,13 +85,14 @@ QList<TextAutoCompleteItem *> StringTextAutoCompleteProvider::findAutoCompleteIt
 
     foreach( TextAutoCompleteItem* item, itemList_ ) {
         int match = item->matchLabelScore(document,range,word);
-        if( match == 1 ) {
-            items.clear();
-            return items.values();
-        }
         if( match ) {
             items.insert(match, item);
         }
+    }
+
+    if( items.size() == 1 && items.contains(1) ) {
+        items.clear();
+        return items.values();
     }
     return items.values();
 }
