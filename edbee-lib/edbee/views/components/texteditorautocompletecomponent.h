@@ -26,9 +26,13 @@ class FakeToolTip : public QWidget
     Q_OBJECT
 
 public:
-    explicit FakeToolTip(QWidget *parent = 0);
+    explicit FakeToolTip(TextEditorController *controller, QWidget *parent = 0);
     void setText(const QString text);
     QTextDocument tipText;
+    TextEditorController* controller();
+
+private:
+    TextEditorController* controllerRef_;       ///< A reference to the controller
 
 protected:
     void paintEvent(QPaintEvent *e);
@@ -44,7 +48,7 @@ class TextEditorAutoCompleteComponent : public QWidget
 {
     Q_OBJECT
 public:
-    explicit TextEditorAutoCompleteComponent( TextEditorController* controller, TextEditorComponent *parent);
+    explicit TextEditorAutoCompleteComponent(TextEditorController* controller, TextEditorComponent *parent);
 
     TextEditorController* controller();
 
@@ -88,7 +92,9 @@ class AutoCompleteDelegate : public QAbstractItemDelegate
     Q_OBJECT
 
 public:
-    AutoCompleteDelegate(QObject *parent = 0);
+    AutoCompleteDelegate(TextEditorController *controller, QObject *parent = 0);
+
+    TextEditorController* controller() const;
 
     void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
 
@@ -97,6 +103,7 @@ public:
 public slots:
 
 private:
+    TextEditorController* controllerRef_;       ///< A reference to the controller
     int pixelSize;
 };
 

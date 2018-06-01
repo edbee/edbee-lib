@@ -73,7 +73,7 @@ TextEditorAutoCompleteComponent::TextEditorAutoCompleteComponent(TextEditorContr
     listWidgetRef_->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     listWidgetRef_->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
 
-    AutoCompleteDelegate *acDel = new AutoCompleteDelegate(this);
+    AutoCompleteDelegate *acDel = new AutoCompleteDelegate(controllerRef_, this);
     listWidgetRef_->setItemDelegate(acDel);
 
     // make clicking in the list word
@@ -139,7 +139,7 @@ void TextEditorAutoCompleteComponent::showInfoTip()
     }
 
     if ( infoTipRef_.isNull() )
-        infoTipRef_ = new FakeToolTip(this);
+        infoTipRef_ = new FakeToolTip(controller(), this);
 
 
     //infoTipRef_->move(listWidgetRef_->x() + listWidgetRef_->width() + 2, listWidgetRef_->y());// (m_completionListView->infoFramePos());
@@ -488,36 +488,73 @@ void TextEditorAutoCompleteComponent::selectItemOnHover(QModelIndex modelIndex)
     listWidgetRef_->selectionModel()->select(modelIndex,QItemSelectionModel::SelectCurrent);
 }
 
-AutoCompleteDelegate::AutoCompleteDelegate(QObject *parent) : QAbstractItemDelegate(parent)
+AutoCompleteDelegate::AutoCompleteDelegate(TextEditorController *controller, QObject *parent) : QAbstractItemDelegate(parent)
 {
     pixelSize = 12;
+    controllerRef_ = controller;
+}
+
+TextEditorController *AutoCompleteDelegate::controller() const
+{
+    return controllerRef_;
 }
 
 void AutoCompleteDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option,
                           const QModelIndex &index) const
 {
-    QFont font("Consolas", 9);
+    //Edbee::themeManager() edbee::Edbee::instance()->themeManager();
+    //TextThemeManager* tm = edbee::Edbee::instance()->themeManager();
+           //    themeManager = edbee->themeManager();
+    qDebug() << "paint 1";
+    qDebug() << "controller ->" << controller();
+    qDebug() << "renderer ->" << controller()->textRenderer();
+    //if controller()->textRenderer()->
+    TextRenderer* renderer = controller()->textRenderer();
+    qDebug() << "paint 2";
+    TextTheme* themeRef_ = renderer->theme();
+    qDebug() << "paint 3";
+    //painter->setBackground( th
+    //themeRef_->backgroundColor() );
+    painter->setPen( themeRef_->caretColor() );//themeRef_->caretColor() );//themeRef_->foregroundColor() );
+    qDebug() << "paint 4";
+    //painter->fillRect( *renderer()->clipRect(), themeRef_->backgroundColor() );
+    //QFont font("Consolas", 9);
+    //QFont font = TextEditorConfig::font();
+    QFont font = controller()->textDocument()->config()->font();
+    qDebug() << "paint 5";
     QFontMetrics fm(font);
+    qDebug() << "paint 6";
+    //pHost->mDisplayFont;
     //TextRenderer* renderer = controller()->textRenderer();
     //TextRenderer* renderer = listWidget
     if (option.state & QStyle::State_Selected)
-        painter->fillRect(option.rect, QColor(0, 122, 204));
-        //painter->fillRect(option.rect, renderer->theme()->lineHighlightColor());
+        //painter->fillRect(option.rect, QColor(0, 122, 204));
+        painter->fillRect(option.rect, renderer->theme()->selectionColor());
     else
-        painter->fillRect(option.rect, QColor(37, 37, 38));
-        //painter->fillRect(option.rect, renderer->theme()->backgroundColor());
+        //painter->fillRect(option.rect, QColor(37, 37, 38));
+        painter->fillRect(option.rect, renderer->theme()->backgroundColor());
+    qDebug() << "paint 7";
     painter->save();
+    qDebug() << "paint 8";
 
     painter->setRenderHint(QPainter::Antialiasing, true);
     //painter->setPen(Qt::P);
-    if (option.state & QStyle::State_Selected)
-        painter->setBrush(option.palette.highlightedText());
-    else
-        painter->setBrush(option.palette.text());
+    qDebug() << "paint 9";
+    //if (option.state & QStyle::State_Selected)
+        //painter->setBrush(option.palette.highlightedText());
+        // //painter->setPen(themeRef_->findHighlightForegroundColor());
+        //painter->setPen(themeRef_->findHighlightForegroundColor());
+        //painter->setBrush(themeRef_->findHighlightForegroundColor());
+        //painter->setBrush(themeRef_->caretColor());
+    //else
+        painter->setPen(themeRef_->foregroundColor());
+        //painter->setBrush(option.palette.text());
+        //painter->setBrush(themeRef_->foregroundColor());
     //QString str = index.data(Qt::DisplayRole).toString();
     //QString sName = str.split("(").value(0);
     //QString sUsage = str;
     //QString sReturn = index;
+    qDebug() << "paint 10";
 
     QString sLabel = index.data(Qt::DisplayRole).toString();
     int sKind = index.data(Qt::DecorationRole).toInt();
@@ -536,16 +573,19 @@ void AutoCompleteDelegate::paint(QPainter *painter, const QStyleOptionViewItem &
     //typeRect.setX(nameRect.x() + fm.width(sName + " : "));
     typeRect.setX(nameRect.x() + nameRect.width() - fm.width(sType) - 1);
     painter->setFont(font);
-    QPen typePen = QPen(QColor(86, 156, 214));
-    QPen textPen = QPen(QColor(241, 241, 241));
-    QPen namePen = QPen(QColor(78, 201, 176));
-    painter->setPen(textPen);
+    //QPen typePen = QPen(QColor(86, 156, 214));
+    QPen typePen = QPen(themeRef_->findHighlightForegroundColor());
+    //QPen textPen = QPen(themeRef_->findHighlightForegroundColor());
+    //QPen textPen = QPen(QColor(241, 241, 241));
+    //QPen namePen = QPen(QColor(78, 201, 176));
+    QPen namePen = QPen(themeRef_->foregroundColor());
+    //painter->setPen(namePen);
     painter->drawText(nameRect, sLabel);
     //painter->drawText(option.rect, sUsage);
     if (sType != "void")
     {
         //painter->drawText(hyphenRect, " - ");
-        painter->setPen(typePen);
+        //painter->setPen(typePen);
         painter->drawText(typeRect, sType);
     }
     painter->restore();
@@ -558,7 +598,7 @@ QSize AutoCompleteDelegate::sizeHint(const QStyleOptionViewItem &  option ,
     return QSize(100, 15);
 }
 
-FakeToolTip::FakeToolTip(QWidget *parent) :
+FakeToolTip::FakeToolTip(TextEditorController *controller, QWidget *parent) :
     QWidget(parent, Qt::ToolTip | Qt::WindowStaysOnTopHint)
 {
     setFocusPolicy(Qt::NoFocus);
@@ -566,6 +606,8 @@ FakeToolTip::FakeToolTip(QWidget *parent) :
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
     tipText.setHtml("");
+
+    controllerRef_ = controller;
 
     // Set the window and button text to the tooltip text color, since this
     // widget draws the background as a tooltip.
@@ -582,9 +624,17 @@ FakeToolTip::FakeToolTip(QWidget *parent) :
 
 void FakeToolTip::setText(const QString text)
 {
-    tipText.setDefaultStyleSheet("p {color:#ffffff}; h1 {color:#ff8888}");
+    TextRenderer* renderer = controller()->textRenderer();
+    TextTheme* themeRef_ = renderer->theme();
+    tipText.setDefaultStyleSheet("p {color:" + themeRef_->foregroundColor().name() + "}");
     tipText.setHtml(QString("<p>%1</p>").arg(text));
+    //tipText.setHtml(QString("%1").arg(text));
     //tipText.setHtml("<font color=white>" + text + "</font>");
+}
+
+TextEditorController *FakeToolTip::controller()
+{
+    return controllerRef_;
 }
 
 void FakeToolTip::paintEvent(QPaintEvent *e)
@@ -593,8 +643,13 @@ void FakeToolTip::paintEvent(QPaintEvent *e)
     QPainter *p = new QPainter(this);
     QStyleOptionFrame *opt = new QStyleOptionFrame();
     QRect labelRect, textRect;
+    //controller()->textRenderer();
+    TextRenderer* renderer = controller()->textRenderer();
+    TextTheme* themeRef_ = renderer->theme();
     opt->init(this);
     style->drawPrimitive(QStyle::PE_PanelTipLabel, opt, p);
+
+    tipText.setDefaultFont(controller()->textDocument()->config()->font());
 
     labelRect = this->rect();
 
@@ -608,9 +663,12 @@ void FakeToolTip::paintEvent(QPaintEvent *e)
     labelRect.setWidth(labelRect.width() - 2);
     labelRect.setHeight(labelRect.height() - 2);
 
-    p->fillRect(labelRect, QColor(37, 37, 38));
+    p->fillRect(labelRect, themeRef_->backgroundColor());//renderer->theme()->backgroundColor()//QColor(37, 37, 38));
 
     p->translate(-1, -1);
+
+    p->setPen(themeRef_->foregroundColor());
+    //tipText.setDefaultStyleSheet();
     tipText.drawContents(p, labelRect);
 
     p->end();
