@@ -50,7 +50,7 @@ class TextEditorAutoCompleteComponent : public QWidget
 public:
     explicit TextEditorAutoCompleteComponent(TextEditorController* controller, TextEditorComponent *parent);
 
-    TextEditorController* controller();
+    TextEditorController* controller() const;
 
     QSize sizeHint() const;
 protected:

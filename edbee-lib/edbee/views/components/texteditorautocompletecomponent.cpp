@@ -85,7 +85,7 @@ TextEditorAutoCompleteComponent::TextEditorAutoCompleteComponent(TextEditorContr
 
 
 /// Returns the current text editor controller
-TextEditorController *TextEditorAutoCompleteComponent::controller()
+TextEditorController *TextEditorAutoCompleteComponent::controller() const
 {
     return controllerRef_;
 }
@@ -93,7 +93,10 @@ TextEditorController *TextEditorAutoCompleteComponent::controller()
 QSize TextEditorAutoCompleteComponent::sizeHint() const
 {
     if(!listWidgetRef_) return QSize();
-    return QSize(350, ( qMin(listWidgetRef_->count(), 10) * 15 ) + 5);
+    //return QSize(350, ( qMin(listWidgetRef_->count(), 10) * 15 ) + 5);
+    const QFont font = controller()->textDocument()->config()->font();
+    QFontMetrics fm(font);
+    return QSize(350, ( qMin(listWidgetRef_->count(), 10) * fm.height() ) + 4 );
     //return listWidgetRef_->sizeHint();
 }
 
@@ -201,7 +204,9 @@ bool TextEditorAutoCompleteComponent::fillAutoCompleteList(TextDocument* documen
     {
         hide();
     }
-    setFixedHeight( ( qMin(listWidgetRef_->count(), 10) * 15 ) + 4 );
+    QFont font = controller()->textDocument()->config()->font();
+    QFontMetrics fm(font);
+    setFixedHeight( ( qMin(listWidgetRef_->count(), 10) * fm.height() ) + 4 );
     if( items.length() > 10 ) {
         listWidgetRef_->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
     } else {
@@ -505,25 +510,17 @@ void AutoCompleteDelegate::paint(QPainter *painter, const QStyleOptionViewItem &
     //Edbee::themeManager() edbee::Edbee::instance()->themeManager();
     //TextThemeManager* tm = edbee::Edbee::instance()->themeManager();
            //    themeManager = edbee->themeManager();
-    qDebug() << "paint 1";
-    qDebug() << "controller ->" << controller();
-    qDebug() << "renderer ->" << controller()->textRenderer();
     //if controller()->textRenderer()->
     TextRenderer* renderer = controller()->textRenderer();
-    qDebug() << "paint 2";
     TextTheme* themeRef_ = renderer->theme();
-    qDebug() << "paint 3";
     //painter->setBackground( th
     //themeRef_->backgroundColor() );
     painter->setPen( themeRef_->caretColor() );//themeRef_->caretColor() );//themeRef_->foregroundColor() );
-    qDebug() << "paint 4";
     //painter->fillRect( *renderer()->clipRect(), themeRef_->backgroundColor() );
     //QFont font("Consolas", 9);
     //QFont font = TextEditorConfig::font();
     QFont font = controller()->textDocument()->config()->font();
-    qDebug() << "paint 5";
     QFontMetrics fm(font);
-    qDebug() << "paint 6";
     //pHost->mDisplayFont;
     //TextRenderer* renderer = controller()->textRenderer();
     //TextRenderer* renderer = listWidget
@@ -533,13 +530,10 @@ void AutoCompleteDelegate::paint(QPainter *painter, const QStyleOptionViewItem &
     else
         //painter->fillRect(option.rect, QColor(37, 37, 38));
         painter->fillRect(option.rect, renderer->theme()->backgroundColor());
-    qDebug() << "paint 7";
     painter->save();
-    qDebug() << "paint 8";
 
     painter->setRenderHint(QPainter::Antialiasing, true);
     //painter->setPen(Qt::P);
-    qDebug() << "paint 9";
     //if (option.state & QStyle::State_Selected)
         //painter->setBrush(option.palette.highlightedText());
         // //painter->setPen(themeRef_->findHighlightForegroundColor());
@@ -554,7 +548,6 @@ void AutoCompleteDelegate::paint(QPainter *painter, const QStyleOptionViewItem &
     //QString sName = str.split("(").value(0);
     //QString sUsage = str;
     //QString sReturn = index;
-    qDebug() << "paint 10";
 
     QString sLabel = index.data(Qt::DisplayRole).toString();
     int sKind = index.data(Qt::DecorationRole).toInt();
@@ -595,7 +588,10 @@ QSize AutoCompleteDelegate::sizeHint(const QStyleOptionViewItem &  option ,
                               const QModelIndex &  index ) const
 {
     //return QSize(400, 15);
-    return QSize(100, 15);
+    //return QSize(100, 15);
+    const QFont font = controller()->textDocument()->config()->font();
+    QFontMetrics fm(font);
+    return QSize(100, ( fm.height() ) );
 }
 
 FakeToolTip::FakeToolTip(TextEditorController *controller, QWidget *parent) :
