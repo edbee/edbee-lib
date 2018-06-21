@@ -85,7 +85,10 @@ QList<TextAutoCompleteItem *> StringTextAutoCompleteProvider::findAutoCompleteIt
 
     foreach( TextAutoCompleteItem* item, itemList_ ) {
         int match = item->matchLabelScore(document,range,word);
-        if( match ) {
+        if( match && match == 1 && item->kind() == 14 ) {
+            items.clear();
+            return items.values();
+        } else if( match ) {
             items.insert(match, item);
         }
     }
@@ -101,7 +104,7 @@ QList<TextAutoCompleteItem *> StringTextAutoCompleteProvider::findAutoCompleteIt
 /// directly add a label
 void StringTextAutoCompleteProvider::add(const QString &label, const int kind, const QString &detail, const QString &documentation)
 {
-    itemList_.push_back(new TextAutoCompleteItem(label, kind, detail=="" ? label + "()" : detail, documentation));
+    itemList_.push_back(new TextAutoCompleteItem(label, kind, detail=="" && kind == 3 ? label + "()" : detail, documentation));
 }
 
 

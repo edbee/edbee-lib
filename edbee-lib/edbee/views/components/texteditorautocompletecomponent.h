@@ -8,6 +8,7 @@
 #include <QScrollBar>
 #include <QStylePainter>
 #include <QPointer>
+#include <QMenu>
 #include <QTextDocument>
 
 class QListWidget;
@@ -56,7 +57,6 @@ public:
 protected:
 
     bool shouldDisplayAutoComplete(TextRange& range, QString& word);
-    void showInfoTip();
     void hideInfoTip();
     bool fillAutoCompleteList(TextDocument *document, const TextRange &range, const QString& word );
 
@@ -77,9 +77,11 @@ public slots:
     void listItemClicked(QListWidgetItem*item);
     void listItemDoubleClicked(QListWidgetItem*item);
     void selectItemOnHover(QModelIndex modelIndex);
+    void showInfoTip();
 
 private:
     TextEditorController* controllerRef_;       ///< A reference to the controller
+    QMenu* menuRef_;
     QListWidget* listWidgetRef_;                ///< The current autocomplete words
     TextEditorComponent* editorComponentRef_;   ///< Reference to the editor component
     bool eventBeingFiltered_;                   ///< Prevent endless double filter when forwarding event to list item
