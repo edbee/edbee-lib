@@ -29,7 +29,7 @@ class FakeToolTip : public QWidget
 public:
     explicit FakeToolTip(TextEditorController *controller, QWidget *parent = 0);
     void setText(const QString text);
-    QTextDocument tipText;
+    QTextDocument* tipText;
     TextEditorController* controller();
 
 private:

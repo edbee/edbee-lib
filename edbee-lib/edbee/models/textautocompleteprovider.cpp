@@ -88,7 +88,7 @@ QList<TextAutoCompleteItem *> StringTextAutoCompleteProvider::findAutoCompleteIt
         if( match && match == 1 && item->kind() == 14 ) {
             items.clear();
             return items.values();
-        } else if( match ) {
+        } else if( match && item->kind() != 14 ) {
             items.insert(match, item);
         }
     }
