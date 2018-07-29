@@ -10,6 +10,7 @@
 #include <QTextEdit>
 #include <QtGui>
 #include <QTime>
+#include <QDesktopWidget>
 
 #include "edbee/edbee.h"
 #include "edbee/models/textautocompleteprovider.h"
@@ -26,7 +27,7 @@
 namespace edbee {
 
 TextEditorAutoCompleteComponent::TextEditorAutoCompleteComponent(TextEditorController *controller, TextEditorComponent *parent)
-    : QWidget(parent)//: QWidget(parent, Qt::ToolTip | Qt::WindowStaysOnTopHint)
+    : QWidget(parent)
     , controllerRef_(controller)
     , menuRef_(nullptr)
     , editorComponentRef_(parent)
@@ -43,9 +44,7 @@ TextEditorAutoCompleteComponent::TextEditorAutoCompleteComponent(TextEditorContr
     listWidgetRef_->installEventFilter(this);
     menuRef_->installEventFilter(this);
     menuRef_->setStyleSheet("QMenu { border: 1px solid black; }");
-    //listWidgetRef_->setStyleSheet("border: 1px solid black");
     listWidgetRef_->setObjectName("listWidgetRef");
-    //layout->addWidget(listWidgetRef_);
     setLayout(layout);
     resize(0, 0);
 
@@ -54,39 +53,16 @@ TextEditorAutoCompleteComponent::TextEditorAutoCompleteComponent(TextEditorContr
     menuRef_->addAction(wAction);
 
     listWidgetRef_->setFocus();
-    //menuRef_->setFocus();
-    //this->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
-    //addWidget(listWidgetRef_);
 
-    //layout->setContentsMargins(0, 0, 0, 0);
-    //layout->setStretch(1, 1);
-    //listWidgetRef_->setSizeAdjustPolicy(QListWidget::AdjustToContents);
-    //layout->->setSizeAdjustPolicy(QListWidget::AdjustToContents);
-    //this->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    //this->resize(350,150); //this->resize(350,150);
     hide();
 
     infoTipRef_ = new FakeToolTip(controllerRef_, this);
 
-    QPalette p = listWidgetRef_->palette();// listWidgetRef_->
+    QPalette p = listWidgetRef_->palette();
     p.setColor(QPalette::Highlight, p.color(QPalette::Highlight));  // prevents the non-focus gray color
     p.setColor(QPalette::HighlightedText, p.color(QPalette::HighlightedText));
     p.setColor(QPalette::Base, QColor(37, 37, 38));
     p.setColor(QPalette::Text, Qt::white);
-    //listWidgetRef_->setPalette(p);
-    //listWidgetRef_->setToolTip(listWidgetRef_->toolTip());
-
-    //editorComponentRef_->installEventFilter(this);
-
-    // prevent the widgets from having foxus
-    //setFocusProxy(editorComponentRef_);
-    //setFocusPolicy(Qt::NoFocus);
-    //SSRlistWidgetRef_->setParent(0);
-    //listWidgetRef_->setWindowFlags(Qt::ToolTip);
-    //listWidgetRef_->setFocusPolicy(Qt::NoFocus);
-
-    //listWidgetRef_->setFocusPolicy(Qt::ClickFocus);
-    //listWidgetRef_->setFocusProxy(editorComponentRef_);
 
     listWidgetRef_->setAttribute(Qt::WA_NoMousePropagation,true);   // do not wheel
     listWidgetRef_->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
@@ -100,10 +76,7 @@ TextEditorAutoCompleteComponent::TextEditorAutoCompleteComponent(TextEditorContr
     listWidgetRef_->setMouseTracking(true);
     connect( listWidgetRef_, SIGNAL(itemClicked(QListWidgetItem*)), this, SLOT(listItemClicked(QListWidgetItem*)));
     connect( listWidgetRef_, SIGNAL(itemDoubleClicked(QListWidgetItem*)), this, SLOT(listItemDoubleClicked(QListWidgetItem*)));
-    //connect( listWidgetRef_, SIGNAL(currentRowChanged(int)), this, SLOT(showToolTip()));
-    //connect( listWidgetRef_, SIGNAL(itemSelectionChanged()), this, SLOT(showToolTip()));
     connect( listWidgetRef_, SIGNAL(currentItemChanged(QListWidgetItem*, QListWidgetItem*)), this, SLOT(showInfoTip()));
-    //connect( listWidgetRef_, SIGNAL(entered(QModelIndex)), this, SLOT(selectItemOnHover(QModelIndex)));
 }
 
 
@@ -116,14 +89,8 @@ TextEditorController *TextEditorAutoCompleteComponent::controller() const
 QSize TextEditorAutoCompleteComponent::sizeHint() const
 {
     if(!listWidgetRef_) return QSize();
-    //return QSize();
-    //return QSize(350, ( qMin(listWidgetRef_->count(), 10) * 15 ) + 5);
 
-    const QFont font = controller()->textDocument()->config()->font();
-    QFontMetrics fm(font);
-    return QSize(350, ( qMin(listWidgetRef_->count(), 10) * fm.height() ) + 4 );
-
-    //return listWidgetRef_->sizeHint();
+    return QSize(850, ( qMin(listWidgetRef_->count(), 10) * 15 ) + 5);
 }
 
 /// This method check if the autocomplete should be shown
@@ -152,7 +119,6 @@ bool TextEditorAutoCompleteComponent::shouldDisplayAutoComplete(TextRange& range
 
 void TextEditorAutoCompleteComponent::showInfoTip()
 {
-    qDebug() << "showInfoTip()";
     if( !listWidgetRef_->isVisible() )
         return;
 
@@ -160,12 +126,9 @@ void TextEditorAutoCompleteComponent::showInfoTip()
     if( !current.isValid() )
         return;
 
-    QString infoTip = current.data(Qt::UserRole).toString();//Qt::WhatsThisRole).toString();
+    QString infoTip = current.data(Qt::UserRole).toString();
     if( infoTip.isEmpty() ) {
-        //delete infoTipRef_.data();
         infoTip = "No tooltip data found!";
-        qDebug() << "no data!";
-        //return;
     }
 
     infoTipRef_->setText(infoTip);
@@ -174,9 +137,29 @@ void TextEditorAutoCompleteComponent::showInfoTip()
     infoTipRef_->tipText->setDefaultFont(font);
 
     QFontMetrics fm(font);
+    int maxWidth = 0;
 
-    menuRef_->resize(QSize(352, ( qMin(listWidgetRef_->count(), 10) * fm.height() ) + 6 ));
-    listWidgetRef_->resize(QSize(350, ( qMin(listWidgetRef_->count(), 10) * fm.height() + 4 )));
+    //for( QListWidgetItem *item : listWidgetRef_->findItems("*", Qt::MatchWildcard)) {
+    for( int i=0; i<listWidgetRef_->count(); i++ ){
+        QListWidgetItem *item = listWidgetRef_->item(i);
+        QString sLabel = item->data(Qt::DisplayRole).toString();
+        QString sDetail = item->data(Qt::UserRole).toString();
+        QString sType = "";
+        int widthMod = 4;
+        if( listWidgetRef_->count() > 10 )
+            widthMod = 16;
+        if( sDetail.contains(" = ") ){
+            sType = QString("%1").arg(sDetail.split(" = ").value(0));
+            int width = fm.width(QString("%1   %2").arg(sLabel).arg(sType)) + widthMod;
+            maxWidth = qMax(width, maxWidth);
+        } else {
+            int width = fm.width(QString("%1").arg(sLabel)) + widthMod;
+            maxWidth = qMax(width, maxWidth);
+        }
+    }
+
+    menuRef_->resize(QSize(maxWidth + 2, ( qMin(listWidgetRef_->count(), 10) * fm.height() ) + 6 ));
+    listWidgetRef_->resize(QSize(maxWidth + 0, ( qMin(listWidgetRef_->count(), 10) * fm.height() + 4 )));
 
     QRect r = listWidgetRef_->visualItemRect(listWidgetRef_->currentItem());
     int xOffset;
@@ -185,17 +168,26 @@ void TextEditorAutoCompleteComponent::showInfoTip()
     else
         xOffset = 5+1;
 
-    QPoint p(listWidgetRef_->parentWidget()->mapToGlobal(r.topRight()).x() + xOffset, listWidgetRef_->parentWidget()->mapToGlobal(r.topRight()).y() + 1);
-
-    infoTipRef_->move(p);
+    //fetch the current selection
+    TextRange range = controller()->textSelection()->range(0);
 
     QSize tipSize = infoTipRef_->tipText->documentLayout()->documentSize().toSize();
 
-    infoTipRef_->show();
     infoTipRef_->resize(tipSize.width(), tipSize.height() - 4);
-    infoTipRef_->raise();
 
-    //m_infoTimer.setInterval(0);
+    //position the list
+    positionWidgetForCaretOffset( qMax(0,range.caret() - currentWord_.length()) );
+
+    QPoint newLoc(listWidgetRef_->parentWidget()->mapToGlobal(r.topRight()).x() + xOffset, listWidgetRef_->parentWidget()->mapToGlobal(r.topRight()).y() + 1);
+
+    QRect screen = QApplication::desktop()->availableGeometry(this);
+    if( newLoc.x() + infoTipRef_->width() > screen.x() + screen.width() ){
+        newLoc.setX(menuRef_->x() - infoTipRef_->width() - 1);
+    }
+
+    infoTipRef_->move(newLoc);
+    infoTipRef_->show();
+    infoTipRef_->raise();
 }
 
 void TextEditorAutoCompleteComponent::hideInfoTip()
@@ -212,31 +204,30 @@ bool TextEditorAutoCompleteComponent::fillAutoCompleteList(TextDocument* documen
     if( items.length() > 0 ) {
         foreach( TextAutoCompleteItem* item, items ) {
             QListWidgetItem *wItem = new QListWidgetItem();
-            //wItem->setText(item->usage());
             wItem->setData(Qt::DisplayRole, item->label());
             wItem->setData(Qt::DecorationRole, item->kind());
             wItem->setData(Qt::UserRole, item->detail());
             wItem->setData(Qt::WhatsThisRole, item->documentation());
-            //wItem->setToolTip(item->usage());
             listWidgetRef_->addItem(wItem);
-            //(item->usage().length() > 0) ? listWidgetRef_->addItem(item->label() + " - " + item->usage()) : listWidgetRef_->addItem(item->label());
         }
         listWidgetRef_->setCurrentIndex(listWidgetRef_->model()->index(0,0) );
-        //listWidgetRef_->currentItem()->setToolTip(listWidgetRef_->currentItem()->toolTip());
-        //listWidgetRef_->setToolTip(listWidgetRef_->toolTip());
     }
     else
     {
         hide();
     }
+
     QFont font = controller()->textDocument()->config()->font();
     QFontMetrics fm(font);
+
     setFixedHeight( ( qMin(listWidgetRef_->count(), 10) * fm.height() ) + 4 );
+
     if( items.length() > 10 ) {
         listWidgetRef_->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
     } else {
         listWidgetRef_->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     }
+
     return items.length() > 0;
 }
 
@@ -247,23 +238,27 @@ void TextEditorAutoCompleteComponent::positionWidgetForCaretOffset(int offset)
 {
     // find the caret position
     TextRenderer* renderer = controller()->textRenderer();
-    int y = renderer->yPosForOffset(offset) + renderer->lineHeight();
-    int x = renderer->xPosForOffset(offset);
-    //QPoint newLoc = listWidgetRef_->parentWidget()->parentWidget()->mapToGlobal(QPoint(x, y));
+    int y = renderer->yPosForOffset(offset);
+    int x = renderer->xPosForOffset(offset) + 35 + 3; //the line number display is 35px wide
     QPoint newLoc = editorComponentRef_->parentWidget()->parentWidget()->mapToGlobal(QPoint(x, y));
-    //QPoint p(listWidgetRef_->parentWidget()->mapToGlobal(r.topRight()).x() + xOffset, listWidgetRef_->parentWidget()->mapToGlobal(r.topRight()).y());
 
-    // TODO: Better position it so it fits no screen
+    //We want to constrain the list to only show within the available screen space
+    QRect screen = QApplication::desktop()->availableGeometry(this);
+    newLoc.setX(qMax(screen.left(), newLoc.x()));                                   //constrain the origin of the list to the leftmost pixel
+    newLoc.setY(qMax(screen.top(), newLoc.y()));                                    //constrain the origin of the list to the topmost pixel
+    newLoc.setX(qMin(screen.x() + screen.width() - menuRef_->width(), newLoc.x())); //ensure that the entire width of the list can be shown to the right
+    if( newLoc.y() + menuRef_->height() > screen.bottom() ){                        //if the list could go below the bottom, draw above
+        newLoc.setY(qMin(newLoc.y(), screen.bottom()) - menuRef_->height());        //positions the list above the word
+    } else {
+        newLoc.setY(newLoc.y() + renderer->lineHeight()); //places it below the line, as normal
+    }
     menuRef_->move(newLoc.x(), newLoc.y());
 }
 
 /// intercepts hide() calls to inform the tooltip to hide as well
 void TextEditorAutoCompleteComponent::hideEvent(QHideEvent *event)
 {
-//    listWidgetRef_->hide();
-    qDebug() << "void TextEditorAutoCompleteComponent::hideEvent(QHideEvent *event)" << event;
     infoTipRef_->hide();
-    //menuRef_->close();
     event->isAccepted();
 }
 
@@ -275,9 +270,7 @@ bool TextEditorAutoCompleteComponent::eventFilter(QObject *obj, QEvent *event)
         hideInfoTip();
         return QObject::eventFilter(obj, event);
     }
-    //if( obj == listWidgetRef_ && event->type()==QEvent::KeyPress && isVisible() ) {
     if( obj == listWidgetRef_ && event->type()==QEvent::KeyPress ) {
-        //qDebug() << "if( obj == listWidgetRef_ && event->type()==QEvent::KeyPress && isVisible() ) {";
         QKeyEvent* key = static_cast<QKeyEvent*>(event);
 
         // text keys are allowed
@@ -286,43 +279,35 @@ bool TextEditorAutoCompleteComponent::eventFilter(QObject *obj, QEvent *event)
             if( nextChar.isLetterOrNumber() ) {
               QApplication::sendEvent(editorComponentRef_, event);
               return true;
-              //return QObject::eventFilter(obj, event);
             }
         }
 
         // escape key
         switch( key->key() ) {
             case Qt::Key_Escape:
-                qDebug() << "Escape";
-                menuRef_->close();//hide();
+                menuRef_->close();
                 return true; // stop event
 
             case Qt::Key_Enter:
             case Qt::Key_Return:
             case Qt::Key_Tab:
-                qDebug() << "Ent/Ret/Tab";
                 if( currentWord_ == listWidgetRef_->currentItem()->text() ) { // sends normal enter/return/tab if you've typed a full word
-                    menuRef_->close();//hide();
+                    menuRef_->close();
                     QApplication::sendEvent(editorComponentRef_, event);
                     return true;
-                    //return false;
                 } else {
                     insertCurrentSelectedListItem();
-                    menuRef_->close();//hide();
+                    menuRef_->close();
                     return true;
                 }
 
-            case Qt::Key_Backspace:
-                qDebug() << "Backspace";
+        case Qt::Key_Backspace:
                 QApplication::sendEvent(editorComponentRef_, event);
                 return true;
-                //return QObject::eventFilter(obj, event);
 
             case Qt::Key_Shift: //ignore shift, don't hide
-                qDebug() << "Shift";
                 QApplication::sendEvent(editorComponentRef_, event);
                 return true;
-                //return false;
 
             // forward special keys to list
             case Qt::Key_Up:
@@ -333,10 +318,9 @@ bool TextEditorAutoCompleteComponent::eventFilter(QObject *obj, QEvent *event)
         }
 
         // default operation is to hide and continue the event
-        menuRef_->close();//hide();
+        menuRef_->close();
         QApplication::sendEvent(editorComponentRef_, event);
         return true;
-        //return false; // continue event
 
     }
     return QObject::eventFilter(obj, event);
@@ -361,16 +345,15 @@ void TextEditorAutoCompleteComponent::updateList()
 
     // when the character after
     if(!shouldDisplayAutoComplete(range, currentWord_)) {
-      menuRef_->close();//hide();
+      menuRef_->close();
       return;
     }
-
-    // position the widget
-    positionWidgetForCaretOffset( qMax(0,range.caret() - currentWord_.length()) );
 
     // fills the autocomplete list with the curent word
     if( fillAutoCompleteList(doc, range, currentWord_)) {
         menuRef_->popup(menuRef_->pos());
+
+        // position the widget
         showInfoTip();
     } else {
         menuRef_->close();
@@ -393,13 +376,12 @@ void TextEditorAutoCompleteComponent::listItemClicked(QListWidgetItem* item)
 {
     item->setSelected(true);
     showInfoTip();
-    //item->setToolTip(item->toolTip());
 }
 
-void TextEditorAutoCompleteComponent::listItemDoubleClicked(QListWidgetItem* item)
+void TextEditorAutoCompleteComponent::listItemDoubleClicked(QListWidgetItem*)
 {
     insertCurrentSelectedListItem();
-    menuRef_->close();//hide();
+    menuRef_->close();
 }
 
 void TextEditorAutoCompleteComponent::selectItemOnHover(QModelIndex modelIndex)
@@ -421,88 +403,52 @@ TextEditorController *AutoCompleteDelegate::controller() const
 void AutoCompleteDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option,
                           const QModelIndex &index) const
 {
-    //Edbee::themeManager() edbee::Edbee::instance()->themeManager();
-    //TextThemeManager* tm = edbee::Edbee::instance()->themeManager();
-           //    themeManager = edbee->themeManager();
-    //if controller()->textRenderer()->
     TextRenderer* renderer = controller()->textRenderer();
     TextTheme* themeRef_ = renderer->theme();
-    //painter->setBackground( th
-    //themeRef_->backgroundColor() );
-    painter->setPen( themeRef_->caretColor() );//themeRef_->caretColor() );//themeRef_->foregroundColor() );
-    //painter->fillRect( *renderer()->clipRect(), themeRef_->backgroundColor() );
-    //QFont font("Consolas", 9);
-    //QFont font = TextEditorConfig::font();
+
+    painter->setPen( themeRef_->caretColor() );
+
     QFont font = controller()->textDocument()->config()->font();
     QFontMetrics fm(font);
-    //pHost->mDisplayFont;
-    //TextRenderer* renderer = controller()->textRenderer();
-    //TextRenderer* renderer = listWidget
+
     if (option.state & QStyle::State_Selected)
-        //painter->fillRect(option.rect, QColor(0, 122, 204));
         painter->fillRect(option.rect, renderer->theme()->selectionColor());
     else
-        //painter->fillRect(option.rect, QColor(37, 37, 38));
         painter->fillRect(option.rect, renderer->theme()->backgroundColor());
     painter->save();
 
     painter->setRenderHint(QPainter::Antialiasing, true);
-    //painter->setPen(Qt::P);
-    //if (option.state & QStyle::State_Selected)
-        //painter->setBrush(option.palette.highlightedText());
-        // //painter->setPen(themeRef_->findHighlightForegroundColor());
-        //painter->setPen(themeRef_->findHighlightForegroundColor());
-        //painter->setBrush(themeRef_->findHighlightForegroundColor());
-        //painter->setBrush(themeRef_->caretColor());
-    //else
-        painter->setPen(themeRef_->foregroundColor());
-        //painter->setBrush(option.palette.text());
-        //painter->setBrush(themeRef_->foregroundColor());
-    //QString str = index.data(Qt::DisplayRole).toString();
-    //QString sName = str.split("(").value(0);
-    //QString sUsage = str;
-    //QString sReturn = index;
+    painter->setPen(themeRef_->foregroundColor());
 
     QString sLabel = index.data(Qt::DisplayRole).toString();
-    int sKind = index.data(Qt::DecorationRole).toInt();
     QString sDetail = index.data(Qt::UserRole).toString();
     QString sDocumentation = index.data(Qt::WhatsThisRole).toString();
     QString sType = "void";
+
     if (sDetail.contains(" = ")) {
         sType = sDetail.split(" = ").value(0);
-        //sUsage = str.split(" = ").value(1);
     }
-    //font.setBold(true);
+
     QRect typeRect = option.rect;
     QRect hyphenRect = option.rect;
     QRect nameRect = option.rect;
+    QPen typePen = QPen(themeRef_->findHighlightForegroundColor());
+    QPen namePen = QPen(themeRef_->foregroundColor());
+
     hyphenRect.setX(hyphenRect.x() + fm.width(sLabel));
-    //typeRect.setX(nameRect.x() + fm.width(sName + " : "));
     typeRect.setX(nameRect.x() + nameRect.width() - fm.width(sType) - 1);
     painter->setFont(font);
-    //QPen typePen = QPen(QColor(86, 156, 214));
-    QPen typePen = QPen(themeRef_->findHighlightForegroundColor());
-    //QPen textPen = QPen(themeRef_->findHighlightForegroundColor());
-    //QPen textPen = QPen(QColor(241, 241, 241));
-    //QPen namePen = QPen(QColor(78, 201, 176));
-    QPen namePen = QPen(themeRef_->foregroundColor());
-    //painter->setPen(namePen);
     painter->drawText(nameRect, sLabel);
-    //painter->drawText(option.rect, sUsage);
+
     if (sType != "void")
     {
-        //painter->drawText(hyphenRect, " - ");
-        //painter->setPen(typePen);
         painter->drawText(typeRect, sType);
     }
     painter->restore();
 }
 
-QSize AutoCompleteDelegate::sizeHint(const QStyleOptionViewItem &  option ,
-                              const QModelIndex &  index ) const
+QSize AutoCompleteDelegate::sizeHint(const QStyleOptionViewItem&, const QModelIndex&) const
 {
-    //return QSize(400, 15);
-    //return QSize(100, 15);
     const QFont font = controller()->textDocument()->config()->font();
     QFontMetrics fm(font);
     return QSize(100, ( fm.height() ) );
@@ -529,14 +475,7 @@ FakeToolTip::FakeToolTip(TextEditorController *controller, QWidget *parent) :
     p.setColor(QPalette::Inactive, QPalette::ButtonText, toolTipTextColor);
     setPalette(p);
 
-    //const int margin = 1 + style()->pixelMetric(QStyle::PM_ToolTipLabelFrameWidth, 0, this);
-    //setContentsMargins(margin + 1, margin, margin, margin);
-
-    //setContentsMargins(0, 0, 0, 0);
-
-    connect(tipText, SIGNAL(documentLayoutChanged()), this, SLOT(docLayChanged()));
-
-    setWindowOpacity(style()->styleHint(QStyle::SH_ToolTipLabel_Opacity, 0, this) / 255.0);
+    setWindowOpacity(style()->styleHint(QStyle::SH_ToolTipLabel_Opacity, nullptr, this) / 255.0);
 }
 
 void FakeToolTip::setText(const QString text)
@@ -552,41 +491,35 @@ TextEditorController *FakeToolTip::controller()
     return controllerRef_;
 }
 
-void FakeToolTip::paintEvent(QPaintEvent *e)
+void FakeToolTip::paintEvent(QPaintEvent*)
 {
     QStyle *style = this->style();
     QPainter *p = new QPainter(this);
     QStyleOptionFrame *opt = new QStyleOptionFrame();
-    QRect labelRect, textRect;
-    //controller()->textRenderer();
+    QRect labelRect;
     TextRenderer* renderer = controller()->textRenderer();
     TextTheme* themeRef_ = renderer->theme();
+
     opt->init(this);
-     style->drawPrimitive(QStyle::PE_PanelTipLabel, opt, p);
+    style->drawPrimitive(QStyle::PE_PanelTipLabel, opt, p);
 
     tipText->setDefaultFont(controller()->textDocument()->config()->font());
 
     labelRect = this->rect();
-
-    //labelRect.setX(labelRect.x() + 2);
-    //labelRect.setY(labelRect.y() + 2);
-    //labelRect.setWidth(labelRect.width() - 2 + 250);
-    //labelRect.setHeight(labelRect.height() - 2 + 400);
 
     labelRect.setX(labelRect.x() + 2);
     labelRect.setY(labelRect.y() + 2);
     labelRect.setWidth(labelRect.width() - 2);
     labelRect.setHeight(labelRect.height() - 2);
 
-    p->fillRect(labelRect, themeRef_->backgroundColor());//renderer->theme()->backgroundColor()//QColor(37, 37, 38));
+    p->fillRect(labelRect, themeRef_->backgroundColor());
 
     p->translate(-2, -2);
-    //p->translate(-1, -1);
 
     p->setPen(themeRef_->foregroundColor());
     labelRect.setWidth(labelRect.width() + 1);
     labelRect.setHeight(labelRect.height() + 1);
-    //tipText.setDefaultStyleSheet();
+
     tipText->drawContents(p, labelRect);
 
     p->end();
@@ -599,8 +532,6 @@ void FakeToolTip::resizeEvent(QResizeEvent *)
     QStyleHintReturnMask frameMask;
     QStyleOption option;
     option.init(this);
-    //if (style()->styleHint(QStyle::SH_ToolTip_Mask, &option, this, &frameMask))
-//        setMask(frameMask.region);
 }
 
 }// edbee

@@ -46,7 +46,7 @@ QString TextAutoCompleteItem::documentation() const
     to Unicode using the fromUtf8() function.
     \sa fromLatin1(), fromLocal8Bit(), fromUtf8(), QByteArray::fromStdString()
 */
-int TextAutoCompleteItem::matchLabelScore(TextDocument *document, const TextRange &range, const QString &word)
+int TextAutoCompleteItem::matchLabelScore(TextDocument*, const TextRange&, const QString &word)
 {
     /// For now a simple prefix-prefix search. Later fuzzy search.
     /// Inspiration:
@@ -55,8 +55,7 @@ int TextAutoCompleteItem::matchLabelScore(TextDocument *document, const TextRang
     /// We probably need to calculate a score
     if( word.length() < 3 )
         return 0;
-    //if ( label_.toLower() == (word.toLower()) ) {
-    if( label_ == word ) {
+        if( label_ == word ) {
         return 1;
     } else if ( label_.toLower().startsWith(word.toLower()) ) {
         return 2;
@@ -114,9 +113,6 @@ void StringTextAutoCompleteProvider::give(TextAutoCompleteItem *item)
     itemList_.push_back(item);
 }
 
-
-
-
 // ------------------------------
 
 TextAutoCompleteProviderList::TextAutoCompleteProviderList(TextAutoCompleteProvider *parentProvider)
@@ -156,7 +152,6 @@ void TextAutoCompleteProviderList::setParentProvider(TextAutoCompleteProvider *p
 {
     parentProviderRef_ = provider;
 }
-
 
 
 // -----------------------------
