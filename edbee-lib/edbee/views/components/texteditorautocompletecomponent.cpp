@@ -185,6 +185,7 @@ void TextEditorAutoCompleteComponent::showInfoTip()
         newLoc.setX(menuRef_->x() - infoTipRef_->width() - 1);
     }
 
+    infoTipRef_->repaint();
     infoTipRef_->move(newLoc);
     infoTipRef_->show();
     infoTipRef_->raise();
