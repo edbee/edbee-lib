@@ -18,6 +18,7 @@
 #include "edbee/models/texteditorconfig.h"
 #include "edbee/texteditorcontroller.h"
 #include "edbee/views/components/texteditorcomponent.h"
+#include "edbee/views/components/textmargincomponent.h"
 #include "edbee/views/textrenderer.h"
 #include "edbee/views/textselection.h"
 #include "edbee/views/texttheme.h"
@@ -26,11 +27,12 @@
 
 namespace edbee {
 
-TextEditorAutoCompleteComponent::TextEditorAutoCompleteComponent(TextEditorController *controller, TextEditorComponent *parent)
+TextEditorAutoCompleteComponent::TextEditorAutoCompleteComponent(TextEditorController *controller, TextEditorComponent *parent, TextMarginComponent *margin)
     : QWidget(parent)
     , controllerRef_(controller)
     , menuRef_(nullptr)
     , editorComponentRef_(parent)
+    , marginComponentRef_(margin)
     , eventBeingFiltered_(false)
     , infoTipRef_(nullptr)
 {
@@ -239,8 +241,9 @@ void TextEditorAutoCompleteComponent::positionWidgetForCaretOffset(int offset)
 {
     // find the caret position
     TextRenderer* renderer = controller()->textRenderer();
+    qDebug() << controller()->textRenderer()->viewportX();
     int y = renderer->yPosForOffset(offset) - controller()->textRenderer()->viewportY(); //offset the y position based on how far scrolled down the editor is
-    int x = renderer->xPosForOffset(offset) + 35 + 3; //the line number display is 35px wide
+    int x = renderer->xPosForOffset(offset) - controller()->textRenderer()->viewportX() + marginComponentRef_->widthHint() - 3; //adjusts x position based on scrollbars, line-number, and position in line
     QPoint newLoc = editorComponentRef_->parentWidget()->parentWidget()->mapToGlobal(QPoint(x, y));
 
     //We want to constrain the list to only show within the available screen space

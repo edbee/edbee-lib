@@ -19,6 +19,7 @@ namespace edbee {
 class TextDocument;
 class TextEditorController;
 class TextEditorComponent;
+class TextMarginComponent;
 class TextEditorWidget;
 class TextRange;
 
@@ -49,7 +50,7 @@ class TextEditorAutoCompleteComponent : public QWidget
 {
     Q_OBJECT
 public:
-    explicit TextEditorAutoCompleteComponent(TextEditorController* controller, TextEditorComponent *parent);
+    explicit TextEditorAutoCompleteComponent(TextEditorController* controller, TextEditorComponent *parent, TextMarginComponent *margin);
 
     TextEditorController* controller() const;
 
@@ -84,6 +85,7 @@ private:
     QMenu* menuRef_;
     QListWidget* listWidgetRef_;                ///< The current autocomplete words
     TextEditorComponent* editorComponentRef_;   ///< Reference to the editor component
+    TextMarginComponent* marginComponentRef_;   ///< Reference to the editor's margin
     bool eventBeingFiltered_;                   ///< Prevent endless double filter when forwarding event to list item
     QString currentWord_;                       ///< The current word beïng entered
     QPointer<FakeToolTip> infoTipRef_;

@@ -84,7 +84,7 @@ TextEditorWidget::TextEditorWidget( QWidget* parent)
 
     /// TODO: Check if this works.. It could be possible the layout screws this
     /// If I add this before the setLayout everything hangs :S ...
-    autoCompleteCompRef_ = new TextEditorAutoCompleteComponent(controller_,editCompRef_);
+    autoCompleteCompRef_ = new TextEditorAutoCompleteComponent( controller_, editCompRef_, marginCompRef_ );
 
 
     marginCompRef_->init();
