@@ -181,7 +181,7 @@ void TextEditorAutoCompleteComponent::showInfoTip()
     QPoint newLoc(listWidgetRef_->parentWidget()->mapToGlobal(r.topRight()).x() + xOffset, listWidgetRef_->parentWidget()->mapToGlobal(r.topRight()).y() + 1);
 
     QRect screen = QApplication::desktop()->availableGeometry(this);
-    if( newLoc.x() + infoTipRef_->width() > screen.x() + screen.width() ){
+    if( newLoc.x() + infoTipRef_->width() > screen.x() + screen.width() && (menuRef_->x() - infoTipRef_->width() - 1) >= 0 ){
         newLoc.setX(menuRef_->x() - infoTipRef_->width() - 1);
     }
 
@@ -239,7 +239,7 @@ void TextEditorAutoCompleteComponent::positionWidgetForCaretOffset(int offset)
 {
     // find the caret position
     TextRenderer* renderer = controller()->textRenderer();
-    int y = renderer->yPosForOffset(offset);
+    int y = renderer->yPosForOffset(offset) - controller()->textRenderer()->viewportY(); //offset the y position based on how far scrolled down the editor is
     int x = renderer->xPosForOffset(offset) + 35 + 3; //the line number display is 35px wide
     QPoint newLoc = editorComponentRef_->parentWidget()->parentWidget()->mapToGlobal(QPoint(x, y));
 
