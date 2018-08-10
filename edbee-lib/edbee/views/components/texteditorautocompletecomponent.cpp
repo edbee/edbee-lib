@@ -148,8 +148,10 @@ void TextEditorAutoCompleteComponent::showInfoTip()
         QString sDetail = item->data(Qt::UserRole).toString();
         QString sType = "";
         int widthMod = 4;
-        if( listWidgetRef_->count() > 10 )
-            widthMod = 16;
+        if( listWidgetRef_->count() > 10 ){
+            widthMod = listWidgetRef_->verticalScrollBar()->width();
+            sLabel = sLabel + " ";
+        }
         if( sDetail.contains(" = ") ){
             sType = QString("%1").arg(sDetail.split(" = ").value(0));
             int width = fm.width(QString("%1   %2").arg(sLabel).arg(sType)) + widthMod;
