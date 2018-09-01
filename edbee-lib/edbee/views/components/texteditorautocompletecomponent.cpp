@@ -133,6 +133,10 @@ void TextEditorAutoCompleteComponent::showInfoTip()
         infoTip = "No tooltip data found!";
     }
 
+    if( infoTipRef_.isNull() ) {
+        qDebug() << "Null infoTipRef_!!! We're probably about to crash!!!!!!11!";
+    }
+
     infoTipRef_->setText(infoTip);
 
     const QFont font = controller()->textDocument()->config()->font();
@@ -464,7 +468,7 @@ FakeToolTip::FakeToolTip(TextEditorController *controller, QWidget *parent) :
     QWidget(parent, Qt::ToolTip | Qt::WindowStaysOnTopHint )
 {
     setFocusPolicy(Qt::NoFocus);
-    setAttribute(Qt::WA_DeleteOnClose);
+    //setAttribute(Qt::WA_DeleteOnClose);
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
     tipText = new QTextDocument(this);
