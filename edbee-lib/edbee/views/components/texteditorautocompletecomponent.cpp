@@ -134,7 +134,7 @@ void TextEditorAutoCompleteComponent::showInfoTip()
     }
 
     if( infoTipRef_.isNull() ) {
-        qDebug() << "Null infoTipRef_!!! We're probably about to crash!!!!!!11!";
+        infoTipRef_ = new FakeToolTip(controllerRef_, this);
     }
 
     infoTipRef_->setText(infoTip);
