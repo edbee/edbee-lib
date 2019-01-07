@@ -2,6 +2,7 @@
 
 edbee.lib:
 
+- fix #79, Using backtab on empty document causes Q_ASSERT failure
 - ref #66, Automatic grouping of Changes that happen in repond of another event. (Crash in setText())
 - add #60, Basic support for auto complete.
 - add #59, Shift+Delete should perform a cut
