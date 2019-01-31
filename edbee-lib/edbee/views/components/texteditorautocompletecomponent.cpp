@@ -242,18 +242,35 @@ bool TextEditorAutoCompleteComponent::fillAutoCompleteList(TextDocument* documen
 
 
 /// positions the widget so it's visible.
-/// This should be improved so border and screen positions are respected
 void TextEditorAutoCompleteComponent::positionWidgetForCaretOffset(int offset)
 {
     // find the caret position
     TextRenderer* renderer = controller()->textRenderer();
-    qDebug() << controller()->textRenderer()->viewportX();
     int y = renderer->yPosForOffset(offset) - controller()->textRenderer()->viewportY(); //offset the y position based on how far scrolled down the editor is
     int x = renderer->xPosForOffset(offset) - controller()->textRenderer()->viewportX() + marginComponentRef_->widthHint() - 3; //adjusts x position based on scrollbars, line-number, and position in line
     QPoint newLoc = editorComponentRef_->parentWidget()->parentWidget()->mapToGlobal(QPoint(x, y));
 
     //We want to constrain the list to only show within the available screen space
-    QRect screen = QApplication::desktop()->availableGeometry(this);
+#if QT_VERSION >= 0x050a00
+    QScreen* pScreen = qApp->screenAt(newLoc);
+    /* From the Qt documentation:
+     * "The available geometry is the geometry excluding window manager reserved
+     * areas such as task bars and system menus.
+     *
+     * Note, on X11 this will return the true available geometry only on systems
+     * with one monitor and if window manager has set _NET_WORKAREA atom. In all
+     * other cases this is equal to geometry(). This is a limitation in X11
+     * window manager specification."
+     */
+    if (!pScreen) {
+        // newLoc is off-screen so cannot be shown
+        return;
+    }
+    QRect screen = pScreen->availableGeometry();
+#else
+    QRect screen = qApp->desktop()->availableGeometry(editorComponentRef_->parentWidget()->parentWidget());
+#endif
+
     newLoc.setX(qMax(screen.left(), newLoc.x()));                                   //constrain the origin of the list to the leftmost pixel
     newLoc.setY(qMax(screen.top(), newLoc.y()));                                    //constrain the origin of the list to the topmost pixel
     newLoc.setX(qMin(screen.x() + screen.width() - menuRef_->width(), newLoc.x())); //ensure that the entire width of the list can be shown to the right
