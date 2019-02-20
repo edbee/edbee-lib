@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "edbee/exports.h"
+
 #include <QWidget>
 
 class QEvent;
@@ -22,8 +24,7 @@ class TextTheme;
 
 /// The textmargin component delegate
 /// You can override the methods in the class for adding functionality to the text-margin component
-class TextMarginComponentDelegate
-{
+class EDBEE_EXPORT TextMarginComponentDelegate {
 public:    
     TextMarginComponentDelegate();
     virtual ~TextMarginComponentDelegate() {}
@@ -50,7 +51,7 @@ private:
 
 /// The margin/line-number component
 /// This class is used for rendering line-numbers etc
-class TextMarginComponent : public QWidget
+class EDBEE_EXPORT TextMarginComponent : public QWidget
 {
     Q_OBJECT
 

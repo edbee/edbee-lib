@@ -3,6 +3,10 @@
  * Author Rick Blommers
  */
 
+#pragma once
+
+#include "edbee/exports.h"
+
 #include <QHash>
 #include <QString>
 #include <QVariant>
@@ -41,8 +45,7 @@ class TextEditorKeyMap;
 /// Context is still not completely thought over but it is used to make certain keybindings
 /// context specific. Think for example of keybindings only used for given language
 ///
-class KeyMapParser
-{
+class EDBEE_EXPORT KeyMapParser {
 public:
     KeyMapParser();
     virtual ~KeyMapParser();

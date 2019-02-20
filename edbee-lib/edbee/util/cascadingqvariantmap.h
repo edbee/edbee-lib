@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "edbee/exports.h"
+
 #include <QVariantMap>
 
 namespace edbee {
@@ -13,8 +15,7 @@ namespace edbee {
 ///
 /// When retrieving an item, it fist tries to find the item at this level, if it does't find
 /// the item it tries the parent item
-class CascadingQVariantMap
-{
+class EDBEE_EXPORT CascadingQVariantMap {
 public:
     explicit CascadingQVariantMap( CascadingQVariantMap* parent = 0);
     void deleteParents();

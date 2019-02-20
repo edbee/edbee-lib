@@ -5,12 +5,13 @@
 
 #pragma once
 
+#include "edbee/exports.h"
+
 namespace edbee {
 
 
 /// A special class to perform line-ending detection
-class LineEnding
-{
+class EDBEE_EXPORT LineEnding {
 public:
 
     enum Type {

@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "edbee/exports.h"
+
 #include <QObject>
 #include <QList>
 
@@ -38,7 +40,7 @@ class TextUndoStack;
 /// - the textdocument scopes, these are the language-dependent scopes found in the current document
 /// - A textlexer, which is used for (re-)building the textdocument scopes.
 ///
-class TextDocument : public QObject
+class EDBEE_EXPORT TextDocument : public QObject
 {
 
 Q_OBJECT

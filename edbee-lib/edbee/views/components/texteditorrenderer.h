@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "edbee/exports.h"
+
 class QLinearGradient;
 class QPainter;
 class QRect;
@@ -14,8 +16,7 @@ namespace edbee {
 class TextRenderer;
 class TextTheme;
 
-class TextEditorRenderer
-{
+class EDBEE_EXPORT TextEditorRenderer {
 public:
     TextEditorRenderer( TextRenderer *renderer );
     virtual ~TextEditorRenderer();

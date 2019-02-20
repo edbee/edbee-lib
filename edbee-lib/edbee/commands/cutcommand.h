@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "edbee/exports.h"
+
 #include "edbee/texteditorcommand.h"
 
 namespace edbee {
@@ -16,7 +18,7 @@ class TextEditorController;
 /// and places onto the clipboard.
 ///
 /// When pressing cut without selection, the full line is cut
-class CutCommand : public TextEditorCommand
+class EDBEE_EXPORT CutCommand : public TextEditorCommand
 {
 public:
     virtual void execute( TextEditorController* controller );

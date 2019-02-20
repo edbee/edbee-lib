@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "edbee/exports.h"
+
 #include <QList>
 #include <QString>
 
@@ -15,8 +17,7 @@ class TextEditorController;
 
 
 /// A basic change
-class Change
-{
+class EDBEE_EXPORT Change {
 public:
 
     virtual ~Change();
@@ -41,7 +42,7 @@ public:
 
 
 /// A textdocument change
-class DocumentChange : public Change
+class EDBEE_EXPORT DocumentChange : public Change
 {
 public:
 };
@@ -51,7 +52,7 @@ public:
 
 
 /// a document text-change that doesn't do anyhting :-)
-class EmptyDocumentChange : public Change
+class EDBEE_EXPORT EmptyDocumentChange : public Change
 {
 public:
     virtual bool isPersistenceRequired();
@@ -65,7 +66,7 @@ public:
 
 
 /// A textcontroller command. This can ALSO be a document command
-class ControllerChange : public Change
+class EDBEE_EXPORT ControllerChange : public Change
 {
 public:
     ControllerChange( TextEditorController* controller );
@@ -81,7 +82,7 @@ private:
 
 
 /// An undoable-command-group
-class ChangeGroup : public ControllerChange
+class EDBEE_EXPORT ChangeGroup : public ControllerChange
 {
 public:
     ChangeGroup( TextEditorController* controller );

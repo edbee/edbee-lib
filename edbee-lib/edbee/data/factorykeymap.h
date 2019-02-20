@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "edbee/exports.h"
+
 namespace edbee {
 
 class TextEditorKeyMap;
@@ -12,8 +14,7 @@ class TextEditorKeyMap;
 /**
  * This class can fill the texteditor keymap with the factory defaults
  */
-class FactoryKeyMap
-{
+class EDBEE_EXPORT FactoryKeyMap {
 public:
     void fill(TextEditorKeyMap* km );
 };

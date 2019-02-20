@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "edbee/exports.h"
+
 #include "edbee/models/textrange.h"
 
 namespace edbee {
@@ -21,7 +23,7 @@ class TextEditorController;
 /// side. Because we support variable font widts..
 /// Also 'remembering' the caret screen-x and -y positions isn't relevant for a docuemnt. That is
 /// stuff that needs to be placed in the view side
-class TextSelection : public TextRangeSet
+class EDBEE_EXPORT TextSelection : public TextRangeSet
 {
 public:
     TextSelection( TextEditorController* controller );

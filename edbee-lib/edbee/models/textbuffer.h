@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "edbee/exports.h"
+
 #include <QObject>
 #include <QVector>
 #include <QSharedData>
@@ -19,7 +21,7 @@ class TextLineData;
 class LineOffsetVector;
 
 
-class TextBufferChangeData : public QSharedData
+class EDBEE_EXPORT TextBufferChangeData : public QSharedData
 {
 public:
     TextBufferChangeData( TextBuffer* buffer, int off, int len, const QChar* text, int textlen );
@@ -42,8 +44,7 @@ public:
 /// This clas represents a text buffer change and is used to pass around between events
 /// This is a shareddata object so the data can be thrown between different threads (delayed emit-support)_
 /// TODO: Still problematic maybe the QChar* text pointer. It is possible that this pointer is being freed.
-class TextBufferChange
-{
+class EDBEE_EXPORT TextBufferChange {
 public:
     TextBufferChange();
     TextBufferChange( TextBuffer* buffer, int off, int len, const QChar* text, int textlen );
@@ -65,7 +66,7 @@ private:
 };
 
 /// This class represents the textbuffer of the editor
-class TextBuffer : public QObject
+class EDBEE_EXPORT TextBuffer : public QObject
 {
 Q_OBJECT
 

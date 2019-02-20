@@ -5,12 +5,14 @@
 
 #pragma once
 
+#include "edbee/exports.h"
+
 #include <QString>
 #include "edbee/texteditorcommand.h"
 
 namespace edbee {
 
-class UndoCommand : public TextEditorCommand
+class EDBEE_EXPORT UndoCommand : public TextEditorCommand
 {
 public:
     UndoCommand( bool soft= false );

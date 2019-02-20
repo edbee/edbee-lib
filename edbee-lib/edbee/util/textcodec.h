@@ -3,6 +3,10 @@
  * Author Rick Blommers
  */
 
+#pragma once
+
+#include "edbee/exports.h"
+
 #include <QObject>
 #include <QList>
 #include <QHash>
@@ -15,8 +19,7 @@ class TextCodec;
 /// The codec manager is used for managing codecs
 /// You shouldnt' instantiatie this class, it's better to access the
 /// codec manager instantiated via the edbee::Edbee
-class TextCodecManager
-{
+class EDBEE_EXPORT TextCodecManager {
 public:
     TextCodecManager();
     ~TextCodecManager();
@@ -34,8 +37,7 @@ private:
 
 /// This class represents a single text codec
 /// The codec has a name and contains methods to create encoders and decoders
-class TextCodec
-{
+class EDBEE_EXPORT TextCodec {
 public:
     TextCodec( const QString& name, const QTextCodec* codec, QTextCodec::ConversionFlags flags );
     const QTextCodec* codec();

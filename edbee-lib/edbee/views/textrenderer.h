@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "edbee/exports.h"
+
 #include <QCache>
 #include <QObject>
 #include <QHash>
@@ -32,7 +34,7 @@ class TextThemeStyler;
 
 /// A class for rendering the text
 /// TODO: Currently this class is also used for positioning text. This probably should be moved in a class of its own
-class TextRenderer : public QObject
+class EDBEE_EXPORT TextRenderer : public QObject
 {
 Q_OBJECT
 

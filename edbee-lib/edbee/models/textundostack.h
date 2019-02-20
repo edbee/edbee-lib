@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "edbee/exports.h"
+
 #include <QObject>
 #include <QMap>
 #include <QStack>
@@ -47,7 +49,7 @@ class ChangeGroup;
 ///
 /// ~~~~
 
-class TextUndoStack : public QObject
+class EDBEE_EXPORT TextUndoStack : public QObject
 {
     Q_OBJECT
 

@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "edbee/exports.h"
+
 #include <QHash>
 #include <QList>
 #include <QMap>
@@ -21,8 +23,7 @@ class Edbee;
 
 
 /// defines a single grammar rule
-class TextGrammarRule
-{
+class EDBEE_EXPORT TextGrammarRule {
 public:
 
     /// the instructions
@@ -122,8 +123,7 @@ private:
 
 
 /// This class defines a single language grammar
-class TextGrammar
-{
+class EDBEE_EXPORT TextGrammar {
 public:
 
     TextGrammar( const QString& name, const QString& displayName );
@@ -154,8 +154,7 @@ private:
 
 
 /// This class is used to manage all 'grammers' used by the lexers
-class TextGrammarManager
-{
+class EDBEE_EXPORT TextGrammarManager {
 protected:
     TextGrammarManager();
     virtual ~TextGrammarManager();

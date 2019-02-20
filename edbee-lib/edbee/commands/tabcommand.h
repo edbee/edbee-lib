@@ -5,12 +5,14 @@
 
 #pragma once
 
+#include "edbee/exports.h"
+
 #include "edbee/texteditorcommand.h"
 
 namespace edbee {
 
 /// For inserting/executing forward and backwards tabs
-class TabCommand : public TextEditorCommand
+class EDBEE_EXPORT TabCommand : public TextEditorCommand
 {
 public:
     /// The possible directions of the tab command

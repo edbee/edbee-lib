@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "edbee/exports.h"
+
 #include <QObject>
 #include <QMap>
 #include <QString>
@@ -16,7 +18,7 @@ class TextEditorCommand;
 
 /// This is a texteditor map. This is used to map Command-Names to commands
 /// This class is the owner of the the given commands
-class TextEditorCommandMap : public QObject
+class EDBEE_EXPORT TextEditorCommandMap : public QObject
 {
     Q_OBJECT
 public:

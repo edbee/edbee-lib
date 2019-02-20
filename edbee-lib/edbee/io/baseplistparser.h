@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "edbee/exports.h"
+
 #include <QHash>
 #include <QStack>
 #include <QString>
@@ -16,8 +18,7 @@ class QXmlStreamReader;
 namespace edbee {
 
 /// A general plist xml-file parser
-class BasePListParser
-{
+class EDBEE_EXPORT BasePListParser {
 public:
     BasePListParser();
     virtual ~BasePListParser();

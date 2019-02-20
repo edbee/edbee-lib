@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "edbee/exports.h"
+
 #include <QObject>
 #include <QString>
 #include <QSharedPointer>
@@ -44,8 +46,7 @@ QString toQString( const T& obj )
 
 
 /// This method represents a test result
-class TestResult
-{
+class EDBEE_EXPORT TestResult {
 public:
     enum Status {
         Passed, Failed, Skipped
@@ -158,7 +159,7 @@ private:
 
 /// A simple unit test. Every private slot is called for a test
 ///
-class TestCase : public QObject
+class EDBEE_EXPORT TestCase : public QObject
 {
     Q_OBJECT
 public:
@@ -204,8 +205,7 @@ private:
 
 /// This is the basic outputhandler.
 /// The basic outputhandler simply executes a qDebug with the given information
-class OutputHandler
-{
+class EDBEE_EXPORT OutputHandler {
 public:
 
     explicit OutputHandler();
@@ -250,7 +250,7 @@ private:
 //=============================================================================
 
 /// This is the main test engine
-class TestEngine : public QObject
+class EDBEE_EXPORT TestEngine : public QObject
 {
     Q_OBJECT
 public:
@@ -311,8 +311,7 @@ inline TestEngine& engine()
 
 
 template <class T>
-class Test
-{
+class EDBEE_EXPORT Test {
 public:
     QSharedPointer<T> child;
 

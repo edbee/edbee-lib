@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "edbee/exports.h"
+
 #include <QChar>
 #include <QString>
 
@@ -16,8 +18,7 @@ namespace edbee {
 /// This class is used to define a gap vector. A Gapvector is split in 2 parts. where the gap
 /// is moved to the insertation/changing point. So reducing the movement of fields
 template <typename T>
-class GapVector
-{
+class EDBEE_EXPORT GapVector {
 public:
     GapVector( int capacity=16 ) : items_(0), capacity_(0), gapBegin_(0), gapEnd_(0)  {
         items_    = new T[capacity];
@@ -408,7 +409,7 @@ protected:
 
 
 /// The character vecor to use
-class QCharGapVector : public GapVector<QChar>
+class EDBEE_EXPORT QCharGapVector : public GapVector<QChar>
 {
 public:
 
@@ -471,8 +472,7 @@ public:
 /// (for debugging purposes) that isn't a gapv
 /// This class is only used for debugging issuess with the gapvector
 template <typename T>
-class NoGapVector
-{
+class EDBEE_EXPORT NoGapVector {
 public:
     NoGapVector( int capacity=16 ) {
         Q_UNUSED(capacity);

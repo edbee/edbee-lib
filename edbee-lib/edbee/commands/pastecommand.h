@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "edbee/exports.h"
+
 #include "edbee/texteditorcommand.h"
 
 namespace edbee {
@@ -16,7 +18,7 @@ class TextEditorController;
 /// There are two special cases:
 /// - there's a line cutting/pasing mode to copy complete lines
 /// - when the number of carets is equal to the number of lines, every line is pasted at a caret
-class PasteCommand : public TextEditorCommand
+class EDBEE_EXPORT PasteCommand : public TextEditorCommand
 {
 public:
     PasteCommand();

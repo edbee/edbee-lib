@@ -1,11 +1,13 @@
 #pragma once
 
+#include "edbee/exports.h"
+
 #include "edbee/texteditorcommand.h"
 
 namespace edbee {
 
 /// moves
-class MoveLineCommand : public TextEditorCommand
+class EDBEE_EXPORT MoveLineCommand : public TextEditorCommand
 {
 public:
     MoveLineCommand( int direction );

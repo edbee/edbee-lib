@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "edbee/exports.h"
+
 #include <QFont>
 #include <QObject>
 #include <QPen>
@@ -14,7 +16,7 @@
 namespace edbee {
 
 /// General configuration settings of the text editor
-class TextEditorConfig : public QObject
+class EDBEE_EXPORT TextEditorConfig : public QObject
 {
 Q_OBJECT
 

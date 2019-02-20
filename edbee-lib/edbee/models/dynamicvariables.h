@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "edbee/exports.h"
+
 #include <QMultiMap>
 #include <QSet>
 #include <QString>
@@ -16,8 +18,7 @@ class TextScopeList;
 class TextScopeSelector;
 
 /// The abstract base class for a dynamic variable
-class DynamicVariable
-{
+class EDBEE_EXPORT DynamicVariable {
 public:
     virtual ~DynamicVariable();
     virtual QVariant value() const = 0;
@@ -28,7 +29,7 @@ public:
 
 
 /// A static dynamic variable :P
-class BasicDynamicVariable : public DynamicVariable
+class EDBEE_EXPORT BasicDynamicVariable : public DynamicVariable
 {
 public:
     BasicDynamicVariable( const QVariant& value );
@@ -43,7 +44,7 @@ private:
 
 
 /// A class that specifies a dynamic variabele with a scope selector
-class ScopedDynamicVariable : public BasicDynamicVariable
+class EDBEE_EXPORT ScopedDynamicVariable : public BasicDynamicVariable
 {
 public:
     ScopedDynamicVariable( const QVariant& value, TextScopeSelector* selector = 0 );
@@ -62,8 +63,7 @@ private:
 
 /// This class is used for remembering/managing dynamic variables
 /// This are a kind of environment variables that are dependent on the given context
-class DynamicVariables
-{
+class EDBEE_EXPORT DynamicVariables {
 public:
     DynamicVariables();
     virtual ~DynamicVariables();

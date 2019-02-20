@@ -5,13 +5,15 @@
 
 #pragma once
 
+#include "edbee/exports.h"
+
 #include "edbee/texteditorcommand.h"
 
 namespace edbee {
 
 
 /// A debug command, for simply suppling/dumping some editor state information to the console
-class DebugCommand : public TextEditorCommand
+class EDBEE_EXPORT DebugCommand : public TextEditorCommand
 {
 public:
 

@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "edbee/exports.h"
+
 //#include "config.h"
 
 #include <QString>
@@ -37,8 +39,7 @@ namespace edbee {
 /// A simple profiler class that can be used to profile certain parts of the code.
 /// I've introduced this class as a poor-mans profiler. Because currently valgrand and other profilers
 /// don't seem to run smoothly on my mac. They crash ..
-class SimpleProfiler
-{
+class EDBEE_EXPORT SimpleProfiler {
 
 public:
 

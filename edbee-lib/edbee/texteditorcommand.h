@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "edbee/exports.h"
+
 #include <QString>
 
 namespace edbee {
@@ -47,8 +49,7 @@ enum CoalesceId {
 ///
 /// These commands can be placed in the TextEditorCommandMap with a given name
 /// By linking this command-name in the Keymap you can register keyboard operations this way
-class TextEditorCommand
-{
+class EDBEE_EXPORT TextEditorCommand {
 public:
     TextEditorCommand();
     virtual ~TextEditorCommand();
