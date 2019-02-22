@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "edbee/exports.h"
+
 #include "edbee/models/change.h"
 
 namespace edbee {
@@ -20,7 +22,7 @@ class TextRangeSet;
 /// This is a complete rewrite of the earlier implementation. This implemenation
 /// simply adds all changes to a group. It tries to compress the changes that are compressable
 /// This group has 1 previous selection and 1 next selection. All selection changes are 'removed' and only the last and first state is stored.
-class MergableChangeGroup : public ChangeGroup
+class EDBEE_EXPORT MergableChangeGroup : public ChangeGroup
 {
 public:
     MergableChangeGroup( TextEditorController* controller );

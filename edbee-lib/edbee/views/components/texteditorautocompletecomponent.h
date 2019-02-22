@@ -1,5 +1,7 @@
 #pragma once
 
+#include "edbee/exports.h"
+
 #include <QModelIndex>
 #include <QWidget>
 
@@ -19,7 +21,7 @@ class TextRange;
 
 /// An autocomplete list
 /// Which receives it's autocomplete list from the document
-class TextEditorAutoCompleteComponent : public QWidget
+class EDBEE_EXPORT TextEditorAutoCompleteComponent : public QWidget
 {
     Q_OBJECT
 public:

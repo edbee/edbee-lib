@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "edbee/exports.h"
+
 #include <QObject>
 
 #include "edbee/util/gapvector.h"
@@ -25,8 +27,7 @@ class TextLineDataManager;
 
 
 /// A text line item reference
-class TextLineData
-{
+class EDBEE_EXPORT TextLineData {
 public:
     TextLineData() {}
     virtual ~TextLineData() {}
@@ -35,7 +36,7 @@ public:
 
 /// a simple class to store a QString in a line
 template<typename T>
-class BasicTextLineData : public TextLineData
+class EDBEE_EXPORT BasicTextLineData : public TextLineData
 {
 public:
     BasicTextLineData( const T& val ) : value_(val) {}
@@ -52,8 +53,7 @@ typedef BasicTextLineData<QString> QStringTextLineData;
 //-------
 
 /// the line data items
-class TextLineDataList
-{
+class EDBEE_EXPORT TextLineDataList {
 public:
     TextLineDataList( );
     virtual ~TextLineDataList();
@@ -72,7 +72,7 @@ private:
 //-------
 
 /// This manager manages all line definitions
-class TextLineDataManager : public QObject
+class EDBEE_EXPORT TextLineDataManager : public QObject
 {
 Q_OBJECT
 

@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "edbee/exports.h"
+
 #include <QCache>
 #include <QTextLayout>
 #include <QTextCharFormat>
@@ -32,8 +34,7 @@ class TextScopeSelector;
 
 //=================================================
 
-class TextThemeRule
-{
+class EDBEE_EXPORT TextThemeRule {
 public:
     TextThemeRule(const QString& name, const QString& selector, QColor foreground=QColor(), QColor background=QColor(), bool bold=false, bool italic=false, bool underline=false );
     virtual ~TextThemeRule();
@@ -65,7 +66,7 @@ private:
 //=================================================
 
 /// This class defines a single theme
-class TextTheme : public QObject
+class EDBEE_EXPORT TextTheme : public QObject
 {
 public:
     TextTheme();
@@ -154,7 +155,7 @@ private:
 
 
 /// This class is used to return the style formats for rendering the texts
-class TextThemeStyler : public QObject
+class EDBEE_EXPORT TextThemeStyler : public QObject
 {
 Q_OBJECT
 
@@ -200,7 +201,7 @@ private:
 /// This class is used to manage load 'themes'.
 /// This method loads only loads a theme if requested.
 /// It will list all available theme when
-class TextThemeManager : public QObject
+class EDBEE_EXPORT TextThemeManager : public QObject
 {
 Q_OBJECT
 

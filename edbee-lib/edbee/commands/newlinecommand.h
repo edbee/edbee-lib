@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "edbee/exports.h"
+
 
 #include "edbee/texteditorcommand.h"
 
@@ -15,7 +17,7 @@ class TextRange;
 
 /// Inserts a newline.
 /// When  smarttab is enabled it also inser leading tabs/spaces
-class NewlineCommand : public TextEditorCommand
+class EDBEE_EXPORT NewlineCommand : public TextEditorCommand
 {
 public:
     enum NewLineType {

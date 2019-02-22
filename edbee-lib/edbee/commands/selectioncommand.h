@@ -5,13 +5,15 @@
 
 #pragma once
 
+#include "edbee/exports.h"
+
 #include "edbee/texteditorcommand.h"
 
 namespace edbee {
 
 /// The selection command is used to move the caret and anchors to
 /// make selections and move the carets around
-class SelectionCommand : public TextEditorCommand
+class EDBEE_EXPORT SelectionCommand : public TextEditorCommand
 {
 public:
     enum SelectionType {

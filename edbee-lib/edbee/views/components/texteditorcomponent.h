@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "edbee/exports.h"
+
 #include <QSize>
 #include <QWidget>
 
@@ -22,7 +24,7 @@ class TextSelection;
 
 /// This is the main texteditor-component (which is the true editor)
 /// This is the QWidget that recieves the keypresses, mouse presses etc.
-class TextEditorComponent : public QWidget
+class EDBEE_EXPORT TextEditorComponent : public QWidget
 {
     Q_OBJECT
 public:

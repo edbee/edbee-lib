@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "edbee/exports.h"
+
 #include "edbee/texteditorcommand.h"
 
 
@@ -13,7 +15,7 @@ namespace edbee {
 /// The Duplicate command.
 /// Duplicates the selected line or text
 ///
-class DuplicateCommand : public TextEditorCommand
+class EDBEE_EXPORT DuplicateCommand : public TextEditorCommand
 {
 public:
     virtual void execute( TextEditorController* controller );

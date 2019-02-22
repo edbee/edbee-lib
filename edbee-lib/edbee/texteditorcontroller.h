@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "edbee/exports.h"
+
 #include <QObject>
 #include <QIcon>
 
@@ -34,7 +36,7 @@ class UndoableTextCommand;
 
 /// The texteditor works via the controller. The controller is the central point/mediater
 /// which maps/controls all messages between the different editor componenents
-class TextEditorController : public QObject
+class EDBEE_EXPORT TextEditorController : public QObject
 {
     Q_OBJECT
 public:

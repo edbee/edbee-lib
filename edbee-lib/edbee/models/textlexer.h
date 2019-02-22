@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "edbee/exports.h"
+
 #include "edbee/models/textbuffer.h"
 
 namespace edbee {
@@ -14,8 +16,7 @@ class TextDocument;
 class TextDocumentScopes;
 
 /// This is a single lexer
-class TextLexer
-{
+class EDBEE_EXPORT TextLexer {
 public:
     TextLexer( TextDocumentScopes* scopes );
     virtual ~TextLexer() {}
