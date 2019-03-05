@@ -126,8 +126,8 @@ public slots:
     virtual void replaceRangeSet(TextRangeSet& rangeSet, const QStringList& texts, int coalesceId=0 );
 
     // caret movements
-    virtual void moveCaretTo( int line, int col, bool keepAnchors );
-    virtual void moveCaretToOffset( int offset, bool keepAnchors );
+    virtual void moveCaretTo( int line, int col, bool keepAnchors, int rangeIndex=-1 );
+    virtual void moveCaretToOffset( int offset, bool keepAnchors, int rangeIndex=-1 );
     virtual void addCaretAt( int line, int col);
     virtual void addCaretAtOffset( int offset );
     virtual void changeAndGiveTextSelection(TextRangeSet* rangeSet , int coalesceId = 0);

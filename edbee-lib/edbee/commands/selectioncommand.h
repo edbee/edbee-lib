@@ -44,7 +44,7 @@ public:
     };
 
 public:
-    explicit SelectionCommand( SelectionType unit, int amount=0, bool keepSelection=false );
+    explicit SelectionCommand( SelectionType unit, int amount=0, bool keepSelection=false, int rangeIndex = -1 );
     virtual ~SelectionCommand();
 
     virtual int commandId();
@@ -56,14 +56,14 @@ public:
     SelectionType unit() { return unit_; }
     int amount() { return amount_; }
     bool keepSelection() { return keepSelection_; }
+    int rangeIndex() { return rangeIndex_; }
 
 private:
 
     SelectionType unit_;
     int amount_;
     bool keepSelection_;
-
-    
+    int rangeIndex_;
 };
 
 
