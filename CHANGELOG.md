@@ -2,6 +2,7 @@
 
 edbee.lib:
 
+- Moved the TextLineDataManager to the core TextDocument
 - add #60, Basic support for auto complete.
 - add #59, Shift+Delete should perform a cut
 - add #56, Added move line up/down commands.

@@ -31,7 +31,6 @@ CharTextDocument::CharTextDocument(QObject *object)
     : TextDocument(object)
     , config_(0)
     , textBuffer_(0)
-    , textLineDataManager_(0)
     , textScopes_(0)
     , textLexer_(0)
     , textCodecRef_(0)
@@ -44,7 +43,6 @@ CharTextDocument::CharTextDocument(QObject *object)
     textBuffer_ = new CharTextBuffer();
     config_ = new TextEditorConfig();
 
-    textLineDataManager_ = new TextLineDataManager();
     textScopes_ = new TextDocumentScopes( this );
 
     textCodecRef_ = Edbee::instance()->codecManager()->codecForName("UTF-8");
@@ -77,7 +75,6 @@ CharTextDocument::~CharTextDocument()
     delete textUndoStack_;
     delete textLexer_;
     delete textScopes_;
-    delete textLineDataManager_;
     delete textBuffer_;
     delete config_;
 }
@@ -154,7 +151,7 @@ void CharTextDocument::textBufferChanged(const TextBufferChange& change)
 
     // execute the line change
     if( !isUndoOrRedoRunning() ) {
-        Change* lineDataChange = textLineDataManager_->createLinesReplacedChange( change.line()+1, change.lineCount(), change.newLineCount() );
+        Change* lineDataChange = lineDataManager()->createLinesReplacedChange( change.line()+1, change.lineCount(), change.newLineCount() );
         if( lineDataChange ) {
             executeAndGiveChange( lineDataChange, true );
         }
