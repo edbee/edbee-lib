@@ -17,6 +17,8 @@ private slots:
     
     void testLineDataManager();
 
+    void testSetTextLineDataIssue66();
+
 
 };
 

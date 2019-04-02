@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "edbee/exports.h"
+
 //#include <QAbstractScrollArea>
 #include <QStringList>
 #include <QWidget>
@@ -30,7 +32,7 @@ class TextSelection;
 /// This is the general edbee widget
 /// This core functionality of this widget is divided in several seperate
 /// compnents. (TextEditorComponent: the main editor, TextMarginComponent: the sidebar with line numbers)
-class TextEditorWidget : public QWidget
+class EDBEE_EXPORT TextEditorWidget : public QWidget
 {
     Q_OBJECT
 public:

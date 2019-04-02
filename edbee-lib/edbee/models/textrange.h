@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "edbee/exports.h"
+
 #include <QObject>
 #include <QVector>
 
@@ -26,8 +28,7 @@ class TextDocument;
 ///   a[b>cdef    (anchor=1, caret=2)  => "b"
 ///   a<b]cdef    (anchor=2, caret=1)  => "b"
 ///
-class TextRange
-{
+class EDBEE_EXPORT TextRange {
 public:
     TextRange( int anchor=0, int caret=0 ) : anchor_(anchor), caret_(caret) {}
 
@@ -102,8 +103,7 @@ private:
 /// Except when the changing_ flag is != 0. The sorting and merging only happens
 /// when changing is 0. This way it possible to add/update muliple rages without the direct
 /// performance hit of sorting and merging.
-class TextRangeSetBase
-{
+class EDBEE_EXPORT TextRangeSetBase {
 public:
     TextRangeSetBase(TextDocument* doc);
     virtual ~TextRangeSetBase() {}
@@ -196,7 +196,7 @@ protected:
 
 
 /// The basic textrange class. A simple class of textrange with a simple vector implementation
-class TextRangeSet : public TextRangeSetBase
+class EDBEE_EXPORT TextRangeSet : public TextRangeSetBase
 {
 public:
     TextRangeSet( TextDocument* doc );
@@ -235,7 +235,7 @@ private:
 ///
 /// The delete mode is used to tell the rangeset if 'deleted' ranges need to be deleted
 /// or simply need to be moved
-class DynamicTextRangeSet : public QObject, public TextRangeSet
+class EDBEE_EXPORT DynamicTextRangeSet : public QObject, public TextRangeSet
 {
 Q_OBJECT
 

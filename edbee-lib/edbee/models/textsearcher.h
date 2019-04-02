@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "edbee/exports.h"
+
 #include <QObject>
 
 #include "edbee/models/textrange.h"
@@ -20,7 +22,7 @@ class TextEditorWidget;
 /// It remembers the current searchTerm that is used for searching
 /// The textsearcher component has got several option. Like case sensitivity
 /// regular expressions etc.
-class TextSearcher : public QObject
+class EDBEE_EXPORT TextSearcher : public QObject
 {
     Q_OBJECT
 public:

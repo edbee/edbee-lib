@@ -8,6 +8,8 @@
 /// Altered to use QT API
 #pragma once
 
+#include "edbee/exports.h"
+
 class QMutex;
 
 //#if !defined(__APPLE__)
@@ -31,8 +33,7 @@ struct DebugAllocation
 };
 
 /// This class is used to remember all memory leakds
-class DebugAllocationList
-{
+class EDBEE_EXPORT DebugAllocationList {
 public:
 
     DebugAllocationList();

@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "edbee/exports.h"
+
 
 class QByteArray;
 
@@ -28,8 +30,7 @@ class TextCodec;
 ///
 /// TextCodecDetector detector( QByteArray)  ;
 /// TextCodec encoding = detector.guessEncoding( QByteArray arr, QTextCode fallback );
-class TextCodecDetector
-{
+class EDBEE_EXPORT TextCodecDetector {
 
 public:
 

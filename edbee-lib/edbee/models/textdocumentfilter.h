@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "edbee/exports.h"
+
 class QString;
 class QStringList;
 
@@ -17,8 +19,7 @@ class TextDocument;
 class TextRangeSet;
 
 
-class TextDocumentFilter
-{
+class EDBEE_EXPORT TextDocumentFilter {
 public:
     virtual ~TextDocumentFilter();
 

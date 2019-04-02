@@ -5,7 +5,11 @@
 
 #include "textlinedatatest.h"
 
+#include "edbee/models/textdocument.h"
 #include "edbee/models/textlinedata.h"
+#include "edbee/views/textselection.h"
+#include "edbee/texteditorcontroller.h"
+#include "edbee/texteditorwidget.h"
 
 #include "edbee/debug.h"
 
@@ -82,6 +86,42 @@ void TextLineDataTest::testLineDataManager()
     testEqual( destroyCount, 1 );
     testEqual( destructCount, 1 );
 
+}
+
+/// References issue #66 github
+/// Calling setText() with a shorter text (less lines) then the original
+//Undo it
+//Cut a text (I suspect multiple lines)
+//And call setText() again with a shorter text
+void TextLineDataTest::testSetTextLineDataIssue66()
+{
+    TextEditorWidget widget;
+    TextDocument* doc = widget.textDocument();
+    TextEditorController* controller = widget.controller();
+    TextLineDataManager* tdm = doc->lineDataManager();
+
+//qDebug()<<"\n ========================================";
+//qDebug()<< "setText(a\\nb\\nc)" ;
+    doc->setText("a\nb\nc");
+    testEqual(filledTestString(*tdm), "---");
+//    qDebug() << "- a:" <<  filledTestString(*tdm);
+
+//qDebug()<<"\n ========================================";
+//qDebug()<< "setText(a\\nb)" ;
+    doc->setText("a\nb");
+    testEqual(filledTestString(*tdm), "--");
+//    qDebug() << "- b:" <<  filledTestString(*tdm);
+
+//qDebug()<<"\n ========================================";
+//qDebug()<< "undo()";
+    controller->undo();
+    testEqual( filledTestString(*tdm), "---");
+//    qDebug() << "- c:" <<  filledTestString(*tdm);
+
+//    exit(1);
+//qDebug()<<"\n ========================================";
+//qDebug()<< "setText(a)";
+    doc->setText("a");
 }
 
 } // edbee

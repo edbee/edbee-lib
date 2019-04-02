@@ -5,11 +5,13 @@
 
 #pragma once
 
+#include "edbee/exports.h"
+
 #include "edbee/texteditorcommand.h"
 
 namespace edbee {
 
-class FindCommand : public TextEditorCommand
+class EDBEE_EXPORT FindCommand : public TextEditorCommand
 {
 public:
 

@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "edbee/exports.h"
+
 #include <QString>
 
 class QIODevice;
@@ -14,8 +16,7 @@ namespace edbee {
 class TextDocument;
 class TextDocumentSerializer;
 
-class TextDocumentSerializerFilter
-{
+class EDBEE_EXPORT TextDocumentSerializerFilter {
 public:
     /// A special filter class to filter lines while saving
     /// @param serializer the text serialzer
@@ -27,8 +28,7 @@ public:
 
 
 /// A class used to load/save a text-file from and to an IODevice
-class TextDocumentSerializer
-{
+class EDBEE_EXPORT TextDocumentSerializer {
 public:
     TextDocumentSerializer( TextDocument* textDocument );
 

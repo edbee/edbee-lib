@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "edbee/exports.h"
+
 #include <QVariant>
 
 class QIODevice;
@@ -14,8 +16,7 @@ namespace edbee {
 /// A Json Parser that supports strings in json sources!
 /// standard json doesn't support comments. This class strips the comments before passing it to qt
 /// the comments are replaced by spaces, this way the line-numbers and column numbers will stay the same
-class JsonParser
-{
+class EDBEE_EXPORT JsonParser {
 public:
     JsonParser();
     virtual ~JsonParser();

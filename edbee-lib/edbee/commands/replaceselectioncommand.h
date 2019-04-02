@@ -5,12 +5,14 @@
 
 #pragma once
 
+#include "edbee/exports.h"
+
 #include "edbee/texteditorcommand.h"
 
 namespace edbee {
 
 /// This command can be used to replace the current selection with a given text
-class ReplaceSelectionCommand : public TextEditorCommand
+class EDBEE_EXPORT ReplaceSelectionCommand : public TextEditorCommand
 {
 public:
     ReplaceSelectionCommand( const QString& text, int caolesceId );

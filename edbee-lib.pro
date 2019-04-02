@@ -5,6 +5,7 @@ TEMPLATE = subdirs
 #QMAKE_LFLAGS+=-fsanitize=address -fsanitize=bounds
 
 
+
 src_lib.subdir = edbee-lib
 
 src_lib_test.subdir = edbee-test

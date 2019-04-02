@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "edbee/exports.h"
+
 #include <QObject>
 #include <QList>
 
@@ -38,7 +40,7 @@ class TextUndoStack;
 /// - the textdocument scopes, these are the language-dependent scopes found in the current document
 /// - A textlexer, which is used for (re-)building the textdocument scopes.
 ///
-class TextDocument : public QObject
+class EDBEE_EXPORT TextDocument : public QObject
 {
 
 Q_OBJECT
@@ -92,7 +94,7 @@ public:
 
     /// this method should return a reference to the undo stack
     virtual TextUndoStack* textUndoStack() = 0;
-    virtual void beginUndoGroup(ChangeGroup* group);
+    virtual void beginUndoGroup(ChangeGroup* group=0);
     virtual void endUndoGroup(int coalesceId, bool flatten=false );
     virtual void endUndoGroupAndDiscard();
     virtual bool isUndoCollectionEnabled();

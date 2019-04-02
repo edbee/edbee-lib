@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "edbee/exports.h"
+
 #include "edbee/models/change.h"
 
 namespace edbee {
@@ -14,7 +16,7 @@ class TextEditorController;
 class TextRangeSet;
 
 /// Move the caret / and selection commands
-class SelectionChange: public ControllerChange
+class EDBEE_EXPORT SelectionChange : public ControllerChange
 {
 public:
 

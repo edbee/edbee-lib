@@ -20,7 +20,6 @@ private slots:
     void testReplaceRangeSet_sizeDiff();
     void testReplaceRangeSet_simpleInsert();
     void testReplaceRangeSet_delete();
-
 };
 
 

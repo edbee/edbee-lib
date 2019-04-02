@@ -5,14 +5,15 @@
 
 #pragma once
 
+#include "edbee/exports.h"
+
 #include <QString>
 
 namespace edbee {
 
 /// The minimal engine we currently require for handling regexpt.
 /// It may grow in the future
-class RegExpEngine
-{
+class EDBEE_EXPORT RegExpEngine {
 public:
     virtual ~RegExpEngine() {}
     virtual QString pattern() = 0;
@@ -33,8 +34,7 @@ public:
 /// A class for matching QStrings with the Oniguruma API
 /// We need this Regular Expression library to be able to support tmLanguages fully
 /// I tried to make this class as close as possible to the QRegExp library
-class RegExp
-{
+class EDBEE_EXPORT RegExp {
 public:
     enum Engine {
         EngineOniguruma = 1,

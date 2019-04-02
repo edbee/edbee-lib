@@ -153,7 +153,7 @@ void CharTextDocument::textBufferChanged(const TextBufferChange& change)
     if( !isUndoOrRedoRunning() ) {
         Change* lineDataChange = lineDataManager()->createLinesReplacedChange( change.line()+1, change.lineCount(), change.newLineCount() );
         if( lineDataChange ) {
-            executeAndGiveChange( lineDataChange, true );
+            executeAndGiveChange( lineDataChange, 0 );
         }
     }
 

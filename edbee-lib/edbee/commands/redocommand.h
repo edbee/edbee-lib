@@ -5,12 +5,14 @@
 
 #pragma once
 
+#include "edbee/exports.h"
+
 #include <QString>
 #include "edbee/texteditorcommand.h"
 
 namespace edbee {
 
-class RedoCommand : public TextEditorCommand
+class EDBEE_EXPORT RedoCommand : public TextEditorCommand
 {
 public:
     RedoCommand(bool soft=false);

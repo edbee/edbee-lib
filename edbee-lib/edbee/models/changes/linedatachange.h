@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "edbee/exports.h"
+
 #include "edbee/models/change.h"
 
 namespace edbee {
@@ -13,7 +15,7 @@ class TextDocument;
 class TextLineData;
 
 /// a class to handle line-data textchanges
-class LineDataChange : public Change
+class EDBEE_EXPORT LineDataChange : public Change
 {
 public:
     LineDataChange(int line, int field);

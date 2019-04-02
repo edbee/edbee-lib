@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "edbee/exports.h"
+
 #include <QHash>
 #include <QString>
 #include <QVariant>
@@ -15,7 +17,7 @@ namespace edbee {
 
 class TextTheme;
 
-class TmThemeParser : public BasePListParser
+class EDBEE_EXPORT TmThemeParser : public BasePListParser
 {
 public:
     TmThemeParser();

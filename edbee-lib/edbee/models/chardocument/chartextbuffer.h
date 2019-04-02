@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "edbee/exports.h"
+
 #include "edbee/models/textbuffer.h"
 #include "edbee/util/gapvector.h"
 #include "edbee/util/lineoffsetvector.h"
@@ -13,7 +15,7 @@ namespace edbee {
 
 
 /// This textbuffer implementation uses QChars for storing the data.
-class CharTextBuffer : public TextBuffer
+class EDBEE_EXPORT CharTextBuffer : public TextBuffer
 {
 public:
     CharTextBuffer( QObject* parent=0);

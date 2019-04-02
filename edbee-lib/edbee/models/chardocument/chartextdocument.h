@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "edbee/exports.h"
+
 #include <QObject>
 #include <QHash>
 
@@ -21,7 +23,7 @@ class TextLineDataManager;
 class TextBufferChange;
 
 /// A plain textdocument. A document with simple character-buffer implementation
-class CharTextDocument : public TextDocument
+class EDBEE_EXPORT CharTextDocument : public TextDocument
 {
 Q_OBJECT
 

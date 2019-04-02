@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "edbee/exports.h"
+
 #include <QVector>
 
 #include "edbee/models/changes/abstractrangedchange.h"
@@ -16,7 +18,7 @@ class TextLineDataList;
 
 /// A full line data text change. This means the growing or shrinking of the line data buffer
 /// It stores the old-data list that needs to be remebered for undoing
-class LineDataListChange : public AbstractRangedChange
+class EDBEE_EXPORT LineDataListChange : public AbstractRangedChange
 {
 public:
     LineDataListChange( TextLineDataManager* manager, int offset , int lenght, int newLength );
