@@ -61,6 +61,8 @@ public:
     QScrollBar* verticalScrollBar() const;
     void setVerticalScrollBar( QScrollBar* scrollBar );
     void setHorizontalScrollBar( QScrollBar* scrollBar );
+    int autoScrollMargin() const;
+    void setAutoScrollMargin(int amount=50);
 
 protected:
 
@@ -100,6 +102,7 @@ private:
     TextMarginComponent* marginCompRef_;                  ///< The margin components
     TextEditorAutoCompleteComponent* autoCompleteCompRef_; ///< The autocomplete list widget
 
+    int autoScrollMargin_; //< Customize the autoscroll margin
 };
 
 } // edbee

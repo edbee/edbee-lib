@@ -53,6 +53,7 @@ TextEditorWidget::TextEditorWidget( QWidget* parent)
     , scrollAreaRef_(0)
     , editCompRef_(0)
     , autoCompleteCompRef_(0)
+    , autoScrollMargin_(50)
 {
     // auto initialize edbee if this hasn't been done alread
     Edbee::instance()->autoInit();
@@ -117,7 +118,7 @@ TextEditorWidget::~TextEditorWidget()
 /// @param yPosIn the position in text-editor 'coordinates'
 void TextEditorWidget::scrollPositionVisible(int xPosIn, int yPosIn)
 {
-    scrollAreaRef_->ensureVisible( xPosIn, yPosIn );
+    scrollAreaRef_->ensureVisible(xPosIn, yPosIn, autoScrollMargin_, autoScrollMargin_);
 }
 
 
@@ -249,6 +250,18 @@ void TextEditorWidget::setHorizontalScrollBar(QScrollBar* scrollBar)
 {
     scrollAreaRef_->setHorizontalScrollBar(scrollBar);
     emit verticalScrollBarChanged( scrollBar );
+}
+
+/// Returns the auto scroll margin
+int TextEditorWidget::autoScrollMargin() const
+{
+    return autoScrollMargin_;
+}
+
+/// Sets the auto scrollmargin
+void TextEditorWidget::setAutoScrollMargin(int amount)
+{
+    autoScrollMargin_ = amount;
 }
 
 
