@@ -27,7 +27,7 @@ TextCodecManager::TextCodecManager()
 
     // append the items
     QList<QByteArray> names = QTextCodec::availableCodecs();
-    qSort(names);
+    std::sort(names.begin(), names.end());
     foreach( QByteArray name, names) {
         QTextCodec* codec = QTextCodec::codecForName(name);
         if( !codecRefMap_.contains( codec->name() ) ) {

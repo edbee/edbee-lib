@@ -2,6 +2,7 @@
 
 edbee.lib:
 
+- fix #89, Replace qSort with std::sort
 - fix #84, Customize the autoScrollMargin
 - Moved the TextLineDataManager to the core TextDocument
 - Improves #82, Ctrl+Drag mouse while expands the last caret (allows multiple caret selections with mouse).
