@@ -274,18 +274,6 @@ void TextEditorWidget::resizeEvent(QResizeEvent* event)
     updateRendererViewport();
 }
 
-/// Returns the auto scroll margin
-int TextEditorWidget::autoScrollMargin() const
-{
-    return autoScrollMargin_;
-}
-
- /// Sets the auto scrollmargin
-void TextEditorWidget::setAutoScrollMargin(int amount)
-{
-    autoScrollMargin_ = amount;
-}
-
 /// a basic event-filter for recieving focus-events of the editor
 /// @param obj the object to filter the events for
 /// @param event the event to filter
