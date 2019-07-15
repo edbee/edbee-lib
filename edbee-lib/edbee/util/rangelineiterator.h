@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "edbee/exports.h"
+
 
 namespace edbee {
 
@@ -27,8 +29,7 @@ class TextRange;
 /// }
 ///
 /// @endcode
-class RangeLineIterator
-{
+class EDBEE_EXPORT RangeLineIterator {
 public:
     RangeLineIterator( TextDocument* doc, const TextRange& range );
     RangeLineIterator( TextDocument* doc, int start, int end );

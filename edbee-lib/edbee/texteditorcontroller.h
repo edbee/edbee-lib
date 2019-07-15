@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "edbee/exports.h"
+
 #include <QObject>
 #include <QIcon>
 
@@ -34,7 +36,7 @@ class UndoableTextCommand;
 
 /// The texteditor works via the controller. The controller is the central point/mediater
 /// which maps/controls all messages between the different editor componenents
-class TextEditorController : public QObject
+class EDBEE_EXPORT TextEditorController : public QObject
 {
     Q_OBJECT
 public:
@@ -126,8 +128,8 @@ public slots:
     virtual void replaceRangeSet(TextRangeSet& rangeSet, const QStringList& texts, int coalesceId=0 );
 
     // caret movements
-    virtual void moveCaretTo( int line, int col, bool keepAnchors );
-    virtual void moveCaretToOffset( int offset, bool keepAnchors );
+    virtual void moveCaretTo( int line, int col, bool keepAnchors, int rangeIndex=-1 );
+    virtual void moveCaretToOffset( int offset, bool keepAnchors, int rangeIndex=-1 );
     virtual void addCaretAt( int line, int col);
     virtual void addCaretAtOffset( int offset );
     virtual void changeAndGiveTextSelection(TextRangeSet* rangeSet , int coalesceId = 0);

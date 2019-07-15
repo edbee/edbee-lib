@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "edbee/exports.h"
+
 #include <QMap>
 #include <QList>
 #include <QRegExp>
@@ -23,7 +25,7 @@ class TextGrammar;
 class TextGrammarRule;
 
 /// A simple lexer matches texts with simple regular expressions
-class GrammarTextLexer : public TextLexer
+class EDBEE_EXPORT GrammarTextLexer : public TextLexer
 {
 public:
     GrammarTextLexer( TextDocumentScopes* scopes );

@@ -20,6 +20,9 @@ Makefile
 *-build-*
 
 edbee-lib-doxydocs
+edbee-lib_dll.pro
+lib
+dll
 
 # cmake ignores
 CMakeCache.txt

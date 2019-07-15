@@ -53,7 +53,7 @@ TextEditorWidget::TextEditorWidget( QWidget* parent)
     , scrollAreaRef_(0)
     , editCompRef_(0)
     , autoCompleteCompRef_(0)
-	, autoScrollMargin_(50)
+    , autoScrollMargin_(50)
 {
     // auto initialize edbee if this hasn't been done alread
     Edbee::instance()->autoInit();
@@ -253,6 +253,18 @@ void TextEditorWidget::setHorizontalScrollBar(QScrollBar* scrollBar)
     emit verticalScrollBarChanged( scrollBar );
 }
 
+/// Returns the auto scroll margin
+int TextEditorWidget::autoScrollMargin() const
+{
+    return autoScrollMargin_;
+}
+
+/// Sets the auto scrollmargin
+void TextEditorWidget::setAutoScrollMargin(int amount)
+{
+    autoScrollMargin_ = amount;
+}
+
 
 /// This mehtod is called when a resize happens
 /// @param event the event of the editor widget
@@ -260,18 +272,6 @@ void TextEditorWidget::resizeEvent(QResizeEvent* event)
 {
     QWidget::resizeEvent(event);
     updateRendererViewport();
-}
-
-/// Returns the auto scroll margin
-int TextEditorWidget::autoScrollMargin() const
-{
-    return autoScrollMargin_;
-}
-
- /// Sets the auto scrollmargin
-void TextEditorWidget::setAutoScrollMargin(int amount)
-{
-    autoScrollMargin_ = amount;
 }
 
 /// a basic event-filter for recieving focus-events of the editor

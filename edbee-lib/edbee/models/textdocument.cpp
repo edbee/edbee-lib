@@ -28,13 +28,16 @@ TextDocument::TextDocument( QObject* obj )
     : QObject(obj)
     , documentFilter_(0)
     , documentFilterRef_(0)
+    , textLineDataManager_(0)
 {
+    textLineDataManager_ = new TextLineDataManager();
 }
 
 
 /// Destroys the textdocument
 TextDocument::~TextDocument()
 {
+    delete textLineDataManager_;
     delete documentFilter_;
 }
 
@@ -49,6 +52,12 @@ void TextDocument::setLineDataFieldsPerLine( int count )
     Q_ASSERT( count >= PredefinedFieldCount );
     lineDataManager()->setFieldsPerLine( count );
     textUndoStack()->clear();
+}
+
+void TextDocument::giveLineDataManager(TextLineDataManager *manager)
+{
+    delete textLineDataManager_;
+    textLineDataManager_ = manager;
 }
 
 

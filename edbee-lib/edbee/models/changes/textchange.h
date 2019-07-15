@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "edbee/exports.h"
+
 #include <QString>
 
 #include "edbee/models/changes/abstractrangedchange.h"
@@ -15,7 +17,7 @@ namespace edbee {
 ///
 /// This class re-uses the variables offset/length and text. Depending on the undo/redo state
 /// these variables contain the new data or the changed data
-class TextChange : public AbstractRangedChange
+class EDBEE_EXPORT TextChange : public AbstractRangedChange
 {
 public:
     TextChange(int offset, int length, const QString& text );

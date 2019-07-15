@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "edbee/exports.h"
+
 #include <QList>
 
 class QString;
@@ -15,8 +17,7 @@ namespace edbee {
 /// The purpose of this class is to put 'global' function that don't quite fit on other places
 ///
 /// You can use this class like this:   Util().converTabsToSpaces()
-class Util
-{
+class EDBEE_EXPORT Util {
 public:
     QString convertTabsToSpaces( const QString& str, int tabSize );
     QList<int> tabColumnOffsets( const QString& str, int tabSize );

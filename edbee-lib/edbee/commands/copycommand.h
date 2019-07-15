@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "edbee/exports.h"
+
 #include <QString>
 
 #include "edbee/texteditorcommand.h"
@@ -15,7 +17,7 @@ class TextEditorController;
 
 
 /// This command is used for copying data to the clipboard
-class CopyCommand : public TextEditorCommand
+class EDBEE_EXPORT CopyCommand : public TextEditorCommand
 {
 public:
     static const QString EDBEE_TEXT_TYPE;

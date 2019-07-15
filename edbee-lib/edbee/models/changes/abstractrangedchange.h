@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "edbee/exports.h"
+
 #include "edbee/models/change.h"
 
 namespace edbee {
@@ -12,7 +14,7 @@ namespace edbee {
 /// This is an abstract class for ranged changes
 /// This are changes (text changes and line changes) that span a range in an array.
 /// These ranges share a common alogrithm for performing merges, detecting overlaps etc.
-class AbstractRangedChange : public Change
+class EDBEE_EXPORT AbstractRangedChange : public Change
 {
 public:
     virtual ~AbstractRangedChange();

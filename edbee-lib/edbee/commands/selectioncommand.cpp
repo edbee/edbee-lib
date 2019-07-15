@@ -23,10 +23,11 @@ namespace edbee {
 /// @param unit the unit of this command
 /// @param amount the number of steps
 /// @param keepSelection when true the anchor stays put (and the selection is expanded)
-SelectionCommand::SelectionCommand( SelectionType unit, int amount, bool keepSelection )
+SelectionCommand::SelectionCommand(SelectionType unit, int amount, bool keepSelection , int rangeIndex)
     : unit_(unit)
     , amount_(amount)
     , keepSelection_(keepSelection)
+    , rangeIndex_(rangeIndex)
 {
 }
 
@@ -118,8 +119,12 @@ void SelectionCommand::execute( TextEditorController* controller )
             break;
         }
         case MoveCaretToExactOffset:
-            sel->toSingleRange();
-            sel->range(0).setCaret(amount_);
+            if( rangeIndex_ >= 0 ) {
+                sel->range(rangeIndex_).setCaret(amount_);
+            } else {
+                sel->toSingleRange();
+                sel->range(0).setCaret(amount_);
+            }
             break;
 
         case SelectAll:

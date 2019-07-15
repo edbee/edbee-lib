@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "edbee/exports.h"
+
 #include <QHash>
 
 
@@ -16,8 +18,7 @@ class TextRenderer;
 class TextRangeSet;
 
 /// A special cache. For remembering the x-coordinates of the carets
-class TextCaretCache
-{
+class EDBEE_EXPORT TextCaretCache {
 public:
     TextCaretCache( TextDocument* doc, TextRenderer* renderer );
 

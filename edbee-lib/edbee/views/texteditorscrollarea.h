@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "edbee/exports.h"
+
 #include <QScrollArea>
 
 class QLinearGradient;
@@ -15,7 +17,7 @@ namespace edbee {
 class PrivateShadowWidget;
 
 /// A special scrollarea that makes it possible to add components to the margins of it
-class TextEditorScrollArea : public QScrollArea
+class EDBEE_EXPORT TextEditorScrollArea : public QScrollArea
 {
     Q_OBJECT
 public:

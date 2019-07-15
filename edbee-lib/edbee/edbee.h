@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "edbee/exports.h"
+
 #include <QObject>
 
 namespace edbee {
@@ -22,7 +24,7 @@ class TextThemeManager;
 /// The texteditor manager,
 /// It manages all singleton objects for the editor
 /// It performs the initialization and shutdown code for all editors
-class Edbee : public QObject
+class EDBEE_EXPORT Edbee : public QObject
 {
     Q_OBJECT
 private:
