@@ -71,6 +71,7 @@ void TabCommand::indent( TextEditorController* controller )
                 int endOffset = offset;
                 for( int j=0; j<tabSize; ++j ) {
                     int off = offset + j;
+                    if(off >= doc->length()) break;
                     QChar chr = doc->charAt(off);
 
                     if( chr != ' ' && chr != '\t' ) break;

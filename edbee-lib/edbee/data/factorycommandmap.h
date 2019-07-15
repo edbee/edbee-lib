@@ -5,14 +5,15 @@
 
 #pragma once
 
+#include "edbee/exports.h"
+
 namespace edbee {
 
 class TextEditorCommandMap;
 
 
 /// This class contains the factory edbee command map
-class FactoryCommandMap
-{
+class EDBEE_EXPORT FactoryCommandMap {
 public:
     void fill(TextEditorCommandMap* cm );
 };

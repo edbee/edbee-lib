@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "edbee/exports.h"
+
 #include <QKeySequence>
 #include <QHash>
 #include <QStringList>
@@ -17,8 +19,7 @@ class TextEditorController;
 
 /// A contexted keysequence
 /// This contains a keysequence and optionally a given context
-class TextEditorKey
-{
+class EDBEE_EXPORT TextEditorKey {
 public:
     TextEditorKey( const QKeySequence& seq );
     TextEditorKey* clone() const;
@@ -36,8 +37,7 @@ private:
 
 /// A text editor key map
 /// This key map, maps key-sequences to action-names.
-class TextEditorKeyMap
-{
+class EDBEE_EXPORT TextEditorKeyMap {
 public:
 
     TextEditorKeyMap( TextEditorKeyMap* parentKeyMap=0 );
@@ -78,8 +78,7 @@ private:
 /// There can be different keymaps for different file-types/
 /// The keymap manager manages all the available keymaps
 /// There's ALWAYS a keymap with the name ""
-class TextKeyMapManager
-{
+class EDBEE_EXPORT TextKeyMapManager {
 public:
     TextKeyMapManager();
     virtual ~TextKeyMapManager();

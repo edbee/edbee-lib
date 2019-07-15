@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "edbee/exports.h"
+
 #include <QVector>
 
 #include "gapvector.h"
@@ -23,8 +25,7 @@ class TextBufferChange;
 /// text this way usually only results in the changine of the offset delta. Which means speeeed
 ///
 /// The line offset pointed at by each index is the first character in the given line.
-class LineOffsetVector
-{
+class EDBEE_EXPORT LineOffsetVector {
 public:
     /// a structure to describe the line change that happend
 //    struct LineChange {

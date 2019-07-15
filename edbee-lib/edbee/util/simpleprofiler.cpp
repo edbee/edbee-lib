@@ -86,7 +86,7 @@ void SimpleProfiler::dumpResults()
 {
     QList<ProfilerItem*> items = statsMap_.values();
     if( items.length() > 0 ) {
-        qSort( items.begin(), items.end(), sortByDuration );
+        std::sort(items.begin(), items.end(), sortByDuration);
 
         qlog_info() << "";
         qlog_info() << "Profiler Results";

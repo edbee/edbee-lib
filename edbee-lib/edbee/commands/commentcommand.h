@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "edbee/exports.h"
+
 #include <QString>
 
 #include "edbee/texteditorcommand.h"
@@ -16,7 +18,7 @@ class TextEditorController;
 /// This command is used for commenting / decommenting a line
 /// We cannot implement this truely at the moment, we first need support for making
 /// scope-based 'environment-variables' so we can creating something like TM_COMMENT_START
-class CommentCommand : public TextEditorCommand
+class EDBEE_EXPORT CommentCommand : public TextEditorCommand
 {  
 public:
     CommentCommand( bool block );

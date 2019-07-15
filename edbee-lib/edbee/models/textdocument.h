@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "edbee/exports.h"
+
 #include <QObject>
 #include <QList>
 
@@ -38,7 +40,7 @@ class TextUndoStack;
 /// - the textdocument scopes, these are the language-dependent scopes found in the current document
 /// - A textlexer, which is used for (re-)building the textdocument scopes.
 ///
-class TextDocument : public QObject
+class EDBEE_EXPORT TextDocument : public QObject
 {
 
 Q_OBJECT
@@ -59,7 +61,8 @@ public:
     virtual void setLineDataFieldsPerLine( int count );
 
     /// this method can be used to give a 'custom' line data item to a given line
-    virtual TextLineDataManager* lineDataManager() = 0;
+    virtual TextLineDataManager* lineDataManager() { return textLineDataManager_; }
+    virtual void giveLineDataManager(TextLineDataManager* manager);
     virtual void giveLineData( int line, int field, TextLineData* dataItem );
     virtual TextLineData* getLineData( int line, int field );
 //    virtual TextLineData* takeLineData( int line, int field ) = 0;
@@ -167,9 +170,11 @@ signals:
 
 
 private:
-
     TextDocumentFilter* documentFilter_;             ///< The document filter if the filter is owned
     TextDocumentFilter* documentFilterRef_;          ///< The reference to the document filter.
+
+    TextLineDataManager* textLineDataManager_;               ///< A class for managing text line data items
+
 };
 
 } // edbee

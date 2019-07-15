@@ -462,8 +462,6 @@ void TextEditorComponent::mouseMoveEvent(QMouseEvent* event )
     if( event->buttons() & Qt::LeftButton ) {
         TextRenderer* renderer = textRenderer();
 
-//        int x = renderer->widgetXToXpos( event->x() + horizontalScrollBar()->value() );
-//        int y = renderer->widgetYToYpos( event->y() + verticalScrollBar()->value() );
         int x = event->x();
         int y = event->y();
 
@@ -472,7 +470,11 @@ void TextEditorComponent::mouseMoveEvent(QMouseEvent* event )
         if( line >= 0 ) { col = renderer->columnIndexForXpos( line, x ); }
         if( line < 0 ) { line = 0; }
 
-        controller()->moveCaretTo( line, col, true );
+        if( event->modifiers() & Qt::ControlModifier) {
+            controller()->moveCaretTo( line, col, true, controller()->textSelection()->rangeCount() - 1 );
+        } else {
+            controller()->moveCaretTo( line, col, true );
+        }
     }
     QWidget::mouseMoveEvent(event);
 }

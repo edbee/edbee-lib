@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "edbee/exports.h"
+
 #include <QList>
 #include <QMap>
 #include <QStack>
@@ -23,7 +25,7 @@ class TextGrammarManager;
 class TextGrammarRule;
 
 /// For parsing a Textmate Language
-class TmLanguageParser : public BasePListParser
+class EDBEE_EXPORT TmLanguageParser : public BasePListParser
 {
 public:
     TmLanguageParser();

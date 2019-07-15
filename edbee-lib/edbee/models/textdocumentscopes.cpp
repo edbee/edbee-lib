@@ -687,7 +687,7 @@ void MultiLineScopedTextRangeSet::toSingleRange()
 /// This method sorts all ranges
 void MultiLineScopedTextRangeSet::sortRanges()
 {
-    qSort( scopedRangeList_.begin(), scopedRangeList_.end(), MultiLineScopedTextRange::lessThan );
+    std::sort(scopedRangeList_.begin(), scopedRangeList_.end(), MultiLineScopedTextRange::lessThan);
 }
 
 

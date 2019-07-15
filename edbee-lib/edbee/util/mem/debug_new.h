@@ -13,8 +13,8 @@
 //#endif
 //#include "memoryleak.h"
 
-#if defined(QT_DEBUG) && !defined(__MINGW32__)
-
+// #if defined(QT_DEBUG) && !defined(__MINGW32__) && defined(EDBEE_DEBUG)
+#if defined(EDBEE_DEBUG)
     #define EDBEE_DEBUG_NEW_ACTIVE
 
     void* debug_malloc      (size_t size, const char* file, const int line);

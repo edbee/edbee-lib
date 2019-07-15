@@ -621,7 +621,9 @@ void TextEditorController::replaceRangeSet(TextRangeSet& rangeSet, const QString
 /// For example:
 ///     moveCaretTo( 2, 1 ) => Moves the caret to the 3rd line and 2nd column
 ///     moveCaretTo( -1, -2 ) => Moves the caret to the character before the last character
-void TextEditorController::moveCaretTo(int line, int col, bool keepAnchors )
+///
+/// The rangeIndex is used to specify which range to move.. (Defaults to -1 which changes to a single range)
+void TextEditorController::moveCaretTo(int line, int col, bool keepAnchors, int rangeIndex )
 {
     if( line < 0) {
         line = textDocument()->lineCount() + line;
@@ -638,17 +640,18 @@ void TextEditorController::moveCaretTo(int line, int col, bool keepAnchors )
 
 //textDocument()->offsetFromLineAndColumn(line,col)
 
-    return moveCaretToOffset( offset , keepAnchors );
+    return moveCaretToOffset( offset , keepAnchors, rangeIndex );
 }
 
 
 /// Moves the caret to the given offset
 /// @param offset the offset to move the caret to
 /// @param keepAnchors should the anchors stay at the current position (extending the selection range)
-void TextEditorController::moveCaretToOffset(int offset, bool keepAnchors)
+/// The rangeIndex is used to specify which range to move.. (Defaults to -1 which changes to a single range)
+void TextEditorController::moveCaretToOffset(int offset, bool keepAnchors, int rangeIndex)
 {
 //    SelectionCommand* command = new SelectionCommand( SelectionCommand::MoveCaretToExactOffset, offset, keepAnchors );
-    SelectionCommand command( SelectionCommand::MoveCaretToExactOffset, offset, keepAnchors );
+    SelectionCommand command( SelectionCommand::MoveCaretToExactOffset, offset, keepAnchors, rangeIndex );
     return executeCommand( &command );
 }
 

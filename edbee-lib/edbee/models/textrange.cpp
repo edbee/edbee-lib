@@ -1099,7 +1099,7 @@ void TextRangeSet::toSingleRange()
 /// Sorts the ranges
 void TextRangeSet::sortRanges()
 {
-    qSort(selectionRanges_.begin(), selectionRanges_.end(), TextRange::lessThan );
+    std::sort(selectionRanges_.begin(), selectionRanges_.end(), TextRange::lessThan);
 }
 
 

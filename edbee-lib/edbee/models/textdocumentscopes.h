@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "edbee/exports.h"
+
 #include <QHash>
 #include <QObject>
 #include <QStringList>
@@ -33,8 +35,7 @@ typedef short TextScopeAtomId;
 
 /// This class defines a full text-scope. A full textscope is textscope
 /// with one ore more scoped-elements
-class TextScope
-{
+class EDBEE_EXPORT TextScope {
 public:
     const QString name();
     int atomCount();
@@ -58,7 +59,7 @@ private:
 
 /// A list of text-scopes.
 /// on a certian location, usually more then one scope is available on a given location
-class TextScopeList : public QVector<TextScope*>
+class EDBEE_EXPORT TextScopeList : public QVector<TextScope*>
 {
 public:
     TextScopeList();
@@ -110,8 +111,7 @@ public:
 ///   composite:    «expression» ([|&-] «expression»)*
 ///   selector:     «composite» (',' «composite»)*
 ///
-class TextScopeSelector
-{
+class EDBEE_EXPORT TextScopeSelector {
 public:
     TextScopeSelector( const QString& selector );
     virtual ~TextScopeSelector();
@@ -138,8 +138,7 @@ private:
 /// These text are converted to a list of numbers
 ///   12.3.24
 ///
-class TextScopeManager
-{
+class EDBEE_EXPORT TextScopeManager {
 public:
     TextScopeManager();
     virtual ~TextScopeManager();
@@ -175,7 +174,7 @@ private:
 
 
 /// A base scoped text range
-class ScopedTextRange : public TextRange
+class EDBEE_EXPORT ScopedTextRange : public TextRange
 {
 public:
     ScopedTextRange( int anchor, int caret, TextScope* scope );
@@ -200,7 +199,7 @@ private:
 
 
 /// A line based ScopedText range, that referenes a multi-line text-reference
-class MultiLineScopedTextRangeReference : public ScopedTextRange
+class EDBEE_EXPORT MultiLineScopedTextRangeReference : public ScopedTextRange
 {
 public:
     MultiLineScopedTextRangeReference( MultiLineScopedTextRange& range );
@@ -220,8 +219,7 @@ private:
 /// a list of textscopes
 /// This class is used for single-line scopes
 /// (Todo, this needs to be optimized)
-class ScopedTextRangeList
-{
+class EDBEE_EXPORT ScopedTextRangeList {
     Q_DISABLE_COPY(ScopedTextRangeList)
 public:
 
@@ -254,7 +252,7 @@ private:
 
 
 /// This class 'defines' a single document scope
-class MultiLineScopedTextRange : public ScopedTextRange
+class EDBEE_EXPORT MultiLineScopedTextRange : public ScopedTextRange
 {
 public:
     MultiLineScopedTextRange(int anchor, int caret, TextScope* scope);
@@ -279,7 +277,7 @@ private:
 
 /// This is a set of scoped textranges. This set is used
 /// to remember parsed language ranges
-class MultiLineScopedTextRangeSet : public TextRangeSetBase
+class EDBEE_EXPORT MultiLineScopedTextRangeSet : public TextRangeSetBase
 {
 public:
     MultiLineScopedTextRangeSet( TextDocument* textDocument, TextDocumentScopes* textDocumentScopes );
@@ -322,7 +320,7 @@ private:
 
 
 /// This class is used to 'contain' all document scope information
-class TextDocumentScopes : public QObject
+class EDBEE_EXPORT TextDocumentScopes : public QObject
 {
 Q_OBJECT
 

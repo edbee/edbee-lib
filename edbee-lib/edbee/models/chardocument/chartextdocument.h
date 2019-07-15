@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "edbee/exports.h"
+
 #include <QObject>
 #include <QHash>
 
@@ -21,7 +23,7 @@ class TextLineDataManager;
 class TextBufferChange;
 
 /// A plain textdocument. A document with simple character-buffer implementation
-class CharTextDocument : public TextDocument
+class EDBEE_EXPORT CharTextDocument : public TextDocument
 {
 Q_OBJECT
 
@@ -32,9 +34,6 @@ public:
 
     /// This method should return the active textbuffer
     virtual TextBuffer* buffer() const;
-
-    /// this method can be used to give a 'custom' line data item to a given line
-    virtual TextLineDataManager* lineDataManager() { return textLineDataManager_; }
 
 
     /// Should return the document-scopes of this document
@@ -86,7 +85,6 @@ private:
     TextEditorConfig* config_;                               ///< The text editor configuration
     TextBuffer* textBuffer_;                                 ///< The textbuffers
 
-    TextLineDataManager* textLineDataManager_;               ///< A class for managing text line data items
     TextDocumentScopes* textScopes_;                         ///< The text document scopes
     TextLexer* textLexer_;                                   ///< The lexer used for finding the scopes
 

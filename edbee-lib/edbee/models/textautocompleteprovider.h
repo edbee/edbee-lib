@@ -1,5 +1,7 @@
 #pragma once
 
+#include "edbee/exports.h"
+
 #include <QList>
 #include <QString>
 #include <QMultiMap>
@@ -15,8 +17,7 @@ class TextRange;
 /// An autocomplete item that's being returned
 /// Currently simply a string.
 /// It's placed in a seperate class for future extentions (LSP: https://github.com/Microsoft/language-server-protocol/blob/master/protocol.md#textDocument_completion)
-class TextAutoCompleteItem
-{
+class EDBEE_EXPORT TextAutoCompleteItem {
 public:
     TextAutoCompleteItem( const QString& label, const int kind, const QString& detail, const QString& documentation );
     QString label() const;
@@ -35,8 +36,7 @@ protected:
 
 
 /// A base autocomplete provider
-class TextAutoCompleteProvider
-{
+class EDBEE_EXPORT TextAutoCompleteProvider {
 public:
     virtual ~TextAutoCompleteProvider() {}
     virtual QList<TextAutoCompleteItem*> findAutoCompleteItemsForRange( TextDocument* document, const TextRange& range, const QString& word ) = 0;
@@ -44,7 +44,7 @@ public:
 
 
 /// a fixed stringlist autocompleter
-class StringTextAutoCompleteProvider : public TextAutoCompleteProvider
+class EDBEE_EXPORT StringTextAutoCompleteProvider : public TextAutoCompleteProvider
 {
 public:
     virtual ~StringTextAutoCompleteProvider();
@@ -74,7 +74,7 @@ protected:
 ///           -> Scope Autocompleter
 ///           -> .. add custom global providers ..
 ///
-class TextAutoCompleteProviderList : public TextAutoCompleteProvider
+class EDBEE_EXPORT TextAutoCompleteProviderList : public TextAutoCompleteProvider
 {
 public:
     TextAutoCompleteProviderList( TextAutoCompleteProvider* parentProvider=0);
@@ -93,7 +93,7 @@ protected:
 
 /*
 /// a grammar based autocomplete list
-class ScopeBasedTextAutoCompleteProvider : public TextAutoCompleteProvider
+class EDBEE_EXPORT ScopeBasedTextAutoCompleteProvider : public TextAutoCompleteProvider
 {
 public:
     virtual QList<TextAutoCompleteItem*> findAutoCompleteItemsForRange( TextDocument* document, TextRange& range );
@@ -104,7 +104,7 @@ protected:
 
 
 /// a texteditor widget specific provider
-class TextEditorSpecificTextAutoCompleteProvider : public TextAutoCompleteProvider
+class EDBEE_EXPORT TextEditorSpecificTextAutoCompleteProvider : public TextAutoCompleteProvider
 {
 public:
     virtual QList<TextAutoCompleteItem*> findAutoCompleteItemsForRange( TextDocument* document, TextRange& range );
@@ -115,8 +115,7 @@ public:
 
 
 /// This class is used to manage the automcomplete provider
-class TextAutoCompleteManager
-{
+class EDBEE_EXPORT TextAutoCompleteManager {
 public:
     TextAutoCompleteManager();
     virtual ~TextAutoCompleteProvider();

@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "edbee/exports.h"
+
 #include "edbee/texteditorcommand.h"
 
 namespace edbee {
@@ -24,7 +26,7 @@ class TextRangeSet;
 /// When spaces are used for tabs the behaviour is different. If the caret is left of
 /// the first non-space character, it will move 1 column to the left, depending on the tabsize
 ///
-class RemoveCommand : public TextEditorCommand
+class EDBEE_EXPORT RemoveCommand : public TextEditorCommand
 {
 public:
     enum RemoveMode {

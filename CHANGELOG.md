@@ -2,7 +2,11 @@
 
 edbee.lib:
 
+- fix #89, Replace qSort with std::sort
 - fix #84, Customize the autoScrollMargin
+- Moved the TextLineDataManager to the core TextDocument
+- Improves #82, Ctrl+Drag mouse while expands the last caret (allows multiple caret selections with mouse).
+- fix #79, Using backtab on empty document causes Q_ASSERT failure
 - ref #66, Automatic grouping of Changes that happen in repond of another event. (Crash in setText())
 - add #60, Basic support for auto complete.
 - add #59, Shift+Delete should perform a cut

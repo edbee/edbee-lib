@@ -381,7 +381,7 @@ static bool grammarsDisplayNameSorterLessThen( const TextGrammar* g1, const Text
 QList<TextGrammar*> TextGrammarManager::grammarsSortedByDisplayName()
 {
     QList<TextGrammar*> results = grammarMap_.values();
-    qSort( results.begin(), results.end(), grammarsDisplayNameSorterLessThen );
+    std::sort(results.begin(), results.end(), grammarsDisplayNameSorterLessThen);
     return results;
 }
 
