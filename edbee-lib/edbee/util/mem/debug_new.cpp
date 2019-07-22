@@ -15,7 +15,7 @@
 #include <malloc.h>
 #endif
 
-
+#if defined(EDBEE_DEBUG)
 #define debug_new_log // printf
 
 /// Logs a malloc operation
@@ -112,7 +112,7 @@ void  operator delete[] (void* p) throw()
 {
     return debug_free(p, "unknown", 0);
 }
-
+#endif
 
 
 namespace edbee {
