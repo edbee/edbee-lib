@@ -1,1 +1,1 @@
-https://bitbucket.org/razvanpetru/qt-components/src/fc2426a9d9fd/QsLog/
+Commit: https://bitbucket.org/codeimproved/qslog/commits/46b643d5bcbc

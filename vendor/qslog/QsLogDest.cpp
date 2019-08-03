@@ -1,4 +1,4 @@
-// Copyright (c) 2010, Razvan Petru
+// Copyright (c) 2013, Razvan Petru
 // All rights reserved.
 
 // Redistribution and use in source and binary forms, with or without modification,
@@ -24,60 +24,45 @@
 // OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "QsLogDest.h"
-#include "QsDebugOutput.h"
-#include <QFile>
-#include <QTextStream>
+#include "QsLogDestConsole.h"
+#include "QsLogDestFile.h"
+#include "QsLogDestFunctor.h"
 #include <QString>
 
 namespace QsLogging
 {
 
-//! file message sink
-class FileDestination : public Destination
+Destination::~Destination() noexcept = default;
+
+//! destination factory
+DestinationPtrU DestinationFactory::MakeFileDestination(const QString& filePath,
+    LogRotationOption rotation, const MaxSizeBytes &sizeInBytesToRotateAfter,
+    const MaxOldLogCount &oldLogsToKeep)
 {
-public:
-    FileDestination(const QString& filePath);
-    virtual void write(const QString& message, Level level);
+    if (LogRotationOption::EnableLogRotation == rotation) {
+        std::unique_ptr<SizeRotationStrategy> logRotation(new SizeRotationStrategy);
+        logRotation->setMaximumSizeInBytes(sizeInBytesToRotateAfter.size);
+        logRotation->setBackupCount(oldLogsToKeep.count);
 
-private:
-    QFile mFile;
-    QTextStream mOutputStream;
-};
+        return DestinationPtrU(new FileDestination(filePath, std::move(logRotation)));
+    }
 
-
-FileDestination::FileDestination(const QString& filePath)
-{
-    mFile.setFileName(filePath);
-    mFile.open(QFile::WriteOnly | QFile::Text); //fixme: should throw on failure
-    mOutputStream.setDevice(&mFile);
+    return DestinationPtrU(new FileDestination(filePath, RotationStrategyPtrU(new NullRotationStrategy)));
 }
 
-void FileDestination::write(const QString& message, Level)
+DestinationPtrU DestinationFactory::MakeDebugOutputDestination()
 {
-    mOutputStream << message << endl;
-    mOutputStream.flush();
+    return DestinationPtrU(new DebugOutputDestination);
 }
 
-//! debugger sink
-class DebugOutputDestination : public Destination
+DestinationPtrU DestinationFactory::MakeFunctorDestination(QsLogging::Destination::LogFunction f)
 {
-public:
-    virtual void write(const QString& message, Level level);
-};
-
-void DebugOutputDestination::write(const QString& message, Level)
-{
-    QsDebugOutput::output(message);
+    return DestinationPtrU(new FunctorDestination(f));
 }
 
-DestinationPtr DestinationFactory::MakeFileDestination(const QString& filePath)
+DestinationPtrU DestinationFactory::MakeFunctorDestination(QObject *receiver, const char *member)
 {
-    return DestinationPtr(new FileDestination(filePath));
-}
-
-DestinationPtr DestinationFactory::MakeDebugOutputDestination()
-{
-    return DestinationPtr(new DebugOutputDestination);
+    return DestinationPtrU(new FunctorDestination(receiver, member));
 }
 
 } // end namespace
