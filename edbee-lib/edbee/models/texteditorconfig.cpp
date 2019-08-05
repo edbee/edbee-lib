@@ -405,6 +405,23 @@ void TextEditorConfig::setShowWhitespaceMode(const QString& str)
     }
 }
 
+/// Sets whether autocomplete comes up automatically, or only manually(manual trigger isn't implemented yet)
+/// @see TextEditorConfig::autocompleteAutoShow
+void TextEditorConfig::setAutocompleteAutoShow(bool enable)
+{
+    qDebug() << "setAutocompleteAutoShow(" << enable << ")\n";
+    if( autocompleteAutoShow_ != enable ) {
+        autocompleteAutoShow_ = enable;
+        notifyChange();
+    }
+}
+
+/// Show autocomplete automatically, or only manually(manual isn't implemented yet)
+bool TextEditorConfig::autocompleteAutoShow() const
+{
+    qDebug() << "autocompleteAutoShow(" << autocompleteAutoShow_ << ")\n";
+    return autocompleteAutoShow_;
+}
 
 /// This internal method is used to notify the listener that a change has happend
 /// Thi smethod only emits a signal if there's no config group change busy
