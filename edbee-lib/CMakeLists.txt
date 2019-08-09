@@ -7,6 +7,8 @@ ENDIF()
 
 PROJECT(edbee-lib)
 
+add_subdirectory(../vendor/qslog/ qslog)
+
 SET(SOURCES
    edbee/util/mem/debug_new.cpp
    edbee/util/mem/debug_allocs.cpp
@@ -176,7 +178,6 @@ ENDIF()
 
 set(CMAKE_AUTOMOC ON)
 
-add_subdirectory(../vendor/qslog/ qslog)
 add_subdirectory(../vendor/onig/ onig)
 
 ADD_DEFINITIONS(
