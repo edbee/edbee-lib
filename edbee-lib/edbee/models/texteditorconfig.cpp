@@ -409,7 +409,6 @@ void TextEditorConfig::setShowWhitespaceMode(const QString& str)
 /// @see TextEditorConfig::autocompleteAutoShow
 void TextEditorConfig::setAutocompleteAutoShow(bool enable)
 {
-    qDebug() << "setAutocompleteAutoShow(" << enable << ")\n";
     if( autocompleteAutoShow_ != enable ) {
         autocompleteAutoShow_ = enable;
         notifyChange();
@@ -419,7 +418,6 @@ void TextEditorConfig::setAutocompleteAutoShow(bool enable)
 /// Show autocomplete automatically, or only manually(manual isn't implemented yet)
 bool TextEditorConfig::autocompleteAutoShow() const
 {
-    qDebug() << "autocompleteAutoShow(" << autocompleteAutoShow_ << ")\n";
     return autocompleteAutoShow_;
 }
 
