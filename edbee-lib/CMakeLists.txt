@@ -51,7 +51,7 @@ SET(SOURCES
    edbee/io/jsonparser.cpp
    edbee/models/textgrammar.cpp
    edbee/models/texteditorcommandmap.cpp
-	 edbee/views/components/texteditorautocompletecomponent.cpp
+   edbee/views/components/texteditorautocompletecomponent.cpp
    edbee/views/components/texteditorcomponent.cpp
    edbee/views/components/texteditorrenderer.cpp
    edbee/views/components/textmargincomponent.cpp
@@ -132,7 +132,7 @@ SET(HEADERS
    edbee/io/jsonparser.h
    edbee/models/textgrammar.h
    edbee/models/texteditorcommandmap.h
-	 edbee/views/components/texteditorautocompletecomponent.h
+   edbee/views/components/texteditorautocompletecomponent.h
    edbee/views/components/texteditorcomponent.h
    edbee/views/components/texteditorrenderer.h
    edbee/views/components/textmargincomponent.h

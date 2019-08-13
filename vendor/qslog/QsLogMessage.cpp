@@ -1,4 +1,4 @@
-// Copyright (c) 2011, Razvan Petru
+// Copyright (c) 2015, Axel Gembe <axel@gembe.net>
 // All rights reserved.
 
 // Redistribution and use in source and binary forms, with or without modification,
@@ -23,47 +23,24 @@
 // OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 // OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "QsDebugOutput.h"
-#include <QString>
-#include <QtGlobal>
+#include "QsLogMessage.h"
+#include "QsLogLevel.h"
 
-#if defined(Q_OS_WIN)
-#define WIN32_LEAN_AND_MEAN
-#include <Windows.h>
-void QsDebugOutput::output( const QString& message )
+namespace QsLogging
 {
-   OutputDebugStringW(reinterpret_cast<const WCHAR*>(message.utf16()));
-   OutputDebugStringW(L"\n");
-}
-#elif defined(Q_OS_SYMBIAN)
-#include <e32debug.h>
-void QsDebugOutput::output( const QString& message )
-{
-    const int maxPrintSize = 256;
-    if(message.size() <= maxPrintSize)
-    {
-        TPtrC16 symbianMessage(reinterpret_cast<const TUint16*>(message.utf16()));
-        RDebug::RawPrint(symbianMessage);
-    }
-    else
-    {
-        QString slicedMessage = message;
-        while(!slicedMessage.isEmpty())
-        {
-            const int sliceSize = qMin(maxPrintSize, slicedMessage.size());
-            const QString slice = slicedMessage.left(sliceSize);
-            slicedMessage.remove(0, sliceSize);
 
-            TPtrC16 symbianSlice(reinterpret_cast<const TUint16*>(slice.utf16()));
-            RDebug::RawPrint(symbianSlice);
-        }
-    }
-}
-#elif defined(Q_OS_UNIX)
-#include <cstdio>
-void QsDebugOutput::output( const QString& message )
+// not using Qt::ISODate because we need the milliseconds too
+static const char DateTimePattern[] = "yyyy-MM-ddThh:mm:ss.zzz";
+
+LogMessage::LogMessage(const QString& m, const QDateTime& t, const Level l)
+    : message(m)
+    , time(t)
+    , level(l)
+    , formatted(QString("%1 %2 %3").arg(LevelName(level))
+        .arg(t.toLocalTime().toString(DateTimePattern))
+        .arg(message))
 {
-   fprintf(stderr, "%s\n", qPrintable(message));
-   fflush(stderr);
+
 }
-#endif
+
+}

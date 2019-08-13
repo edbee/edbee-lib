@@ -1,4 +1,5 @@
-// Copyright (c) 2013, Razvan Petru
+// Copyright (c) 2014, Razvan Petru
+// Copyright (c) 2014, Omar Carey
 // All rights reserved.
 
 // Redistribution and use in source and binary forms, with or without modification,
@@ -23,26 +24,43 @@
 // OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 // OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef QSLOGLEVEL_H
-#define QSLOGLEVEL_H
-class QString;
+#include "QsLogDestFunctor.h"
+#include <cstddef>
+#include <QtGlobal>
+#include <QString>
 
-namespace QsLogging
+const char* const QsLogging::FunctorDestination::Type = "functor";
+
+QsLogging::FunctorDestination::FunctorDestination(LogFunction f)
+    : QObject(nullptr)
+    , mLogFunction(f)
 {
-enum Level
-{
-    TraceLevel = 0,
-    DebugLevel,
-    InfoLevel,
-    WarnLevel,
-    ErrorLevel,
-    FatalLevel,
-    OffLevel
-};
-
-const char* LevelName(Level theLevel);
-QString LocalizedLevelName(Level theLevel);
-
 }
 
-#endif // QSLOGLEVEL_H
+QsLogging::FunctorDestination::FunctorDestination(QObject* receiver, const char* member)
+    : QObject(nullptr)
+    , mLogFunction(nullptr)
+{
+    connect(this, SIGNAL(logMessageReady(QsLogging::LogMessage)),
+            receiver, member, Qt::QueuedConnection);
+}
+
+
+void QsLogging::FunctorDestination::write(const LogMessage& message)
+{
+    if (mLogFunction)
+        mLogFunction(message);
+
+    if (message.level > QsLogging::TraceLevel)
+        emit logMessageReady(message);
+}
+
+bool QsLogging::FunctorDestination::isValid()
+{
+    return true;
+}
+
+QString QsLogging::FunctorDestination::type() const
+{
+    return QString::fromLatin1(Type);
+}

@@ -6,7 +6,7 @@
 #pragma once
 
 #include <QFileInfo>
-#include <QsLog.h>
+#include "../vendor/qslog/QsLog.h"
 
 
 #define qlog_trace() \

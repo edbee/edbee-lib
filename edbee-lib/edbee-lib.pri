@@ -165,3 +165,21 @@ HEADERS += \
 include($$PWD/../vendor/qslog/QsLog.pri)
 include($$PWD/../vendor/onig/onig.pri)
 
+## Files that can usefully listed inside Qt IDE (Qt Creator, as "Other files")
+##============================================================================
+DISTFILES += \
+    $$PWD/../CHANGELOG.md \
+    $$PWD/../LICENSE \
+    $$PWD/../README.md \
+    $$PWD/../.travis.yml \
+    $$PWD/../.gitignore \
+    $$PWD/../CMakeLists.txt \
+    $$PWD/../CI/travis.install.sh \
+    $$PWD/../CI/travis.osx.install.sh \
+    $$PWD/../CI/travis.before_install.sh \
+    $$PWD/../CI/travis.osx.before_install.sh \
+    $$PWD/CMakeLists.txt \
+    $$PWD/Doxyfile \
+    $$PWD/doc/coding-style.md \
+    $$PWD/doc/index.md \
+    $$PWD/images/doc-logo.png
