@@ -2,6 +2,7 @@
 
 edbee.lib:
 
+- Update Onigmo to 6.2.0 (2019-08-13)
 - fix #89, Replace qSort with std::sort
 - fix #84, Customize the autoScrollMargin
 - Moved the TextLineDataManager to the core TextDocument
