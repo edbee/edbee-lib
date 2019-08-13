@@ -15,7 +15,7 @@
 #include <malloc.h>
 #endif
 
-
+#if defined(EDBEE_DEBUG)
 #define debug_new_log // printf
 
 /// Logs a malloc operation
@@ -23,7 +23,7 @@
 /// @param file the file of the malloc
 /// @param line the line number of the allocation
 void* debug_malloc(size_t size, const char* file, const int line)
-{   
+{
     edbee::DebugAllocationList* allocList = edbee::DebugAllocationList::instance();
     QMutexLocker lock(allocList->mutex());
 
@@ -112,7 +112,7 @@ void  operator delete[] (void* p) throw()
 {
     return debug_free(p, "unknown", 0);
 }
-
+#endif
 
 
 namespace edbee {
