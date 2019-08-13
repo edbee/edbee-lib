@@ -370,6 +370,11 @@ void TextEditorAutoCompleteComponent::updateList()
     TextDocument* doc = controller()->textDocument();
     TextRange range = controller()->textSelection()->range(0);
 
+    if (!isVisible() && !doc->config()->autocompleteAutoShow())
+    {
+        return;
+    }
+
     // when the character after
     if(!shouldDisplayAutoComplete(range, currentWord_)) {
       menuRef_->close();
