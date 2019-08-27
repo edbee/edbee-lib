@@ -267,7 +267,7 @@ TextScope::TextScope()
 // Destructs the textscope
 TextScope::~TextScope()
 {
-    delete scopeAtoms_;
+    delete[] scopeAtoms_;
 }
 
 
