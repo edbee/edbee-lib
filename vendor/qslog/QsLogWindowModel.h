@@ -1,4 +1,4 @@
-// Copyright (c) 2012, Razvan Petru
+// Copyright (c) 2015, Axel Gembe <axel@gembe.net>
 // All rights reserved.
 
 // Redistribution and use in source and binary forms, with or without modification,
@@ -23,15 +23,50 @@
 // OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 // OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef QSDEBUGOUTPUT_H
-#define QSDEBUGOUTPUT_H
+#ifndef QSLOGWINDOWMODEL_H
+#define QSLOGWINDOWMODEL_H
 
-class QString;
+#include "QsLogSharedLibrary.h"
+#include "QsLogMessage.h"
+#include <QAbstractTableModel>
+#include <QReadWriteLock>
 
-class QsDebugOutput
+#include <limits>
+#include <deque>
+
+namespace QsLogging
 {
+class QSLOG_SHARED_OBJECT LogWindowModel : public QAbstractTableModel
+{
+    Q_OBJECT
 public:
-   static void output(const QString& a_message);
+    enum Column
+    {
+        TimeColumn = 0,
+        LevelNameColumn = 1,
+        MessageColumn = 2,
+        FormattedMessageColumn = 100
+    };
+
+    explicit LogWindowModel(size_t max_items = std::numeric_limits<size_t>::max());
+    virtual ~LogWindowModel() noexcept;
+
+    void addEntry(const LogMessage& message);
+    void clear();
+    LogMessage at(size_t index) const;
+
+    // QAbstractTableModel overrides
+    int columnCount(const QModelIndex& parent = QModelIndex()) const override;
+    int rowCount(const QModelIndex& parent = QModelIndex()) const override;
+    QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
+    QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
+
+private:
+    std::deque<LogMessage> mLogMessages;
+    mutable QReadWriteLock mMessagesLock;
+    size_t mMaxItems;
 };
 
-#endif // QSDEBUGOUTPUT_H
+}
+
+#endif // QSLOGWINDOWMODEL_H
