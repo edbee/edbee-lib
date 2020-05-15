@@ -6,6 +6,7 @@
 #include "texteditorrenderer.h"
 
 #include <QPainter>
+#include <QPainterPath>
 #include <QTextLayout>
 
 #include "edbee/models/textdocument.h"
