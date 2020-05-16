@@ -2,6 +2,9 @@
 
 edbee.lib:
 
+- fix #98, Missing header include in Qt 5.15rc
+- fix #94 (partial), Resource delete fix in TextDocumentscopes
+- Merged PR #86, Updated QsLog
 - fix #89, Replace qSort with std::sort
 - fix #84, Customize the autoScrollMargin
 - Moved the TextLineDataManager to the core TextDocument
