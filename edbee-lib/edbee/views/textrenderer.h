@@ -61,8 +61,14 @@ public:
     int yPosForLine( int line );
     int yPosForOffset( int offset );
 
+// Document access functions (Document vs Placeholder text)
+    int lineCount();
+    QString getLine(int index);
+
 // caching
     QTextLayout* textLayoutForLine( int line );
+    QTextLayout* textLayoutForLineForPlaceholder( int line );
+    QTextLayout* textLayoutForLineNormal( int line );
 
 // rendering
     void renderBegin(const QRect& rect );
@@ -70,6 +76,7 @@ public:
 
 // getters / setters
     TextDocument* textDocument();
+    TextDocument* placeholderTextDocument();
     TextSelection *textSelection();
     TextEditorConfig* config();
     TextEditorController* controller();
@@ -142,6 +149,7 @@ private:
     int startLine_;                           ///< The first line that needs rendering
     int endLine_;                             ///< The last line that needs rendering
 
+    TextDocument* placeHolderDocument_;
 };
 
 } // edbee

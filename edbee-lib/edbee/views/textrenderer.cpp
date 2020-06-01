@@ -8,10 +8,12 @@
 #include <QDateTime>
 #include <QRect>
 #include <QPainter>
+#include <QStringList>
 #include <QTextLayout>
 
 #include "edbee/util/simpleprofiler.h"
 
+#include "edbee/models/chardocument/chartextdocument.h"
 #include "edbee/models/textdocument.h"
 #include "edbee/models/texteditorconfig.h"
 #include "edbee/models/textlexer.h"
@@ -42,16 +44,18 @@ TextRenderer::TextRenderer(TextEditorController* controller)
     , endOffset_(0)
     , startLine_(0)
     , endLine_(0)
+    , placeHolderDocument_(0)
 {
     connect( controller, SIGNAL(textDocumentChanged(edbee::TextDocument*,edbee::TextDocument*)), this, SLOT(textDocumentChanged(edbee::TextDocument*,edbee::TextDocument*)));
     textThemeStyler_ = new TextThemeStyler( controller );
-
+    placeHolderDocument_ = new CharTextDocument();
 }
 
 
 /// the destructor
 TextRenderer::~TextRenderer()
 {
+    delete placeHolderDocument_;
     delete textThemeStyler_;
     cachedTextLayoutList_.clear();
 //    qDeleteAll(cachedTextLayoutList_);
@@ -226,16 +230,84 @@ int TextRenderer::yPosForOffset(int offset)
     return yPosForLine(line);
 }
 
-
-
 /// This method returns the textlayout for the given line
 QTextLayout *TextRenderer::textLayoutForLine(int line)
+{
+    Q_ASSERT( line >= 0 );
+/// FIXME:  Invalide TextLayout cache when required!!!
+    if( controller()->textDocument()->length() == 0){
+        return textLayoutForLineForPlaceholder(line);
+    } else {
+        return textLayoutForLineNormal(line);
+    }
+}
+
+QTextLayout *TextRenderer::textLayoutForLineForPlaceholder(int line)
 {
     Q_ASSERT( line >= 0 );
 /// FIXME:  Invalide TextLayout cache when required!!!
 
     TextDocument* doc = textDocument();
     if( line >= doc->lineCount() ) return 0;
+
+    QTextLayout* textLayout = cachedTextLayoutList_.object(line);
+    if( !textLayout ) {
+        textLayout = new QTextLayout();
+        textLayout->setCacheEnabled(true);
+        int tabWidth = controllerRef_->widget()->fontMetrics().charWidth("M",0);
+
+        QTextOption option;
+        option.setTabStop( config()->indentSize() * tabWidth );
+        if( config()->showWhitespaceMode() == TextEditorConfig::ShowWhitespaces ) {
+            option.setFlags( QTextOption::ShowTabsAndSpaces );        /// TODO: Make an option to show spaces and tabs
+        }
+
+        textLayout->setFont( textWidget()->font() );
+        textLayout->setTextOption( option );
+
+        // add extra format (no format)
+        QTextCharFormat format;
+
+        QColor color = themeStyler()->theme()->foregroundColor();
+        color.setAlpha(180);
+        format.setForeground(color);
+
+
+        QString text = doc->lineWithoutNewline(line);
+
+        QVector<QTextLayout::FormatRange> formatRanges;
+        QTextLayout::FormatRange formatRange;
+        formatRange.start = 0;
+        formatRange.length = text.length();
+        formatRange.format = format;
+        formatRanges.append(formatRange);
+        textLayout->setFormats(formatRanges);
+
+        textLayout->setText(text);
+        textLayout->beginLayout();
+        QTextLine textline = textLayout->createLine();
+        Q_UNUSED(textline);
+        textLayout->endLayout();
+
+        // update the width cache
+        totalWidthCache_ = qMax( totalWidthCache_, qRound(textLayout->boundingRect().width()+0.5));
+
+        // add to the cache
+        cachedTextLayoutList_.insert( line, textLayout );
+//qlog_info() << "Cache Line: " << line;
+
+    }
+    return textLayout;
+}
+
+QTextLayout *TextRenderer::textLayoutForLineNormal(int line)
+{
+    Q_ASSERT( line >= 0 );
+/// FIXME:  Invalide TextLayout cache when required!!!
+
+    TextDocument* doc = textDocument();
+    if( line >= doc->lineCount() ) return 0;
+
     QTextLayout* textLayout = cachedTextLayoutList_.object(line);
     if( !textLayout ) {
         textLayout = new QTextLayout();
@@ -291,7 +363,6 @@ QTextLayout *TextRenderer::textLayoutForLine(int line)
 //qlog_info() << "Cache Line: " << line;
 
     }
-
     return textLayout;
 }
 
@@ -349,7 +420,16 @@ void TextRenderer::renderEnd( const QRect& rect )
 /// This method returns the document
 TextDocument* TextRenderer::textDocument()
 {
+    if( controllerRef_->textDocument()->length() == 0 ){
+        // return placeholder textdocument
+        return placeHolderDocument_;
+    }
     return controllerRef_->textDocument();
+}
+
+TextDocument *TextRenderer::placeholderTextDocument()
+{
+    return placeHolderDocument_;
 }
 
 

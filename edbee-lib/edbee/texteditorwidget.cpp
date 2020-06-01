@@ -265,6 +265,11 @@ void TextEditorWidget::setAutoScrollMargin(int amount)
     autoScrollMargin_ = amount;
 }
 
+void TextEditorWidget::setPlaceholderText(const QString &text)
+{
+    this->textRenderer()->placeholderTextDocument()->setText(text);
+}
+
 
 /// This mehtod is called when a resize happens
 /// @param event the event of the editor widget

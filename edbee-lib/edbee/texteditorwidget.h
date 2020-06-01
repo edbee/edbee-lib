@@ -63,6 +63,7 @@ public:
     void setHorizontalScrollBar( QScrollBar* scrollBar );
 	int autoScrollMargin() const;
     void setAutoScrollMargin(int amount=50);
+    void setPlaceholderText(const QString& text);
 
 protected:
 

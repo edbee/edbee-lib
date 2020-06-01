@@ -10,6 +10,7 @@
 #include <QMenu>
 #include <QPainter>
 #include <QPaintEvent>
+#include <QPalette>
 #include <QTimer>
 
 #include "edbee/commands/selectioncommand.h"
