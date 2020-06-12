@@ -318,11 +318,11 @@ bool TextEditorAutoCompleteComponent::eventFilter(QObject *obj, QEvent *event)
             case Qt::Key_Enter:
             case Qt::Key_Return:
             case Qt::Key_Tab:
-                if( currentWord_ == listWidgetRef_->currentItem()->text() ) { // sends normal enter/return/tab if you've typed a full word
+                if( listWidgetRef_->currentItem() && currentWord_ == listWidgetRef_->currentItem()->text() ) { // sends normal enter/return/tab if you've typed a full word
                     menuRef_->close();
                     QApplication::sendEvent(editorComponentRef_, event);
                     return true;
-                } else {
+                } else if ( listWidgetRef_->currentItem() ) {
                     insertCurrentSelectedListItem();
                     menuRef_->close();
                     return true;
