@@ -19,7 +19,7 @@ class TextRange;
 /// It's placed in a seperate class for future extentions (LSP: https://github.com/Microsoft/language-server-protocol/blob/master/protocol.md#textDocument_completion)
 class EDBEE_EXPORT TextAutoCompleteItem {
 public:
-    TextAutoCompleteItem( const QString& label, const int kind, const QString& detail, const QString& documentation );
+    TextAutoCompleteItem( const QString& label, const int kind = 0, const QString& detail = "", const QString& documentation = "");
     QString label() const;
     int kind() const;
     QString detail() const;
@@ -50,7 +50,7 @@ public:
     virtual ~StringTextAutoCompleteProvider();
     virtual QList<TextAutoCompleteItem*> findAutoCompleteItemsForRange( TextDocument* document, const TextRange& range, const QString& word ) ;
 
-    virtual void add(const QString& label, const int kind, const QString& detail = "", const QString& documentation = "");
+    virtual void add(const QString& label, const int kind = 0, const QString& detail = "", const QString& documentation = "");
     virtual void give(TextAutoCompleteItem* item);
 protected:
     QList<TextAutoCompleteItem*> itemList_;

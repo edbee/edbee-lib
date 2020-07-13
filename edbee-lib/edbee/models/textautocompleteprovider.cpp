@@ -8,6 +8,10 @@
 
 namespace edbee {
 
+// We don't have lang-server support, but for future support, the constants of langserver are used
+const int LANG_COMPLETION_ITEM_KIND_KEYWORD = 14;
+
+/// @param kind the kind of autocomplete items (Use a Langserver constant)
 TextAutoCompleteItem::TextAutoCompleteItem(const QString &label, const int kind, const QString &detail, const QString &documentation)
     : label_(label),
       kind_(kind),
@@ -55,7 +59,7 @@ int TextAutoCompleteItem::matchLabelScore(TextDocument*, const TextRange&, const
     /// We probably need to calculate a score
     if( word.length() < 3 )
         return 0;
-        if( label_ == word ) {
+    if( label_ == word ) {
         return 1;
     } else if ( label_.toLower().startsWith(word.toLower()) ) {
         return 2;
@@ -84,10 +88,10 @@ QList<TextAutoCompleteItem *> StringTextAutoCompleteProvider::findAutoCompleteIt
 
     foreach( TextAutoCompleteItem* item, itemList_ ) {
         int match = item->matchLabelScore(document,range,word);
-        if( match && match == 1 && item->kind() == 14 ) {
+        if( match && match == 1 && item->kind() == LANG_COMPLETION_ITEM_KIND_KEYWORD  ) {
             items.clear();
             return items.values();
-        } else if( match && item->kind() != 14 ) {
+        } else if( match && item->kind() != LANG_COMPLETION_ITEM_KIND_KEYWORD  ) {
             items.insert(match, item);
         }
     }
