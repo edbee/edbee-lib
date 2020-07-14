@@ -41,7 +41,7 @@ TextEditorAutoCompleteComponent::TextEditorAutoCompleteComponent(TextEditorContr
     layout->setSpacing(0);
     layout->setMargin(0);
 
-    menuRef_ = new QMenu();
+    menuRef_ = new QMenu(this);
     listWidgetRef_ = new QListWidget(menuRef_);
     listWidgetRef_->installEventFilter(this);
     menuRef_->installEventFilter(this);
@@ -130,7 +130,7 @@ void TextEditorAutoCompleteComponent::showInfoTip()
 
     QString infoTip = current.data(Qt::UserRole).toString();
     if( infoTip.isEmpty() ) {
-        infoTip = "No tooltip data found!";
+//        infoTip = "No tooltip data found!";
     }
 
     if( infoTipRef_.isNull() ) {
@@ -166,8 +166,12 @@ void TextEditorAutoCompleteComponent::showInfoTip()
         }
     }
 
-    menuRef_->resize(QSize(maxWidth + 2, ( qMin(listWidgetRef_->count(), 10) * fm.height() ) + 6 ));
-    listWidgetRef_->resize(QSize(maxWidth + 0, ( qMin(listWidgetRef_->count(), 10) * fm.height() + 4 )));
+    int spacing = 0;
+    menuRef_->resize(QSize(maxWidth + spacing + 2, ( qMin(listWidgetRef_->count(), 10) * fm.height() ) + 6 ));
+    listWidgetRef_->resize(QSize(maxWidth + spacing, ( qMin(listWidgetRef_->count(), 10) * fm.height() + 4 )));
+//    menuRef_->resize(QSize(maxWidth + spacing + 2, ( qMin(listWidgetRef_->count(), 10) * fm.height() ) ));
+//    listWidgetRef_->resize(QSize(maxWidth + spacing, ( qMin(listWidgetRef_->count(), 10) * fm.height() )));
+
 
     QRect r = listWidgetRef_->visualItemRect(listWidgetRef_->currentItem());
     int xOffset;
@@ -193,10 +197,12 @@ void TextEditorAutoCompleteComponent::showInfoTip()
         newLoc.setX(menuRef_->x() - infoTipRef_->width() - 1);
     }
 
-    infoTipRef_->repaint();
-    infoTipRef_->move(newLoc);
-    infoTipRef_->show();
-    infoTipRef_->raise();
+    if(!infoTip.isEmpty()) {
+      infoTipRef_->repaint();
+      infoTipRef_->move(newLoc);
+      infoTipRef_->show();
+      infoTipRef_->raise();
+    }
 }
 
 void TextEditorAutoCompleteComponent::hideInfoTip()
@@ -327,6 +333,7 @@ bool TextEditorAutoCompleteComponent::eventFilter(QObject *obj, QEvent *event)
                     menuRef_->close();
                     return true;
                 }
+                break;
 
         case Qt::Key_Backspace:
                 QApplication::sendEvent(editorComponentRef_, event);

@@ -33,6 +33,8 @@ TextEditorConfig::TextEditorConfig( QObject* parent )
     , themeName_("Monokai")
     , scrollPastEnd_(false)
     , showWhitespaceMode_(HideWhitespaces)
+    , autocompleteAutoShow_(true)
+    , autocompleteMinimalCharacters_(0)
 {
     charGroups_.append( QStringLiteral("./\\()\"'-:,.;<>~!@#$%^&*|+=[]{}`~?"));
 }
@@ -413,6 +415,16 @@ void TextEditorConfig::setAutocompleteAutoShow(bool enable)
         autocompleteAutoShow_ = enable;
         notifyChange();
     }
+}
+
+int TextEditorConfig::autocompleteMinimalCharacters() const
+{
+    return autocompleteMinimalCharacters_;
+}
+
+void TextEditorConfig::setAutocompleteMinimalCharacters(int amount)
+{
+    autocompleteMinimalCharacters_ = amount;
 }
 
 /// Show autocomplete automatically, or only manually(manual isn't implemented yet)
