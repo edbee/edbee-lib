@@ -208,7 +208,17 @@ void TextEditorComponent::paintEvent(QPaintEvent* paintEvent)
 //    QStyleOptionFocusRect option;
 //    option.init(this);
 //    option.backgroundColor = palette().color(QPalette::Window);
-//    style()->drawPrimitive(QStyle::PE_FrameFocusRect, &option, &p,this);
+    //    style()->drawPrimitive(QStyle::PE_FrameFocusRect, &option, &p,this);
+}
+
+void TextEditorComponent::moveEvent(QMoveEvent *moveEvent)
+{
+
+}
+
+void TextEditorComponent::hideEvent(QHideEvent *hideEvent)
+{
+
 }
 
 

@@ -1,14 +1,20 @@
 #include "textautocompleteprovider.h"
 
+#include "edbee/models/texteditorconfig.h"
 #include "edbee/models/textdocument.h"
 #include "edbee/models/textdocumentscopes.h"
+#include "edbee/models/textgrammar.h"
 
 #include "edbee/debug.h"
 
 namespace edbee {
 
-TextAutoCompleteItem::TextAutoCompleteItem(const QString &label)
-    : label_(label)
+/// @param kind the kind of autocomplete items (Use a Langserver constant)
+TextAutoCompleteItem::TextAutoCompleteItem(const QString &label, const int kind, const QString &detail, const QString &documentation)
+    : label_(label),
+      kind_(kind),
+      detail_(detail),
+      documentation_(documentation)
 {
 }
 
@@ -19,17 +25,47 @@ QString TextAutoCompleteItem::label() const
     return label_;
 }
 
+int TextAutoCompleteItem::kind() const
+{
+    return kind_;
+}
+
+QString TextAutoCompleteItem::detail() const
+{
+    return detail_;
+}
+
+QString TextAutoCompleteItem::documentation() const
+{
+    return documentation_;
+}
+
 
 /// Compares the given text-autocomplete item with the label
-/// This methd should return a match score, where a score of 0 means NO match
-int TextAutoCompleteItem::matchLabelScore(TextDocument *document, const TextRange &range, const QString &word)
+/// This method should return a match score, where a score of 0 means NO match
+/*! \fn int TextAutoCompleteItem::matchLabelScore(TextDocument *document, const TextRange &range, const QString &word)
+    Returns a copy of the \a str string. The given string is converted
+    to Unicode using the fromUtf8() function.
+    \sa fromLatin1(), fromLocal8Bit(), fromUtf8(), QByteArray::fromStdString()
+*/
+int TextAutoCompleteItem::matchLabelScore(TextDocument* doc, const TextRange&, const QString &word)
 {
     /// For now a simple prefix-prefix search. Later fuzzy search.
     /// Inspiration:
     /// - https://www.quora.com/How-is-the-fuzzy-search-algorithm-in-Sublime-Text-designed-How-would-you-design-something-similar)
     /// - https://github.com/renstrom/fuzzysearch
     /// We probably need to calculate a score
-    return label_.startsWith(word) ? 1 : 0;
+    if( word.length() < doc->config()->autocompleteMinimalCharacters())
+        return 0;
+    if( label_ == word ) {
+        return 1;
+    } else if ( label_.toLower().startsWith(word.toLower()) ) {
+        return 2;
+    } else if ( label_.toLower().contains(word.toLower()) ) {
+        return 3;
+    } else {
+        return 0;
+    }
 }
 
 
@@ -46,20 +82,30 @@ StringTextAutoCompleteProvider::~StringTextAutoCompleteProvider()
 /// Search auto-complete items in the list
 QList<TextAutoCompleteItem *> StringTextAutoCompleteProvider::findAutoCompleteItemsForRange(TextDocument *document, const TextRange &range, const QString &word)
 {
-    QList<TextAutoCompleteItem *> result;
+    QMultiMap<int, TextAutoCompleteItem *> items;
+
     foreach( TextAutoCompleteItem* item, itemList_ ) {
-        if( item->matchLabelScore(document,range,word)) {
-            result.append(item);
+        int match = item->matchLabelScore(document,range,word);
+        if( match && match == 1 && item->kind() == edbee::TextAutoCompleteKind::Keyword ) {
+            items.clear();
+            return items.values();
+        } else if( match && item->kind() != edbee::TextAutoCompleteKind::Keyword ) {
+            items.insert(match, item);
         }
     }
-    return result;
+
+    if( items.size() == 1 && items.contains(1) ) {
+        items.clear();
+        return items.values();
+    }
+    return items.values();
 }
 
 
 /// directly add a label
-void StringTextAutoCompleteProvider::add(const QString &label)
+void StringTextAutoCompleteProvider::add(const QString &label, const int kind, const QString &detail, const QString &documentation)
 {
-    itemList_.push_back( new TextAutoCompleteItem(label));
+    itemList_.push_back(new TextAutoCompleteItem(label, kind, detail=="" && kind == 3 ? label + "()" : detail, documentation));
 }
 
 
@@ -68,9 +114,6 @@ void StringTextAutoCompleteProvider::give(TextAutoCompleteItem *item)
 {
     itemList_.push_back(item);
 }
-
-
-
 
 // ------------------------------
 
@@ -82,7 +125,6 @@ TextAutoCompleteProviderList::TextAutoCompleteProviderList(TextAutoCompleteProvi
 TextAutoCompleteProviderList::~TextAutoCompleteProviderList()
 {
     qDeleteAll(providerList_);
-    providerList_.clear();
 }
 
 
@@ -112,7 +154,6 @@ void TextAutoCompleteProviderList::setParentProvider(TextAutoCompleteProvider *p
 {
     parentProviderRef_ = provider;
 }
-
 
 
 // -----------------------------

@@ -85,7 +85,7 @@ TextEditorWidget::TextEditorWidget( QWidget* parent)
 
     /// TODO: Check if this works.. It could be possible the layout screws this
     /// If I add this before the setLayout everything hangs :S ...
-    autoCompleteCompRef_ = new TextEditorAutoCompleteComponent(controller_,editCompRef_);
+    autoCompleteCompRef_ = new TextEditorAutoCompleteComponent( controller_, editCompRef_, marginCompRef_ );
 
 
     marginCompRef_->init();
@@ -94,6 +94,7 @@ TextEditorWidget::TextEditorWidget( QWidget* parent)
     connect( this, SIGNAL(horizontalScrollBarChanged(QScrollBar*)), SLOT(connectHorizontalScrollBar()) );
     connect( this, SIGNAL(verticalScrollBarChanged(QScrollBar*)), SLOT(connectVerticalScrollBar()) );
     connect( editCompRef_, SIGNAL(textKeyPressed()), autoCompleteCompRef_, SLOT(textKeyPressed()));
+    connect( controller_, SIGNAL(backspacePressed()), autoCompleteCompRef_, SLOT(backspacePressed()));
 
 
     setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Expanding );
@@ -277,7 +278,6 @@ void TextEditorWidget::resizeEvent(QResizeEvent* event)
     QWidget::resizeEvent(event);
     updateRendererViewport();
 }
-
 
 /// a basic event-filter for recieving focus-events of the editor
 /// @param obj the object to filter the events for

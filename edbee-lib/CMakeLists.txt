@@ -7,6 +7,8 @@ ENDIF()
 
 PROJECT(edbee-lib)
 
+add_subdirectory(../vendor/qslog/ qslog)
+
 SET(SOURCES
    edbee/util/mem/debug_new.cpp
    edbee/util/mem/debug_allocs.cpp
@@ -176,7 +178,6 @@ ENDIF()
 
 set(CMAKE_AUTOMOC ON)
 
-add_subdirectory(../vendor/qslog/ qslog)
 add_subdirectory(../vendor/onig/ onig)
 
 ADD_DEFINITIONS(
@@ -196,8 +197,10 @@ INCLUDE_DIRECTORIES(
 )
 
 ADD_LIBRARY(edbee-lib STATIC
-  ${SOURCES} ${HEADERS} ${QS_LOG_SOURCES} ${QS_LOG_HEADERS} ${ONIG_SOURCES}
+  ${SOURCES} ${HEADERS} ${ONIG_SOURCES}
   ${ONIG_HEADERS})
+
+target_link_libraries(edbee-lib QsLog)
 
 TARGET_INCLUDE_DIRECTORIES(edbee-lib PUBLIC
   ${Qt5Core_INCLUDE_DIRS}

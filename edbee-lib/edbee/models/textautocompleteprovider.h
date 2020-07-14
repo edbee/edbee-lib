@@ -4,24 +4,68 @@
 
 #include <QList>
 #include <QString>
+#include <QMultiMap>
+#include <QStandardItemModel>
+#include <QSortFilterProxyModel>
+#include <QStandardItem>
 
 namespace edbee {
 
 class TextDocument;
 class TextRange;
 
+
+// We don't have lang-server support, but for future support, the constants of langserver are used
+// https://microsoft.github.io/language-server-protocol/specifications/specification-3-14/#textDocument_completion
+namespace TextAutoCompleteKind {
+  enum TextAutoCompleteKindEnum {
+    Text = 1,
+    Method = 2,
+    Function = 3,
+    Constructor = 4,
+    Field = 5,
+    Variable = 6,
+    Class = 7,
+    Interface = 8,
+    Module = 9,
+    Property = 10,
+    Unit = 11,
+    Value = 12,
+    Enum = 13,
+    Keyword = 14,
+    Snippet = 15,
+    Color = 16,
+    File = 17,
+    Reference = 18,
+    Folder = 19,
+    EnumMember = 20,
+    Constant = 21,
+    Struct = 22,
+    Event = 23,
+    Operator = 24,
+    TypeParameter = 25
+  };
+}
+
+
 /// An autocomplete item that's being returned
 /// Currently simply a string.
 /// It's placed in a seperate class for future extentions (LSP: https://github.com/Microsoft/language-server-protocol/blob/master/protocol.md#textDocument_completion)
 class EDBEE_EXPORT TextAutoCompleteItem {
 public:
-    TextAutoCompleteItem( const QString& label );
+    TextAutoCompleteItem( const QString& label, const int kind = 0, const QString& detail = "", const QString& documentation = "");
     QString label() const;
+    int kind() const;
+    QString detail() const;
+    QString documentation() const;
 
     int matchLabelScore( TextDocument* document, const TextRange& range, const QString& word );
 
 protected:
     QString label_;
+    int kind_;
+    QString detail_;
+    QString documentation_;
 };
 
 
@@ -40,9 +84,8 @@ public:
     virtual ~StringTextAutoCompleteProvider();
     virtual QList<TextAutoCompleteItem*> findAutoCompleteItemsForRange( TextDocument* document, const TextRange& range, const QString& word ) ;
 
-    virtual void add(const QString& label );
+    virtual void add(const QString& label, const int kind = 0, const QString& detail = "", const QString& documentation = "");
     virtual void give(TextAutoCompleteItem* item);
-
 protected:
     QList<TextAutoCompleteItem*> itemList_;
 

@@ -33,6 +33,8 @@ TextEditorConfig::TextEditorConfig( QObject* parent )
     , themeName_("Monokai")
     , scrollPastEnd_(false)
     , showWhitespaceMode_(HideWhitespaces)
+    , autocompleteAutoShow_(true)
+    , autocompleteMinimalCharacters_(0)
 {
     charGroups_.append( QStringLiteral("./\\()\"'-:,.;<>~!@#$%^&*|+=[]{}`~?"));
 }
@@ -405,6 +407,31 @@ void TextEditorConfig::setShowWhitespaceMode(const QString& str)
     }
 }
 
+/// Sets whether autocomplete comes up automatically, or only manually(manual trigger isn't implemented yet)
+/// @see TextEditorConfig::autocompleteAutoShow
+void TextEditorConfig::setAutocompleteAutoShow(bool enable)
+{
+    if( autocompleteAutoShow_ != enable ) {
+        autocompleteAutoShow_ = enable;
+        notifyChange();
+    }
+}
+
+int TextEditorConfig::autocompleteMinimalCharacters() const
+{
+    return autocompleteMinimalCharacters_;
+}
+
+void TextEditorConfig::setAutocompleteMinimalCharacters(int amount)
+{
+    autocompleteMinimalCharacters_ = amount;
+}
+
+/// Show autocomplete automatically, or only manually(manual isn't implemented yet)
+bool TextEditorConfig::autocompleteAutoShow() const
+{
+    return autocompleteAutoShow_;
+}
 
 /// This internal method is used to notify the listener that a change has happend
 /// Thi smethod only emits a signal if there's no config group change busy
