@@ -2,6 +2,7 @@
 
 edbee.lib:
 
+- add #101, Support for JSON based grammar files.
 - fix #67, PlacholderText support via TextEditorWidget::setPlaceholderText. (uses 70% opacity of foreground color)
 - fix #98, Missing header include in Qt 5.15rc
 - fix #94 (partial), Resource delete fix in TextDocumentscopes
