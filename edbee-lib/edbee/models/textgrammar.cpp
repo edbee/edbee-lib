@@ -8,7 +8,6 @@
 #include <QDir>
 
 #include "edbee/io/tmlanguageparser.h"
-#include "edbee/io/tmlanguageparserjson.h"
 #include "edbee/util/regexp.h"
 
 #include "edbee/debug.h"
@@ -22,7 +21,7 @@ namespace edbee {
 TextGrammarRule::TextGrammarRule(TextGrammar* grammar, Instruction instruction)
     : grammarRef_(grammar)
     , instruction_(instruction)
-    , matchRegExp_(0)
+    , matchRegExp_(nullptr)
     , endRegExpString_()
 {
 }
