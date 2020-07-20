@@ -2,6 +2,7 @@
 
 edbee.lib:
 
+- fix #90, Fixed several Qt deprecation warnings. Chagned 0 to nullptr. Possible incompatibility with older releases!
 - add #101, Support for JSON based grammar files.
 - fix #67, PlacholderText support via TextEditorWidget::setPlaceholderText. (uses 70% opacity of foreground color)
 - fix #98, Missing header include in Qt 5.15rc

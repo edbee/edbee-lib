@@ -299,6 +299,7 @@ Change *TextDocument::executeAndGiveChange(Change* change, int coalesceId )
         beginUndoGroup();   // automaticly group changes together (when changes happend on emition)
         change->execute( this );
         Change* result = giveChangeWithoutFilter( change, coalesceId );
+        Q_UNUSED(result)
         endUndoGroup(coalesceId, true);
         return textUndoStack()->last();
 //        return result;

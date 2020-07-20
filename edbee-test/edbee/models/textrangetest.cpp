@@ -32,7 +32,7 @@ do { \
 /// @param definition the definition. In the format  anchor>caret,anchor>caret
 static void addRanges( TextRangeSet* sel, const QString& definition )
 {
-    QStringList ranges = definition.split(",", QString::SkipEmptyParts);
+    QStringList ranges = definition.split(",", Qt::SkipEmptyParts);
     foreach( QString range, ranges ) {
         QStringList values = range.split(">");
         Q_ASSERT(values.length() == 2);

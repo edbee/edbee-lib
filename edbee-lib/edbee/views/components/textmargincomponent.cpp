@@ -31,7 +31,7 @@ static const int MarginPaddingRight = 5;
 
 /// The default constructor
 TextMarginComponentDelegate::TextMarginComponentDelegate()
-    : marginComponentRef_(0)
+    : marginComponentRef_(nullptr)
     , startLine_(0)
 {
 }
@@ -52,19 +52,19 @@ int TextMarginComponentDelegate::widthBeforeLineNumber()
 /// Custom rendering before the line-numbers etc are drawn
 void TextMarginComponentDelegate::renderBefore(QPainter *painter, int startLine, int endLine, int width)
 {
-    Q_UNUSED(painter);
-    Q_UNUSED(startLine);
-    Q_UNUSED(endLine);
-    Q_UNUSED(width);
+    Q_UNUSED(painter)
+    Q_UNUSED(startLine)
+    Q_UNUSED(endLine)
+    Q_UNUSED(width)
 }
 
 /// The delegate can berform custom rendering on a given line
 void TextMarginComponentDelegate::renderAfter(QPainter* painter, int startLine, int endLine, int width)
 {
-    Q_UNUSED(painter);
-    Q_UNUSED(startLine);
-    Q_UNUSED(endLine);
-    Q_UNUSED(width);
+    Q_UNUSED(painter)
+    Q_UNUSED(startLine)
+    Q_UNUSED(endLine)
+    Q_UNUSED(width)
 }
 
 /// Make this method return true to enable mouse tracking
@@ -77,8 +77,8 @@ bool TextMarginComponentDelegate::requiresMouseTracking()
 /// To use it you MUST manually call setMouseTracking() on the TextMarginComponent
 void TextMarginComponentDelegate::mouseMoveEvent(int line, QMouseEvent* event)
 {
-    Q_UNUSED(line);
-    Q_UNUSED(event);
+    Q_UNUSED(line)
+    Q_UNUSED(event)
     if( event->buttons() & Qt::LeftButton ) {
         if( line >= 0 ) {
             TextEditorController* controller = marginComponent()->editorWidget()->controller();
@@ -94,7 +94,7 @@ void TextMarginComponentDelegate::mouseMoveEvent(int line, QMouseEvent* event)
 
 void TextMarginComponentDelegate::mousePressEvent(int line, QMouseEvent* event)
 {
-    Q_UNUSED(event);
+    Q_UNUSED(event)
     if( line >= 0 ) {
         TextEditorController* controller = marginComponent()->editorWidget()->controller();
         controller->moveCaretTo(line,0,false);
@@ -105,7 +105,7 @@ void TextMarginComponentDelegate::mousePressEvent(int line, QMouseEvent* event)
 
 void TextMarginComponentDelegate::leaveEvent(QEvent* event)
 {
-    Q_UNUSED(event);
+    Q_UNUSED(event)
 }
 
 
@@ -121,10 +121,10 @@ TextMarginComponent::TextMarginComponent(TextEditorWidget* editor, QWidget* pare
     , top_(0)
     , width_(-1)
     , lastLineCount_(-1)
-    , marginFont_(0)
+    , marginFont_(nullptr)
     , editorRef_( editor )
-    , delegate_(0)
-    , delegateRef_(0)
+    , delegate_(nullptr)
+    , delegateRef_(nullptr)
 {
     this->setFocusPolicy( Qt::NoFocus );
     this->setAutoFillBackground(false);
@@ -228,8 +228,8 @@ TextRenderer* TextMarginComponent::renderer() const
 void TextMarginComponent::setDelegate(TextMarginComponentDelegate* delegate)
 {
     delete delegate_;
-    delegate_ = 0;
-    if( delegate == 0 ) { delegate = new TextMarginComponentDelegate(); }
+    delegate_ = nullptr;
+    if( delegate == nullptr ) { delegate = new TextMarginComponentDelegate(); }
     delegateRef_ = delegate;
 
     // perform some updates
@@ -317,7 +317,7 @@ void TextMarginComponent::renderLineNumber(QPainter* painter, int startLine, int
     painter->setFont(*marginFont_);
     QColor selectedPenColor = renderer()->theme()->foregroundColor();
     QColor penColor( selectedPenColor);
-    penColor.setAlphaF(0.5f);
+    penColor.setAlphaF(0.5);
 
     int lineHeight = renderer()->lineHeight();
     int textWidth =  width-LineNumberRightPadding-MarginPaddingRight - delegate()->widthBeforeLineNumber();
@@ -376,7 +376,8 @@ void TextMarginComponent::leaveEvent(QEvent* event)
 /// forward the mouse wheel event to the scrollbar so you can use the mouse wheel on this component
 void TextMarginComponent::wheelEvent(QWheelEvent* event)
 {
-    if( event->orientation() == Qt::Vertical) {
+//    if( event->orientation() == Qt::Vertical) {
+    if( event->angleDelta().y() != 0 ) {
         QApplication::sendEvent( editorRef_->textScrollArea()->verticalScrollBar(), event );
     }
 }
