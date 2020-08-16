@@ -197,7 +197,7 @@ int TextRenderer::xPosForColumn(int line, int column)
         QTextLine tl = layout->lineAt(0);
         x += tl.cursorToX(column);
     }
-    return round(x);
+    return qRound(x);
 }
 
 

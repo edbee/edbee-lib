@@ -2,6 +2,7 @@
 
 edbee.lib:
 
+- ref #106, Missing round function on SuSE. (Changed to qRound)
 - ref #99, Speed improvements for markAll. (Added beginChanges and endChanges, to  prevent updating)
 - fix #96, Added support for readonly mode, via widget->setReadonly() or controller->setReadonly
 - fix #90, Fixed several Qt deprecation warnings. Chagned 0 to nullptr. Possible incompatibility with older releases!
