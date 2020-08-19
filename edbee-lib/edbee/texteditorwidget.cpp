@@ -241,7 +241,7 @@ QScrollBar* TextEditorWidget::verticalScrollBar() const
 void TextEditorWidget::setVerticalScrollBar(QScrollBar* scrollBar)
 {
     scrollAreaRef_->setVerticalScrollBar(scrollBar);
-    emit verticalScrollBarChanged( scrollBar );
+    emit verticalScrollBarChanged(scrollBar);
 }
 
 
@@ -251,7 +251,7 @@ void TextEditorWidget::setVerticalScrollBar(QScrollBar* scrollBar)
 void TextEditorWidget::setHorizontalScrollBar(QScrollBar* scrollBar)
 {
     scrollAreaRef_->setHorizontalScrollBar(scrollBar);
-    emit verticalScrollBarChanged( scrollBar );
+    emit horizontalScrollBarChanged(scrollBar);
 }
 
 /// Returns the auto scroll margin

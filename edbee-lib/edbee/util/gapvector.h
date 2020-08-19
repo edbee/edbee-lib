@@ -29,7 +29,7 @@ public:
     }
 
     ~GapVector() {
-        delete items_;
+        delete[] items_;
     }
 
     /// returns the used length of the data

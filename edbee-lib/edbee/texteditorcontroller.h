@@ -121,11 +121,11 @@ public slots:
     virtual void storeSelection( int coalesceId=0 );
 
     // replace the given selection
-    virtual void replace( int offset, int length, const QString& text, int coalesceId );
-    virtual void replaceSelection( const QString& text, int coalesceId=0 );
-    virtual void replaceSelection( const QStringList& texts, int coalesceId=0 );
-    virtual void replaceRangeSet(TextRangeSet& rangeSet, const QString& text, int coalesceId=0 );
-    virtual void replaceRangeSet(TextRangeSet& rangeSet, const QStringList& texts, int coalesceId=0 );
+    virtual void replace( int offset, int length, const QString& text, int coalesceId, bool stickySelection=false);
+    virtual void replaceSelection(const QString& text, int coalesceId=0, bool stickySelection=false);
+    virtual void replaceSelection(const QStringList& texts, int coalesceId=0, bool stickySelection=false);
+    virtual void replaceRangeSet(TextRangeSet& rangeSet, const QString& text, int coalesceId=0, bool stickySelection=false);
+    virtual void replaceRangeSet(TextRangeSet& rangeSet, const QStringList& texts, int coalesceId=0, bool stickySelection=false);
 
     // caret movements
     virtual void moveCaretTo( int line, int col, bool keepAnchors, int rangeIndex=-1 );

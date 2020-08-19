@@ -202,14 +202,14 @@ void TextDocument::beginChanges(TextEditorController* controller)
 
 
 /// Replaces the given rangeset
-void TextDocument::replaceRangeSet(TextRangeSet& rangeSet, const QString& textIn )
+void TextDocument::replaceRangeSet(TextRangeSet& rangeSet, const QString& textIn, bool stickySelection)
 {
-    return replaceRangeSet( rangeSet, QStringList(textIn) );
+    return replaceRangeSet(rangeSet, QStringList(textIn), stickySelection);
 }
 
 
 /// replaces the given rangeset
-void TextDocument::replaceRangeSet(TextRangeSet& rangeSet, const QStringList& textsIn )
+void TextDocument::replaceRangeSet(TextRangeSet& rangeSet, const QStringList& textsIn, bool stickySelection)
 {
 
     QStringList texts = textsIn;
@@ -237,14 +237,21 @@ void TextDocument::replaceRangeSet(TextRangeSet& rangeSet, const QStringList& te
 
         // when a new caret position is supplied (can only happen via a TextDocumentFilter)
         // access it and change the caret to the given position
+        int caret = 0;
         if( effectiveChangeWithCaret && effectiveChangeWithCaret->caret() >= 0 ) {
-          range.setCaret( effectiveChangeWithCaret->caret() );
-
+          caret = effectiveChangeWithCaret->caret();
         // Default caret location is change-independent: old location + length new text
         } else {
-          range.setCaret(range.min() + text.length() );
+          caret = range.min() + text.length();
         }
-        range.reset();
+
+        // sticky selection, keeps the selection around the text
+        if(stickySelection) {
+          range.set(range.min(), caret);
+        } else {
+          range.setCaret(caret);
+          range.reset();
+        }
 
         // next range
         if( rangeSet.rangeCount() < oldRangeCount ) {
@@ -321,7 +328,7 @@ void TextDocument::append(const QString& text, int coalesceId )
 /// @param coalesceId (default 0) the coalesceId to use. Whe using the same number changes could be merged to one change. CoalesceId of 0 means no merging
 void TextDocument::replace( int offset, int length, const QString& text, int coalesceId )
 {
-    executeAndGiveChange( new TextChange( offset, length, text ), coalesceId );
+    executeAndGiveChange( new TextChange( offset, length, text ), coalesceId);
 }
 
 

@@ -339,7 +339,8 @@ void TextEditorComponent::keyReleaseEvent(QKeyEvent *event)
 
 void TextEditorComponent::inputMethodEvent( QInputMethodEvent* m )
 {
-   // replace the selection with an empty text
+
+    // replace the selection with an empty text
     if( textSelection()->hasSelection() ) {
         controller()->replaceSelection("",false);
     }
@@ -355,6 +356,7 @@ void TextEditorComponent::inputMethodEvent( QInputMethodEvent* m )
 
     if( !m->preeditString().isEmpty() ) {
 //        replaceSelection(m->preeditString());
+        controller()->replaceSelection(m->preeditString(),false, true);
     } else {
         controller()->replaceSelection(m->commitString(),false);
     }

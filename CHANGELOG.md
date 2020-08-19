@@ -2,6 +2,12 @@
 
 edbee.lib:
 
+- Support for sticky-selection in replaceSelection methods. (Required for InpuMethod entry)
+- Improved TextEditorComponent::InputMethodEvent... It now support special chars entry like expected. (Option+e,  e => ´ => é)
+- ref #107, Several improvements  (Thanks @sebcaux)
+  - Fixed gapvector destructor: it did not use an array delete.
+  - TextEditorWidget::setHorizontalScrollBar not emits the correct horizontalScrollBarChanged event.
+  - (Did not include the condition defines, for older Qt versions)
 - ref #106, Missing round function on SuSE. (Changed to qRound)
 - ref #99, Speed improvements for markAll. (Added beginChanges and endChanges, to  prevent updating)
 - fix #96, Added support for readonly mode, via widget->setReadonly() or controller->setReadonly
