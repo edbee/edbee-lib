@@ -5,6 +5,9 @@ IF(POLICY CMP0020)
   CMAKE_POLICY(SET CMP0020 NEW)
 ENDIF()
 
+# hack?? https://stackoverflow.com/questions/31561309/cmake-warnings-under-os-x-macosx-rpath-is-not-specified-for-the-following-targe
+set(CMAKE_MACOSX_RPATH 1)
+
 PROJECT(edbee-lib)
 
 add_subdirectory(../vendor/qslog/ qslog)
