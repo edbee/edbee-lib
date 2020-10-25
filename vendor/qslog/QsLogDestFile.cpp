@@ -170,7 +170,7 @@ void QsLogging::FileDestination::write(const LogMessage& message)
         mOutputStream.setCodec(QTextCodec::codecForName("UTF-8"));
     }
 
-    mOutputStream << utf8Message << Qt::endl;
+    mOutputStream << utf8Message << '\n';
     mOutputStream.flush();
 }
 

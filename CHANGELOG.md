@@ -2,6 +2,7 @@
 
 edbee.lib:
 
+- #112, Workaround for missing Qt::endl in Qt 5.12
 - Support for sticky-selection in replaceSelection methods. (Required for InpuMethod entry)
 - Improved TextEditorComponent::InputMethodEvent... It now support special chars entry like expected. (Option+e,  e => ´ => é)
 - ref #107, Several improvements  (Thanks @sebcaux)
