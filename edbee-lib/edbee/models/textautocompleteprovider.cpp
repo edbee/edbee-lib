@@ -1,5 +1,6 @@
 #include "textautocompleteprovider.h"
 
+#include "edbee/models/texteditorconfig.h"
 #include "edbee/models/textdocument.h"
 #include "edbee/models/textdocumentscopes.h"
 #include "edbee/models/textgrammar.h"
@@ -8,6 +9,7 @@
 
 namespace edbee {
 
+/// @param kind the kind of autocomplete items (Use a Langserver constant)
 TextAutoCompleteItem::TextAutoCompleteItem(const QString &label, const int kind, const QString &detail, const QString &documentation)
     : label_(label),
       kind_(kind),
@@ -46,16 +48,16 @@ QString TextAutoCompleteItem::documentation() const
     to Unicode using the fromUtf8() function.
     \sa fromLatin1(), fromLocal8Bit(), fromUtf8(), QByteArray::fromStdString()
 */
-int TextAutoCompleteItem::matchLabelScore(TextDocument*, const TextRange&, const QString &word)
+int TextAutoCompleteItem::matchLabelScore(TextDocument* doc, const TextRange&, const QString &word)
 {
     /// For now a simple prefix-prefix search. Later fuzzy search.
     /// Inspiration:
     /// - https://www.quora.com/How-is-the-fuzzy-search-algorithm-in-Sublime-Text-designed-How-would-you-design-something-similar)
     /// - https://github.com/renstrom/fuzzysearch
     /// We probably need to calculate a score
-    if( word.length() < 3 )
+    if( word.length() < doc->config()->autocompleteMinimalCharacters())
         return 0;
-        if( label_ == word ) {
+    if( label_ == word ) {
         return 1;
     } else if ( label_.toLower().startsWith(word.toLower()) ) {
         return 2;
@@ -84,10 +86,10 @@ QList<TextAutoCompleteItem *> StringTextAutoCompleteProvider::findAutoCompleteIt
 
     foreach( TextAutoCompleteItem* item, itemList_ ) {
         int match = item->matchLabelScore(document,range,word);
-        if( match && match == 1 && item->kind() == 14 ) {
+        if( match && match == 1 && item->kind() == edbee::TextAutoCompleteKind::Keyword ) {
             items.clear();
             return items.values();
-        } else if( match && item->kind() != 14 ) {
+        } else if( match && item->kind() != edbee::TextAutoCompleteKind::Keyword ) {
             items.insert(match, item);
         }
     }

@@ -113,8 +113,8 @@ public:
     virtual TextDocumentFilter* documentFilter();
 
     void beginChanges( TextEditorController* controller );
-    void replaceRangeSet( TextRangeSet& rangeSet, const QString& text );
-    void replaceRangeSet( TextRangeSet& rangeSet, const QStringList& texts );
+    void replaceRangeSet(TextRangeSet& rangeSet, const QString& text, bool stickySelection = false);
+    void replaceRangeSet(TextRangeSet& rangeSet, const QStringList& texts, bool stickySelection = false);
     void giveSelection( TextEditorController* controller,  TextRangeSet* rangeSet);
     void endChanges( int coalesceId );
 

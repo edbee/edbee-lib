@@ -67,7 +67,8 @@ Of course it would also be nice to fill the editor with a file. you can use the 
 
 edbee::TextEditorWidget* widget =  new edbee::TextEditorWidget();
 edbee::TextDocumentSerializer serializer( widget->textDocument() );
-if( !serializer.load( "your-filename.rb" ) ) {
+QFile file( QStringLiteral("your-filename.rb") );
+if( !serializer.load( &file ) ) {
     QMessageBox::warning(this, tr("Error opening file"), tr("Error opening file!\n%1").arg(serializer.errorString()) );
 }
 

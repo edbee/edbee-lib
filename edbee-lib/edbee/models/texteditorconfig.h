@@ -92,6 +92,9 @@ public:
     bool autocompleteAutoShow() const;
     void setAutocompleteAutoShow( bool enable );
 
+    int autocompleteMinimalCharacters() const;
+    void setAutocompleteMinimalCharacters( int amount );
+
 
 signals:
     void configChanged();
@@ -125,6 +128,7 @@ private:
     int showWhitespaceMode_;            ///< The current whitespace mode to make
 
     bool autocompleteAutoShow_;         ///< Show autocomplete automatically, or only when manually triggered
+    int autocompleteMinimalCharacters_; ///< How manu characters need to be entered before autocomplete kicks in
 };
 
 } // edbee

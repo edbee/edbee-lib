@@ -46,18 +46,18 @@ namespace edbee {
 TextEditorController::TextEditorController( TextEditorWidget* widget, QObject *parent)
     : QObject(parent)
     , widgetRef_(widget)
-    , textDocument_(0)
-    , textDocumentRef_(0)
-    , textSelection_(0)
-    , keyMap_(0)
-    , keyMapRef_(0)
-    , commandMap_(0)
-    , commandMapRef_(0)
-    , textRenderer_(0)
-    , textCaretCache_(0)
-    , textSearcher_(0)
+    , textDocument_(nullptr)
+    , textDocumentRef_(nullptr)
+    , textSelection_(nullptr)
+    , keyMap_(nullptr)
+    , keyMapRef_(nullptr)
+    , commandMap_(nullptr)
+    , commandMapRef_(nullptr)
+    , textRenderer_(nullptr)
+    , textCaretCache_(nullptr)
+    , textSearcher_(nullptr)
     , autoScrollToCaret_(AutoScrollAlways)
-    , borderedTextRanges_(0)
+    , borderedTextRanges_(nullptr)
 {
 
     // create the keymap
@@ -162,7 +162,7 @@ void TextEditorController::setTextDocument(TextDocument* doc)
 
         // delete the old stuff
         delete textDocument_;
-        textDocument_ = 0;
+        textDocument_ = nullptr;
     }
 }
 
@@ -266,7 +266,7 @@ TextRangeSet *TextEditorController::borderedTextRanges() const
 void TextEditorController::setKeyMap(TextEditorKeyMap* keyMap)
 {
     delete keyMap_;
-    keyMap_ = 0;
+    keyMap_ = nullptr;
     keyMapRef_= keyMap;
 }
 
@@ -294,7 +294,7 @@ TextEditorKeyMap*TextEditorController::keyMap() const
 void TextEditorController::setCommandMap(TextEditorCommandMap* commandMap)
 {
     delete commandMap_;
-    commandMap_ = 0;
+    commandMap_ = nullptr;
     commandMapRef_ = commandMap;
 }
 
@@ -365,7 +365,7 @@ DynamicVariables* TextEditorController::dynamicVariables() const
 /// This slot is placed if a piece of text is replaced
 void TextEditorController::onTextChanged( edbee::TextBufferChange change )
 {
-    Q_UNUSED(change);
+    Q_UNUSED(change)
 
     /// update the selection
 //    textSelection()->changeSpatial( change.offset(), change.length(), change.newTextLength() );
@@ -382,7 +382,7 @@ void TextEditorController::onTextChanged( edbee::TextBufferChange change )
 /// @param oldRangeSet the old range set of the change
 void TextEditorController::onSelectionChanged(TextRangeSet* oldRangeSet)
 {
-    Q_UNUSED(oldRangeSet);
+    Q_UNUSED(oldRangeSet)
 
     /// TODO: improve this:
     if( widgetRef_) {
@@ -518,6 +518,12 @@ void TextEditorController::storeSelection(int coalesceId)
 /// This method executes the command
 void TextEditorController::executeCommand( TextEditorCommand* textCommand )
 {
+    // Only readonly commands can be executed in readonly mode
+    if( readonly() && !textCommand->readonly() ) {
+        updateStatusText( "Cannot edit a readonly document!" );
+        return;
+    }
+
     emit commandToBeExecuted( textCommand  );
     textCommand->execute( this );
     emit commandExecuted( textCommand );
@@ -552,7 +558,19 @@ bool TextEditorController::executeCommand(const QString& name)
     // try to retrieve the command
     TextEditorCommand* command = commandMap()->get(commandName);
     if( command ) { executeCommand( command ); }
-    return command != 0;
+    return command != nullptr;
+}
+
+/// Return the readonly state.
+bool TextEditorController::readonly() const
+{
+    return widget()->readonly();
+}
+
+/// Sets the readonly state
+void TextEditorController::setReadonly(bool value)
+{
+    widget()->setReadonly(value);
 }
 
 
@@ -561,30 +579,30 @@ bool TextEditorController::executeCommand(const QString& name)
 /// @param length the number of characters to replace
 /// @param text the text to replace
 /// @param coalesceId the identifier for grouping undo operations
-void TextEditorController::replace(int offset, int length, const QString& text, int coalesceId)
+void TextEditorController::replace(int offset, int length, const QString& text, int coalesceId, bool stickySelection)
 {
 //    SelectionTextChange* change = new SelectionTextChange(this);
     TextRangeSet ranges(textDocument());
     ranges.addRange(offset, offset+length);
-    replaceRangeSet(ranges,text,coalesceId);
+    replaceRangeSet(ranges,text,coalesceId, stickySelection);
 }
 
 
 /// This method replaces the selection with the given text
 /// @param text the text to replace the selection with
 /// @param coalesceId the identifier for grouping undo operations
-void TextEditorController::replaceSelection(const QString& text, int coalesceId )
+void TextEditorController::replaceSelection(const QString& text, int coalesceId, bool stickySelection)
 {
-    replaceRangeSet( *dynamic_cast<TextRangeSet*>( textSelection() ), text, coalesceId );
+    replaceRangeSet( *dynamic_cast<TextRangeSet*>( textSelection() ), text, coalesceId, stickySelection);
 }
 
 
 /// This method replaces the given selection with the given texts
 /// @param texts the list of texts that need to be replaced
 /// @param coalesceID the identifier for grouping undo operation
-void TextEditorController::replaceSelection(const QStringList& texts, int coalesceId)
+void TextEditorController::replaceSelection(const QStringList& texts, int coalesceId, bool stickySelection)
 {
-    replaceRangeSet( *dynamic_cast<TextRangeSet*>( textSelection() ), texts, coalesceId );
+    replaceRangeSet(*dynamic_cast<TextRangeSet*>( textSelection() ), texts, coalesceId, stickySelection);
 }
 
 
@@ -592,11 +610,13 @@ void TextEditorController::replaceSelection(const QStringList& texts, int coales
 /// @param reangeSet hte ranges to replace
 /// @param text the text to replace the selection with
 /// @param coalesceId the identifier for grouping undo operations
-void TextEditorController::replaceRangeSet(TextRangeSet& rangeSet, const QString& text, int coalesceId)
+void TextEditorController::replaceRangeSet(TextRangeSet& rangeSet, const QString& text, int coalesceId, bool stickySelection)
 {
+    if(readonly()) return;
+
     textDocument()->beginChanges( this );
-    textDocument()->replaceRangeSet(rangeSet, text);
-    textDocument()->endChanges( coalesceId );
+    textDocument()->replaceRangeSet(rangeSet, text, stickySelection);
+    textDocument()->endChanges(coalesceId);
     notifyStateChange();
 }
 
@@ -605,10 +625,12 @@ void TextEditorController::replaceRangeSet(TextRangeSet& rangeSet, const QString
 /// @param rangeSet the rangeset to fille
 /// @param text the texts to fill the given ranges with.
 /// @param coalesceId the identifier for grouping undo operations
-void TextEditorController::replaceRangeSet(TextRangeSet& rangeSet, const QStringList& texts, int coalesceId)
+void TextEditorController::replaceRangeSet(TextRangeSet& rangeSet, const QStringList& texts, int coalesceId, bool stickySelection)
 {
+    if(readonly()) return;
+
     textDocument()->beginChanges( this );
-    textDocument()->replaceRangeSet( rangeSet, texts );
+    textDocument()->replaceRangeSet( rangeSet, texts, stickySelection);
     textDocument()->endChanges( coalesceId );
     notifyStateChange();
 }
@@ -687,7 +709,7 @@ void TextEditorController::changeAndGiveTextSelection(TextRangeSet* rangeSet, in
 /// controller based operations are undone. When suppplying false a Document operation is being undone
 void TextEditorController::undo(bool soft)
 {
-    textDocument()->textUndoStack()->undo( soft ? this : 0, soft );
+    textDocument()->textUndoStack()->undo( soft ? this : nullptr, soft );
 }
 
 
@@ -696,7 +718,7 @@ void TextEditorController::undo(bool soft)
 /// @param soft perform a soft undo?
 void TextEditorController::redo(bool soft)
 {
-    textDocument()->textUndoStack()->redo( soft ? this : 0, soft );
+    textDocument()->textUndoStack()->redo( soft ? this : nullptr, soft );
 }
 
 

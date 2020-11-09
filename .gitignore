@@ -40,5 +40,7 @@ edbee-test/edbee-test
 .vscode
 
 .vs/
-edbee-lib/debug/
-edbee-lib/release/
+edbee-lib/edbee-lib_autogen/
+edbee-lib/qslog/
+edbee-test/edbee-test_autogen/
+edbee-test/edbee-lib/qslog/

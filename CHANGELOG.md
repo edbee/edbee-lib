@@ -2,6 +2,18 @@
 
 edbee.lib:
 
+- #112, Workaround for missing Qt::endl in Qt 5.12
+- Support for sticky-selection in replaceSelection methods. (Required for InpuMethod entry)
+- Improved TextEditorComponent::InputMethodEvent... It now support special chars entry like expected. (Option+e,  e => ´ => é)
+- ref #107, Several improvements  (Thanks @sebcaux)
+  - Fixed gapvector destructor: it did not use an array delete.
+  - TextEditorWidget::setHorizontalScrollBar not emits the correct horizontalScrollBarChanged event.
+  - (Did not include the condition defines, for older Qt versions)
+- ref #106, Missing round function on SuSE. (Changed to qRound)
+- ref #99, Speed improvements for markAll. (Added beginChanges and endChanges, to  prevent updating)
+- fix #96, Added support for readonly mode, via widget->setReadonly() or controller->setReadonly
+- fix #90, Fixed several Qt deprecation warnings. Chagned 0 to nullptr. Possible incompatibility with older releases!
+- add #101, Support for JSON based grammar files.
 - fix #67, PlacholderText support via TextEditorWidget::setPlaceholderText. (uses 70% opacity of foreground color)
 - fix #98, Missing header include in Qt 5.15rc
 - fix #94 (partial), Resource delete fix in TextDocumentscopes

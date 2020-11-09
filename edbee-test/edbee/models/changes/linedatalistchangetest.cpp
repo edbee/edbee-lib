@@ -18,7 +18,7 @@ static const int TEST_FIELD_INDEX = PredefinedFieldCount;
 typedef BasicTextLineData<QString> TestLineData;
 
 LineDataListChangeTest::LineDataListChangeTest()
-    : doc_(0)
+    : doc_(nullptr)
 {
 }
 
@@ -41,7 +41,7 @@ void LineDataListChangeTest::clean()
     qDeleteAll(changeList_);
     changeList_.clear();
     delete doc_;
-    doc_ = 0;
+    doc_ = nullptr;
 }
 
 
@@ -208,7 +208,7 @@ QString LineDataListChangeTest::data2ptr( LineDataListChange* change )
         if( list[i] ) {
             TextLineData* lineData = list[i]->at(manager(),TEST_FIELD_INDEX);
             if( lineData ) {
-                result.append( QStringLiteral("").sprintf("%8p", lineData) );
+                result.append( QStringLiteral("").asprintf("%8p", static_cast<void*>(lineData)) );
             } else {
                 result.append(".");
             }

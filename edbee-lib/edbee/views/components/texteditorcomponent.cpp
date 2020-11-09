@@ -36,9 +36,9 @@ namespace edbee {
 /// @param parent the parent QObject
 TextEditorComponent::TextEditorComponent(TextEditorController* controller, QWidget* parent)
     : QWidget(parent)
-    , caretTimer_(0)
+    , caretTimer_(nullptr)
     , controllerRef_(controller)
-    , textEditorRenderer_(0)
+    , textEditorRenderer_(nullptr)
 {
     textEditorRenderer_ = new TextEditorRenderer( controller->textRenderer());
 
@@ -213,12 +213,12 @@ void TextEditorComponent::paintEvent(QPaintEvent* paintEvent)
 
 void TextEditorComponent::moveEvent(QMoveEvent *moveEvent)
 {
-
+    Q_UNUSED(moveEvent)
 }
 
 void TextEditorComponent::hideEvent(QHideEvent *hideEvent)
 {
-
+    Q_UNUSED(hideEvent)
 }
 
 
@@ -317,7 +317,7 @@ void TextEditorComponent::keyPressEvent(QKeyEvent* event)
 /// the key release event
 void TextEditorComponent::keyReleaseEvent(QKeyEvent *event)
 {
-    Q_UNUSED(event);
+    Q_UNUSED(event)
 }
 
 
@@ -339,8 +339,13 @@ void TextEditorComponent::keyReleaseEvent(QKeyEvent *event)
 
 void TextEditorComponent::inputMethodEvent( QInputMethodEvent* m )
 {
-   // replace the selection with an empty text
-    if( textSelection()->hasSelection() ) {
+ #ifndef Q_OS_LINUX
+
+/// TODO: https://doc.qt.io/qt-5/qinputmethodevent.html
+/// Analyize how to implement this. The preeditString should NOT alter the undo-buffer
+
+    // replace the selection with an empty text (only if there's content to replace)
+    if( textSelection()->hasSelection() && (!m->preeditString().isEmpty() || !m->commitString().isEmpty())) {
         controller()->replaceSelection("",false);
     }
 
@@ -355,10 +360,14 @@ void TextEditorComponent::inputMethodEvent( QInputMethodEvent* m )
 
     if( !m->preeditString().isEmpty() ) {
 //        replaceSelection(m->preeditString());
+        controller()->replaceSelection(m->preeditString(),false, true);
     } else {
         controller()->replaceSelection(m->commitString(),false);
     }
 
+    m->accept();
+
+ #endif
 }
 
 
@@ -484,14 +493,14 @@ void TextEditorComponent::mouseMoveEvent(QMouseEvent* event )
 /// A focus in event occured
 void TextEditorComponent::focusInEvent(QFocusEvent *event)
 {
-    Q_UNUSED(event);
+    Q_UNUSED(event)
 }
 
 
 /// The focus is lost, we must STOP coalescing of undo-events!
 void TextEditorComponent::focusOutEvent(QFocusEvent *event)
 {
-    Q_UNUSED(event);
+    Q_UNUSED(event)
     // no merging for new changes!!
     textDocument()->textUndoStack()->resetAllLastCoalesceIds();
 }
@@ -501,7 +510,7 @@ void TextEditorComponent::focusOutEvent(QFocusEvent *event)
 /// Add the default menu actions
 void TextEditorComponent::contextMenuEvent(QContextMenuEvent* event)
 {
-    Q_UNUSED(event);
+    Q_UNUSED(event)
 
     QMenu* menu = new QMenu();
     menu->addAction( controller()->createAction("cut", tr("Cut") ) );

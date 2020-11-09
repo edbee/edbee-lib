@@ -8,8 +8,8 @@
 #include <QList>
 #include <QTimer>
 
-#include <QsLog.h>
-#include <QsLogDest.h>
+#include "../vendor/qslog/QsLog.h"
+#include "../vendor/qslog/QsLogDest.h"
 
 #include "edbee/util/test.h"
 #include "edbee/edbee.h"
