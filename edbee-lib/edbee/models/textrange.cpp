@@ -7,6 +7,7 @@
 
 #include "textdocument.h"
 #include "textrange.h"
+#include "texteditorconfig.h"
 #include "edbee/debug.h"
 
 namespace edbee {
@@ -242,6 +243,22 @@ void TextRange::moveCaretToLineBoundary(TextDocument* doc, int amount, const QSt
 
     }
     setCaretBounded( doc, caret );
+}
+
+/// Moves the caret to a word boundary  (used for word dragging selections)
+void TextRange::moveCaretToWordBoundaryAtOffset(TextDocument *doc, int newOffset)
+{
+    TextEditorConfig* config = doc->config();
+
+    // changed offset
+    setCaret(newOffset);
+    // left direction
+    if( newOffset < anchor()) {
+        moveCaretByCharGroup(doc, -1, config->whitespaces(), config->charGroups());
+    // right direction
+    } else {
+        moveCaretByCharGroup(doc, 1, config->whitespaces(), config->charGroups());
+    }
 }
 
 
@@ -772,7 +789,6 @@ void TextRangeSetBase::toggleWordSelectionAt(int offset, const QString& whitespa
     // default operation is select word at
     selectWordAt( offset, whitespace, characterGroups );
 }
-
 
 /// This method moves the carets by character
 void TextRangeSetBase::moveCarets( int amount )

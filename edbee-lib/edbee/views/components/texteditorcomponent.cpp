@@ -39,6 +39,7 @@ TextEditorComponent::TextEditorComponent(TextEditorController* controller, QWidg
     , caretTimer_(nullptr)
     , controllerRef_(controller)
     , textEditorRenderer_(nullptr)
+    , clickCount_(0)
 {
     textEditorRenderer_ = new TextEditorRenderer( controller->textRenderer());
 
@@ -401,6 +402,7 @@ void TextEditorComponent::mousePressEvent(QMouseEvent* event)
         int col = renderer->columnIndexForXpos( line, x );
 
         if( event->button() == Qt::LeftButton ) {
+            clickCount_ = 1;
             if( event->modifiers()&Qt::ControlModifier ) {
                 controller()->addCaretAt( line, col );
             } else {
@@ -441,11 +443,13 @@ void TextEditorComponent::mouseReleaseEvent(QMouseEvent *event)
 /// @param event the mouse double click that occured
 void TextEditorComponent::mouseDoubleClickEvent( QMouseEvent* event )
 {
+    qlog_info() << "mouseDoubleClickEvent" << event;
+
     static SelectionCommand selectWord( SelectionCommand::SelectWord );
     if( event->button() == Qt::LeftButton ) {
+        clickCount_ = 2;
 
         if( event->modifiers()&Qt::ControlModifier ) {
-
             // get the location of the double
             int x = event->x();
             int y = event->y();
@@ -454,7 +458,7 @@ void TextEditorComponent::mouseDoubleClickEvent( QMouseEvent* event )
 
             // add the word there
             SelectionCommand toggleWordSelectionAtCommand( SelectionCommand::ToggleWordSelectionAt, textDocument()->offsetFromLineAndColumn(line,col) );
-            controller()->executeCommand( &toggleWordSelectionAtCommand );
+            controller()->executeCommand( &toggleWordSelectionAtCommand );           
         } else {
             controller()->executeCommand( &selectWord  );
         }
@@ -479,6 +483,17 @@ void TextEditorComponent::mouseMoveEvent(QMouseEvent* event )
         int col = 0;
         if( line >= 0 ) { col = renderer->columnIndexForXpos( line, x ); }
         if( line < 0 ) { line = 0; }
+
+        if( clickCount_ == 2 ) {
+            TextRange range = textSelection()->range(0);  // copy range
+
+            int newOffset = textDocument()->offsetFromLineAndColumn(line, col);
+            range.moveCaretToWordBoundaryAtOffset(textDocument(), newOffset);
+
+            controller()->moveCaretToOffset(range.caret(), true);
+            return;
+        }
+
 
         if( event->modifiers() & Qt::ControlModifier) {
             controller()->moveCaretTo( line, col, true, controller()->textSelection()->rangeCount() - 1 );

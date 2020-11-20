@@ -86,6 +86,7 @@ private:
     TextEditorController* controllerRef_;       ///< A reference to the controller
     TextEditorRenderer* textEditorRenderer_;    /// A text-editor renderer
 
+    int clickCount_;  ///< The number of clicks
 };
 
 } // edbee

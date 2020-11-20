@@ -74,6 +74,8 @@ public:
     void moveAnchorUntilChar( TextDocument* doc, int amount, const QString& chars );
     void moveCaretByCharGroup( TextDocument* doc, int amount, const QString& whitespace, const QStringList& characterGroups );
     void moveCaretToLineBoundary( TextDocument* doc, int amount, const QString& whitespace );
+    void moveCaretToWordBoundaryAtOffset( TextDocument* doc, int offset );
+
 
     void expandToFullLine( TextDocument* doc, int amount );
     void deselectTrailingNewLine( TextDocument* doc );
