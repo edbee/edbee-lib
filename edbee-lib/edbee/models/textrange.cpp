@@ -261,6 +261,29 @@ void TextRange::moveCaretToWordBoundaryAtOffset(TextDocument *doc, int newOffset
     }
 }
 
+/// Moves the caret to a word boundary  (used for word dragging selections)
+void TextRange::moveCaretToLineBoundaryAtOffset(TextDocument *doc, int newOffset)
+{
+    TextEditorConfig* config = doc->config();
+
+    // changed offset
+    setCaret(newOffset);
+
+    int firstLine = doc->lineFromOffset(min());
+    int lastLine = doc->lineFromOffset(max());
+
+    int newLine = doc->lineFromOffset(newOffset);
+
+    // left direction
+    if( newLine < lastLine ) {
+        this->caret_ = doc->offsetFromLine(newLine);
+        this->anchor_ = doc->offsetFromLine(lastLine+1);
+    // right direction
+    } else if( newLine > firstLine) {
+        this->anchor_ = doc->offsetFromLine(firstLine-1);
+        this->caret_ = doc->offsetFromLine(newLine+1);
+    }
+}
 
 /// Expands the selection range so it only consists of full lines
 /// amount specifies the amount (and the direction) of the expansions

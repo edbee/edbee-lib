@@ -32,7 +32,7 @@ do { \
 /// @param definition the definition. In the format  anchor>caret,anchor>caret
 static void addRanges( TextRangeSet* sel, const QString& definition )
 {
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
     QStringList ranges = definition.split(",", Qt::SkipEmptyParts);
 #else
     QStringList ranges = definition.split(",", QString::SkipEmptyParts);
