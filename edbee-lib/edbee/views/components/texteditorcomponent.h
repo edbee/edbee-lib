@@ -55,6 +55,7 @@ protected:
     virtual void keyReleaseEvent ( QKeyEvent* event );
     void inputMethodEvent( QInputMethodEvent* m );
     QVariant inputMethodQuery( Qt::InputMethodQuery p ) const;
+    void registerClickEvent();
     virtual void mousePressEvent( QMouseEvent* event );
     virtual void mouseReleaseEvent( QMouseEvent* event );
     virtual void mouseDoubleClickEvent( QMouseEvent* event );
@@ -86,6 +87,8 @@ private:
     TextEditorController* controllerRef_;       ///< A reference to the controller
     TextEditorRenderer* textEditorRenderer_;    /// A text-editor renderer
 
+    int clickCount_;     ///< The number of clicks
+    qint64 lastClickEvent_; ///< Last click event time
 };
 
 } // edbee

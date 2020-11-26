@@ -7,6 +7,7 @@
 
 #include <QApplication>
 #include <QClipboard>
+#include <QDateTime>
 #include <QMenu>
 #include <QPainter>
 #include <QPaintEvent>
@@ -31,6 +32,9 @@
 
 namespace edbee {
 
+const qint64 TRIPLE_CLICK_DELAY_IN_MS = 250; // 0.25 seconds
+
+
 /// The default texteditor compenent constructor
 /// @param controller the active controller for this editor
 /// @param parent the parent QObject
@@ -39,6 +43,8 @@ TextEditorComponent::TextEditorComponent(TextEditorController* controller, QWidg
     , caretTimer_(nullptr)
     , controllerRef_(controller)
     , textEditorRenderer_(nullptr)
+    , clickCount_(0)
+    , lastClickEvent_(0)
 {
     textEditorRenderer_ = new TextEditorRenderer( controller->textRenderer());
 
@@ -378,6 +384,19 @@ QVariant TextEditorComponent::inputMethodQuery( Qt::InputMethodQuery p ) const
     return QVariant();
 }
 
+/// registers a click event and modifies the clickcount and last-click moment
+void TextEditorComponent::registerClickEvent()
+{
+    qint64 currentClickEvent = QDateTime::currentMSecsSinceEpoch();
+    if( currentClickEvent - lastClickEvent_ <=TRIPLE_CLICK_DELAY_IN_MS ) {
+        clickCount_ += 1;
+    } else {
+        clickCount_ = 1;
+    }
+//    qlog_info() << "clickcount: " << clickCount_;
+    lastClickEvent_ = currentClickEvent;
+}
+
 
 /// A mouse press happens
 ///
@@ -401,6 +420,17 @@ void TextEditorComponent::mousePressEvent(QMouseEvent* event)
         int col = renderer->columnIndexForXpos( line, x );
 
         if( event->button() == Qt::LeftButton ) {
+            qint64 currentClickEvent = QDateTime::currentMSecsSinceEpoch();
+            registerClickEvent();
+            if( clickCount_ > 1 ) {
+                if( clickCount_ == 3) {
+                    TextRange range = textSelection()->range(0);
+                    SelectionCommand toggleWordSelectionAtCommand( SelectionCommand::SelectFullLine, 0);
+                    controller()->executeCommand( &toggleWordSelectionAtCommand );
+                }
+                return;
+            }
+
             if( event->modifiers()&Qt::ControlModifier ) {
                 controller()->addCaretAt( line, col );
             } else {
@@ -443,9 +473,13 @@ void TextEditorComponent::mouseDoubleClickEvent( QMouseEvent* event )
 {
     static SelectionCommand selectWord( SelectionCommand::SelectWord );
     if( event->button() == Qt::LeftButton ) {
+        registerClickEvent();
+        if( clickCount_ > 2 ) {
+            return;
+        }
+
 
         if( event->modifiers()&Qt::ControlModifier ) {
-
             // get the location of the double
             int x = event->x();
             int y = event->y();
@@ -454,7 +488,7 @@ void TextEditorComponent::mouseDoubleClickEvent( QMouseEvent* event )
 
             // add the word there
             SelectionCommand toggleWordSelectionAtCommand( SelectionCommand::ToggleWordSelectionAt, textDocument()->offsetFromLineAndColumn(line,col) );
-            controller()->executeCommand( &toggleWordSelectionAtCommand );
+            controller()->executeCommand( &toggleWordSelectionAtCommand );           
         } else {
             controller()->executeCommand( &selectWord  );
         }
@@ -479,6 +513,25 @@ void TextEditorComponent::mouseMoveEvent(QMouseEvent* event )
         int col = 0;
         if( line >= 0 ) { col = renderer->columnIndexForXpos( line, x ); }
         if( line < 0 ) { line = 0; }
+
+        if( clickCount_ == 2 ) {
+            TextRange range = textSelection()->range(0);
+
+            int newOffset = textDocument()->offsetFromLineAndColumn(line, col);
+            range.moveCaretToWordBoundaryAtOffset(textDocument(), newOffset);
+
+            controller()->moveCaretToOffset(range.caret(), true);
+            return;
+        } else if( clickCount_ == 3 ) {
+            TextRange range = textSelection()->range(0);  // copy range
+
+            int newOffset = textDocument()->offsetFromLineAndColumn(line, col);
+            range.moveCaretToLineBoundaryAtOffset(textDocument(), newOffset);
+
+            controller()->moveCaretToOffset(range.caret(), true);
+            return;
+        }
+
 
         if( event->modifiers() & Qt::ControlModifier) {
             controller()->moveCaretTo( line, col, true, controller()->textSelection()->rangeCount() - 1 );

@@ -2,6 +2,8 @@
 
 edbee.lib:
 
+- ref #115, basic Tripple-click support (TODO: still need to fix, anchor movement in controllers)
+- fix #114, Double-click + drag should end at word boundaries
 - #112, Workaround for missing Qt::endl in Qt 5.12
 - Support for sticky-selection in replaceSelection methods. (Required for InpuMethod entry)
 - Improved TextEditorComponent::InputMethodEvent... It now support special chars entry like expected. (Option+e,  e => ´ => é)

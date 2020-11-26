@@ -25,6 +25,7 @@ public:
         MoveCaretByWord,                ///< moves the caret(s) by the given amount of words
         MoveCaretByLine,                ///< moves the caret(s) by the given amount of lines
         MoveCaretByPage,                ///< moves the caret(s) by the given amount of pages
+        MoveCaretToWordBoundary,        ///< moves the caret to a line-boundary (<0 begin of line, >0 end of line)
         MoveCaretToLineBoundary,        ///< moves the caret to a line-boundary (<0 begin of line, >0 end of line)
         MoveCaretToDocumentBegin,       ///< moves the caret to the document start
         MoveCaretToDocumentEnd,         ///< moves the caret to the document end
