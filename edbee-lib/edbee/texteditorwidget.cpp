@@ -79,7 +79,7 @@ TextEditorWidget::TextEditorWidget(QWidget* parent)
 
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->addWidget( scrollAreaRef_ );
-    layout->setMargin(0);
+    layout->setContentsMargins(0, 0, 0, 0);
 
     setLayout(layout);
     setFocusProxy( editCompRef_ );
