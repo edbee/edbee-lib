@@ -44,6 +44,7 @@ TextEditorComponent::TextEditorComponent(TextEditorController* controller, QWidg
     , controllerRef_(controller)
     , textEditorRenderer_(nullptr)
     , clickCount_(0)
+    , clickRange_()
     , lastClickEvent_(0)
 {
     textEditorRenderer_ = new TextEditorRenderer( controller->textRenderer());
@@ -393,6 +394,7 @@ void TextEditorComponent::registerClickEvent()
     } else {
         clickCount_ = 1;
     }
+
 //    qlog_info() << "clickcount: " << clickCount_;
     lastClickEvent_ = currentClickEvent;
 }
@@ -427,6 +429,7 @@ void TextEditorComponent::mousePressEvent(QMouseEvent* event)
                     TextRange range = textSelection()->range(0);
                     SelectionCommand toggleWordSelectionAtCommand( SelectionCommand::SelectFullLine, 0);
                     controller()->executeCommand( &toggleWordSelectionAtCommand );
+                    clickRange_ = textSelection()->range(0);
                 }
                 return;
             }
@@ -471,7 +474,6 @@ void TextEditorComponent::mouseReleaseEvent(QMouseEvent *event)
 /// @param event the mouse double click that occured
 void TextEditorComponent::mouseDoubleClickEvent( QMouseEvent* event )
 {
-    static SelectionCommand selectWord( SelectionCommand::SelectWord );
     if( event->button() == Qt::LeftButton ) {
         registerClickEvent();
         if( clickCount_ > 2 ) {
@@ -490,7 +492,9 @@ void TextEditorComponent::mouseDoubleClickEvent( QMouseEvent* event )
             SelectionCommand toggleWordSelectionAtCommand( SelectionCommand::ToggleWordSelectionAt, textDocument()->offsetFromLineAndColumn(line,col) );
             controller()->executeCommand( &toggleWordSelectionAtCommand );           
         } else {
+            static SelectionCommand selectWord( SelectionCommand::SelectWord );
             controller()->executeCommand( &selectWord  );
+            clickRange_ = textSelection()->range(0);
         }
         return;
     }
@@ -519,16 +523,23 @@ void TextEditorComponent::mouseMoveEvent(QMouseEvent* event )
 
             int newOffset = textDocument()->offsetFromLineAndColumn(line, col);
             range.moveCaretToWordBoundaryAtOffset(textDocument(), newOffset);
+            range.minVar() = qMin(clickRange_.min(), range.min());
+            range.maxVar() = qMax(clickRange_.max(), range.max());
 
-            controller()->moveCaretToOffset(range.caret(), true);
+
+            controller()->moveCaretAndAnchorToOffset(range.caret(), range.anchor());
             return;
         } else if( clickCount_ == 3 ) {
             TextRange range = textSelection()->range(0);  // copy range
 
-            int newOffset = textDocument()->offsetFromLineAndColumn(line, col);
-            range.moveCaretToLineBoundaryAtOffset(textDocument(), newOffset);
+            int clickLine = textDocument()->lineFromOffset(clickRange_.min());
+            if(line < clickLine ) {
+                range.set( textDocument()->offsetFromLine(line), clickRange_.max());
+            } else {
+                range.set(clickRange_.min(), textDocument()->offsetFromLine(line+1));
+            }
 
-            controller()->moveCaretToOffset(range.caret(), true);
+            controller()->moveCaretAndAnchorToOffset(range.caret(), range.anchor());
             return;
         }
 

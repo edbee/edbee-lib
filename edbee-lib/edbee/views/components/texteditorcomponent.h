@@ -7,11 +7,14 @@
 
 #include "edbee/exports.h"
 
+#include "edbee/models/textrange.h"
+
 #include <QSize>
 #include <QWidget>
 
 namespace edbee {
 
+class TextRange;
 class TextDocument;
 class TextEditorCommandMap;
 class TextEditorConfig;
@@ -87,7 +90,8 @@ private:
     TextEditorController* controllerRef_;       ///< A reference to the controller
     TextEditorRenderer* textEditorRenderer_;    /// A text-editor renderer
 
-    int clickCount_;     ///< The number of clicks
+    int clickCount_;        ///< The number of clicks
+    TextRange clickRange_;  ///< The initial click range (to keep the first word/line selected)
     qint64 lastClickEvent_; ///< Last click event time
 };
 

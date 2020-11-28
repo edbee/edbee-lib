@@ -2,7 +2,7 @@
 
 edbee.lib:
 
-- ref #115, basic Tripple-click support (TODO: still need to fix, anchor movement in controllers)
+- fix #115, basic Tripple-click support
 - fix #114, Double-click + drag should end at word boundaries
 - #112, Workaround for missing Qt::endl in Qt 5.12
 - Support for sticky-selection in replaceSelection methods. (Required for InpuMethod entry)

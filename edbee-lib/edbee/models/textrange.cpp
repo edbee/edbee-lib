@@ -250,13 +250,14 @@ void TextRange::moveCaretToWordBoundaryAtOffset(TextDocument *doc, int newOffset
 {
     TextEditorConfig* config = doc->config();
 
-    // changed offset
-    setCaret(newOffset);
     // left direction
     if( newOffset < anchor()) {
+        setAnchor(max());
+        setCaret(newOffset);
         moveCaretByCharGroup(doc, -1, config->whitespaces(), config->charGroups());
     // right direction
     } else {
+        setCaret(newOffset);
         moveCaretByCharGroup(doc, 1, config->whitespaces(), config->charGroups());
     }
 }
@@ -264,23 +265,21 @@ void TextRange::moveCaretToWordBoundaryAtOffset(TextDocument *doc, int newOffset
 /// Moves the caret to a word boundary  (used for word dragging selections)
 void TextRange::moveCaretToLineBoundaryAtOffset(TextDocument *doc, int newOffset)
 {
-    TextEditorConfig* config = doc->config();
+    int firstLine = doc->lineFromOffset(min());
+    int lastLine = doc->lineFromOffset(max());
 
     // changed offset
     setCaret(newOffset);
-
-    int firstLine = doc->lineFromOffset(min());
-    int lastLine = doc->lineFromOffset(max());
 
     int newLine = doc->lineFromOffset(newOffset);
 
     // left direction
     if( newLine < lastLine ) {
         this->caret_ = doc->offsetFromLine(newLine);
-        this->anchor_ = doc->offsetFromLine(lastLine+1);
+        this->anchor_ = doc->offsetFromLine(lastLine);
     // right direction
     } else if( newLine > firstLine) {
-        this->anchor_ = doc->offsetFromLine(firstLine-1);
+        this->anchor_ = doc->offsetFromLine(firstLine);
         this->caret_ = doc->offsetFromLine(newLine+1);
     }
 }

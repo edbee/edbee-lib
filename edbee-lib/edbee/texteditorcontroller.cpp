@@ -677,6 +677,17 @@ void TextEditorController::moveCaretToOffset(int offset, bool keepAnchors, int r
     return executeCommand( &command );
 }
 
+/// Move the caret and the anchor to the given offeset
+/// @param caret the caret location
+/// @param anchor the anchor location
+/// The rangeIndex is used to specify which range to move.. (Defaults to -1 which changes to a single range)
+void TextEditorController::moveCaretAndAnchorToOffset(int caret, int anchor, int rangeIndex)
+{
+    SelectionCommand command( SelectionCommand::MoveCaretToExactOffset, caret, true, rangeIndex);
+    command.setAnchor(anchor);
+    return executeCommand( &command );
+}
+
 
 /// Adds a new caret to the selection
 /// @param line the line number
