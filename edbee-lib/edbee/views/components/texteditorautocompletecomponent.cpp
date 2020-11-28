@@ -39,7 +39,7 @@ TextEditorAutoCompleteComponent::TextEditorAutoCompleteComponent(TextEditorContr
     /// initialize the widget
     QBoxLayout* layout = new QBoxLayout(QBoxLayout::TopToBottom);
     layout->setSpacing(0);
-    layout->setMargin(0);
+    layout->setContentsMargins(0, 0, 0, 0);
 
     menuRef_ = new QMenu(this);
     listWidgetRef_ = new QListWidget(menuRef_);
