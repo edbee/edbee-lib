@@ -11,7 +11,7 @@
 
 #include "edbee/debug.h"
 
-#define DUMP_UNDO_STACK
+//#define DUMP_UNDO_STACK
 
 namespace edbee {
 

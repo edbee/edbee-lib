@@ -422,11 +422,9 @@ void TextEditorComponent::mousePressEvent(QMouseEvent* event)
         int col = renderer->columnIndexForXpos( line, x );
 
         if( event->button() == Qt::LeftButton ) {
-            qint64 currentClickEvent = QDateTime::currentMSecsSinceEpoch();
             registerClickEvent();
             if( clickCount_ > 1 ) {
                 if( clickCount_ == 3) {
-                    TextRange range = textSelection()->range(0);
                     SelectionCommand toggleWordSelectionAtCommand( SelectionCommand::SelectFullLine, 0);
                     controller()->executeCommand( &toggleWordSelectionAtCommand );
                     clickRange_ = textSelection()->range(0);
