@@ -35,8 +35,8 @@ public:
 
     virtual void executeSpecialNewline( TextEditorController* controller, bool nextLine );
 
-    virtual void execute( TextEditorController* controller );
-    virtual QString toString();
+    virtual void execute( TextEditorController* controller ) override;
+    virtual QString toString() override;
 
 private:
     NewLineType newLineType_;       ///< The current newline type

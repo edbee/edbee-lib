@@ -18,8 +18,8 @@ namespace edbee {
 class EDBEE_EXPORT DuplicateCommand : public TextEditorCommand
 {
 public:
-    virtual void execute( TextEditorController* controller );
-    virtual QString toString();
+    virtual void execute( TextEditorController* controller ) override;
+    virtual QString toString() override;
 };
 
 } // edbee

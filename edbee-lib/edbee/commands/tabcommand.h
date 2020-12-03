@@ -33,8 +33,8 @@ public:
     TabCommand( Direction direction, bool insertTab );
 
     virtual void indent( TextEditorController* controller );
-    virtual void execute( TextEditorController* controller );
-    virtual QString toString();
+    virtual void execute( TextEditorController* controller ) override;
+    virtual QString toString() override;
 
 private:
     Direction dir_;                 ///< The tab direction

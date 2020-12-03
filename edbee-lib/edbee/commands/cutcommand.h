@@ -21,8 +21,8 @@ class TextEditorController;
 class EDBEE_EXPORT CutCommand : public TextEditorCommand
 {
 public:
-    virtual void execute( TextEditorController* controller );
-    virtual QString toString();
+    virtual void execute( TextEditorController* controller ) override;
+    virtual QString toString() override;
 };
 
 

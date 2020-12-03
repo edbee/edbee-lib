@@ -2,6 +2,7 @@
 
 edbee.lib:
 
+- fix #118, Missing `override` specifier in command header files
 - fix #115, basic Tripple-click support
 - fix #114, Double-click + drag should end at word boundaries
 - #112, Workaround for missing Qt::endl in Qt 5.12

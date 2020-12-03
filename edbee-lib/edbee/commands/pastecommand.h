@@ -25,8 +25,8 @@ public:
 
     virtual int commandId();
 
-    virtual void execute( TextEditorController* controller );
-    virtual QString toString();
+    virtual void execute( TextEditorController* controller ) override;
+    virtual QString toString() override;
 };
 
 } // edbee

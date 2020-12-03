@@ -31,7 +31,7 @@ public:
 
     FindCommand( FindType findType );
 
-    virtual void execute( TextEditorController* controller );
+    virtual void execute( TextEditorController* controller ) override;
     virtual QString toString() override;
     virtual bool readonly() override;
 

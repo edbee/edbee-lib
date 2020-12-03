@@ -22,8 +22,8 @@ class EDBEE_EXPORT CommentCommand : public TextEditorCommand
 {  
 public:
     CommentCommand( bool block );
-    virtual void execute( TextEditorController* controller );
-    virtual QString toString(); 
+    virtual void execute( TextEditorController* controller ) override;
+    virtual QString toString() override;
 
 private:
 

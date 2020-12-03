@@ -19,8 +19,8 @@ public:
 
     virtual int commandId() { return coalesceId_; }
 
-    virtual void execute( TextEditorController* controller );
-    virtual QString toString();
+    virtual void execute( TextEditorController* controller ) override;
+    virtual QString toString() override;
 
 private:
     QString text_;          ///< The text to 'replace'
