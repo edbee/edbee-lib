@@ -85,6 +85,11 @@ void SelectionCommand::execute( TextEditorController* controller )
             TextSelection::moveCaretsByLine( controller, sel, amount_ );
             break;
 
+        case MoveCaretToWordBoundary:
+            sel->moveCaretsByCharGroup(amount_,  document->config()->whitespaceWithoutNewline(), document->config()->charGroups() );
+            break;
+
+
         case MoveCaretToLineBoundary:
             sel->moveCaretsToLineBoundary( amount_, document->config()->whitespaceWithoutNewline() );
             break;
