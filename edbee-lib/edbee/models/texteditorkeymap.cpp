@@ -160,7 +160,9 @@ bool TextEditorKeyMap::add(const QString& command, const QString& seq)
     // when the given keys-string is a 'standard-key' name we use the standard key
     QKeySequence::StandardKey standardKey = TextEditorKeyMap::standardKeyFromString(seq);
     if( standardKey != QKeySequence::UnknownKey) {
-        add( command, new TextEditorKey( QKeySequence(standardKey) ) );
+        foreach(QKeySequence sequence,QKeySequence::keyBindings(standardKey)) {
+            add( command, new TextEditorKey( QKeySequence(sequence) ) );
+        }
         return true;
     }
 
