@@ -357,6 +357,10 @@ void TextMarginComponent::mousePressEvent(QMouseEvent* event)
 
     delegate()->mousePressEvent( line, event );
     QWidget::mousePressEvent(event);
+
+    if(!editorWidget()->textEditorComponent()->hasFocus()) {
+        editorWidget()->textEditorComponent()->setFocus();
+    }
 }
 
 

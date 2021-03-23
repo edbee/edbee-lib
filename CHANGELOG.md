@@ -2,6 +2,7 @@
 
 edbee.lib:
 
+- fix #123, Clicking on TextMarginComponet now moves focus to TextEditorComponent
 - fix #121, Standard Keys not working correctly (Fixed by fetching ALL keybindings via QKeySequence::keyBinding)
 - fix #119, Missing `case MoveCaretToWordBoundary:` in `switch` statement
 - fix #118, Missing `override` specifier in command header files
