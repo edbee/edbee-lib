@@ -1,5 +1,4 @@
-# CMake build support courtesy of Axel Gembe <axel@gembe.net>
-cmake_minimum_required(VERSION 2.8)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.1...3.20)
 
 project(QsLog)
 

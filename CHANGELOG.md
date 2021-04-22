@@ -2,6 +2,7 @@
 
 edbee.lib:
 
+- fix #125, CMake 3.20 Deprecation Warning
 - fix #123, Clicking on TextMarginComponet now moves focus to TextEditorComponent
 - fix #121, Standard Keys not working correctly (Fixed by fetching ALL keybindings via QKeySequence::keyBinding)
 - fix #119, Missing `case MoveCaretToWordBoundary:` in `switch` statement
