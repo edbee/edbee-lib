@@ -5,6 +5,7 @@
 
 #include "textrenderer.h"
 
+#include <QBrush>
 #include <QDateTime>
 #include <QRect>
 #include <QPainter>
@@ -27,6 +28,7 @@
 
 /// Using control picutres makes it possible to show the control characters (rquires a special font)
 //#define USE_CONTROL_PICTURES
+#define RENDER_UNICODE_CONTROL_CHARACTERS
 
 namespace edbee {
 
@@ -242,6 +244,44 @@ QTextLayout *TextRenderer::textLayoutForLine(int line)
     }
 }
 
+
+// Sample from: https://github.com/microsoft/vscode/pull/136347/commits/d2c24cc1d1161193c46ac44364a053c082657d69
+static bool isControlCharacter(QChar charCode)
+{
+    if (charCode < 32) {
+        // TAB
+        return (charCode != 8);
+    }
+    if (charCode == 127) {
+        // DEL
+        return true;
+    }
+
+    if (
+        (charCode >= 0x202A && charCode <= 0x202E)
+        || (charCode >= 0x2066 && charCode <= 0x2069)
+        || (charCode >= 0x200E && charCode <= 0x200F)
+        || charCode == 0x061C
+    ) {
+        // Unicode Directional Formatting Characters
+        // LRE	U+202A	LEFT-TO-RIGHT EMBEDDING
+        // RLE	U+202B	RIGHT-TO-LEFT EMBEDDING
+        // PDF	U+202C	POP DIRECTIONAL FORMATTING
+        // LRO	U+202D	LEFT-TO-RIGHT OVERRIDE
+        // RLO	U+202E	RIGHT-TO-LEFT OVERRIDE
+        // LRI	U+2066	LEFT‑TO‑RIGHT ISOLATE
+        // RLI	U+2067	RIGHT‑TO‑LEFT ISOLATE
+        // FSI	U+2068	FIRST STRONG ISOLATE
+        // PDI	U+2069	POP DIRECTIONAL ISOLATE
+        // LRM	U+200E	LEFT-TO-RIGHT MARK
+        // RLM	U+200F	RIGHT-TO-LEFT MARK
+        // ALM	U+061C	ARABIC LETTER MARK
+        return true;
+    }
+    return false;
+ }
+
+
 QTextLayout *TextRenderer::textLayoutForLineForPlaceholder(int line)
 {
     Q_ASSERT( line >= 0 );
@@ -327,8 +367,38 @@ QTextLayout *TextRenderer::textLayoutForLineNormal(int line)
 
         // add extra format
 
-        textLayout->setFormats(themeStyler()->getLineFormatRanges(line));
+
         QString text = doc->lineWithoutNewline(line);
+
+#ifdef RENDER_UNICODE_CONTROL_CHARACTERS
+        QVector<QTextLayout::FormatRange> formatRanges = themeStyler()->getLineFormatRanges(line);
+
+        QTextCharFormat textFormat;
+        textFormat.setBackground(Qt::red); //QBrush(QColor::red()));
+        textFormat.setForeground(Qt::white); //QBrush(QColor::red()));
+
+        for( int i=0; i<text.size(); ++i ) {
+            QChar c = text.at(i);
+            if( isControlCharacter(c) ) {
+              QString str = QString("[U+%1]").arg(QString::number(c.unicode(),16));
+              QString newString = "⚠️";
+              // text.replace(i, 1, str);
+              text.replace(i, 1, newString);
+
+              QTextLayout::FormatRange formatRange;
+              formatRange.format = textFormat;
+              formatRange.start = i;
+              formatRange.length = newString.length();
+              formatRange.format.setToolTip(str);
+              formatRanges.append(formatRange);
+
+            }
+        }
+        textLayout->setFormats(formatRanges);
+#else
+        textLayout->setFormats(themeStyler()->getLineFormatRanges(line));
+#endif
+
 #ifdef USE_CONTROL_PICTURES
         for( int i=0; i<text.size(); ++i ) {
             QChar c = text.at(i);
@@ -348,6 +418,8 @@ QTextLayout *TextRenderer::textLayoutForLineNormal(int line)
             }
         }
 #endif
+
+
 
         textLayout->setText( text );
         textLayout->beginLayout();
