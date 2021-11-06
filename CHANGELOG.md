@@ -2,7 +2,9 @@
 
 edbee.lib:
 
-- hack #127, Option to show Unicode BIDI characters (CVE-2021-425740). (as red-alert icons for now)
+- ref #127,
+  - Option to show Unicode BIDI characters (CVE-2021-425740). (as red icons for now)
+  - It is configurable via 'TexteditorConfig::renderBidiContolCharacters', and defaults to true
 - fix #125, CMake 3.20 Deprecation Warning
 - fix #123, Clicking on TextMarginComponet now moves focus to TextEditorComponent
 - fix #121, Standard Keys not working correctly (Fixed by fetching ALL keybindings via QKeySequence::keyBinding)

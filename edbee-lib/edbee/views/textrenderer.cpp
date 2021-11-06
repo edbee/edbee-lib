@@ -28,7 +28,6 @@
 
 /// Using control picutres makes it possible to show the control characters (rquires a special font)
 //#define USE_CONTROL_PICTURES
-#define RENDER_UNICODE_CONTROL_CHARACTERS
 
 namespace edbee {
 
@@ -361,43 +360,45 @@ QTextLayout *TextRenderer::textLayoutForLineNormal(int line)
             option.setFlags( QTextOption::ShowTabsAndSpaces );        /// TODO: Make an option to show spaces and tabs
         }
 
-          textLayout->setFont( textWidget()->font() );
-//qlog_info() << "font: " <<   textWidget()->font().pointSizeF();
+        textLayout->setFont( textWidget()->font() );
+        //qlog_info() << "font: " <<   textWidget()->font().pointSizeF();
         textLayout->setTextOption( option );
 
         // add extra format
 
 
         QString text = doc->lineWithoutNewline(line);
-
-#ifdef RENDER_UNICODE_CONTROL_CHARACTERS
         QVector<QTextLayout::FormatRange> formatRanges = themeStyler()->getLineFormatRanges(line);
 
-        QTextCharFormat textFormat;
-        textFormat.setBackground(Qt::red); //QBrush(QColor::red()));
-        textFormat.setForeground(Qt::white); //QBrush(QColor::red()));
+        if( config()->renderBidiContolCharacters() ) {
+            QTextCharFormat textFormat;
+            textFormat.setBackground(Qt::red); //QBrush(QColor::red()));
+            textFormat.setForeground(Qt::white); //QBrush(QColor::red()));
 
-        for( int i=0; i<text.size(); ++i ) {
-            QChar c = text.at(i);
-            if( isControlCharacter(c) ) {
-              QString str = QString("[U+%1]").arg(QString::number(c.unicode(),16));
-              QString newString = "⚠️";
-              // text.replace(i, 1, str);
-              text.replace(i, 1, newString);
+            for( int i=0; i<text.size(); ++i ) {
+                QChar c = text.at(i);
+                if( isControlCharacter(c) ) {
+                  QString str = QString("[U+%1]").arg(QString::number(c.unicode(),16));
+                  //QString newString = "⚠️";
+                  // text.replace(i, 1, str);
 
-              QTextLayout::FormatRange formatRange;
-              formatRange.format = textFormat;
-              formatRange.start = i;
-              formatRange.length = newString.length();
-              formatRange.format.setToolTip(str);
-              formatRanges.append(formatRange);
+                  // Better replacement for control character: http://unicode.org/charts/PDF/U2400.pdf
+                  // This fixes the strange caret behaviour
+                  //QString newString(0x2426); // Arabiq question mark
+                  QString newString(0x2425); // YMBOL FOR DELETE FORM TWO
+                  text.replace(i, 1, newString);
 
+                  QTextLayout::FormatRange formatRange;
+                  formatRange.format = textFormat;
+                  formatRange.start = i;
+                  formatRange.length = newString.length();
+                  formatRange.format.setToolTip(str);
+                  formatRanges.append(formatRange);
+
+                }
             }
         }
         textLayout->setFormats(formatRanges);
-#else
-        textLayout->setFormats(themeStyler()->getLineFormatRanges(line));
-#endif
 
 #ifdef USE_CONTROL_PICTURES
         for( int i=0; i<text.size(); ++i ) {

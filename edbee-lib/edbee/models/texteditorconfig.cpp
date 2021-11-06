@@ -33,6 +33,7 @@ TextEditorConfig::TextEditorConfig( QObject* parent )
     , themeName_("Monokai")
     , scrollPastEnd_(false)
     , showWhitespaceMode_(HideWhitespaces)
+    , renderBidiContolCharacters_(true)
     , autocompleteAutoShow_(true)
     , autocompleteMinimalCharacters_(0)
 {
@@ -405,6 +406,19 @@ void TextEditorConfig::setShowWhitespaceMode(const QString& str)
             notifyChange();
         }
     }
+}
+
+bool TextEditorConfig::renderBidiContolCharacters() const
+{
+    return renderBidiContolCharacters_;
+}
+
+/// Sets the render bidirectional control-character mode.
+/// For showing possible security related characters:  https://www.trojansource.codes
+/// Default is Enabled!
+void TextEditorConfig::setRenderBidiContolCharacters(bool enabled)
+{
+    renderBidiContolCharacters_ = enabled;
 }
 
 /// Sets whether autocomplete comes up automatically, or only manually(manual trigger isn't implemented yet)
