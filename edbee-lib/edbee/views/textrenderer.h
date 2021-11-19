@@ -17,8 +17,6 @@
 
 class QPainter;
 class QRect;
-class QTextLayout;
-
 
 namespace edbee {
 
@@ -31,6 +29,7 @@ class TextRangeSet;
 class TextSelection;
 class TextTheme;
 class TextThemeStyler;
+class TextLayout;
 
 /// A class for rendering the text
 /// TODO: Currently this class is also used for positioning text. This probably should be moved in a class of its own
@@ -66,9 +65,9 @@ public:
     QString getLine(int index);
 
 // caching
-    QTextLayout* textLayoutForLine( int line );
-    QTextLayout* textLayoutForLineForPlaceholder( int line );
-    QTextLayout* textLayoutForLineNormal( int line );
+    TextLayout* textLayoutForLine( int line );
+    TextLayout* textLayoutForLineForPlaceholder( int line );
+    TextLayout* textLayoutForLineNormal( int line );
 
 // rendering
     void renderBegin(const QRect& rect );
@@ -135,7 +134,7 @@ private:
     qint64 caretTime_;                      ///< The current time of the caret. -1 means that the caret is disabled
     qint64 caretBlinkRate_;                 ///< The caret blink rate
 
-    QCache<int,QTextLayout> cachedTextLayoutList_;  ///< A list of cached text layouts
+    QCache<int,TextLayout> cachedTextLayoutList_;   ///< A list of cached text layouts
 
     QRect viewport_;                                ///< The current (total) viewport. (This is updated from the window)
     int totalWidthCache_;                           ///< The total width cache

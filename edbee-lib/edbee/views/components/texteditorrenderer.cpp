@@ -15,6 +15,7 @@
 #include "edbee/views/texttheme.h"
 #include "edbee/views/textselection.h"
 #include "edbee/views/textrenderer.h"
+#include "edbee/views/textlayout.h"
 #include "edbee/util/simpleprofiler.h"
 
 #include "edbee/debug.h"
@@ -92,7 +93,7 @@ void TextEditorRenderer::renderLineSelection(QPainter *painter,int line)
 /// TODO: iprove ranges at line by calling rangesForOffsets first for only the visible offsets!
     if( sel->rangesAtLine( line, firstRangeIdx, lastRangeIdx ) ) {
 
-        QTextLayout* textLayout = renderer()->textLayoutForLine(line);
+        TextLayout* textLayout = renderer()->textLayoutForLine(line);
         QRectF rect = textLayout->boundingRect();
         QTextLine textLine = textLayout->lineAt(0);
 

@@ -114,7 +114,7 @@ int TextRenderer::totalWidth()
 {
     if( !totalWidthCache_ ) {
         for( int line=0,cnt=textDocument()->lineCount(); line<cnt; ++line ) {
-            QTextLayout* layout = textLayoutForLine( line );
+            TextLayout* layout = textLayoutForLine( line );
             totalWidthCache_ = qMax( qRound(layout->boundingRect().right()+0.5), totalWidthCache_ );
         }
 
@@ -179,7 +179,7 @@ int TextRenderer::firstVisibleLine()
 /// This method returns the (closet) valid column for the given x-position
 int TextRenderer::columnIndexForXpos(int line, int x )
 {
-    QTextLayout* layout = textLayoutForLine( line );
+    TextLayout* layout = textLayoutForLine( line );
     if(!layout) return 0;
 
     //x -= sideBarLeftWidth();
@@ -192,7 +192,7 @@ int TextRenderer::columnIndexForXpos(int line, int x )
 /// This method returns the x position for the given column
 int TextRenderer::xPosForColumn(int line, int column)
 {
-    QTextLayout* layout = textLayoutForLine( line );
+    TextLayout* layout = textLayoutForLine( line );
     qreal x = 0;// sideBarLeftWidth();
     if(layout) {
         QTextLine tl = layout->lineAt(0);
@@ -232,7 +232,7 @@ int TextRenderer::yPosForOffset(int offset)
 }
 
 /// This method returns the textlayout for the given line
-QTextLayout *TextRenderer::textLayoutForLine(int line)
+TextLayout *TextRenderer::textLayoutForLine(int line)
 {
     Q_ASSERT( line >= 0 );
 /// FIXME:  Invalide TextLayout cache when required!!!
@@ -281,7 +281,7 @@ static bool isControlCharacter(QChar charCode)
  }
 
 
-QTextLayout *TextRenderer::textLayoutForLineForPlaceholder(int line)
+TextLayout *TextRenderer::textLayoutForLineForPlaceholder(int line)
 {
     Q_ASSERT( line >= 0 );
 /// FIXME:  Invalide TextLayout cache when required!!!
@@ -289,7 +289,7 @@ QTextLayout *TextRenderer::textLayoutForLineForPlaceholder(int line)
     TextDocument* doc = textDocument();
     if( line >= doc->lineCount() ) return nullptr;
 
-    QTextLayout* textLayout = cachedTextLayoutList_.object(line);
+    TextLayout* textLayout = cachedTextLayoutList_.object(line);
     if( !textLayout ) {
         textLayout = new QTextLayout();
         textLayout->setCacheEnabled(true);
@@ -339,7 +339,7 @@ QTextLayout *TextRenderer::textLayoutForLineForPlaceholder(int line)
     return textLayout;
 }
 
-QTextLayout *TextRenderer::textLayoutForLineNormal(int line)
+TextLayout *TextRenderer::textLayoutForLineNormal(int line)
 {
     Q_ASSERT( line >= 0 );
 /// FIXME:  Invalide TextLayout cache when required!!!
@@ -347,7 +347,7 @@ QTextLayout *TextRenderer::textLayoutForLineNormal(int line)
     TextDocument* doc = textDocument();
     if( line >= doc->lineCount() ) return nullptr;
 
-    QTextLayout* textLayout = cachedTextLayoutList_.object(line);
+    TextLayout* textLayout = cachedTextLayoutList_.object(line);
     if( !textLayout ) {
         textLayout = new QTextLayout();
         textLayout->setCacheEnabled(true);
@@ -443,7 +443,7 @@ QTextLayout *TextRenderer::textLayoutForLineNormal(int line)
 
 /// This method starts rendering
 void TextRenderer::renderBegin( const QRect& rect )
-{    
+{
 
 //PROF_BEGIN
     TextDocument* doc = textDocument();
