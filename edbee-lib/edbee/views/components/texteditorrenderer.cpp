@@ -95,7 +95,6 @@ void TextEditorRenderer::renderLineSelection(QPainter *painter,int line)
 
         TextLayout* textLayout = renderer()->textLayoutForLine(line);
         QRectF rect = textLayout->boundingRect();
-        QTextLine textLine = textLayout->lineAt(0);
 
         int lastLineColumn = doc->lineLength(line);
 
@@ -105,8 +104,8 @@ void TextEditorRenderer::renderLineSelection(QPainter *painter,int line)
             int startColumn = doc->columnFromOffsetAndLine( range.min(), line );
             int endColumn   = doc->columnFromOffsetAndLine( range.max(), line );
 
-            int startX = textLine.cursorToX( startColumn );
-            int endX   = textLine.cursorToX( endColumn );
+            int startX = textLayout->cursorToX(startColumn);
+            int endX   = textLayout->cursorToX(endColumn);
 
             if( range.length() > 0 && endColumn+1 >= lastLineColumn) endX += 3;
 
@@ -134,9 +133,8 @@ void TextEditorRenderer::renderLineBorderedRanges(QPainter *painter,int line)
 /// TODO: improve ranges at line by calling rangesForOffsets first for only the visible offsets!
     if( sel->rangesAtLine( line, firstRangeIdx, lastRangeIdx ) ) {
 
-        QTextLayout* textLayout = renderer()->textLayoutForLine(line);
+        TextLayout* textLayout = renderer()->textLayoutForLine(line);
         QRectF rect = textLayout->boundingRect();
-        QTextLine textLine = textLayout->lineAt(0);
 
         int lastLineColumn = doc->lineLength(line);
 
@@ -146,8 +144,8 @@ void TextEditorRenderer::renderLineBorderedRanges(QPainter *painter,int line)
             int startColumn = doc->columnFromOffsetAndLine( range.min(), line );
             int endColumn   = doc->columnFromOffsetAndLine( range.max(), line );
 
-            qreal startX = textLine.cursorToX( startColumn );
-            qreal endX   = textLine.cursorToX( endColumn );
+            qreal startX = textLayout->cursorToX( startColumn );
+            qreal endX   = textLayout->cursorToX( endColumn );
 
             if( range.length() > 0 && endColumn+1 >= lastLineColumn) endX += 3;
 
@@ -185,7 +183,7 @@ void TextEditorRenderer::renderLineSeparator(QPainter *painter,int line)
 void TextEditorRenderer::renderLineText(QPainter *painter, int line)
 {
 //PROF_BEGIN_NAMED("render-line-text")
-    QTextLayout* textLayout = renderer()->textLayoutForLine(line);
+    TextLayout* textLayout = renderer()->textLayoutForLine(line);
 
     // draw the text layout
     QPoint lineStartPos(0, line*renderer()->lineHeight() );
@@ -227,8 +225,9 @@ void TextEditorRenderer::renderCarets(QPainter *painter)
 
             QPoint lineStartPos(0, renderer()->yPosForLine(line));
 
-            QTextLayout* textLayout = renderer()->textLayoutForLine(line);
+            TextLayout* textLayout = renderer()->textLayoutForLine(line);
             for( int caret = 0, rangeCount=sel->rangeCount(); caret < rangeCount; ++caret ) {
+
                 TextRange& range = sel->range(caret);
                 int caretLine = doc->lineFromOffset( range.caret() );
                 if( caretLine == line ) {

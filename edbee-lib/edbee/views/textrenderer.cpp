@@ -18,6 +18,7 @@
 #include "edbee/models/textdocument.h"
 #include "edbee/models/texteditorconfig.h"
 #include "edbee/models/textlexer.h"
+#include "edbee/views/textlayout.h"
 #include "edbee/views/textselection.h"
 #include "edbee/views/texttheme.h"
 #include "edbee/texteditorcontroller.h"
@@ -184,8 +185,7 @@ int TextRenderer::columnIndexForXpos(int line, int x )
 
     //x -= sideBarLeftWidth();
 
-    QTextLine tl = layout->lineAt(0);
-    return tl.xToCursor( x );
+    return layout->xToCursor( x );
 }
 
 
@@ -195,8 +195,7 @@ int TextRenderer::xPosForColumn(int line, int column)
     TextLayout* layout = textLayoutForLine( line );
     qreal x = 0;// sideBarLeftWidth();
     if(layout) {
-        QTextLine tl = layout->lineAt(0);
-        x += tl.cursorToX(column);
+        x += layout->cursorToX(column);
     }
     return qRound(x);
 }
@@ -291,7 +290,7 @@ TextLayout *TextRenderer::textLayoutForLineForPlaceholder(int line)
 
     TextLayout* textLayout = cachedTextLayoutList_.object(line);
     if( !textLayout ) {
-        textLayout = new QTextLayout();
+        textLayout = new TextLayout(textDocument());
         textLayout->setCacheEnabled(true);
         int tabWidth = controllerRef_->widget()->fontMetrics().horizontalAdvance('M');
 
@@ -301,8 +300,8 @@ TextLayout *TextRenderer::textLayoutForLineForPlaceholder(int line)
             option.setFlags( QTextOption::ShowTabsAndSpaces );        /// TODO: Make an option to show spaces and tabs
         }
 
-        textLayout->setFont( textWidget()->font() );
-        textLayout->setTextOption( option );
+        textLayout->qTextLayout()->setFont( textWidget()->font() );
+        textLayout->qTextLayout()->setTextOption( option );
 
         // add extra format (no format)
         QTextCharFormat format;
@@ -323,10 +322,7 @@ TextLayout *TextRenderer::textLayoutForLineForPlaceholder(int line)
         textLayout->setFormats(formatRanges);
 
         textLayout->setText(text);
-        textLayout->beginLayout();
-        QTextLine textline = textLayout->createLine();
-        Q_UNUSED(textline);
-        textLayout->endLayout();
+        textLayout->buildLayout();
 
         // update the width cache
         totalWidthCache_ = qMax( totalWidthCache_, qRound(textLayout->boundingRect().width()+0.5));
@@ -339,6 +335,7 @@ TextLayout *TextRenderer::textLayoutForLineForPlaceholder(int line)
     return textLayout;
 }
 
+
 TextLayout *TextRenderer::textLayoutForLineNormal(int line)
 {
     Q_ASSERT( line >= 0 );
@@ -349,7 +346,7 @@ TextLayout *TextRenderer::textLayoutForLineNormal(int line)
 
     TextLayout* textLayout = cachedTextLayoutList_.object(line);
     if( !textLayout ) {
-        textLayout = new QTextLayout();
+        textLayout = new TextLayout(textDocument());
         textLayout->setCacheEnabled(true);
         int tabWidth = controllerRef_->widget()->fontMetrics().horizontalAdvance('M');
 
@@ -360,17 +357,18 @@ TextLayout *TextRenderer::textLayoutForLineNormal(int line)
             option.setFlags( QTextOption::ShowTabsAndSpaces );        /// TODO: Make an option to show spaces and tabs
         }
 
-        textLayout->setFont( textWidget()->font() );
+        textLayout->qTextLayout()->setFont( textWidget()->font() );
         //qlog_info() << "font: " <<   textWidget()->font().pointSizeF();
-        textLayout->setTextOption( option );
+        textLayout->qTextLayout()->setTextOption( option );
 
         // add extra format
-
-
         QString text = doc->lineWithoutNewline(line);
         QVector<QTextLayout::FormatRange> formatRanges = themeStyler()->getLineFormatRanges(line);
 
+        TextLayoutBuilder textLayoutBuilder(textLayout, text, formatRanges);
+
         if( config()->renderBidiContolCharacters() ) {
+
             QTextCharFormat textFormat;
             textFormat.setBackground(Qt::red); //QBrush(QColor::red()));
             textFormat.setForeground(Qt::white); //QBrush(QColor::red()));
@@ -378,10 +376,12 @@ TextLayout *TextRenderer::textLayoutForLineNormal(int line)
             for( int i=0; i<text.size(); ++i ) {
                 QChar c = text.at(i);
                 if( isControlCharacter(c) ) {
+
                   QString str = QString("[U+%1]").arg(QString::number(c.unicode(),16));
                   //QString newString = "⚠️";
                   // text.replace(i, 1, str);
 
+                  /* ORIGINAL first solution
                   // Better replacement for control character: http://unicode.org/charts/PDF/U2400.pdf
                   // This fixes the strange caret behaviour
                   //QString newString(0x2426); // Arabiq question mark
@@ -394,6 +394,8 @@ TextLayout *TextRenderer::textLayoutForLineNormal(int line)
                   formatRange.length = newString.length();
                   formatRange.format.setToolTip(str);
                   formatRanges.append(formatRange);
+                  */
+                  textLayoutBuilder.replace(i, 1, str, textFormat);
 
                 }
             }
@@ -414,7 +416,7 @@ TextLayout *TextRenderer::textLayoutForLineNormal(int line)
                 text.replace(i,1,c);
             }
             if( c < 32 && c != 8 ) {
-                c = QChar( 0x2400+c.unicode() );  // add the Control Pictures range (see: http://unicode.org/charts/PDF/U2400.pdf )
+                c = QChar( 0x2400+c.unicode() );  // add     the Control Pictures range (see: http://unicode.org/charts/PDF/U2400.pdf )
                 text.replace(i,1,c);
             }
         }
@@ -423,10 +425,7 @@ TextLayout *TextRenderer::textLayoutForLineNormal(int line)
 
 
         textLayout->setText( text );
-        textLayout->beginLayout();
-        QTextLine textline = textLayout->createLine();
-        Q_UNUSED(textline)
-        textLayout->endLayout();
+        textLayout->buildLayout();
 
         // update the width cache
         totalWidthCache_ = qMax( totalWidthCache_, qRound(textLayout->boundingRect().width()+0.5));
