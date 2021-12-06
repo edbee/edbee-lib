@@ -248,7 +248,7 @@ static bool isControlCharacter(QChar charCode)
 {
     if (charCode < 32) {
         // TAB
-        return (charCode != 9);
+        return (charCode != '\t');
     }
     if (charCode == 127) {
         // DEL
