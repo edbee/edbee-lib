@@ -87,6 +87,7 @@ SET(SOURCES
    edbee/views/components/textmargincomponent.cpp
    edbee/views/textcaretcache.cpp
    edbee/views/texteditorscrollarea.cpp
+   edbee/views/textlayout.cpp
    edbee/views/textrenderer.cpp
    edbee/views/textselection.cpp
    edbee/views/texttheme.cpp
@@ -168,6 +169,7 @@ SET(HEADERS
    edbee/views/components/textmargincomponent.h
    edbee/views/textcaretcache.h
    edbee/views/texteditorscrollarea.h
+   edbee/views/textlayout.h
    edbee/views/textrenderer.h
    edbee/views/textselection.h
    edbee/views/texttheme.h
