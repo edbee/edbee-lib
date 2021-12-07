@@ -44,3 +44,5 @@ edbee-lib/edbee-lib_autogen/
 edbee-lib/qslog/
 edbee-test/edbee-test_autogen/
 edbee-test/edbee-lib/qslog/
+
+build/

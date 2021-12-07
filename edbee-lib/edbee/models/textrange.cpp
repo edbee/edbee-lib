@@ -422,6 +422,12 @@ bool TextRange::touches(TextRange& range)
     return( max1 == min2 || max2 == min1 );
 }
 
+/// checks if the given position is in this textrange
+bool TextRange::contains(int pos)
+{
+    return min() <= pos && pos < max();
+}
+
 
 
 //=========================================================================

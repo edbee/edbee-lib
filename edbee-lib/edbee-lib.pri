@@ -77,6 +77,7 @@ SOURCES += \
     $$PWD/edbee/views/components/textmargincomponent.cpp \
     $$PWD/edbee/views/textcaretcache.cpp \
     $$PWD/edbee/views/texteditorscrollarea.cpp \
+    $$PWD/edbee/views/textlayout.cpp \
     $$PWD/edbee/views/textrenderer.cpp \
     $$PWD/edbee/views/textselection.cpp \
     $$PWD/edbee/views/texttheme.cpp
@@ -158,6 +159,7 @@ HEADERS += \
     $$PWD/edbee/views/components/textmargincomponent.h \
     $$PWD/edbee/views/textcaretcache.h \
     $$PWD/edbee/views/texteditorscrollarea.h \
+    $$PWD/edbee/views/textlayout.h \
     $$PWD/edbee/views/textrenderer.h \
     $$PWD/edbee/views/textselection.h \
     $$PWD/edbee/views/texttheme.h

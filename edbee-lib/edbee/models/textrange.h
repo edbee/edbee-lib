@@ -87,6 +87,7 @@ public:
 
     bool equals(const TextRange &range );
     bool touches( TextRange& range );
+    bool contains( int pos );
 
     static bool lessThan( TextRange& r1, TextRange& r2 );
 
