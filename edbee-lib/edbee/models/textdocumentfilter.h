@@ -8,7 +8,9 @@
 #include "edbee/exports.h"
 
 class QString;
-class QStringList;
+#if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
+    class QStringList;
+#endif
 
 namespace edbee {
 

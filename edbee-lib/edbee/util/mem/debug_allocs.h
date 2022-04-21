@@ -10,7 +10,16 @@
 
 #include "edbee/exports.h"
 
-class QMutex;
+
+
+#if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
+    #define EdbeeRecursiveMutex QMutex
+#else
+    #define EdbeeRecursiveMutex QRecursiveMutex
+#endif
+
+class EdbeeRecursiveMutex;
+
 
 //#if !defined(__APPLE__)
 //#include <malloc>
@@ -51,7 +60,7 @@ public:
     }
 
 
-    QMutex* mutex();
+    EdbeeRecursiveMutex* mutex();
 
 public:
     void start( bool checkDelete );
@@ -71,7 +80,7 @@ public:
 private:
     std::map< void *, DebugAllocation*>  allocationList_;       ///< The allocation
     bool checkDelete_;                                          ///< Should we check for invalid deletes?
-    QMutex* mutex_;                                             ///< The current mutext
+    EdbeeRecursiveMutex* mutex_;                                ///< The current mutext
     bool running_;                                              ///< A we 'recording'
     bool started_;                                              ///< Paused?
 

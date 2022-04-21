@@ -410,13 +410,14 @@ void TextEditorComponent::registerClickEvent()
 /// @param event the mouse event
 void TextEditorComponent::mousePressEvent(QMouseEvent* event)
 {
-    if( event->button() == Qt::LeftButton || event->button() == Qt::MidButton ) {
+    if( event->button() == Qt::LeftButton || event->button() == Qt::MiddleButton ) {
         TextRenderer* renderer = textRenderer();
 
 //        int x = renderer->widgetXToXpos( event->x() + horizontalScrollBar()->value() );
 //        int y = renderer->widgetYToYpos( event->y() + verticalScrollBar()->value() );
-        int x = event->x();
-        int y = event->y();
+        int x = event->pos().x();
+        int y = event->pos().y();
+
 
         int line = renderer->rawLineIndexForYpos( y );
         int col = renderer->columnIndexForXpos( line, x );
@@ -438,7 +439,7 @@ void TextEditorComponent::mousePressEvent(QMouseEvent* event)
                 controller()->moveCaretTo( line, col, event->modifiers()&Qt::ShiftModifier );
             }
         }
-        if( QApplication::clipboard()->supportsSelection() && event->button() == Qt::MidButton ) { // X11 / linux support middle button paste
+        if( QApplication::clipboard()->supportsSelection() && event->button() == Qt::MiddleButton ) { // X11 / linux support middle button paste
             controller()->moveCaretTo( line, col, false ); // clear actual selection and put cursor under mouse
             controller()->replaceSelection( QApplication::clipboard()->text(QClipboard::Selection), CoalesceId_Paste );
             controller()->updateStatusText();

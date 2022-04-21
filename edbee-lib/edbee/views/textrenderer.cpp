@@ -246,20 +246,20 @@ TextLayout *TextRenderer::textLayoutForLine(int line)
 // Sample from: https://github.com/microsoft/vscode/pull/136347/commits/d2c24cc1d1161193c46ac44364a053c082657d69
 static bool isControlCharacter(QChar charCode)
 {
-    if (charCode < 32) {
+    if (charCode < QChar(32)) {
         // TAB
         return (charCode != '\t');
     }
-    if (charCode == 127) {
+    if (charCode == QChar(127)) {
         // DEL
         return true;
     }
 
     if (
-        (charCode >= 0x202A && charCode <= 0x202E)
-        || (charCode >= 0x2066 && charCode <= 0x2069)
-        || (charCode >= 0x200E && charCode <= 0x200F)
-        || charCode == 0x061C
+        (charCode >= QChar(0x202A) && charCode <= QChar(0x202E))
+        || (charCode >= QChar(0x2066) && charCode <= QChar(0x2069))
+        || (charCode >= QChar(0x200E) && charCode <= QChar(0x200F))
+        || charCode == QChar(0x061C)
     ) {
         // Unicode Directional Formatting Characters
         // LRE	U+202A	LEFT-TO-RIGHT EMBEDDING

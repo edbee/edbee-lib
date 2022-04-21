@@ -72,7 +72,7 @@ TextEditorKeyMap::~TextEditorKeyMap()
 /// @param keyMap the keymap to copy the keys from
 void TextEditorKeyMap::copyKeysTo(TextEditorKeyMap* keyMap)
 {
-    for( QHash<QString,TextEditorKey*>::const_iterator itr = keyMap_.constBegin(); itr != keyMap_.constEnd(); ++itr ) {
+    for( QMultiHash<QString,TextEditorKey*>::const_iterator itr = keyMap_.constBegin(); itr != keyMap_.constEnd(); ++itr ) {
         keyMap->keyMap_.insert( itr.key(), itr.value()->clone() );
     }
 }
@@ -84,7 +84,7 @@ void TextEditorKeyMap::copyKeysTo(TextEditorKeyMap* keyMap)
 /// @return the keysequence or 0 if not found
 TextEditorKey* TextEditorKeyMap::get(const QString& name) const
 {
-    QHash<QString,TextEditorKey*>::const_iterator itr = keyMap_.find(name);
+    QMultiHash<QString,TextEditorKey*>::const_iterator itr = keyMap_.find(name);
     if( itr != keyMap_.end() ) { return itr.value(); }
     if( parentRef_ ) { return parentRef_->get(name); }
     return nullptr;
@@ -203,7 +203,7 @@ void TextEditorKeyMap::replace(const QString& name, TextEditorKey* sequence)
 QString TextEditorKeyMap::findBySequence(QKeySequence sequence, QKeySequence::SequenceMatch& match)
 {
     // find the current map
-    QHash<QString,TextEditorKey*>::iterator itr = keyMap_.begin();
+    QMultiHash<QString,TextEditorKey*>::iterator itr = keyMap_.begin();
     while (itr != keyMap_.end()) {
         match =  sequence.matches( itr.value()->sequence() );
         if( match != QKeySequence::NoMatch ) {
@@ -226,10 +226,18 @@ QKeySequence TextEditorKeyMap::joinKeySequences(const QKeySequence seq1, const Q
     int idx=0;
     int keys[] = {0,0,0,0};
     for( int i=0; i < seq1.count(); ++i ) {
+#if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
         keys[idx++] = seq1[i];
+#else
+        keys[idx++] = seq1[i].toCombined();
+#endif
     }
     for( int i=0; i < seq2.count(); ++i ) {
+#if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
         keys[idx++] = seq2[i];
+#else
+        keys[idx++] = seq2[i].toCombined();
+#endif
     }
     return QKeySequence(keys[0],keys[1],keys[2],keys[3]);
 }
@@ -320,7 +328,7 @@ QKeySequence::StandardKey TextEditorKeyMap::standardKeyFromString( const QString
 QString TextEditorKeyMap::toString() const
 {
     QString str;
-    for( QHash<QString,TextEditorKey*>::const_iterator itr = keyMap_.constBegin(); itr != keyMap_.constEnd(); ++itr ) {
+    for( QMultiHash<QString,TextEditorKey*>::const_iterator itr = keyMap_.constBegin(); itr != keyMap_.constEnd(); ++itr ) {
         if( !str.isEmpty()) str.append(",");
         str.append( QStringLiteral("%1:%2").arg(itr.key()).arg(itr.value()->sequence().toString()) );
     }

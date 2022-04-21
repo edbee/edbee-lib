@@ -9,7 +9,6 @@
 
 #include <QMap>
 #include <QList>
-#include <QRegExp>
 #include <QVector>
 
 #include "edbee/models/textlexer.h"

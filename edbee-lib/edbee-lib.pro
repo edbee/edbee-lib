@@ -6,6 +6,10 @@
 
 QT += core gui widgets
 
+# for the time being:
+greaterThan(QT_MAJOR_VERSION,5): QT += core5compat
+
+
 TARGET = edbee
 TEMPLATE = lib
 CONFIG += staticlib
