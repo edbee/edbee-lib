@@ -3,6 +3,7 @@
 edbee.lib:
 
 - fix #133, Added Qt 6.3.0 compatibility
+- fix #132, Writing diacritics in Linux
 - ref #128, Build in supprort for virtual characters. Alternate position/cursor calculations via TextLayout
 - ref #127,
   - Option to show Unicode BIDI characters (CVE-2021-425740). (as red icons for now)
