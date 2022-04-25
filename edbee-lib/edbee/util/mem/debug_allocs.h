@@ -49,7 +49,7 @@ public:
     virtual ~DebugAllocationList();
 
     void clear();
-    int size() { return allocationList_.size(); }
+    size_t size() { return allocationList_.size(); }
     inline bool isRunning() { return running_; }
 
     void pause( bool val )

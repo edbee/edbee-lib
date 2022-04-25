@@ -428,7 +428,7 @@ void CommentCommand::execute(TextEditorController* controller)
     TextDocument* doc = controller->textDocument();
 
     // start changing the document
-    int lastOffset = -1;
+    // int lastOffset = -1;
 
     doc->beginChanges(controller);
     for( int i=0,cnt=selection->rangeCount(); i<cnt; ++i ) {
@@ -439,7 +439,8 @@ void CommentCommand::execute(TextEditorController* controller)
         controller->textDocument()->textLexer()->lexRange(range.min(), range.max());
 
         // comment the range and get the last offset
-        lastOffset = commentRange( controller, range, block_ );
+        // lastOffset = commentRange( controller, range, block_ );
+        commentRange( controller, range, block_ );
     }
 
     doc->giveSelection( controller, selection );
