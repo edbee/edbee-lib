@@ -7,6 +7,7 @@
 
 #include <QApplication>
 #include <QAction>
+#include <QAccessibleTextUpdateEvent>
 #include <QThread>
 
 #include "edbee/commands/selectioncommand.h"
@@ -123,7 +124,7 @@ void TextEditorController::setTextDocument(TextDocument* doc)
 {
     Q_ASSERT_GUI_THREAD;
 
-    if( doc != textDocumentRef_ ) {       
+    if( doc != textDocumentRef_ ) {
         // disconnect the old document
         TextDocument* oldDocumentRef = textDocument();
         if( oldDocumentRef ) {
@@ -374,6 +375,18 @@ void TextEditorController::onTextChanged( edbee::TextBufferChange change )
     if( widgetRef_) {
         widget()->updateGeometryComponents();
         notifyStateChange();
+
+#ifndef QT_NO_ACCESSIBILITY
+        // this is a bit tricky, a textbuffer change uses the newtext-value
+        // for storing the old text. The new text can be found in the document
+        QString oldText(change.newText());
+        QString newText = textDocument()->textPart(change.offset(), change.newTextLength());
+
+        QAccessibleTextUpdateEvent ev(widget(), change.offset(), oldText, newText);
+        /// TODO: When a caret is included, (Inherited change, use this caret position)
+        QAccessible::updateAccessibility(&ev);
+#endif
+
     }
 }
 
@@ -467,7 +480,7 @@ void TextEditorController::updateStatusText( const QString& extraText )
     if( !extraText.isEmpty() ) {
         text.append(" | " );
         text.append(extraText);
-    }   
+    }
     emit updateStatusTextSignal( text );
 }
 
@@ -751,7 +764,7 @@ void TextEditorController::beginUndoGroup( ChangeGroup* group )
 ///                  and id > 0 means if the previous command had the same id, the command is merged
 /// @param flatten when an undogroup is ended and flatten is set to true ALL sub-undo-groups are merged to this group (default=false)
 void TextEditorController::endUndoGroup(int coalesceId, bool flatten )
-{    
+{
     textDocument()->endUndoGroup(coalesceId,flatten);
 }
 

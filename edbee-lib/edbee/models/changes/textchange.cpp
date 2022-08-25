@@ -192,4 +192,6 @@ void TextChange::replaceText(TextDocument* document)
 }
 
 
+
+
 } // edbee
