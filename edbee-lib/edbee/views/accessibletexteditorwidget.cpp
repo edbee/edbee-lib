@@ -15,7 +15,6 @@
 
 //#define VIA_EDITOR_COMPONENT
 
-
 namespace edbee {
 
 AccessibleTextEditorWidget::AccessibleTextEditorWidget(TextEditorWidget* widget)
@@ -171,9 +170,14 @@ int AccessibleTextEditorWidget::characterCount() const
 /// Returns the position and size of the character at position offset in screen coordinates.
 QRect AccessibleTextEditorWidget::characterRect(int offset) const
 {
+    TextEditorComponent* comp = textWidget()->textEditorComponent();
     int xPos = this->renderer()->xPosForOffset(offset);
     int yPos = this->renderer()->yPosForOffset(offset);
-    return QRect(xPos, yPos, renderer()->emWidth(), renderer()->lineHeight());
+    QPoint point(xPos, yPos);
+    QPoint pointScreen = comp->mapToGlobal(point);
+    //xPos = comp->mapToGlobal()
+    //yPos = rect.y();
+    return QRect(pointScreen.x(), pointScreen.y(), renderer()->emWidth(), renderer()->lineHeight());
 }
 
 
