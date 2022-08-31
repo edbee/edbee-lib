@@ -29,6 +29,7 @@
 #include "edbee/texteditorcommand.h"
 #include "edbee/edbee.h"
 #include "edbee/texteditorwidget.h"
+#include "edbee/views/accessibletexteditorwidget.h"
 #include "edbee/views/components/texteditorcomponent.h"
 #include "edbee/views/components/textmargincomponent.h"
 #include "edbee/views/textrenderer.h"
@@ -36,6 +37,7 @@
 #include "edbee/views/textselection.h"
 
 #include "edbee/debug.h"
+
 
 
 namespace edbee {
@@ -376,17 +378,7 @@ void TextEditorController::onTextChanged( edbee::TextBufferChange change )
         widget()->updateGeometryComponents();
         notifyStateChange();
 
-#ifndef QT_NO_ACCESSIBILITY
-        // this is a bit tricky, a textbuffer change uses the newtext-value
-        // for storing the old text. The new text can be found in the document
-        QString oldText(change.newText());
-        QString newText = textDocument()->textPart(change.offset(), change.newTextLength());
-
-        QAccessibleTextUpdateEvent ev(widget(), change.offset(), oldText, newText);
-        /// TODO: When a caret is included, (Inherited change, use this caret position)
-        QAccessible::updateAccessibility(&ev);
-#endif
-
+        AccessibleTextEditorWidget::notifyTextChangeEvent(widget(), &change);
     }
 }
 
@@ -671,7 +663,7 @@ void TextEditorController::moveCaretTo(int line, int col, bool keepAnchors, int 
     }
 
     int minusNewLineChar = textDocument()->lineCount()-1 == line ? 0 : 1;
-    offset += qBound(0, col, lineLength-minusNewLineChar );
+    offset += qBound(0, col, qMax(lineLength-minusNewLineChar, 0));
 
 //textDocument()->offsetFromLineAndColumn(line,col)
 

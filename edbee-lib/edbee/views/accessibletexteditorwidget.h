@@ -10,6 +10,7 @@
 
 namespace edbee {
 
+class TextBufferChange;
 class TextDocument;
 class TextEditorController;
 class TextEditorWidget;
@@ -25,9 +26,13 @@ public:
 
 public:
     static QAccessibleInterface* factory(const QString& className, QObject * object);
+    static QWidget* eventWidgetForTextEditor(TextEditorWidget* widget);
+
+    static void notifyTextSelectionEvent(TextEditorWidget* widget, TextSelection* selection);
+    static void notifyTextChangeEvent(TextEditorWidget* widget, TextBufferChange* change);
+
+
     void* interface_cast(QAccessible::InterfaceType t) override;
-
-
     QAccessible::State state() const override;
 
     // QAccessibleTextInterface interface
@@ -54,6 +59,11 @@ public:
     virtual void deleteText(int startOffset, int endOffset) override;
     virtual void insertText(int offset, const QString &text) override;
     virtual void replaceText(int startOffset, int endOffset, const QString &text) override;
+
+
+    virtual QAccessibleInterface* focusChild() const override;
+    virtual QRect rect() const override;
+
 
 protected:
     TextDocument* textDocument() const;

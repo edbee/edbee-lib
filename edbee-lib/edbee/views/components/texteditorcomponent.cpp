@@ -5,6 +5,7 @@
 
 #include "texteditorcomponent.h"
 
+#include <QAccessibleEvent>
 #include <QApplication>
 #include <QClipboard>
 #include <QDateTime>
@@ -552,6 +553,15 @@ void TextEditorComponent::mouseMoveEvent(QMouseEvent* event )
 void TextEditorComponent::focusInEvent(QFocusEvent *event)
 {
     Q_UNUSED(event)
+
+#ifndef QT_NO_ACCESSIBILITY
+//    controller()->widget()->setFocus(Qt::MouseFocusReason);
+//    controller()->widget()->grabKeyboard();
+
+    // pretend if the main widget got focus
+//    QAccessibleEvent ev(this, QAccessible::Focus);
+//    QAccessible::updateAccessibility(&ev);
+#endif
 }
 
 

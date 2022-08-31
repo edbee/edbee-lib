@@ -5,20 +5,21 @@
 
 #include "selectionchange.h"
 
-#include <QAccessibleTextSelectionEvent>
-
 #include "edbee/models/textbuffer.h"
 #include "edbee/models/texteditorconfig.h"
 #include "edbee/models/change.h"
 #include "edbee/models/textdocument.h"
 #include "edbee/models/textrange.h"
 #include "edbee/models/textundostack.h"
+#include "edbee/views/accessibletexteditorwidget.h"
 #include "edbee/views/textrenderer.h"
 #include "edbee/views/textselection.h"
 #include "edbee/texteditorcontroller.h"
 #include "edbee/texteditorwidget.h"
 
 #include "edbee/debug.h"
+
+
 
 namespace edbee {
 
@@ -119,18 +120,7 @@ void SelectionChange::notifyChange()
     /// TODO: make the controllerContext only repaint the affected areas via the TextRangeSets
     controllerContext()->onSelectionChanged( rangeSet_ );
 
-
-
-    // TEST Single selection change, TODO: multiple selection ranges??
-#ifndef QT_NO_ACCESSIBILITY
-    for(int i=0, cnt = controller()->textSelection()->rangeCount(); i < cnt; ++i) {
-        TextRange range = controller()->textSelection()->range(i);
-        QAccessibleTextSelectionEvent ev(controller()->widget(), range.min(), range.max());
-        ev.setCursorPosition(range.caret());
-        QAccessible::updateAccessibility(&ev);
-    }
-#endif
-
+    AccessibleTextEditorWidget::notifyTextSelectionEvent(controller()->widget(), controller()->textSelection());
 }
 
 
