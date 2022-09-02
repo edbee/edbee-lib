@@ -51,21 +51,21 @@ public:
     virtual int offsetAtPoint(const QPoint &point) const override;
     virtual void scrollToSubstring(int startIndex, int endIndex) override;
     virtual QString attributes(int offset, int *startOffset, int *endOffset) const override;
-//    virtual QString textAfterOffset(int offset, QAccessible::TextBoundaryType boundaryType, int *startOffset, int *endOffset) const override;
-//    virtual QString textAtOffset(int offset, QAccessible::TextBoundaryType boundaryType, int *startOffset, int *endOffset) const override;
-//    virtual QString textBeforeOffset(int offset, QAccessible::TextBoundaryType boundaryType, int *startOffset, int *endOffset) const override;
+
+    virtual QString textAfterOffset(int offset, QAccessible::TextBoundaryType boundaryType, int *startOffset, int *endOffset) const override;
+    virtual QString textAtOffset(int offset, QAccessible::TextBoundaryType boundaryType, int *startOffset, int *endOffset) const override;
+    virtual QString textBeforeOffset(int offset, QAccessible::TextBoundaryType boundaryType, int *startOffset, int *endOffset) const override;
 
     // QAccessibleEditableTextInterface
     virtual void deleteText(int startOffset, int endOffset) override;
     virtual void insertText(int offset, const QString &text) override;
     virtual void replaceText(int startOffset, int endOffset, const QString &text) override;
 
-
     virtual QAccessibleInterface* focusChild() const override;
     virtual QRect rect() const override;
 
-
 protected:
+
     TextDocument* textDocument() const;
     TextSelection* textSelection() const;
     TextEditorController* controller() const;
