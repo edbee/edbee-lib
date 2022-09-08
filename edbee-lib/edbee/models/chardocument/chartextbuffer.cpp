@@ -83,6 +83,8 @@ void CharTextBuffer::replaceText(int offset, int length, const QChar* buffer, in
     emit textAboutToBeChanged( change );
 
     // replace the text
+    QString oldText = buf_.mid(offset, length);
+
     buf_.replace( offset, length, buffer, bufferLength );
 
     // replace the line data and offsets
@@ -90,7 +92,7 @@ void CharTextBuffer::replaceText(int offset, int length, const QChar* buffer, in
 
 //    emit linesReplaced( change.line, change.lineCount, change.newLineCount );
 //    emit textReplaced( offset, length, buffer, bufferLength );
-    emit textChanged( change );
+    emit textChanged( change, oldText );
 
 }
 
@@ -168,7 +170,7 @@ void CharTextBuffer::rawAppendEnd()
 
     emit textAboutToBeChanged( change );
     lineOffsetList_.applyChange( change );
-    emit textChanged( change );
+    emit textChanged( change, QString() );
 
     rawAppendLineStart_ = -1;
     rawAppendStart_     = -1;

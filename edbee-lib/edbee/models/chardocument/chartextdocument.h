@@ -79,7 +79,7 @@ public:
 protected slots:
 //    virtual void textReplaced( int offset, int length, const QChar* data, int dataLength );
 //    virtual void linesReplaced( int line, int lineCount, int newLineCount );
-    virtual void textBufferChanged( const edbee::TextBufferChange& change );
+    virtual void textBufferChanged( const edbee::TextBufferChange& change, QString oldText = QString() );
 
 private:
     TextEditorConfig* config_;                               ///< The text editor configuration

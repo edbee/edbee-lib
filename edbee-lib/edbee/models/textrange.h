@@ -256,7 +256,7 @@ public:
     bool deleteMode() const;
 
 public slots:
-    void textChanged( edbee::TextBufferChange change );
+    void textChanged( edbee::TextBufferChange change, QString oldText = QString() );
 
 private:
     bool stickyMode_;                       ///< Sticky mode means if this rangeset is the current selection (This requires a different approach)

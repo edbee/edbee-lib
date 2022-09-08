@@ -131,7 +131,7 @@ void TextEditorController::setTextDocument(TextDocument* doc)
         TextDocument* oldDocumentRef = textDocument();
         if( oldDocumentRef ) {
             oldDocumentRef->textUndoStack()->unregisterController(this);
-            disconnect( oldDocumentRef, SIGNAL(textChanged(edbee::TextBufferChange)), this, SLOT(onTextChanged(edbee::TextBufferChange)) );
+            disconnect( oldDocumentRef, SIGNAL(textChanged(edbee::TextBufferChange, QString)), this, SLOT(onTextChanged(edbee::TextBufferChange, QString)) );
             disconnect( textDocumentRef_->lineDataManager(), SIGNAL(lineDataChanged(int,int,int)), this, SLOT(onLineDataChanged(int,int,int)));
         }
 
@@ -151,7 +151,7 @@ void TextEditorController::setTextDocument(TextDocument* doc)
 
         textDocumentRef_->textUndoStack()->registerContoller(this);
 
-        connect( textDocumentRef_, SIGNAL(textChanged(edbee::TextBufferChange)), this, SLOT(onTextChanged(edbee::TextBufferChange)));
+        connect( textDocumentRef_, SIGNAL(textChanged(edbee::TextBufferChange, QString)), this, SLOT(onTextChanged(edbee::TextBufferChange, QString)));
         connect( textDocumentRef_->lineDataManager(), SIGNAL(lineDataChanged(int,int,int)), this, SLOT(onLineDataChanged(int,int,int)) );
 
         // force an repaint when the grammar is changed
@@ -366,10 +366,8 @@ DynamicVariables* TextEditorController::dynamicVariables() const
 
 
 /// This slot is placed if a piece of text is replaced
-void TextEditorController::onTextChanged( edbee::TextBufferChange change )
+void TextEditorController::onTextChanged( edbee::TextBufferChange change, QString oldText )
 {
-    Q_UNUSED(change)
-
     /// update the selection
 //    textSelection()->changeSpatial( change.offset(), change.length(), change.newTextLength() );
 
@@ -378,7 +376,7 @@ void TextEditorController::onTextChanged( edbee::TextBufferChange change )
         widget()->updateGeometryComponents();
         notifyStateChange();
 
-        AccessibleTextEditorWidget::notifyTextChangeEvent(widget(), &change);
+        AccessibleTextEditorWidget::notifyTextChangeEvent(widget(), &change, oldText);
     }
 }
 

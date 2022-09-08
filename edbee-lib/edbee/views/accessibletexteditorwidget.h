@@ -29,7 +29,7 @@ public:
     static QWidget* eventWidgetForTextEditor(TextEditorWidget* widget);
 
     static void notifyTextSelectionEvent(TextEditorWidget* widget, TextSelection* selection);
-    static void notifyTextChangeEvent(TextEditorWidget* widget, TextBufferChange* change);
+    static void notifyTextChangeEvent(TextEditorWidget* widget, TextBufferChange* change, QString oldText);
 
 
     void* interface_cast(QAccessible::InterfaceType t) override;
