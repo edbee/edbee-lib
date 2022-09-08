@@ -17,7 +17,7 @@ class TextEditorWidget;
 class TextRenderer;
 class TextSelection;
 
-class EDBEE_EXPORT AccessibleTextEditorWidget : public QAccessibleWidget, public QAccessibleTextInterface, public QAccessibleEditableTextInterface
+class EDBEE_EXPORT AccessibleTextEditorWidget : public QAccessibleWidget, public QAccessibleTextInterface
 {
 public:
     explicit AccessibleTextEditorWidget(TextEditorWidget* widget);
@@ -55,11 +55,6 @@ public:
     virtual QString textAfterOffset(int offset, QAccessible::TextBoundaryType boundaryType, int *startOffset, int *endOffset) const override;
     virtual QString textAtOffset(int offset, QAccessible::TextBoundaryType boundaryType, int *startOffset, int *endOffset) const override;
     virtual QString textBeforeOffset(int offset, QAccessible::TextBoundaryType boundaryType, int *startOffset, int *endOffset) const override;
-
-    // QAccessibleEditableTextInterface
-    virtual void deleteText(int startOffset, int endOffset) override;
-    virtual void insertText(int offset, const QString &text) override;
-    virtual void replaceText(int startOffset, int endOffset, const QString &text) override;
 
     virtual QAccessibleInterface* focusChild() const override;
     virtual QRect rect() const override;
