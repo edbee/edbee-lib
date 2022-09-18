@@ -617,7 +617,7 @@ void TextRenderer::textDocumentChanged(edbee::TextDocument *oldDocument, edbee::
     reset();
 
     // connect with the new dpcument
-    connect( newDocument, SIGNAL(textChanged(edbee::TextBufferChange, QSstring)), this, SLOT(textChanged(edbee::TextBufferChange, QString)));
+    connect( newDocument, SIGNAL(textChanged(edbee::TextBufferChange, QString)), this, SLOT(textChanged(edbee::TextBufferChange, QString)));
     connect( newDocument, SIGNAL(lastScopedOffsetChanged(int,int)), this, SLOT(lastScopedOffsetChanged(int,int)) );
 }
 
