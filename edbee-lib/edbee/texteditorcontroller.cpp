@@ -7,6 +7,7 @@
 
 #include <QApplication>
 #include <QAction>
+#include <QAccessibleTextUpdateEvent>
 #include <QThread>
 
 #include "edbee/commands/selectioncommand.h"
@@ -28,6 +29,7 @@
 #include "edbee/texteditorcommand.h"
 #include "edbee/edbee.h"
 #include "edbee/texteditorwidget.h"
+#include "edbee/views/accessibletexteditorwidget.h"
 #include "edbee/views/components/texteditorcomponent.h"
 #include "edbee/views/components/textmargincomponent.h"
 #include "edbee/views/textrenderer.h"
@@ -35,6 +37,7 @@
 #include "edbee/views/textselection.h"
 
 #include "edbee/debug.h"
+
 
 
 namespace edbee {
@@ -123,12 +126,12 @@ void TextEditorController::setTextDocument(TextDocument* doc)
 {
     Q_ASSERT_GUI_THREAD;
 
-    if( doc != textDocumentRef_ ) {       
+    if( doc != textDocumentRef_ ) {
         // disconnect the old document
         TextDocument* oldDocumentRef = textDocument();
         if( oldDocumentRef ) {
             oldDocumentRef->textUndoStack()->unregisterController(this);
-            disconnect( oldDocumentRef, SIGNAL(textChanged(edbee::TextBufferChange)), this, SLOT(onTextChanged(edbee::TextBufferChange)) );
+            disconnect( oldDocumentRef, SIGNAL(textChanged(edbee::TextBufferChange, QString)), this, SLOT(onTextChanged(edbee::TextBufferChange, QString)) );
             disconnect( textDocumentRef_->lineDataManager(), SIGNAL(lineDataChanged(int,int,int)), this, SLOT(onLineDataChanged(int,int,int)));
         }
 
@@ -148,7 +151,7 @@ void TextEditorController::setTextDocument(TextDocument* doc)
 
         textDocumentRef_->textUndoStack()->registerContoller(this);
 
-        connect( textDocumentRef_, SIGNAL(textChanged(edbee::TextBufferChange)), this, SLOT(onTextChanged(edbee::TextBufferChange)));
+        connect( textDocumentRef_, SIGNAL(textChanged(edbee::TextBufferChange, QString)), this, SLOT(onTextChanged(edbee::TextBufferChange, QString)));
         connect( textDocumentRef_->lineDataManager(), SIGNAL(lineDataChanged(int,int,int)), this, SLOT(onLineDataChanged(int,int,int)) );
 
         // force an repaint when the grammar is changed
@@ -363,10 +366,8 @@ DynamicVariables* TextEditorController::dynamicVariables() const
 
 
 /// This slot is placed if a piece of text is replaced
-void TextEditorController::onTextChanged( edbee::TextBufferChange change )
+void TextEditorController::onTextChanged( edbee::TextBufferChange change, QString oldText )
 {
-    Q_UNUSED(change)
-
     /// update the selection
 //    textSelection()->changeSpatial( change.offset(), change.length(), change.newTextLength() );
 
@@ -374,6 +375,8 @@ void TextEditorController::onTextChanged( edbee::TextBufferChange change )
     if( widgetRef_) {
         widget()->updateGeometryComponents();
         notifyStateChange();
+
+        AccessibleTextEditorWidget::notifyTextChangeEvent(widget(), &change, oldText);
     }
 }
 
@@ -467,7 +470,7 @@ void TextEditorController::updateStatusText( const QString& extraText )
     if( !extraText.isEmpty() ) {
         text.append(" | " );
         text.append(extraText);
-    }   
+    }
     emit updateStatusTextSignal( text );
 }
 
@@ -658,7 +661,7 @@ void TextEditorController::moveCaretTo(int line, int col, bool keepAnchors, int 
     }
 
     int minusNewLineChar = textDocument()->lineCount()-1 == line ? 0 : 1;
-    offset += qBound(0, col, lineLength-minusNewLineChar );
+    offset += qBound(0, col, qMax(lineLength-minusNewLineChar, 0));
 
 //textDocument()->offsetFromLineAndColumn(line,col)
 
@@ -751,7 +754,7 @@ void TextEditorController::beginUndoGroup( ChangeGroup* group )
 ///                  and id > 0 means if the previous command had the same id, the command is merged
 /// @param flatten when an undogroup is ended and flatten is set to true ALL sub-undo-groups are merged to this group (default=false)
 void TextEditorController::endUndoGroup(int coalesceId, bool flatten )
-{    
+{
     textDocument()->endUndoGroup(coalesceId,flatten);
 }
 

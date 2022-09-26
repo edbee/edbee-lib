@@ -5,6 +5,7 @@
 
 #include "texteditorcomponent.h"
 
+#include <QAccessibleEvent>
 #include <QApplication>
 #include <QClipboard>
 #include <QDateTime>
@@ -63,7 +64,9 @@ TextEditorComponent::TextEditorComponent(TextEditorController* controller, QWidg
 
 //    setAttribute( Qt::WA_MacShowFocusRect); // show a mac focus rect
 
-    setFocusPolicy( Qt::WheelFocus   );
+    setFocusPolicy(Qt::WheelFocus);
+
+
     //  setFocusPolicy(Qt::ClickFocus);       (since 2013-02-16, can be removed tab still works :) )
     setAttribute(Qt::WA_KeyCompression);
     setAttribute(Qt::WA_InputMethodEnabled);
@@ -291,6 +294,7 @@ void TextEditorComponent::keyPressEvent(QKeyEvent* event)
     if( match == QKeySequence::ExactMatch ) {
 //        qlog_info() << "[[[ found command:" << command << "]]";
         controller()->executeCommand( command );
+
         lastKeySequence_ = QKeySequence();
         return;
     }
@@ -310,10 +314,12 @@ void TextEditorComponent::keyPressEvent(QKeyEvent* event)
                 textDocument()->textUndoStack()->resetAllLastCoalesceIds();
             }
         }
+
         lastCharacter_ = text;
         controller()->replaceSelection( text, CoalesceId_AppendChar );
         controller()->updateStatusText();
         emit textKeyPressed();
+
     } else {
         QWidget::keyPressEvent(event);
     }
@@ -324,7 +330,7 @@ void TextEditorComponent::keyPressEvent(QKeyEvent* event)
 /// the key release event
 void TextEditorComponent::keyReleaseEvent(QKeyEvent *event)
 {
-    Q_UNUSED(event)
+    QWidget::keyReleaseEvent(event);
 }
 
 

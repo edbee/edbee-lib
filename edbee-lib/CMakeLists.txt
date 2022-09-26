@@ -81,6 +81,7 @@ SET(SOURCES
    edbee/util/textcodec.cpp
    edbee/util/textcodecdetector.cpp
    edbee/util/util.cpp
+   edbee/views/accessibletexteditorwidget.cpp
    edbee/views/components/texteditorautocompletecomponent.cpp
    edbee/views/components/texteditorcomponent.cpp
    edbee/views/components/texteditorrenderer.cpp
@@ -163,6 +164,7 @@ SET(HEADERS
    edbee/util/textcodec.h
    edbee/util/textcodecdetector.h
    edbee/util/util.h
+   edbee/views/accessibletexteditorwidget.h
    edbee/views/components/texteditorautocompletecomponent.h
    edbee/views/components/texteditorcomponent.h
    edbee/views/components/texteditorrenderer.h

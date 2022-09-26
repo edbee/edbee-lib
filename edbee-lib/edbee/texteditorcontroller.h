@@ -100,7 +100,7 @@ signals:
 
 public slots:
 
-    void onTextChanged( edbee::TextBufferChange change );
+    void onTextChanged( edbee::TextBufferChange change, QString oldText = QString() );
     void onSelectionChanged( edbee::TextRangeSet *oldRangeSet );
     void onLineDataChanged( int line, int length, int newLength );
 

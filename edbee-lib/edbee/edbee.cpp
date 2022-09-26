@@ -6,6 +6,7 @@
 #include "edbee.h"
 
 #include <QApplication>
+#include <QAccessible>
 
 #include "edbee/models/textautocompleteprovider.h"
 #include "edbee/models/dynamicvariables.h"
@@ -15,6 +16,7 @@
 #include "edbee/models/textdocumentscopes.h"
 #include "edbee/models/textgrammar.h"
 #include "edbee/util/textcodec.h"
+#include "edbee/views/accessibletexteditorwidget.h"
 #include "edbee/views/texttheme.h"
 
 
@@ -182,9 +184,11 @@ void Edbee::init()
 
     qRegisterMetaType<edbee::TextBufferChange>("edbee::TextBufferChange");
 
+    // register the AccessibileText interface
+    QAccessible::installFactory(edbee::AccessibleTextEditorWidget::factory);
+
     // factory fill the default command map
     defaultCommandMap_->loadFactoryCommandMap();
-
 
     // load all grammar definitions
     if( !grammarPath_.isEmpty() ) {

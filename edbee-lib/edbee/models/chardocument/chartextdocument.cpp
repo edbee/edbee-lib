@@ -59,7 +59,7 @@ CharTextDocument::CharTextDocument(QObject *object)
 
     // simply forward the about to change signal
     connect( textBuffer_, SIGNAL(textAboutToBeChanged(edbee::TextBufferChange)), SIGNAL(textAboutToBeChanged(edbee::TextBufferChange)), Qt::DirectConnection );
-    connect( textBuffer_, SIGNAL(textChanged(edbee::TextBufferChange)), SLOT(textBufferChanged(edbee::TextBufferChange)), Qt::DirectConnection );
+    connect( textBuffer_, SIGNAL(textChanged(edbee::TextBufferChange, QString)), SLOT(textBufferChanged(edbee::TextBufferChange, QString)), Qt::DirectConnection );
 
     // forward the persisted state changes
     connect( textUndoStack_, SIGNAL(persistedChanged(bool)), this,  SIGNAL(persistedChanged(bool)) );
@@ -143,7 +143,7 @@ Change *CharTextDocument::giveChangeWithoutFilter(Change *change, int coalesceId
 
 
 // the text is changed
-void CharTextDocument::textBufferChanged(const TextBufferChange& change)
+void CharTextDocument::textBufferChanged(const TextBufferChange& change, QString oldText)
 {
     if( textLexer_ ) {
         textLexer_->textChanged( change );
@@ -158,7 +158,7 @@ void CharTextDocument::textBufferChanged(const TextBufferChange& change)
     }
 
     // emit the textchanged singal
-    emit textChanged( change);   // and notify the document listeners
+    emit textChanged(change, oldText);   // and notify the document listeners
 }
 
 

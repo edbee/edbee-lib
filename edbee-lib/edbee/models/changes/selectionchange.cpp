@@ -11,12 +11,15 @@
 #include "edbee/models/textdocument.h"
 #include "edbee/models/textrange.h"
 #include "edbee/models/textundostack.h"
+#include "edbee/views/accessibletexteditorwidget.h"
 #include "edbee/views/textrenderer.h"
 #include "edbee/views/textselection.h"
 #include "edbee/texteditorcontroller.h"
 #include "edbee/texteditorwidget.h"
 
 #include "edbee/debug.h"
+
+
 
 namespace edbee {
 
@@ -116,6 +119,8 @@ void SelectionChange::notifyChange()
 {
     /// TODO: make the controllerContext only repaint the affected areas via the TextRangeSets
     controllerContext()->onSelectionChanged( rangeSet_ );
+
+    AccessibleTextEditorWidget::notifyTextSelectionEvent(controller()->widget(), controller()->textSelection());
 }
 
 

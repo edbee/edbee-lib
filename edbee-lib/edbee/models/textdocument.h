@@ -157,7 +157,7 @@ public:
 signals:
 
     void textAboutToBeChanged( edbee::TextBufferChange change );
-    void textChanged( edbee::TextBufferChange change );
+    void textChanged( edbee::TextBufferChange change, QString oldText = QString() );
 
     /// This signal is emitted if the persisted state is changed
     void persistedChanged(bool persisted);

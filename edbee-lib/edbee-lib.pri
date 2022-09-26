@@ -71,6 +71,7 @@ SOURCES += \
     $$PWD/edbee/util/textcodec.cpp \
     $$PWD/edbee/util/textcodecdetector.cpp \
     $$PWD/edbee/util/util.cpp \
+    $$PWD/edbee/views/accessibletexteditorwidget.cpp \
     $$PWD/edbee/views/components/texteditorautocompletecomponent.cpp \
     $$PWD/edbee/views/components/texteditorcomponent.cpp \
     $$PWD/edbee/views/components/texteditorrenderer.cpp \
@@ -153,6 +154,7 @@ HEADERS += \
     $$PWD/edbee/util/textcodec.h \
     $$PWD/edbee/util/textcodecdetector.h \
     $$PWD/edbee/util/util.h \
+    $$PWD/edbee/views/accessibletexteditorwidget.h \
     $$PWD/edbee/views/components/texteditorautocompletecomponent.h \
     $$PWD/edbee/views/components/texteditorcomponent.h \
     $$PWD/edbee/views/components/texteditorrenderer.h \

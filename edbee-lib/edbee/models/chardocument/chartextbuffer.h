@@ -43,7 +43,7 @@ public:
 
 protected slots:
 
-    void emitTextChanged( edbee::TextBufferChange* change );
+    void emitTextChanged( edbee::TextBufferChange* change, QString oldText = QString());
 
 private:
     QCharGapVector buf_;                     ///< The textbuffer

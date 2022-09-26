@@ -145,7 +145,7 @@ public:
  signals:
 
     void textAboutToBeChanged( edbee::TextBufferChange change );
-    void textChanged( edbee::TextBufferChange change );
+    void textChanged( edbee::TextBufferChange change, QString oldText = QString() );
 
 };
 
