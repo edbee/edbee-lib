@@ -1,7 +1,8 @@
-# Upcoming Release
+# Changelog
 
 edbee.lib:
 
+- Fix out-of-bounds write in TextDocumentSerializer
 - add #135, QAccessibleTextInterface support
 - add TextBuffer::emitTextChanged is extended with the oldText. SIGNAL void emitTextChanged( TextBufferChange* change, QString oldText = QString()); (WARNING: signal interface changes )
 - fix #133, Added Qt 6.3.0 compatibility

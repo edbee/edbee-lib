@@ -42,7 +42,7 @@ bool TextDocumentSerializer::loadWithoutOpening( QIODevice* ioDevice )
     QTextDecoder* textDecoder=0;
 
     // read the buffer
-    QByteArray bytes(blockSize_,0);
+    QByteArray bytes(blockSize_ + 1,0);
     QString remainingBuffer;
 
     /// TODO: atEnd doesn't seem to work !?!
@@ -51,7 +51,7 @@ bool TextDocumentSerializer::loadWithoutOpening( QIODevice* ioDevice )
 
         int bytesRead = ioDevice->read( bytes.data(), blockSize_ );
         if( bytesRead > 0 ) {
-            bytes[bytesRead+1] = 0; // 0 terminate the read bytes
+            bytes[bytesRead + 1] = 0; // 0 terminate the read bytes
 
             // In the first block we're need to detect the correct encoding
             if( !detectedCodec ) {
