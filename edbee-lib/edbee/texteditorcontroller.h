@@ -147,9 +147,12 @@ public slots:
     virtual void executeCommand( TextEditorCommand* textCommand );
     virtual bool executeCommand( const QString& name=QString() );
 
+ public:
+
     // returns the readonly state
     virtual bool readonly() const;
     virtual void setReadonly(bool value);
+
 
 private:
 

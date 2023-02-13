@@ -2,6 +2,7 @@
 
 edbee.lib:
 
+- ref #136, remove TextDocumentController readonly methods from slots
 - Fix out-of-bounds write in TextDocumentSerializer
 - add #135, QAccessibleTextInterface support
 - add TextBuffer::emitTextChanged is extended with the oldText. SIGNAL void emitTextChanged( TextBufferChange* change, QString oldText = QString()); (WARNING: signal interface changes )
