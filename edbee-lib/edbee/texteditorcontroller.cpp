@@ -11,9 +11,6 @@
 #include <QThread>
 
 #include "edbee/commands/selectioncommand.h"
-#include "edbee/models/changes/mergablechangegroup.h"
-#include "edbee/models/changes/textchange.h"
-#include "edbee/models/changes/textchangewithcaret.h"
 #include "edbee/models/changes/selectionchange.h"
 #include "edbee/models/chardocument/chartextdocument.h"
 #include "edbee/models/textbuffer.h"
@@ -519,7 +516,7 @@ void TextEditorController::storeSelection(int coalesceId)
 
 
 /// This method executes the command
-void TextEditorController::executeCommand( TextEditorCommand* textCommand )
+void TextEditorController::executeCommand( edbee::TextEditorCommand* textCommand )
 {
     // Only readonly commands can be executed in readonly mode
     if( readonly() && !textCommand->readonly() ) {
@@ -542,8 +539,7 @@ void TextEditorController::executeCommand( TextEditorCommand* textCommand )
 /// and it will retrieve the command-name from the QAction data method
 ///
 /// @param name of the command to execute
-/// @return true if the command exists
-bool TextEditorController::executeCommand(const QString& name)
+void TextEditorController::executeCommand(const QString& name)
 {
     // check if an empty command name has been supplied
     QString commandName = name;
@@ -553,7 +549,7 @@ bool TextEditorController::executeCommand(const QString& name)
         QAction* action= qobject_cast<QAction*>(sender());
         if( !action ) {
             qlog_warn() << "executeCommand was triggered without argument and without QAction data attribute!";
-            return false;
+            return;
         }
         commandName = action->data().toString();
     }
@@ -561,7 +557,6 @@ bool TextEditorController::executeCommand(const QString& name)
     // try to retrieve the command
     TextEditorCommand* command = commandMap()->get(commandName);
     if( command ) { executeCommand( command ); }
-    return command != nullptr;
 }
 
 /// Return the readonly state.
@@ -613,7 +608,7 @@ void TextEditorController::replaceSelection(const QStringList& texts, int coales
 /// @param reangeSet hte ranges to replace
 /// @param text the text to replace the selection with
 /// @param coalesceId the identifier for grouping undo operations
-void TextEditorController::replaceRangeSet(TextRangeSet& rangeSet, const QString& text, int coalesceId, bool stickySelection)
+void TextEditorController::replaceRangeSet(edbee::TextRangeSet& rangeSet, const QString& text, int coalesceId, bool stickySelection)
 {
     if(readonly()) return;
 
@@ -628,7 +623,7 @@ void TextEditorController::replaceRangeSet(TextRangeSet& rangeSet, const QString
 /// @param rangeSet the rangeset to fille
 /// @param text the texts to fill the given ranges with.
 /// @param coalesceId the identifier for grouping undo operations
-void TextEditorController::replaceRangeSet(TextRangeSet& rangeSet, const QStringList& texts, int coalesceId, bool stickySelection)
+void TextEditorController::replaceRangeSet(edbee::TextRangeSet& rangeSet, const QStringList& texts, int coalesceId, bool stickySelection)
 {
     if(readonly()) return;
 
@@ -711,7 +706,7 @@ void TextEditorController::addCaretAtOffset(int offset)
 
 
 /// This method changes the text selection
-void TextEditorController::changeAndGiveTextSelection(TextRangeSet* rangeSet, int coalesceId )
+void TextEditorController::changeAndGiveTextSelection(edbee::TextRangeSet* rangeSet, int coalesceId )
 {
     SelectionChange* change = new SelectionChange(this);
     change->giveTextRangeSet( rangeSet );
@@ -739,7 +734,7 @@ void TextEditorController::redo(bool soft)
 
 /// Starts an undo group
 /// @param group the undogroup to use (defaults to a MergableChangeGroup)
-void TextEditorController::beginUndoGroup( ChangeGroup* group )
+void TextEditorController::beginUndoGroup( edbee::ChangeGroup* group )
 {
     if( !group ) {
         group = new ChangeGroup( this );

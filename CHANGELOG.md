@@ -2,6 +2,8 @@
 
 edbee.lib:
 
+- fix #136, BREAKING CHANGE: return type TextEditorController::executeCommand changed to void.
+  - changed TextEditorController slot argumens to fully-qualified types.
 - ref #136, remove TextDocumentController readonly methods from slots
 - Fix out-of-bounds write in TextDocumentSerializer
 - add #135, QAccessibleTextInterface support

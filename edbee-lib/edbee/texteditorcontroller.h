@@ -124,8 +124,8 @@ public slots:
     virtual void replace( int offset, int length, const QString& text, int coalesceId, bool stickySelection=false);
     virtual void replaceSelection(const QString& text, int coalesceId=0, bool stickySelection=false);
     virtual void replaceSelection(const QStringList& texts, int coalesceId=0, bool stickySelection=false);
-    virtual void replaceRangeSet(TextRangeSet& rangeSet, const QString& text, int coalesceId=0, bool stickySelection=false);
-    virtual void replaceRangeSet(TextRangeSet& rangeSet, const QStringList& texts, int coalesceId=0, bool stickySelection=false);
+    virtual void replaceRangeSet(edbee::TextRangeSet& rangeSet, const QString& text, int coalesceId=0, bool stickySelection=false);
+    virtual void replaceRangeSet(edbee::TextRangeSet& rangeSet, const QStringList& texts, int coalesceId=0, bool stickySelection=false);
 
     // caret movements
     virtual void moveCaretTo( int line, int col, bool keepAnchors, int rangeIndex=-1 );
@@ -133,19 +133,19 @@ public slots:
     virtual void moveCaretAndAnchorToOffset(int caret, int anchor, int rangeIndex= -1 );
     virtual void addCaretAt( int line, int col);
     virtual void addCaretAtOffset( int offset );
-    virtual void changeAndGiveTextSelection(TextRangeSet* rangeSet , int coalesceId = 0);
+    virtual void changeAndGiveTextSelection(edbee::TextRangeSet* rangeSet , int coalesceId = 0);
 
     // perform an undo
     virtual void undo(bool soft=false);
     virtual void redo(bool soft=false);
 
     // command execution
-    virtual void beginUndoGroup( ChangeGroup* group=0 );
+    virtual void beginUndoGroup( edbee::ChangeGroup* group=0 );
     virtual void endUndoGroup(int coalesceId=0, bool flatten=false);
 
     // low level command execution
-    virtual void executeCommand( TextEditorCommand* textCommand );
-    virtual bool executeCommand( const QString& name=QString() );
+    virtual void executeCommand( edbee::TextEditorCommand* textCommand );
+    virtual void executeCommand( const QString& name=QString() );
 
  public:
 
