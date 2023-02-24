@@ -177,30 +177,20 @@ SET(HEADERS
    edbee/views/texttheme.h
 )
 
-FIND_PACKAGE(Qt5Core REQUIRED)
-FIND_PACKAGE(Qt5UiTools REQUIRED)
-FIND_PACKAGE(Qt5Widgets REQUIRED)
-
-IF(Qt5_POSITION_INDEPENDENT_CODE)
-  SET(CMAKE_POSITION_INDEPENDENT_CODE ON)
-ENDIF()
-
-set(CMAKE_AUTOMOC ON)
-
 add_subdirectory(../vendor/onig/ onig)
 
-ADD_DEFINITIONS(
-    ${Qt5Core_DEFINITIONS}
-    ${Qt5UiTools_DEFINTIONS}
-    ${Qt5Widgets_DEFINTIONS}
-)
-
+if (BUILD_WITH_QT5)
+  find_package(Qt5 REQUIRED COMPONENTS Core UiTools Widgets)
+  message(STATUS "Building with Qt ${Qt5Core_VERSION}")
+  set(QT_LIBS Qt5::Core Qt5::UiTools Qt5::Widgets)
+else()
+  find_package(Qt6 REQUIRED COMPONENTS Core UiTools Widgets Core5Compat)
+  message(STATUS "Building with Qt ${Qt6Core_VERSION}")
+  set(QT_LIBS Qt6::Core Qt6::UiTools Qt6::Widgets Qt6:Core5Compat)
+endif()
 
 SET(CMAKE_INCLUDE_CURRENT_DIR ON)
 INCLUDE_DIRECTORIES(
-    ${Qt5Core_INCLUDE_DIRS}
-    ${Qt5UiTools_INCLUDE_DIRS}
-    ${Qt5Widgets_INCLUDE_DIRS}
     ${QS_LOG_INCLUDE_DIRS}
     ${ONIG_INCLUDE_DIRS}
 )
@@ -209,15 +199,12 @@ ADD_LIBRARY(edbee-lib STATIC
   ${SOURCES} ${HEADERS} ${ONIG_SOURCES}
   ${ONIG_HEADERS})
 
-target_link_libraries(edbee-lib QsLog)
+target_link_libraries(edbee-lib QsLog ${QT_LIBS})
+
+set_target_properties(edbee-lib PROPERTIES AUTOMOC ON CXX_STANDARD 11)
 
 TARGET_INCLUDE_DIRECTORIES(edbee-lib PUBLIC
-  ${Qt5Core_INCLUDE_DIRS}
-  ${Qt5UiTools_INCLUDE_DIRS}
-  ${Qt5Widgets_INCLUDE_DIRS}
   ${QS_LOG_INCLUDE_DIRS}
   ${ONIG_INCLUDE_DIRS}
   ${CMAKE_CURRENT_SOURCE_DIR}
 )
-
-SET_PROPERTY(TARGET edbee-lib PROPERTY CXX_STANDARD 11)

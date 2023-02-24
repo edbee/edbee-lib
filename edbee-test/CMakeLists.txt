@@ -67,32 +67,27 @@ SET(HEADERS
   edbee/views/textthememanagertest.h
 )
 
-FIND_PACKAGE(Qt5Core REQUIRED)
-FIND_PACKAGE(Qt5UiTools REQUIRED)
-FIND_PACKAGE(Qt5Widgets REQUIRED)
-
-ADD_DEFINITIONS(
-    ${Qt5Core_DEFINITIONS}
-    ${Qt5UiTools_DEFINTIONS}
-    ${Qt5Widgets_DEFINTIONS}
-)
+if (BUILD_WITH_QT5)
+  find_package(Qt5 REQUIRED COMPONENTS Core UiTools Widgets)
+  message(STATUS "Building with Qt ${Qt5Core_VERSION}")
+  set(QT_LIBS Qt5::Core Qt5::UiTools Qt5::Widgets)
+else()
+  find_package(Qt6 REQUIRED COMPONENTS Core UiTools Widgets)
+  message(STATUS "Building with Qt ${Qt6Core_VERSION}")
+  set(QT_LIBS Qt6::Core Qt6::UiTools Qt6::Widgets)
+endif()
 
 SET(CMAKE_INCLUDE_CURRENT_DIR ON)
 INCLUDE_DIRECTORIES(
-    ${Qt5Core_INCLUDE_DIRS}
-    ${Qt5UiTools_INCLUDE_DIRS}
-    ${Qt5Widgets_INCLUDE_DIRS}
     ../edbee-lib/
     ${QS_LOG_INCLUDE_DIRS}
 )
-
-set(CMAKE_AUTOMOC ON)
 
 ADD_EXECUTABLE(edbee-test
   ${SOURCES} ${HEADERS} ${QS_LOG_SOURCES} ${QS_LOG_HEADERS}
 )
 
-TARGET_LINK_LIBRARIES(edbee-test edbee-lib ${Qt5Core_LIBRARIES}
-    ${Qt5Widgets_LIBRARIES} ${Qt5UiTools_LIBRARIES})
+TARGET_LINK_LIBRARIES(edbee-test edbee-lib ${QT_LIBS})
 
-SET_PROPERTY(TARGET edbee-test PROPERTY CXX_STANDARD 11)
+set_target_properties(edbee-test PROPERTIES AUTOMOC ON  CXX_STANDARD 11)
+
