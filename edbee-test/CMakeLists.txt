@@ -69,19 +69,11 @@ SET(HEADERS
 
 if (BUILD_WITH_QT5)
   find_package(Qt5 REQUIRED COMPONENTS Core UiTools Widgets)
-  message(STATUS "Building with Qt ${Qt5Core_VERSION}")
   set(QT_LIBS Qt5::Core Qt5::UiTools Qt5::Widgets)
 else()
   find_package(Qt6 REQUIRED COMPONENTS Core UiTools Widgets)
-  message(STATUS "Building with Qt ${Qt6Core_VERSION}")
   set(QT_LIBS Qt6::Core Qt6::UiTools Qt6::Widgets)
 endif()
-
-SET(CMAKE_INCLUDE_CURRENT_DIR ON)
-INCLUDE_DIRECTORIES(
-    ../edbee-lib/
-    ${QS_LOG_INCLUDE_DIRS}
-)
 
 ADD_EXECUTABLE(edbee-test
   ${SOURCES} ${HEADERS} ${QS_LOG_SOURCES} ${QS_LOG_HEADERS}
@@ -89,5 +81,5 @@ ADD_EXECUTABLE(edbee-test
 
 TARGET_LINK_LIBRARIES(edbee-test edbee-lib ${QT_LIBS})
 
-set_target_properties(edbee-test PROPERTIES AUTOMOC ON  CXX_STANDARD 11)
+set_target_properties(edbee-test PROPERTIES AUTOMOC ON CXX_STANDARD 11)
 

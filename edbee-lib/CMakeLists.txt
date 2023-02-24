@@ -179,21 +179,15 @@ SET(HEADERS
 
 add_subdirectory(../vendor/onig/ onig)
 
-if (BUILD_WITH_QT5)
+if(BUILD_WITH_QT5)
   find_package(Qt5 REQUIRED COMPONENTS Core UiTools Widgets)
   message(STATUS "Building with Qt ${Qt5Core_VERSION}")
   set(QT_LIBS Qt5::Core Qt5::UiTools Qt5::Widgets)
 else()
   find_package(Qt6 REQUIRED COMPONENTS Core UiTools Widgets Core5Compat)
   message(STATUS "Building with Qt ${Qt6Core_VERSION}")
-  set(QT_LIBS Qt6::Core Qt6::UiTools Qt6::Widgets Qt6:Core5Compat)
+  set(QT_LIBS Qt6::Core Qt6::UiTools Qt6::Widgets Qt6::Core5Compat)
 endif()
-
-SET(CMAKE_INCLUDE_CURRENT_DIR ON)
-INCLUDE_DIRECTORIES(
-    ${QS_LOG_INCLUDE_DIRS}
-    ${ONIG_INCLUDE_DIRS}
-)
 
 ADD_LIBRARY(edbee-lib STATIC
   ${SOURCES} ${HEADERS} ${ONIG_SOURCES}
