@@ -2,6 +2,8 @@ CMAKE_MINIMUM_REQUIRED(VERSION 3.1...3.20)
 
 project(QsLog)
 
+OPTION(BUILD_WITH_QT5 "Whether to build with Qt5 or Qt6." ON)
+
 # Add CMake modules
 set(CMAKE_MODULE_PATH
     "${QsLog_SOURCE_DIR}/cmake"
@@ -13,9 +15,14 @@ include(QsLogConfigTargets)
 # Add a _d to debug binaries
 set(CMAKE_DEBUG_POSTFIX "_d")
 
-# Qt5
-find_package(Qt5Core REQUIRED)
-set(CMAKE_AUTOMOC ON)
+# Qt
+if(BUILD_WITH_QT5)
+    find_package(Qt5 REQUIRED COMPONENTS Core)
+    set(QT_LIBRARIES Qt5::Core)
+else()
+    find_package(Qt6 REQUIRED COMPONENTS Core)
+    set(QT_LIBRARIES Qt6::Core)
+endif()
 
 # As moc files are generated in the binary dir, tell to always look for includes there
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
@@ -83,22 +90,24 @@ else(QS_LOG_IS_SHARED_LIBRARY)
 	set(QS_LOG_LIBRARY_TYPE STATIC)
 endif(QS_LOG_IS_SHARED_LIBRARY)
 
+add_library(QsLog ${QS_LOG_LIBRARY_TYPE} ${HEADER_FILES} ${SOURCE_FILES})
+
+set_target_properties(QsLog PROPERTIES AUTOMOC ON)
+
 option(QS_LOG_BUILD_WINDOW "Build log window, depends on Qt5::Widgets" OFF)
 if(QS_LOG_BUILD_WINDOW)
-	find_package(Qt5Widgets REQUIRED)
-	list(APPEND ADDITIONAL_LIBRARIES Qt5::Widgets)
-        list(APPEND HEADER_FILES QsLogWindowModel.h QsLogWindow.h)
-        list(APPEND SOURCE_FILES QsLogWindowModel.cpp QsLogWindow.cpp)
-	list(APPEND UI_FILES QsLogWindow.ui)
-	list(APPEND RES_FILES QsLogWindow.qrc)
-	qt5_wrap_ui(UI_SOURCE_FILES ${UI_FILES})
-	qt5_add_resources(RES_SOURCE_FILES ${RES_FILES})
+    if(BUILD_WITH_QT5)
+        find_package(Qt5 REQUIRED COMPONENTS Widgets)
+        list(APPEND ADDITIONAL_LIBRARIES Qt5::Widgets)
+    else()
+        find_package(Qt6 REQUIRED COMPONENTS Widgets)
+        list(APPEND ADDITIONAL_LIBRARIES Qt6::Widgets)
+	endif()
     add_definitions(-DQS_LOG_WINDOW)
+    set_target_properties(QsLog PROPERTIES AUTOUIC ON AUTORCC ON)
 endif()
 
-add_library(QsLog ${QS_LOG_LIBRARY_TYPE} ${HEADER_FILES} ${SOURCE_FILES} ${UI_SOURCE_FILES} ${RES_SOURCE_FILES})
-
-target_link_libraries(QsLog Qt5::Core ${ADDITIONAL_LIBRARIES})
+target_link_libraries(QsLog ${QT_LIBRARIES} ${ADDITIONAL_LIBRARIES})
 
 install(FILES ${HEADER_FILES} DESTINATION include/QsLog)
 QsLog_install_target(QsLog "")

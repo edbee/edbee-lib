@@ -2,6 +2,7 @@ CMAKE_MINIMUM_REQUIRED(VERSION 3.1...3.20)
 
 PROJECT(edbee)
 
+OPTION(BUILD_WITH_QT5 "Whether to build with Qt5 or Qt6." ON)
+
 ADD_SUBDIRECTORY(edbee-lib)
 ADD_SUBDIRECTORY(edbee-test)
-

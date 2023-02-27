@@ -1,7 +1,13 @@
 set(PROJECTNAME QsLogUnitTest)
 project(${PROJECTNAME})
 
-find_package(Qt5Test REQUIRED)
+if(BUILD_WITH_QT5)
+    find_package(Qt5 REQUIRED COMPONENTS Test)
+    set(QT_LIBRARIES Qt5::Core Qt5::Test)
+else()
+    find_package(Qt6 REQUIRED COMPONENTS Test)
+    set(QT_LIBRARIES Qt6::Core Qt6::Test)
+endif()
 
 include_directories(${QsLogUnitTest_SOURCE_DIR} ${QsLog_SOURCE_DIR})
 
@@ -26,4 +32,6 @@ set(SOURCE_FILES
 
 add_executable(${PROJECTNAME} ${SOURCE_FILES} ${HEADER_FILES})
 
-target_link_libraries(${PROJECTNAME} QsLog Qt5::Core Qt5::Test)
+set_target_properties(${PROJECTNAME} PROPERTIES AUTOMOC ON)
+
+target_link_libraries(${PROJECTNAME} QsLog ${QT_LIBRARIES})
