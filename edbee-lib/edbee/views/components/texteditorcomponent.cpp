@@ -483,10 +483,13 @@ void TextEditorComponent::mouseDoubleClickEvent( QMouseEvent* event )
 
         if( event->modifiers()&Qt::ControlModifier ) {
             // get the location of the double
-            int x = event->x();
-            int y = event->y();
-            int line = textRenderer()->rawLineIndexForYpos( y );
-            int col = textRenderer()->columnIndexForXpos( line, x );
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+            auto eventPos = event->pos();
+#else
+            auto eventPos = event->position().toPoint();
+#endif
+            int line = textRenderer()->rawLineIndexForYpos( eventPos.y() );
+            int col = textRenderer()->columnIndexForXpos( line, eventPos.x() );
 
             // add the word there
             SelectionCommand toggleWordSelectionAtCommand( SelectionCommand::ToggleWordSelectionAt, textDocument()->offsetFromLineAndColumn(line,col) );
@@ -510,12 +513,14 @@ void TextEditorComponent::mouseMoveEvent(QMouseEvent* event )
     if( event->buttons() & Qt::LeftButton ) {
         TextRenderer* renderer = textRenderer();
 
-        int x = event->x();
-        int y = event->y();
-
-        int line = renderer->rawLineIndexForYpos( y );
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+        auto eventPos = event->pos();
+#else
+        auto eventPos = event->position().toPoint();
+#endif
+        int line = renderer->rawLineIndexForYpos( eventPos.y() );
         int col = 0;
-        if( line >= 0 ) { col = renderer->columnIndexForXpos( line, x ); }
+        if( line >= 0 ) { col = renderer->columnIndexForXpos( line, eventPos.x() ); }
         if( line < 0 ) { line = 0; }
 
         if( clickCount_ == 2 ) {

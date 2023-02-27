@@ -341,7 +341,11 @@ void TextMarginComponent::renderLineNumber(QPainter* painter, int startLine, int
 /// This method sends the the mouse movement events to the delegate
 void TextMarginComponent::mouseMoveEvent(QMouseEvent* event)
 {
-    int y = event->y() + top_;
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+    int y = event->pos().y() + top_;
+#else
+    int y = event->position().toPoint().y() + top_;
+#endif
     int line = renderer()->lineIndexForYpos( y );
     delegate()->mouseMoveEvent(line, event);
     QWidget::mouseMoveEvent(event);
@@ -352,9 +356,12 @@ void TextMarginComponent::mouseMoveEvent(QMouseEvent* event)
 /// This method sends the the mouse movement events to the delegate
 void TextMarginComponent::mousePressEvent(QMouseEvent* event)
 {
-    int y = event->y() + top_;
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+    int y = event->pos().y() + top_;
+#else
+    int y = event->position().toPoint().y() + top_;
+#endif
     int line = renderer()->lineIndexForYpos( y );
-
     delegate()->mousePressEvent( line, event );
     QWidget::mousePressEvent(event);
 
