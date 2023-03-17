@@ -1232,6 +1232,7 @@ bool DynamicTextRangeSet::deleteMode() const
 /// This method is notified if a change happens to the textbuffer
 void DynamicTextRangeSet::textChanged(edbee::TextBufferChange change, QString oldText)
 {
+    Q_UNUSED(oldText)
     changeSpatial( change.offset(), change.length(), change.newTextLength(), stickyMode_, deleteMode_ );
 }
 

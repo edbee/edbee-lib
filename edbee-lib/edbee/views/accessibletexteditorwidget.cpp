@@ -39,6 +39,7 @@ static int D2V(TextEditorWidget* widget, int offset)
     int line = widget->textDocument()->lineFromOffset(offset);
     return offset + line;
 #else
+    Q_UNUSED(widget)
     return offset;
 #endif
 }
@@ -47,18 +48,19 @@ static int D2V(TextEditorWidget* widget, int offset)
 static int V2D(TextEditorWidget* widget, int vOffset)
 {
 #ifdef WINDOWS_END_LINE_READ_ERROR_FIX
-  TextDocument* doc = widget->textDocument();
-  int displacement = 0;
-  for( int i=0, cnt = doc->lineCount(); i < cnt; ++i ) {
-      int lineVOffset = doc->offsetFromLine(i) + i;
+    TextDocument* doc = widget->textDocument();
+    int displacement = 0;
+    for( int i=0, cnt = doc->lineCount(); i < cnt; ++i ) {
+        int lineVOffset = doc->offsetFromLine(i) + i;
 
-      if( vOffset < lineVOffset) {
-        return vOffset - displacement; // remove the newline count
-      }
-      displacement = i;
-  }
-  return vOffset - displacement;
+        if( vOffset < lineVOffset) {
+            return vOffset - displacement; // remove the newline count
+        }
+        displacement = i;
+    }
+    return vOffset - displacement;
 #else
+    Q_UNUSED(widget)
     return vOffset;
 #endif
 }
@@ -393,6 +395,7 @@ int AccessibleTextEditorWidget::offsetAtPoint(const QPoint &point) const
 /// Ensures that the text between startIndex and endIndex is visible.
 void AccessibleTextEditorWidget::scrollToSubstring(int startIndex, int endIndex)
 {
+    Q_UNUSED(endIndex)
     // qDebug() << " scrollToSubstring >>" << startIndex << ", " << endIndex;
     controller()->scrollOffsetVisible(V2D(textWidget(), startIndex));
 }
@@ -402,6 +405,9 @@ void AccessibleTextEditorWidget::scrollToSubstring(int startIndex, int endIndex)
 /// In addition the range of the attributes is returned in startOffset and endOffset.
 QString AccessibleTextEditorWidget::attributes(int offset, int *startOffset, int *endOffset) const
 {
+    Q_UNUSED(offset)
+    Q_UNUSED(startOffset)
+    Q_UNUSED(endOffset)
     // qDebug() << " attributes >>" << offset << ", " << *startOffset << ", " <<  *endOffset;
     return QString();
 }
