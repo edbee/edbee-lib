@@ -24,7 +24,7 @@ LineDataListChange::LineDataListChange( TextLineDataManager* manager, int line, 
     : managerRef_(manager)
     , offset_(line)
     , docLength_(newLength)
-    , oldListList_(0)
+    , oldListList_(nullptr)
     , contentLength_(length)
 {
 }
