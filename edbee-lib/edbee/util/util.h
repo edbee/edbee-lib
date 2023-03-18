@@ -24,11 +24,11 @@ public:
 
 
     /// This method calculates 2 intersections between 2 ranges.
-    /// @param exclusive als het exclusief is dan wordt een overlap niet inclusief. In other words:
+    /// @param exclusive if it is exclusive then an overlap will not be included. In other words:
     ///			- Inclusive:  end < begin
     ///			- Exclusive:  end <= begin
-    /// @param resultBegin a pointer to the variable recieving the result
-    /// @param resultEnd a pointer to the variable recieving the result
+    /// @param resultBegin a pointer to the variable receiving the result
+    /// @param resultEnd a pointer to the variable receiving the result
     /// @return false => no overlap, true => overlap
     template<typename T>
     bool intersection( T begin1, T end1, T begin2, T end2, bool exclusive=false, T* resultBegin=0, T* resultEnd=0 )

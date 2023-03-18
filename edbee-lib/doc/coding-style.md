@@ -43,7 +43,7 @@ QList<Item*> itemRefList_;
 Method definitions
 ------------------
 
-Seperate methods from eachother with 2 blank lines.  This improves the visible separation of method bodies.
+Separate methods from each other with 2 blank lines.  This improves the visible separation of method bodies.
 
 
 Ownership
@@ -77,7 +77,7 @@ Memory Leak Detection and include order
 ---------------------------------------
 
 We use custom memory leak detection. To enable this leak detection it is required to include 'debug.h'
-Uou must include "debug.h" in every Source file AFTER all pre-compiled items and header files. Example:
+You must include "debug.h" in every Source file AFTER all pre-compiled items and header files. Example:
 
 ~~~{.cpp} 
 // first you should include the source's header file. (This allows you to see if the headers users 'missing' dependencies'

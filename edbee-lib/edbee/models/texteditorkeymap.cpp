@@ -102,7 +102,7 @@ QKeySequence TextEditorKeyMap::getSequence(const QString& name) const
 }
 
 
-/// Returns al list of all keysequences for the given command
+/// Returns a list of all keysequences for the given command
 /// This method will also search the parents for the given keysequences
 QList<TextEditorKey*> TextEditorKeyMap::getAll(const QString& name) const
 {

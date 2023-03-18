@@ -550,7 +550,7 @@ void TextRenderer::resetCaretTime()
 }
 
 
-/// this method returnst true if the caret is visible
+/// this method returns true if the caret is visible
 bool TextRenderer::shouldRenderCaret()
 {
     if( caretTime_ < 0 ) { return false; }

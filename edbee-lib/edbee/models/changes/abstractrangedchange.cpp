@@ -137,7 +137,7 @@ bool AbstractRangedChange::merge( AbstractRangedChange* change )
 }
 
 
-/// This method checks if this textchange is overlapped by the second text change
+/// This method checks if this textchange is overlapped by the second textchange
 /// overlapping is an exclusive overlap, which means the changes are really on top of eachother
 /// to test if the changes are touching use isTouchedBy
 /// @param secondChange the other change to compare it to

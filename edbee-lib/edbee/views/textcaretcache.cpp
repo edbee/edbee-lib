@@ -84,7 +84,7 @@ void TextCaretCache::add(int offset)
     add( offset, xpos );
 }
 
-/// This method should be called if the caret moves from th
+/// This method should be called if the caret moves
 void TextCaretCache::caretMovedFromOldOffsetToNewOffset(int oldOffset, int newOffset)
 {
 //    qlog_info() << "[CACHE:move]" << oldOffset<< " => " << newOffset << " << " << xPosCache_.contains(oldOffset);

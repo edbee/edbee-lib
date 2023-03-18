@@ -368,7 +368,7 @@ int TestEngine::run(TestCase* test)
     currentTestRef_ = test;
     currentTestRef_->setEngine(this);
 
-    // retrieve the meta object  and invoke al private slots
+    // retrieve the meta object and invoke all private slots
     const QMetaObject *metaObject = test->metaObject();
 
     // retrieve all methods

@@ -30,8 +30,8 @@ class TextSelection;
 
 
 /// This is the general edbee widget
-/// This core functionality of this widget is divided in several seperate
-/// compnents. (TextEditorComponent: the main editor, TextMarginComponent: the sidebar with line numbers)
+/// The core functionality of this widget is divided in several separate
+/// components. (TextEditorComponent: the main editor, TextMarginComponent: the sidebar with line numbers)
 class EDBEE_EXPORT TextEditorWidget : public QWidget
 {
     Q_OBJECT

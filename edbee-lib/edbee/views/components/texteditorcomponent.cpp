@@ -640,7 +640,7 @@ void TextEditorComponent::updateLineAtOffset(int offset)
 }
 
 
-/// updates the character before and at the given offest
+/// updates the character before and at the given offset
 void TextEditorComponent::updateAreaAroundOffset(int offset, int width )
 {
     TextRenderer* ren = textRenderer();

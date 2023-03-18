@@ -192,7 +192,7 @@ void MultiLineScopedTextRange::setGrammarRule(TextGrammarRule* rule)
 }
 
 
-/// Returnst he active grammar rule
+/// Returns the active grammar rule
 TextGrammarRule* MultiLineScopedTextRange::grammarRule() const
 {
     return ruleRef_;
@@ -940,7 +940,7 @@ TextScopeList TextDocumentScopes::scopesAtOffset( int offset, bool includeEnd  )
 }
 
 
-/// This method returns all scoped ranges at the given offest
+/// This method returns all scoped ranges at the given offset
 /// Hmmm this is almost exactly the same implementation as the scopesAtOffset method !? (perhaps we should refactor this)
 ///
 /// Warning you MUST destroy (qDeleteAll) the list with scoped textranges returned by this list

@@ -202,7 +202,7 @@ void TextRange::moveCaretByCharGroup(TextDocument *doc, int amount, const QStrin
                 }
             }
 
-            // al other characters are valid
+            // all other characters are valid
             if( !found ) {
                 QString str = characterGroups.join("");
                 str.append(whitespace);
@@ -778,7 +778,7 @@ void TextRangeSetBase::expandToWords(const QString& whitespace, const QStringLis
 
 
 /// Selects the word at the given offset
-/// @param offset the offset of the wordt to select
+/// @param offset the offset of the word to select
 void TextRangeSetBase::selectWordAt(int offset, const QString& whitespace, const QStringList& characterGroups )
 {
     TextRange newRange(offset,offset);
@@ -789,7 +789,7 @@ void TextRangeSetBase::selectWordAt(int offset, const QString& whitespace, const
 
 
 /// Toggles a word selection at the given location
-/// The idea is the following, double-click an empty place to select the wordt at the given location
+/// The idea is the following, double-click an empty place to select the word at the given location
 /// Double click an existing selection to remove the selection (and caret)
 void TextRangeSetBase::toggleWordSelectionAt(int offset, const QString& whitespace, const QStringList& characterGroups)
 {
@@ -848,7 +848,7 @@ void TextRangeSetBase::moveCaretsByCharGroup(int amount, const QString& whitespa
 }
 
 
-/// Moves al carets to the given line boundary (line-boundary automaticly switches between column 0 and first non-whitespace character)
+/// Moves all carets to the given line boundary (line-boundary automatically switches between column 0 and first non-whitespace character)
 /// @param direction the direction < 0 to the start of the line (or first char)  > 0 to the end of the line
 /// @param whitespace the characters to see as whitespace
 void TextRangeSetBase::moveCaretsToLineBoundary(int direction , const QString& whitespace)
@@ -936,7 +936,7 @@ void TextRangeSetBase::mergeOverlappingRanges( bool joinBorders )
 
 
 
-/// This mehtod  sets the first range item
+/// This method sets the first range item
 /// @param anchor the anchor of the selection
 /// @param caret the caret position
 /// @param index the default range index (default 0)
@@ -979,7 +979,7 @@ TextDocument*TextRangeSetBase::textDocument() const
 
 /// This method adds (or removes) the given spatial length at the given location.
 ///
-/// It adjusts all locations, anchors with the given locations. It automaticly moves carets,
+/// It adjusts all locations, anchors with the given locations. It automatically moves carets,
 /// 'removes' selection etc.
 ///
 /// @param pos the position to add the spatial length to

@@ -45,7 +45,7 @@ TextCodecManager::~TextCodecManager()
 }
 
 
-/// Registers the given codec. The ownership of this codec is transfered to the codec manger
+/// Registers the given codec. The ownership of this codec is transfered to the codec manager
 /// @param codec the codec to register.
 void TextCodecManager::giveTextCodec( TextCodec* codec )
 {

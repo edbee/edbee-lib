@@ -56,7 +56,7 @@ TextEditorWidget::TextEditorWidget(QWidget* parent)
     , autoScrollMargin_(50)
     , readonly_(false)
 {
-    // auto initialize edbee if this hasn't been done alread
+    // auto initialize edbee if this hasn't been done already
     Edbee::instance()->autoInit();
 
     // create the controller
@@ -100,7 +100,7 @@ TextEditorWidget::TextEditorWidget(QWidget* parent)
 
     setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Expanding );
 
-    editCompRef_->installEventFilter(this);     // recieve events for the ability to emit focus events
+    editCompRef_->installEventFilter(this);     // receive events for the ability to emit focus events
 }
 
 
@@ -142,7 +142,7 @@ void TextEditorWidget::scrollTopToLine(int line)
 }
 
 
-/// Returns the confirguation object for this widget
+/// Returns the configuration object for this widget
 TextEditorConfig* TextEditorWidget::config() const
 {
     return textDocument()->config();
@@ -212,7 +212,7 @@ void TextEditorWidget::resetCaretTime()
 }
 
 
-/// This method performs a full update. Which means it callibirates the scrollbars
+/// This method performs a full update. Which means it calibrates the scrollbars
 /// invalidates all caches, redraws the screen and updates the scrollbars
 void TextEditorWidget::fullUpdate()
 {
@@ -285,7 +285,7 @@ void TextEditorWidget::setReadonly(bool value)
 }
 
 
-/// This mehtod is called when a resize happens
+/// This method is called when a resize happens
 /// @param event the event of the editor widget
 void TextEditorWidget::resizeEvent(QResizeEvent* event)
 {
@@ -293,7 +293,7 @@ void TextEditorWidget::resizeEvent(QResizeEvent* event)
     updateRendererViewport();
 }
 
-/// a basic event-filter for recieving focus-events of the editor
+/// a basic event-filter for receiving focus-events of the editor
 /// @param obj the object to filter the events for
 /// @param event the event to filter
 bool TextEditorWidget::eventFilter(QObject* obj, QEvent* event)
@@ -342,7 +342,7 @@ void TextEditorWidget::updateLineAtOffset(int offset)
 }
 
 
-/// updates the character before and at the given offest
+/// updates the character before and at the given offset
 /// @param offset the offset of the area to repaint.
 /// @param width the width of the area to update (default is 8 pixels)
 void TextEditorWidget::updateAreaAroundOffset(int offset, int width )

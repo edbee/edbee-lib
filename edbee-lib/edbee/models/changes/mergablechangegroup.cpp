@@ -289,7 +289,7 @@ void MergableChangeGroup::giveChange(TextDocument* doc, Change* change)
         delete newSelection_;
         newSelection_ = selectionChange->takeRangeSet();
 
-        /// we can simply delete the change, the ComplexTextChange automaticly records the last change selection on the undoGroupEnd
+        /// we can simply delete the change, the ComplexTextChange automatically records the last change selection on the undoGroupEnd
         delete change;
         return;
     }

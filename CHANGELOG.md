@@ -3,14 +3,14 @@
 edbee.lib:
 
 - fix #136, BREAKING CHANGE: return type TextEditorController::executeCommand changed to void.
-  - changed TextEditorController slot argumens to fully-qualified types.
+  - changed TextEditorController slot arguments to fully-qualified types.
 - ref #136, remove TextDocumentController readonly methods from slots
 - Fix out-of-bounds write in TextDocumentSerializer
 - add #135, QAccessibleTextInterface support
 - add TextBuffer::emitTextChanged is extended with the oldText. SIGNAL void emitTextChanged( TextBufferChange* change, QString oldText = QString()); (WARNING: signal interface changes )
 - fix #133, Added Qt 6.3.0 compatibility
 - fix #132, Writing diacritics in Linux
-- ref #128, Build in supprort for virtual characters. Alternate position/cursor calculations via TextLayout
+- ref #128, Build in support for virtual characters. Alternate position/cursor calculations via TextLayout
 - ref #127,
   - Option to show Unicode BIDI characters (CVE-2021-425740). (as red icons for now)
   - It is configurable via 'TexteditorConfig::renderBidiContolCharacters', and defaults to true
@@ -19,7 +19,7 @@ edbee.lib:
 - fix #121, Standard Keys not working correctly (Fixed by fetching ALL keybindings via QKeySequence::keyBinding)
 - fix #119, Missing `case MoveCaretToWordBoundary:` in `switch` statement
 - fix #118, Missing `override` specifier in command header files
-- fix #115, basic Tripple-click support
+- fix #115, basic Triple-click support
 - fix #114, Double-click + drag should end at word boundaries
 - #112, Workaround for missing Qt::endl in Qt 5.12
 - Support for sticky-selection in replaceSelection methods. (Required for InpuMethod entry)
@@ -31,7 +31,7 @@ edbee.lib:
 - ref #106, Missing round function on SuSE. (Changed to qRound)
 - ref #99, Speed improvements for markAll. (Added beginChanges and endChanges, to  prevent updating)
 - fix #96, Added support for readonly mode, via widget->setReadonly() or controller->setReadonly
-- fix #90, Fixed several Qt deprecation warnings. Chagned 0 to nullptr. Possible incompatibility with older releases!
+- fix #90, Fixed several Qt deprecation warnings. Changed 0 to nullptr. Possible incompatibility with older releases!
 - add #101, Support for JSON based grammar files.
 - fix #67, PlacholderText support via TextEditorWidget::setPlaceholderText. (uses 70% opacity of foreground color)
 - fix #98, Missing header include in Qt 5.15rc
@@ -59,7 +59,7 @@ edbee.lib:
 	- Line numbers of lines with selection are rendered with 100% opacity
 - fix #38, Margin line-number font size is now set to the font size of the editor. It also renders number with an opacity of 0.5.
 - fix #32, Changing showWhiteSpace option does not trigger a redraw
-- add #31, Support for rendering borderedTextRanges. These are textranges rendered with borders, that aren't selected. TextEditorController has a member 'borderedTextRanges()'. Altering this rangeset (and updating the view controller::update) renderes borders aroudn the given ranges
+- add #31, Support for rendering borderedTextRanges. These are textranges rendered with borders, that aren't selected. TextEditorController has a member 'borderedTextRanges()'. Altering this rangeset (and updating the view controller::update) renders borders around the given ranges
 - fix #30, Edbee crashes when you cut/copy with nothing selected. (Bug in clipboard operation)
 - fix #27, Theme loading/handling bugfixes
 	- Theme-colors with alpha channels are parsed correctly. (QColor expects #AARRGGBB, theme uses #RRGGBBAA)
@@ -69,7 +69,7 @@ edbee.lib:
 - fix #26, Changing a theme in the ThemeManager, now updates the ThemePointer used by the renderer. (Fixes corruption on theme reloading)
 - fix #25, Removed the 'memory ok :-D' message
 - fix #24, Clearing the undostack unregistered all controllers incorrectly
-- fix #23, Scope invaldating optimization wasn't working correctly. Removed optimization for now
+- fix #23, Scope invalidating optimization wasn't working correctly. Removed optimization for now
 - fix #19, Workaround-hack for non-bmp-unicode character movement. (experimental)
 - Added DebugCommand::DumpCharacterCodes (for dumping hex-character codes)
 - fix #14, MinGW compatibility: Disabled memoryLeak detection and fixed mingw compilation (different library-name is generated for mingw)
@@ -86,7 +86,7 @@ edbee.lib:
 - fix #6, Theme Manager only attempts to load a theme if a theme path has been set.
 - fix, updated Onigmo (Oniguruma-mod) library to version 6.1.1 (Fixes memory corruption with lexing)
 - fix, removed config.h reference from simpleprofiler.h (Which caused compilation via to fail, refs issue #1)
-- fix, mouse double click didn't select wordt anymore. (Issue with newer Qt version??)
+- fix, mouse double click didn't select word any more. (Issue with newer Qt version??)
 - fix, moveCaret after the last character didn't work correctly on the if the last line didn't end with a newline
 - fix, Syntax highlighting didn't work on the last line of the document. (First highlight after the first enter)
 - fix, onig.pri, it contained strange references to qslog
@@ -118,9 +118,9 @@ All lines above refer to github-issue numbers
 - fix #124, Line breaks (\n) are rendered with QTextLayout, which results in a strange character on a Linux environment (github issue 2)
 - fix #123, Updated oniguruma to 5.13.5 to solve a segfault on Ubuntu 13 (64bits)
 - fix #122, Library can't be compiled on Linux, unix  is a predefined word on unix
-- fix #118, The width of the editor component should add an extra spacing so the caret isn't placed agains the right window border
+- fix #118, The width of the editor component should add an extra spacing so the caret isn't placed against the right window border
 - fix #117, The last line doesn't show the caret marker in the line-number column
-- fix #116, The linenumber column isn't updated properly when the number of digets increases.
+- fix #116, The line-number column isn't updated properly when the number of digits increases.
 - fix #114, Added a factory keymap so the editor works out of the box
 - fix #103, Renamed the *TextChange related classes. So it's more clear what the changes represent
 - fix #73, Complete rewrite of coalescing (change-merging) algorithm, so all textchanges are mergable. (Fixes #98,#97,#95,#41,#99,#100,#101)
@@ -137,8 +137,8 @@ All lines above refer to github-issue numbers
 - fix #66, Grammar type detection (by filename) detected the wrong grammars. (it forgot to check the '.' )
 - fix #40, text now is by default case insensitive
 - fix #30, #32, Searching selection via the findcommand now result in soft undoable changes
-- fix #20, Changing TextEditorConfig now automaticly updates the state of edbee.
-- fix #21, Improved fallback pallette when a theme cannot be loaded. (fixes complete black screen)
+- fix #20, Changing TextEditorConfig now automatically updates the state of edbee.
+- fix #21, Improved fallback palette when a theme cannot be loaded. (fixes complete black screen)
 - fix #16, linespacing issue, the space always was at least 1 pixel
 - fix #2, made it possible to configure TextEditorConfig. (was hardcoded)
 
