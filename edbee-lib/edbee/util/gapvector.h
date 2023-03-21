@@ -20,7 +20,7 @@ namespace edbee {
 template <typename T>
 class EDBEE_EXPORT GapVector {
 public:
-    GapVector( int capacity=16 ) : items_(0), capacity_(0), gapBegin_(0), gapEnd_(0)  {
+    GapVector( int capacity=16 ) : items_(nullptr), capacity_(0), gapBegin_(0), gapEnd_(0)  {
         items_    = new T[capacity];
         capacity_ = capacity;
         gapBegin_ = 0;

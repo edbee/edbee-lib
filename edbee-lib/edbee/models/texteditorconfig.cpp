@@ -296,7 +296,7 @@ void TextEditorConfig::setUndoGroupPerSpace(bool enable)
 }
 
 
-/// should the caret-offset been shown. The texteditor can signal a
+/// should the caret-offset be shown. The texteditor can signal a
 /// statusbar text to a slot. This text can optionally contain the
 /// current caret offset
 bool TextEditorConfig::showCaretOffset() const

@@ -34,8 +34,8 @@ class TextSelection;
 class UndoableTextCommand;
 
 
-/// The texteditor works via the controller. The controller is the central point/mediater
-/// which maps/controls all messages between the different editor componenents
+/// The texteditor works via the controller. The controller is the central point/mediator
+/// which maps/controls all messages between the different editor components
 class EDBEE_EXPORT TextEditorController : public QObject
 {
     Q_OBJECT
@@ -167,11 +167,11 @@ private:
     TextEditorCommandMap* commandMap_;        ///< the ownership
     TextEditorCommandMap* commandMapRef_;     ///< A reference to the command
     TextRenderer* textRenderer_;              ///< The text renderer
-    TextCaretCache* textCaretCache_;          ///< The text-caret cache. (For remembering the x-position of the current carrets)
+    TextCaretCache* textCaretCache_;          ///< The text-caret cache. (For remembering the x-position of the current carets)
 
     TextSearcher* textSearcher_;              ///< The text-searcher
     
-    AutoScrollToCaret autoScrollToCaret_;     ///< This flags tells the editor to automaticly scrol to the caret
+    AutoScrollToCaret autoScrollToCaret_;     ///< This flags tells the editor to automatically scroll to the caret
 
 
     // extra highlight text

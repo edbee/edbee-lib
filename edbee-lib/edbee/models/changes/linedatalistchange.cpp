@@ -16,7 +16,7 @@ class TextLineDataManager;
 
 
 /// The line data text change constructor
-/// @param manger the line data manager
+/// @param manager the line data manager
 /// @param line the starting line of the change
 /// @param length the number of lines affected
 /// @param newLength the new number of lines
@@ -24,7 +24,7 @@ LineDataListChange::LineDataListChange( TextLineDataManager* manager, int line, 
     : managerRef_(manager)
     , offset_(line)
     , docLength_(newLength)
-    , oldListList_(0)
+    , oldListList_(nullptr)
     , contentLength_(length)
 {
 }

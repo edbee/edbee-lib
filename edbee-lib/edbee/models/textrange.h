@@ -103,7 +103,7 @@ private:
 /// This abstract class represents a set of textranges
 /// The ranges are kept ordered and will not contain overlapping regions.
 ///
-/// Every method automaticly orders and merges overlapping ranges.
+/// Every method automatically orders and merges overlapping ranges.
 /// Except when the changing_ flag is != 0. The sorting and merging only happens
 /// when changing is 0. This way it possible to add/update muliple rages without the direct
 /// performance hit of sorting and merging.

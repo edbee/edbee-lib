@@ -42,7 +42,7 @@ namespace edbee {
 
 /// The constructor
 /// @param widget the widget this controller is associated with
-/// @paarm parent the QObject parent of the controlle
+/// @paarm parent the QObject parent of the controller
 TextEditorController::TextEditorController( TextEditorWidget* widget, QObject *parent)
     : QObject(parent)
     , widgetRef_(widget)
@@ -67,7 +67,7 @@ TextEditorController::TextEditorController( TextEditorWidget* widget, QObject *p
     // create the text renderer
     textRenderer_ = new TextRenderer( this );
 
-    // create a text document ( this sould happen AFTER the creation of the renderer)
+    // create a text document (this should happen AFTER the creation of the renderer)
     giveTextDocument( new CharTextDocument() );
 
     // Now all objects have been created we can init them
@@ -106,8 +106,8 @@ void TextEditorController::notifyStateChange()
 }
 
 
-/// sets the document and tranfers the ownership of the textdocument to this class
-/// @param doc the new document for this controlelr
+/// sets the document and transfers the ownership of the textdocument to this class
+/// @param doc the new document for this controller
 void TextEditorController::giveTextDocument(TextDocument* doc)
 {
     if( doc != textDocument_ ) {
@@ -171,7 +171,7 @@ void TextEditorController::setTextDocument(TextDocument* doc)
 /// @param autoScroll the new autoscroll to caret setting. This can be one of the following values:
 ///  - AutoScrollAlways => Always scroll the view so the caret is visible
 //   - AutoScrollWhenFocus => Only scroll the view when the editor has got the focus
-//   - AutoScrollNever => Never perform automatic scolling
+//   - AutoScrollNever => Never perform automatic scrolling
 void TextEditorController::setAutoScrollToCaret(TextEditorController::AutoScrollToCaret autoScroll)
 {
      autoScrollToCaret_ = autoScroll;
@@ -254,7 +254,7 @@ TextRenderer*TextEditorController::textRenderer() const
 
 
 /// returns the bordered textranges
-/// These are textranges that are rendered with a border, but aren't truely selected
+/// These are textranges that are rendered with a border, but aren't truly selected
 TextRangeSet *TextEditorController::borderedTextRanges() const
 {
     return borderedTextRanges_;
@@ -271,7 +271,7 @@ void TextEditorController::setKeyMap(TextEditorKeyMap* keyMap)
 }
 
 
-/// gives a keymap to the editor. The ownership is transfered to this controller
+/// gives a keymap to the editor. The ownership is transferred to this controller
 /// @param keyMap the new keymap to give to the controller
 void TextEditorController::giveKeyMap(TextEditorKeyMap* keyMap)
 {
@@ -289,7 +289,7 @@ TextEditorKeyMap*TextEditorController::keyMap() const
 
 
 /// set a commandmap
-/// the ownership is NOT transfered to this object. The old owned command-map is deleted
+/// the ownership is NOT transferred to this object. The old owned command-map is deleted
 /// @parm commandMap the new commandMap of this object
 void TextEditorController::setCommandMap(TextEditorCommandMap* commandMap)
 {
@@ -340,7 +340,7 @@ void TextEditorController::giveTextSearcher(TextSearcher* searcher)
 }
 
 
-/// Returnst the associated text searcher object
+/// Returns the associated text searcher object
 /// @return the textsearcher object
 TextSearcher *TextEditorController::textSearcher()
 {
@@ -410,7 +410,7 @@ void TextEditorController::updateAfterConfigChange()
 {
     textRenderer()->setThemeByName( textDocument()->config()->themeName() );
 
-    // we need to figure out a betrer way to do this
+    // we need to figure out a better way to do this
     QFont font = textDocument()->config()->font();
     widget()->setFont( font );
     widget()->textEditorComponent()->setFont( font );
@@ -498,14 +498,14 @@ void TextEditorController::scrollOffsetVisible(int offset)
 }
 
 
-/// This method makes sure caret 1 is vible
+/// This method makes sure caret 1 is visible
 void TextEditorController::scrollCaretVisible()
 {
     scrollOffsetVisible( textSelection()->range(0).caret() );
 }
 
 
-/// This method adds a textchange on the stack that simply stores the current text-selection
+/// This method adds a text change on the stack that simply stores the current text-selection
 /// @param coalsceId the coalescing identifier for merging/coalescing undo operations
 void TextEditorController::storeSelection(int coalesceId)
 {
@@ -535,7 +535,7 @@ void TextEditorController::executeCommand( edbee::TextEditorCommand* textCommand
 
 /// Executes a command with the given name
 ///
-/// When the name hasn't been supplied. This functiona assumes the command is triggered by a QAction
+/// When the name hasn't been supplied. This function assumes the command is triggered by a QAction
 /// and it will retrieve the command-name from the QAction data method
 ///
 /// @param name of the command to execute
@@ -605,7 +605,7 @@ void TextEditorController::replaceSelection(const QStringList& texts, int coales
 
 
 ///  Replaces the given rangeset with the given text
-/// @param reangeSet hte ranges to replace
+/// @param rangeset the ranges to replace
 /// @param text the text to replace the selection with
 /// @param coalesceId the identifier for grouping undo operations
 void TextEditorController::replaceRangeSet(edbee::TextRangeSet& rangeSet, const QString& text, int coalesceId, bool stickySelection)
@@ -620,7 +620,7 @@ void TextEditorController::replaceRangeSet(edbee::TextRangeSet& rangeSet, const 
 
 
 /// Replaces the given ranges with the given texts. Different text per range is possible
-/// @param rangeSet the rangeset to fille
+/// @param rangeSet the rangeset to fill
 /// @param text the texts to fill the given ranges with.
 /// @param coalesceId the identifier for grouping undo operations
 void TextEditorController::replaceRangeSet(edbee::TextRangeSet& rangeSet, const QStringList& texts, int coalesceId, bool stickySelection)
@@ -675,7 +675,7 @@ void TextEditorController::moveCaretToOffset(int offset, bool keepAnchors, int r
     return executeCommand( &command );
 }
 
-/// Move the caret and the anchor to the given offeset
+/// Move the caret and the anchor to the given offset
 /// @param caret the caret location
 /// @param anchor the anchor location
 /// The rangeIndex is used to specify which range to move.. (Defaults to -1 which changes to a single range)
@@ -715,7 +715,7 @@ void TextEditorController::changeAndGiveTextSelection(edbee::TextRangeSet* range
 
 
 /// This method performs an undo operation. By supplying soft only
-/// controller based operations are undone. When suppplying false a Document operation is being undone
+/// controller based operations are undone. When supplying false a Document operation is being undone
 void TextEditorController::undo(bool soft)
 {
     textDocument()->textUndoStack()->undo( soft ? this : nullptr, soft );
@@ -723,7 +723,7 @@ void TextEditorController::undo(bool soft)
 
 
 /// This method performs an redo operation. By supplying soft only controller based operations are redone.
-/// When suppplying false a Document operation is being redone
+/// When supplying false a Document operation is being redone
 /// @param soft perform a soft undo?
 void TextEditorController::redo(bool soft)
 {

@@ -309,7 +309,7 @@ static int insertBlockComment( TextEditorController* controller, TextRange& rang
 {
     TextDocument* doc = controller->textDocument();
 
-    // for safety I don't use the range anymore. It's adjusted automaticly, but could in theory vanish
+    // for safety I don't use the range anymore. It's adjusted automatically, but could in theory vanish
     int min = range.min();
     int max = range.max();
 

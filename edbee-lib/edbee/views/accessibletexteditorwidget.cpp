@@ -39,6 +39,7 @@ static int D2V(TextEditorWidget* widget, int offset)
     int line = widget->textDocument()->lineFromOffset(offset);
     return offset + line;
 #else
+    Q_UNUSED(widget)
     return offset;
 #endif
 }
@@ -47,18 +48,19 @@ static int D2V(TextEditorWidget* widget, int offset)
 static int V2D(TextEditorWidget* widget, int vOffset)
 {
 #ifdef WINDOWS_END_LINE_READ_ERROR_FIX
-  TextDocument* doc = widget->textDocument();
-  int displacement = 0;
-  for( int i=0, cnt = doc->lineCount(); i < cnt; ++i ) {
-      int lineVOffset = doc->offsetFromLine(i) + i;
+    TextDocument* doc = widget->textDocument();
+    int displacement = 0;
+    for( int i=0, cnt = doc->lineCount(); i < cnt; ++i ) {
+        int lineVOffset = doc->offsetFromLine(i) + i;
 
-      if( vOffset < lineVOffset) {
-        return vOffset - displacement; // remove the newline count
-      }
-      displacement = i;
-  }
-  return vOffset - displacement;
+        if( vOffset < lineVOffset) {
+            return vOffset - displacement; // remove the newline count
+        }
+        displacement = i;
+    }
+    return vOffset - displacement;
 #else
+    Q_UNUSED(widget)
     return vOffset;
 #endif
 }
@@ -66,16 +68,13 @@ static int V2D(TextEditorWidget* widget, int vOffset)
 /// returns the virtual length of the textdocument
 static int VLEN(TextEditorWidget* widget)
 {
-#ifndef WINDOWS_END_LINE_READ_ERROR_FIX
+#if ! defined(WINDOWS_END_LINE_READ_ERROR_FIX)
     return widget->textDocument()->length();
-#endif
-
-#ifdef WINDOWS_LAST_LINE_ERROR_FIX
+#elif defined(WINDOWS_LAST_LINE_ERROR_FIX)
     return widget->textDocument()->length() + widget->textDocument()->lineCount();
 #else
     return widget->textDocument()->length() + widget->textDocument()->lineCount() - 1;
 #endif
-
 }
 
 /// Converts the given text to a virtual text
@@ -94,10 +93,9 @@ static const QString VTEXT(QString str)
 /// It prepends every newline with a space
 static const QString VTEXT(TextDocument* doc)
 {
-#ifndef WINDOWS_END_LINE_READ_ERROR_FIX
+#if ! defined(WINDOWS_END_LINE_READ_ERROR_FIX)
     return doc->text();
-#endif
-#ifdef WINDOWS_LAST_LINE_ERROR_FIX
+#elif defined(WINDOWS_LAST_LINE_ERROR_FIX)
     QString result = VTEXT(doc->text());
     return result + WINDOWS_EMPTY_LINE_FIX;
 #else
@@ -106,22 +104,22 @@ static const QString VTEXT(TextDocument* doc)
 }
 
 
-/// Return a part of text, translating the virtual characteers
+/// Return a part of text, translating the virtual characters
 /// It prepends every newline with a space
-/// It  assumers an extra space + newline is placed at the end of the document
+/// It assumes an extra space + newline is placed at the end of the document
 static const QString VTEXT_PART(TextDocument* doc, int offset, int length)
 {
-#ifndef WINDOWS_END_LINE_READ_ERROR_FIX
-    if(length < 0) { return QString(); }
+#if ! defined(WINDOWS_END_LINE_READ_ERROR_FIX)
+    if(length < 0) {
+        return QString();
+    }
 
     return doc->textPart(offset, qMin(length, doc->length() - offset));
-#endif
-    int docLength = doc->length();
-#ifdef WINDOWS_LAST_LINE_ERROR_FIX
-    int endOffset = qMin(offset + length, docLength + 2);
 #else
-    int endOffset = qMin(offset + length, docLength);
-#endif
+    int docLength = doc->length();
+#if defined(WINDOWS_LAST_LINE_ERROR_FIX)
+        int endOffset = qMin(offset + length, docLength + 2);
+#endif // WINDOWS_LAST_LINE_ERROR_FIX - First use
     //qDebug() << "VTEXT_PART: " << offset << ", " << length << " :: docLength: " << docLength << ", endOffset: " << endOffset;
 
     QString txt;
@@ -131,14 +129,15 @@ static const QString VTEXT_PART(TextDocument* doc, int offset, int length)
         txt = VTEXT(doc->textPart(offset, len));
     }
 
-#ifdef WINDOWS_LAST_LINE_ERROR_FIX
+#if defined(WINDOWS_LAST_LINE_ERROR_FIX)
     //qDebug() << " - B  endOffset: " << endOffset << " >= " << docLength;
     if( endOffset >= docLength ) {
         txt.append(WINDOWS_EMPTY_LINE_FIX);
     }
-#endif
+#endif // WINDOWS_LAST_LINE_ERROR_FIX - Second use
     //qDebug() << " => " << txt;
     return txt;
+#endif // WINDOWS_END_LINE_READ_ERROR_FIX
 }
 
 
@@ -396,6 +395,7 @@ int AccessibleTextEditorWidget::offsetAtPoint(const QPoint &point) const
 /// Ensures that the text between startIndex and endIndex is visible.
 void AccessibleTextEditorWidget::scrollToSubstring(int startIndex, int endIndex)
 {
+    Q_UNUSED(endIndex)
     // qDebug() << " scrollToSubstring >>" << startIndex << ", " << endIndex;
     controller()->scrollOffsetVisible(V2D(textWidget(), startIndex));
 }
@@ -405,6 +405,9 @@ void AccessibleTextEditorWidget::scrollToSubstring(int startIndex, int endIndex)
 /// In addition the range of the attributes is returned in startOffset and endOffset.
 QString AccessibleTextEditorWidget::attributes(int offset, int *startOffset, int *endOffset) const
 {
+    Q_UNUSED(offset)
+    Q_UNUSED(startOffset)
+    Q_UNUSED(endOffset)
     // qDebug() << " attributes >>" << offset << ", " << *startOffset << ", " <<  *endOffset;
     return QString();
 }

@@ -168,7 +168,7 @@ You can contribute via github
 - Push to the branch (git push origin my-new-feature)
 - Create new Pull Request
 
-Of course you can also contribute by contacting me via twitter @gamecreature or drop me al message
+Of course you can also contribute by contacting me via twitter @gamecreature or drop me a message
 via the email-address supplied at [https://github.com/gamecreature](https://github.com/gamecreature)
 
 Issues?

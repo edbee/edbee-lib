@@ -48,9 +48,9 @@ namespace TextAutoCompleteKind {
 }
 
 
-/// An autocomplete item that's being returned
+/// An autocomplete item that is being returned
 /// Currently simply a string.
-/// It's placed in a seperate class for future extentions (LSP: https://github.com/Microsoft/language-server-protocol/blob/master/protocol.md#textDocument_completion)
+/// It is placed in a separate class for future extensions (LSP: https://github.com/Microsoft/language-server-protocol/blob/master/protocol.md#textDocument_completion)
 class EDBEE_EXPORT TextAutoCompleteItem {
 public:
     TextAutoCompleteItem( const QString& label, const int kind = 0, const QString& detail = "", const QString& documentation = "");

@@ -303,7 +303,7 @@ Change *TextDocument::executeAndGiveChange(Change* change, int coalesceId )
         return documentFilter()->filterChange( this, change, coalesceId );
     } else {
 
-        beginUndoGroup();   // automaticly group changes together (when changes happend on emition)
+        beginUndoGroup();   // automatically group changes together (when changes happen on emission)
         change->execute( this );
         Change* result = giveChangeWithoutFilter( change, coalesceId );
         Q_UNUSED(result)
