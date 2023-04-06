@@ -42,7 +42,7 @@ void LineOffsetVector::applyChange(TextBufferChange change)
 
 //qlog_info() << "- before: " << toUnitTestString() ;
 //qlog_info() << "- offsetList_.replace(" << change.line() << "," << change.lineCount() << ": " << offsets << ")";
-    offsetList_.replace( line, change.lineCount(), change.newLineOffsets().constBegin().operator->(), change.newLineCount() );
+    offsetList_.replace( line, change.lineCount(), change.newLineOffsets().constData(), change.newLineCount() );
 //qlog_info() << "- after: " << toUnitTestString();
 
 
