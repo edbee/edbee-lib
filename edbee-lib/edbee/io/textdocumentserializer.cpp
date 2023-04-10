@@ -42,14 +42,14 @@ bool TextDocumentSerializer::loadWithoutOpening( QIODevice* ioDevice )
     QTextDecoder* textDecoder=0;
 
     // read the buffer
-    QByteArray bytes(blockSize_ + 1,0);
+    QByteArray bytes(blockSize_ + 1, 0);
     QString remainingBuffer;
 
     /// TODO: atEnd doesn't seem to work !?!
 /// TODO: implement isStopRequested to stop loading if required
     while( /*ioDeviceRef_->atEnd() &&*/ true /*!isStopRequested()*/ ) {
 
-        int bytesRead = ioDevice->read( bytes.data(), blockSize_ );
+        int bytesRead = ioDevice->read( bytes.data(), blockSize_ - 1);
         if( bytesRead > 0 ) {
             bytes[bytesRead + 1] = 0; // 0 terminate the read bytes
 

@@ -2,6 +2,7 @@
 
 edbee.lib:
 
+- fix #140, Fix Array index out of bounds assertion loading with TextDocumentSerializer
 - fix #136, BREAKING CHANGE: return type TextEditorController::executeCommand changed to void.
   - changed TextEditorController slot arguments to fully-qualified types.
 - ref #136, remove TextDocumentController readonly methods from slots
