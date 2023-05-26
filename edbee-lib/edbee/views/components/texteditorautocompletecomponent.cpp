@@ -40,6 +40,8 @@ TextEditorAutoCompleteComponent::TextEditorAutoCompleteComponent(TextEditorContr
     layout->setSpacing(0);
     layout->setContentsMargins(0, 0, 0, 0);
 
+    this->setFocusPolicy(Qt::NoFocus);
+
     menuRef_ = new QMenu(this);
     listWidgetRef_ = new QListWidget(menuRef_);
     listWidgetRef_->installEventFilter(this);
