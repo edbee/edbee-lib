@@ -493,7 +493,7 @@ void TextEditorComponent::mouseDoubleClickEvent( QMouseEvent* event )
 
             // add the word there
             SelectionCommand toggleWordSelectionAtCommand( SelectionCommand::ToggleWordSelectionAt, textDocument()->offsetFromLineAndColumn(line,col) );
-            controller()->executeCommand( &toggleWordSelectionAtCommand );           
+            controller()->executeCommand( &toggleWordSelectionAtCommand );
         } else {
             static SelectionCommand selectWord( SelectionCommand::SelectWord );
             controller()->executeCommand( &selectWord  );

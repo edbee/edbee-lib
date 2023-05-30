@@ -33,6 +33,7 @@ TextEditorAutoCompleteComponent::TextEditorAutoCompleteComponent(TextEditorContr
     , editorComponentRef_(parent)
     , marginComponentRef_(margin)
     , eventBeingFiltered_(false)
+    , canceled_(false)
     , infoTipRef_(nullptr)
 {
     /// initialize the widget
@@ -114,7 +115,14 @@ bool TextEditorAutoCompleteComponent::shouldDisplayAutoComplete(TextRange& range
     wordRange.maxVar() = range.max(); // next go past the right caret!
     word = doc->textPart(wordRange.min(), wordRange.length()).trimmed();      // workaround for space select bug! #61
 
-    if(word.isEmpty()) return false;
+    if(word.isEmpty()) {
+        canceled_ = false;
+        return false;
+    }
+
+    // canceled state, hides the autocomplete
+    if( canceled_ ) { return false; }
+
 
     // else we can should
     return true;
@@ -321,6 +329,7 @@ bool TextEditorAutoCompleteComponent::eventFilter(QObject *obj, QEvent *event)
         switch( key->key() ) {
             case Qt::Key_Escape:
                 menuRef_->close();
+                canceled_ = true;
                 return true; // stop event
 
             case Qt::Key_Enter:
@@ -337,7 +346,7 @@ bool TextEditorAutoCompleteComponent::eventFilter(QObject *obj, QEvent *event)
                 }
                 break;
 
-        case Qt::Key_Backspace:
+            case Qt::Key_Backspace:
                 QApplication::sendEvent(editorComponentRef_, event);
                 return true;
 
@@ -379,15 +388,16 @@ void TextEditorAutoCompleteComponent::updateList()
     TextDocument* doc = controller()->textDocument();
     TextRange range = controller()->textSelection()->range(0);
 
-    if (!isVisible() && !doc->config()->autocompleteAutoShow())
-    {
+    if (!doc->config()->autocompleteAutoShow()) {
         return;
     }
 
     // when the character after
     if(!shouldDisplayAutoComplete(range, currentWord_)) {
-      menuRef_->close();
-      return;
+        if(isVisible()) {
+            menuRef_->close();
+        }
+        return;
     }
 
     // fills the autocomplete list with the curent word

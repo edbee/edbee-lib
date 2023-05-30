@@ -68,7 +68,7 @@ protected:
     virtual void contextMenuEvent(QContextMenuEvent* event);
 
 public slots:
-    
+
     void repaintCarets();
     virtual void updateLineAtOffset(int offset);
     virtual void updateAreaAroundOffset(int offset, int width=8);

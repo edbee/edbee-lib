@@ -90,6 +90,7 @@ private:
     TextMarginComponent* marginComponentRef_;   ///< Reference to the editor's margin
     bool eventBeingFiltered_;                   ///< Prevent endless double filter when forwarding event to list item
     QString currentWord_;                       ///< The current word beïng entered
+    bool canceled_;                             ///< Has the autocomplete been canceled
     QPointer<FakeToolTip> infoTipRef_;
 };
 
