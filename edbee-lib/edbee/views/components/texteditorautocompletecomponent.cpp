@@ -45,6 +45,7 @@ TextEditorAutoCompleteComponent::TextEditorAutoCompleteComponent(TextEditorContr
 
     menuRef_ = new QMenu(this);
     listWidgetRef_ = new QListWidget(menuRef_);
+    listWidgetRef_->setFocusPolicy(Qt::NoFocus);
     listWidgetRef_->installEventFilter(this);
     menuRef_->installEventFilter(this);
     menuRef_->setStyleSheet("QMenu { border: 1px solid black; }");
@@ -403,6 +404,8 @@ void TextEditorAutoCompleteComponent::updateList()
     // fills the autocomplete list with the curent word
     if( fillAutoCompleteList(doc, range, currentWord_)) {
         menuRef_->popup(menuRef_->pos());
+
+        editorComponentRef_->setFocus();
 
         // position the widget
         showInfoTip();

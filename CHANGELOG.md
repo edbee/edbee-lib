@@ -5,6 +5,7 @@ edbee.lib:
 - fix, Autocomplete Improvements
   - autocomplete is now really canceled with the escape key. It only appears again if the word becomes blank
   - add Qt::NoFocus focus policy to TextEditorAutocompleteComponent, to hopefully solve focus issue (https://github.com/Mudlet/Mudlet/issues/5310)
+	- add Qt::NoFocus focus policy to QListWidget of autocomplete, and force the focus on the TextEditorWidget after opening the popup
 - fix #140, Fix Array index out of bounds assertion loading with TextDocumentSerializer
 - fix #136, BREAKING CHANGE: return type TextEditorController::executeCommand changed to void.
   - changed TextEditorController slot arguments to fully-qualified types.
