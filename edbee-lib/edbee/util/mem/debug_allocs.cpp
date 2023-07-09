@@ -33,7 +33,7 @@ DebugAllocationList::DebugAllocationList()
     , running_(false)
     , started_(false)
 {
-#if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
     mutex_ = new EdbeeRecursiveMutex( QMutex::Recursive );
 #else
     mutex_ = new EdbeeRecursiveMutex();
@@ -65,7 +65,7 @@ void DebugAllocationList::clear()
 }
 
 
-/// Retuns the mutex for thread-safety
+/// Returns the mutex for thread-safety
 EdbeeRecursiveMutex* DebugAllocationList::mutex()
 {
     return mutex_;
