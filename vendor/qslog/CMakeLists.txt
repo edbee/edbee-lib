@@ -59,8 +59,8 @@ if(APPLE)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
 endif()
 
-# Use 10.7 OSX SDK
-set(CMAKE_OSX_DEPLOYMENT_TARGET "10.7")
+# Use 11.0 OSX SDK for Qt6 compatibility
+set(CMAKE_OSX_DEPLOYMENT_TARGET "11.0")
 
 option(QS_LOG_LINE_NUMBERS "Automatically writes the file and line for each log message" ON)
 if(QS_LOG_LINE_NUMBERS)
