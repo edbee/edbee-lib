@@ -59,8 +59,6 @@ TextEditorAutoCompleteComponent::TextEditorAutoCompleteComponent(TextEditorContr
 
     listWidgetRef_->setFocus();
 
-    hide();
-
     infoTipRef_ = new FakeToolTip(controllerRef_, this);
 
     QPalette p = listWidgetRef_->palette();
