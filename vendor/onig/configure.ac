@@ -1,9 +1,9 @@
 dnl Process this file with autoconf to produce a configure script.
-AC_INIT(onigmo, 6.1.2)
+AC_INIT(onigmo, 6.2.0)
 
 AC_CONFIG_MACRO_DIR([m4])
 
-AM_INIT_AUTOMAKE(foreign)
+AM_INIT_AUTOMAKE([foreign subdir-objects])
 AC_CONFIG_HEADER(config.h)
 
 
@@ -42,7 +42,7 @@ dnl Checks for programs.
 AC_PROG_CC
 AC_PROG_LIBTOOL
 AM_PROG_CC_C_O
-LTVERSION="6:3:0"
+LTVERSION="6:5:0"
 AC_SUBST(LTVERSION)
 
 AC_PROG_INSTALL
@@ -69,22 +69,5 @@ dnl Checks for library functions.
 AC_FUNC_ALLOCA
 AC_FUNC_MEMCMP
 
-dnl Add custom edbee boilerplate start
-AH_TOP([#include "config-onig-edbee.h"
-
-#ifdef _WIN32
-
-    #include "win32/config.h"
-
-    // Rick: added to make it compile on windows
-    #define ONIG_EXTERN extern
-
-    // Rick: added to decrease the numberr of warnings for onig
-    #define _CRT_SECURE_NO_WARNINGS
-
-#else])
 
 AC_OUTPUT([Makefile onigmo-config sample/Makefile], [chmod +x onigmo-config])
-
-dnl Add custom edbee boilerplate end
-AH_BOTTOM([#endif])

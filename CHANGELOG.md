@@ -2,6 +2,7 @@
 
 edbee.lib:
 
+- (2024-07-16), fix #145, Update to Onigmo 6.1.0 => 6.2.0, Deprecation warnings are silenced (-Wdeprecated-non-prototype)
 - fix, Autocomplete Improvements
   - autocomplete is now really canceled with the escape key. It only appears again if the word becomes blank
   - add Qt::NoFocus focus policy to TextEditorAutocompleteComponent, to hopefully solve focus issue (https://github.com/Mudlet/Mudlet/issues/5310)
