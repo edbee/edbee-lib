@@ -25,7 +25,9 @@ void FactoryKeyMap::fill( TextEditorKeyMap* km )
     add( "goto_next_word", "move_to_next_word" );
     add( "goto_prev_word", "move_to_previous_word" );
     add( "goto_bol", "move_to_start_of_line" );
+    add( "goto_bol", "move_to_start_of_block");
     add( "goto_eol", "move_to_end_of_line" );
+    add( "goto_eol", "move_to_end_of_block");
     add( "goto_next_line", "move_to_next_line" );
     add( "goto_prev_line", "move_to_previous_line" );
     add( "goto_bof", "move_to_start_of_document" );
