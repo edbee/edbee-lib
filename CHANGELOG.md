@@ -2,6 +2,7 @@
 
 edbee.lib:
 
+- PR #147, Add ctrl-a /  ctrl-e support for macOS
 - fix, Autocomplete Improvements
   - autocomplete is now really canceled with the escape key. It only appears again if the word becomes blank
   - add Qt::NoFocus focus policy to TextEditorAutocompleteComponent, to hopefully solve focus issue (https://github.com/Mudlet/Mudlet/issues/5310)
