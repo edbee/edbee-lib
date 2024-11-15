@@ -42,11 +42,18 @@ TextEditorAutoCompleteComponent::TextEditorAutoCompleteComponent(TextEditorContr
     layout->setContentsMargins(0, 0, 0, 0);
 
     this->setFocusPolicy(Qt::NoFocus);
+    this->setAttribute(Qt::WA_ShowWithoutActivating);
 
     menuRef_ = new QMenu(this);
+    menuRef_->setFocusPolicy(Qt::NoFocus);
+    menuRef_->setAttribute(Qt::WA_ShowWithoutActivating);
+
     listWidgetRef_ = new QListWidget(menuRef_);
     listWidgetRef_->setFocusPolicy(Qt::NoFocus);
+    listWidgetRef_->setAttribute(Qt::WA_ShowWithoutActivating);
+
     listWidgetRef_->installEventFilter(this);
+
     menuRef_->installEventFilter(this);
     menuRef_->setStyleSheet("QMenu { border: 1px solid black; }");
     listWidgetRef_->setObjectName("listWidgetRef");

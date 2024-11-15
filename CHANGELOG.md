@@ -2,6 +2,7 @@
 
 edbee.lib:
 
+- Autocomplete changes, setFocusPolicy on QMenu an adding `setAttribute(Qt::WA_ShowWithoutActivating)` 
 - PR #147, Add ctrl-a /  ctrl-e support for macOS
 - fix, Autocomplete Improvements
   - autocomplete is now really canceled with the escape key. It only appears again if the word becomes blank
