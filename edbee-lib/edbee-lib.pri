@@ -168,7 +168,6 @@ HEADERS += \
 
 ## Extra dependencies
 ##====================
-include($$PWD/../vendor/qslog/QsLog.pri)
 include($$PWD/../vendor/onig/onig.pri)
 
 ## Files that can usefully listed inside Qt IDE (Qt Creator, as "Other files")

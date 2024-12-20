@@ -8,11 +8,10 @@
 #include <QList>
 #include <QTimer>
 
-#include "../vendor/qslog/QsLog.h"
-#include "../vendor/qslog/QsLogDest.h"
-
 #include "edbee/util/test.h"
 #include "edbee/edbee.h"
+
+#define EDBEE_LOG_LEVEL edbee::LogLevel::TRACE
 
 #include "edbee/debug.h"
 
@@ -41,10 +40,10 @@ int main(int argc, char* argv[])
     //=====================
 
     // make sure we see the QsLogging items
-    QsLogging::Logger& logger = QsLogging::Logger::instance();
-    static QsLogging::DestinationPtrU debugDestination( QsLogging::DestinationFactory::MakeDebugOutputDestination() );
-    logger.addDestination(std::move(debugDestination));
-    logger.setLoggingLevel(QsLogging::TraceLevel);
+    // QsLogging::Logger& logger = QsLogging::Logger::instance();
+    // static QsLogging::DestinationPtrU debugDestination( QsLogging::DestinationFactory::MakeDebugOutputDestination() );
+    // logger.addDestination(std::move(debugDestination));
+    // logger.setLoggingLevel(QsLogging::TraceLevel);
 
 
     // Load the grammars

@@ -10,8 +10,6 @@ set(CMAKE_MACOSX_RPATH 1)
 
 PROJECT(edbee-lib)
 
-add_subdirectory(../vendor/qslog/ qslog)
-
 SET(SOURCES
    edbee/commands/commentcommand.cpp
    edbee/commands/copycommand.cpp
@@ -193,7 +191,7 @@ ADD_LIBRARY(edbee-lib STATIC
   ${SOURCES} ${HEADERS} ${ONIG_SOURCES}
   ${ONIG_HEADERS})
 
-target_link_libraries(edbee-lib QsLog ${QT_LIBS})
+target_link_libraries(edbee-lib ${QT_LIBS})
 
 set_target_properties(edbee-lib PROPERTIES AUTOMOC ON CXX_STANDARD 11)
 
