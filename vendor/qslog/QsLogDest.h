@@ -27,14 +27,18 @@
 #define QSLOGDEST_H
 
 #include "QsLogLevel.h"
-#include "QsLogMessage.h"
-#include "QsLogSharedLibrary.h"
+#include <QSharedPointer>
 #include <QtGlobal>
-#include <limits>
-#include <memory>
-#include <functional>
 class QString;
 class QObject;
+
+#ifdef QSLOG_IS_SHARED_LIBRARY
+#define QSLOG_SHARED_OBJECT Q_DECL_EXPORT
+#elif QSLOG_IS_SHARED_LIBRARY_IMPORT
+#define QSLOG_SHARED_OBJECT Q_DECL_IMPORT
+#else
+#define QSLOG_SHARED_OBJECT
+#endif
 
 namespace QsLogging
 {
@@ -42,29 +46,18 @@ namespace QsLogging
 class QSLOG_SHARED_OBJECT Destination
 {
 public:
-    using LogFunction = std::function<void(const LogMessage& message)>;
+    typedef void (*LogFunction)(const QString &message, Level level);
 
 public:
-    virtual ~Destination() noexcept;
-    virtual void write(const LogMessage& message) = 0;
-    //!
-    //! \brief isValid
-    //! \return whether the destination was created correctly
-    //!
-    virtual bool isValid() = 0;
-    //!
-    //! \brief type
-    //! \return the type as a string e.g: console, file.
-    //!         The returned value may change in different versions of QsLog, but two destinations
-    //!         of the same type will return the same value.
-    //!
-    virtual QString type() const = 0;
+    virtual ~Destination();
+    virtual void write(const QString& message, Level level) = 0;
+    virtual bool isValid() = 0; // returns whether the destination was created correctly
 };
+typedef QSharedPointer<Destination> DestinationPtr;
 
-using DestinationPtrU = std::unique_ptr<Destination>;
 
 // a series of "named" paramaters, to make the file destination creation more readable
-enum class LogRotationOption
+enum LogRotationOption
 {
     DisableLogRotation = 0,
     EnableLogRotation  = 1
@@ -85,20 +78,20 @@ struct QSLOG_SHARED_OBJECT MaxOldLogCount
 };
 
 
-//! Creates logging destinations/sinks. The caller takes ownership of the destinations from the
-//! factory and will pass ownership to the logger when adding the destination.
+//! Creates logging destinations/sinks. The caller shares ownership of the destinations with the logger.
+//! After being added to a logger, the caller can discard the pointers.
 class QSLOG_SHARED_OBJECT DestinationFactory
 {
 public:
-    static DestinationPtrU MakeFileDestination(const QString& filePath,
-        LogRotationOption rotation = LogRotationOption::DisableLogRotation,
+    static DestinationPtr MakeFileDestination(const QString& filePath,
+        LogRotationOption rotation = DisableLogRotation,
         const MaxSizeBytes &sizeInBytesToRotateAfter = MaxSizeBytes(),
         const MaxOldLogCount &oldLogsToKeep = MaxOldLogCount());
-    static DestinationPtrU MakeDebugOutputDestination();
+    static DestinationPtr MakeDebugOutputDestination();
     // takes a pointer to a function
-    static DestinationPtrU MakeFunctorDestination(Destination::LogFunction f);
+    static DestinationPtr MakeFunctorDestination(Destination::LogFunction f);
     // takes a QObject + signal/slot
-    static DestinationPtrU MakeFunctorDestination(QObject* receiver, const char* member);
+    static DestinationPtr MakeFunctorDestination(QObject *receiver, const char *member);
 };
 
 } // end namespace

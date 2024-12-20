@@ -27,57 +27,40 @@
 #define QSLOG_H
 
 #include "QsLogLevel.h"
-#include "QsLogMessage.h"
-#include "QsLogSharedLibrary.h"
+#include "QsLogDest.h"
 #include <QDebug>
 #include <QString>
-#include <memory>
 
-#define QS_LOG_VERSION "2.1"
+#define QS_LOG_VERSION "2.0b3"
 
 namespace QsLogging
 {
-
 class Destination;
 class LoggerImpl; // d pointer
-using DestinationPtrU = std::unique_ptr<Destination>;
 
 class QSLOG_SHARED_OBJECT Logger
 {
 public:
     static Logger& instance();
+    static void destroyInstance();
     static Level levelFromLogMessage(const QString& logMessage, bool* conversionSucceeded = 0);
 
-public:
-    Logger(const Logger&) = delete;
-    Logger& operator=(const Logger&) = delete;
-
-    ~Logger() noexcept;
-
-#if defined(Q_OS_WIN)
-    //! When QS_LOG_SEPARATE_THREAD is defined on Windows, and you are using this library as a DLL,
-    //! this function must be called before your program ends, to ensure a clean shutdown of the logger thread.
-    //! Failing to call it will result in an assert being triggered, an error message being printed
-    //! out and most probably a deadlock.
-    //! Returns the wait result for the thread. When called on a non-threaded logger returns true
-    //! immediately.
-    bool shutDownLoggerThread();
-#endif
+    ~Logger();
 
     //! Adds a log message destination. Don't add null destinations.
-    void addDestination(DestinationPtrU &&destination);
-
-    //! Removes and returns a previously added destination. Returns null if not found.
-    DestinationPtrU removeDestination(const QString& type);
-
-    //! Checks if a destination of a specific type has been added. Pass T::Type as parameter.
-    bool hasDestinationOfType(const char* type) const;
-
-    //! Messages at a level < 'newLevel' will be ignored
+    void addDestination(DestinationPtr destination);
+    //! Logging at a level < 'newLevel' will be ignored
     void setLoggingLevel(Level newLevel);
-
     //! The default level is INFO
     Level loggingLevel() const;
+    //! Set to false to disable timestamp inclusion in log messages
+    void setIncludeTimestamp(bool e);
+    //! Default value is true.
+    bool includeTimestamp() const;
+    //! Set to false to disable log level inclusion in log messages
+    void setIncludeLogLevel(bool l);
+    //! Default value is true.
+    bool includeLogLevel() const;
 
     //! The helper forwards the streaming to QDebug and builds the final
     //! log message.
@@ -86,25 +69,30 @@ public:
     public:
         explicit Helper(Level logLevel) :
             level(logLevel),
-            qtDebug(&buffer) {}
-        ~Helper() noexcept;
+            qtDebug(&buffer)
+        {}
+        ~Helper();
         QDebug& stream(){ return qtDebug; }
 
     private:
+        void writeToLog();
+
         Level level;
         QString buffer;
         QDebug qtDebug;
-    };
+	};
 
 private:
     Logger();
+    Logger(const Logger&);            // not available
+    Logger& operator=(const Logger&); // not available
 
-    void enqueueWrite(const LogMessage& message);
-    void write(const LogMessage& message);
+    void enqueueWrite(const QString& message, Level level);
+    void write(const QString& message, Level level);
 
-    std::unique_ptr<LoggerImpl> d;
+    LoggerImpl* d;
 
-    friend class LoggerThread;
+    friend class LogWriterRunnable;
 };
 
 } // end namespace

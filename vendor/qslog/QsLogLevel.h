@@ -25,10 +25,10 @@
 
 #ifndef QSLOGLEVEL_H
 #define QSLOGLEVEL_H
-class QString;
 
 namespace QsLogging
 {
+
 enum Level
 {
     TraceLevel = 0,
@@ -39,9 +39,6 @@ enum Level
     FatalLevel,
     OffLevel
 };
-
-const char* LevelName(Level theLevel);
-QString LocalizedLevelName(Level theLevel);
 
 }
 

@@ -40,8 +40,6 @@ set(HEADER_FILES
 	QsLogDestFunctor.h
 	QsLogDisableForThisFile.h
 	QsLogLevel.h
-	QsLogMessage.h
-	QsLogSharedLibrary.h
     )
 
 set(SOURCE_FILES
@@ -50,8 +48,6 @@ set(SOURCE_FILES
 	QsLogDestConsole.cpp
 	QsLogDestFile.cpp
 	QsLogDestFunctor.cpp
-	QsLogMessage.cpp
-	QsLogLevel.cpp
     )
 
 if(APPLE)

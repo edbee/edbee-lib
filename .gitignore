@@ -35,6 +35,7 @@ install_manifest.txt
 compile_commands.json
 CTestTestfile.cmake
 cov-int
+.qt
 
 edbee-test/edbee-test
 .vscode

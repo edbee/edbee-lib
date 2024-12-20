@@ -1,1 +1,1 @@
-Commit: https://bitbucket.org/codeimproved/qslog/commits/46b643d5bcbc
+https://github.com/gerwaric/QsLog/commit/867af76f938664810c3d409439601f2a22890286
