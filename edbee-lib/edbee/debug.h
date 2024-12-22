@@ -6,7 +6,6 @@
 #pragma once
 
 #include "edbee/util/logging.h"
-
 #include "edbee/util/mem/debug_new.h"
 
 #if defined(QT_DEBUG)

@@ -4,6 +4,7 @@
  */
 
 #include <QXmlStreamReader>
+#include <iostream>
 
 #include "baseplistparser.h"
 
@@ -22,6 +23,8 @@ BasePListParser::BasePListParser()
 /// the default desctructor
 BasePListParser::~BasePListParser()
 {
+
+    std::cout << "DELETE (DESTRUCTOR) xml_ "<< xml_ << std::endl;
     delete xml_;
 }
 
@@ -49,6 +52,7 @@ bool BasePListParser::beginParsing(QIODevice* device)
     elementStack_.clear();
 
     xml_ = new QXmlStreamReader(device);
+  std::cout << "RESERVE xml_ "<< xml_ << std::endl;
     if( readNextElement("plist" ) ) {
         return true;
     } else {
@@ -67,6 +71,7 @@ bool BasePListParser::endParsing()
         lastErrorMessage_ = QObject::tr("line %1: %2").arg(xml_->lineNumber()).arg(xml_->errorString());
         result = false;
     }
+  std::cout << "DELETE xml_ "<< xml_ << std::endl;;
     delete xml_;
     xml_ = 0;
     return result;

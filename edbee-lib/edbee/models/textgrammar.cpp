@@ -298,6 +298,7 @@ TextGrammar* TextGrammarManager::readGrammarFile(const QString& file)
     QString lastErrorMessage;
 
     TmLanguageParser parser;
+    qDebug() << "Parse: " << file;
     grammar = parser.parse(file);
     if(grammar) {
         giveGrammar(grammar);

@@ -13,6 +13,8 @@ greaterThan(QT_MAJOR_VERSION,5): QT += core5compat
 TARGET = edbee
 TEMPLATE = lib
 CONFIG += staticlib
+CONFIG += c++11
+
 
 # Define EDBEE_BEGUG to enable memory debugging
 DEFINES += EDBEE_DEBUG
