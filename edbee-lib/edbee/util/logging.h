@@ -10,40 +10,40 @@
 
 namespace edbee {
     enum LogLevel {
-        FATAL = 1,
-        CRITICAL = 2,
-        ERROR = 3,
-        WARNING = 4,
-        INFO = 5,
-        DEBUG = 6,
-        TRACE = 7   // No difference between trace and debug
+        LogLevelFatal = 1,
+        LogLevelCritical = 2,
+        LogLevelError = 3,
+        LogLevelWarning = 4,
+        LogLevelInfo = 5,
+        LogLevelDebug = 6,
+        LogLevelTrace = 7
     };
 }
 
 #ifndef EDBEE_LOG_LEVEL
-#define EDBEE_LOG_LEVEL edbee::LogLevel::TRACE
+#define EDBEE_LOG_LEVEL edbee::LogLevel::LogLevelTrace
 #endif
 
 #define qlog_trace() \
-    if( EDBEE_LOG_LEVEL < edbee::LogLevel::TRACE ) {} \
+    if( EDBEE_LOG_LEVEL < edbee::LogLevel::LogLevelTrace ) {} \
     else qDebug() << QFileInfo(__FILE__).fileName() << '@' << __LINE__
 #define qlog_debug() \
-    if( EDBEE_LOG_LEVEL < edbee::LogLevel::DEBUG ) {} \
+    if( EDBEE_LOG_LEVEL < edbee::LogLevel::LogLevelDebug ) {} \
     else qDebug() << QFileInfo(__FILE__).fileName() << '@' << __LINE__
 #define qlog_info()  \
-    if( EDBEE_LOG_LEVEL < edbee::LogLevel::INFO ) {} \
+    if( EDBEE_LOG_LEVEL < edbee::LogLevel::LogLevelInfo ) {} \
     else qInfo() << QFileInfo( __FILE__).fileName() << '@' << __LINE__
 #define qlog_warn()  \
-    if( EDBEE_LOG_LEVEL < edbee::LogLevel::WARNING ) {} \
+    if( EDBEE_LOG_LEVEL < edbee::LogLevel::LogLevelWarning ) {} \
     else qWarning() << QFileInfo(__FILE__).fileName() << '@' << __LINE__
 #define qlog_error() \
-    if( EDBEE_LOG_LEVEL < edbee::LogLevel::ERROR ) {} \
+    if( EDBEE_LOG_LEVEL < edbee::LogLevel::LogLevelError ) {} \
     else qError() << QFileInfo(__FILE__).fileName() << '@' << __LINE__
 #define qlog_critical() \
-    if( EDBEE_LOG_LEVEL < edbee::LogLevel::CRITICAL ) {} \
+    if( EDBEE_LOG_LEVEL < edbee::LogLevel::LogLevelCritical	 ) {} \
     else qCritical() << QFileInfo(__FILE__).fileName() << '@' << __LINE__
 #define qlog_fatal() \
-    if( EDBEE_LOG_LEVEL < edbee::LogLevel::FATAL ) {} \
+    if( EDBEE_LOG_LEVEL < edbee::LogLevel::LogLevelFatal ) {} \
     else qFatal() << QFileInfo(__FILE__).fileName() << '@' << __LINE__
 
 
