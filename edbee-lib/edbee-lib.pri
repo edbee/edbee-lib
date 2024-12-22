@@ -168,7 +168,8 @@ HEADERS += \
 
 ## Extra dependencies
 ##====================
-include($$PWD/../vendor/onig/onig.pri)
+
+include($$PWD/../vendor/oniguruma/oniguruma.pri)
 
 ## Files that can usefully listed inside Qt IDE (Qt Creator, as "Other files")
 ##============================================================================
