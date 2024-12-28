@@ -175,7 +175,7 @@ SET(HEADERS
    edbee/views/texttheme.h
 )
 
-add_subdirectory(../vendor/onig/ onig)
+add_subdirectory(../vendor/oniguruma/ oniguruma)
 
 if(BUILD_WITH_QT5)
   find_package(Qt5 REQUIRED COMPONENTS Core UiTools Widgets)

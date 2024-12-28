@@ -48,3 +48,4 @@ edbee-test/edbee-lib/qslog/
 build/
 
 .idea/
+*.old/

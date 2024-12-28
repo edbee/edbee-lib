@@ -157,6 +157,23 @@ Known Issues and Missing Features
 * Optimalisations for better render support and background calculate/paint-ahead functionality
 * I really want to build in scripting support, for extending the editor with plugins.
 
+Dependencies
+------------
+
+The following dependencies have been added.
+(via git subtree, to embed the code and not add the complexity of a submodule to the end user)
+
+Oniguruma has been added
+
+```sh
+git subtree add --prefix vendor/oniguruma/oniguruma https://github.com/kkos/oniguruma master --squash
+```
+
+To update oniguruma
+
+```sh
+git subtree pull --prefix vendor/oniguruma/oniguruma https://github.com/kkos/oniguruma master --squash
+```
 
 Contributing
 ------------
