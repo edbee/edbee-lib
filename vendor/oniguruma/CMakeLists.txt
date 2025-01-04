@@ -13,6 +13,14 @@ IF(NOT WIN32)
   )
 ENDIF(NOT WIN32)
 
+IF(WIN32) 
+  EXECUTE_PROCESS(
+    COMMAND "xcopy /s /e /Y/ I -Rp ${CMAKE_CURRENT_SOURCE_DIR}/patch/* ${ONIG_DIR} && copy ${ONIG_DIR}/src/config.h.windows.in ${ONIG_DIR}/src/config.h"    
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+  )
+ENDIF(WIN32)
+
+
 SET(ONIG_INCLUDE_DIRS
   ${ONIG_DIR}/src/
 
