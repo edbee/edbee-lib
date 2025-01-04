@@ -196,7 +196,6 @@ target_link_libraries(edbee-lib ${QT_LIBS})
 set_target_properties(edbee-lib PROPERTIES AUTOMOC ON CXX_STANDARD 11)
 
 TARGET_INCLUDE_DIRECTORIES(edbee-lib PUBLIC
-  ${QS_LOG_INCLUDE_DIRS}
   ${ONIG_INCLUDE_DIRS}
   ${CMAKE_CURRENT_SOURCE_DIR}
 )

@@ -2,6 +2,8 @@
 
 edbee.lib:
 
+- (2025-01-04) Remove qslog references from `edbee-test`
+
 - Replaced qslog dependency with qlog_* macros to qDebug, qWarning etc.
 - Autocomplete changes, setFocusPolicy on QMenu an adding `setAttribute(Qt::WA_ShowWithoutActivating)`
 - PR #147, Add ctrl-a /  ctrl-e support for macOS

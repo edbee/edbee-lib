@@ -76,7 +76,7 @@ else()
 endif()
 
 ADD_EXECUTABLE(edbee-test
-  ${SOURCES} ${HEADERS} ${QS_LOG_SOURCES} ${QS_LOG_HEADERS}
+  ${SOURCES} ${HEADERS}
 )
 
 TARGET_LINK_LIBRARIES(edbee-test edbee-lib ${QT_LIBS})
