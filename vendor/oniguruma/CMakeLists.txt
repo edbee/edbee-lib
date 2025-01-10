@@ -2,6 +2,7 @@
 SET(ONIG_DIR "${CMAKE_CURRENT_SOURCE_DIR}/oniguruma")
 
 IF(NOT WIN32)
+  message(STATUS "ONIGURUMA Unix Like - patch and configure")
   EXECUTE_PROCESS(
     COMMAND "cp -Rp ${CMAKE_CURRENT_SOURCE_DIR}/patch/* ${ONIG_DIR}"
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
@@ -14,10 +15,9 @@ IF(NOT WIN32)
 ENDIF(NOT WIN32)
 
 IF(WIN32) 
-  EXECUTE_PROCESS(
-    COMMAND "xcopy /s /e /Y/ I -Rp ${CMAKE_CURRENT_SOURCE_DIR}/patch/* ${ONIG_DIR} && copy ${ONIG_DIR}/src/config.h.windows.in ${ONIG_DIR}/src/config.h"    
-    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-  )
+  message(STATUS "ONIGURUMA Win32 - patch and copy config.h")
+  file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/patch/ DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/oniguruma/)
+  file(COPY_FILE ${CMAKE_CURRENT_SOURCE_DIR}/oniguruma/src/config.h.windows.in ${CMAKE_CURRENT_SOURCE_DIR}/oniguruma/src/config.h)
 ENDIF(WIN32)
 
 

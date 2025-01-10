@@ -175,6 +175,16 @@ To update oniguruma
 git subtree pull --prefix vendor/oniguruma/oniguruma https://github.com/kkos/oniguruma master --squash
 ```
 
+Build with minGW
+----------------
+
+```powershell
+# Sample to build with MinGW on Qt  (-DCMAKE_PREFIX_PATH=you cmake path)
+cmake -G "MinGW Makefiles" -DCMAKE_PREFIX_PATH="C:\Qt\6.8.0\mingw_64\lib\cmake\"  .
+cmake --build .
+```
+
+
 Contributing
 ------------
 
