@@ -1,5 +1,3 @@
-#include "config-oniguruma-edbee.h"
-
 #if defined(__MINGW32__) || _MSC_VER >= 1600
 #define HAVE_STDINT_H 1
 #endif
