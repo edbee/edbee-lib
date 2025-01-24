@@ -6,6 +6,7 @@
 #pragma once
 
 #include "edbee/exports.h"
+#include "edbee/edbeeversion.h"
 
 #include <QObject>
 
@@ -39,6 +40,7 @@ public:
     void setThemePath( const QString& themePath );
 
     void autoInit();
+    const char* version() const;
 
 public slots:
     void init();

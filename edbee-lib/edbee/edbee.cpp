@@ -98,6 +98,12 @@ void Edbee::autoInit()
     }
 }
 
+/// Returns the edbee version number
+const char* Edbee::version() const
+{
+    return EDBEE_VERSION;
+}
+
 
 
 /// TODO: We need a way to load the (scoped) environment variables

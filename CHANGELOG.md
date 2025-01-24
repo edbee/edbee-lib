@@ -1,10 +1,14 @@
 # Changelog
 
-edbee.lib:
 
+- (2025-01-24) [v0.9.0] #150, Add version number (EDBEE_VERSION / Edbee::instance()->version())
+- (2025-01-24) #145, Replace onigmo with onigruma
 - (2025-01-04) Remove qslog references from `edbee-test`
+- (2024-12-28) Default cmake build is QT6 (use the BUILD_WITH_QT5 option)
+- (2024-12-22) Replaced qslog dependency with qlog_* macros to qDebug, qWarning etc.
 
-- Replaced qslog dependency with qlog_* macros to qDebug, qWarning etc.
+Older Items
+
 - Autocomplete changes, setFocusPolicy on QMenu an adding `setAttribute(Qt::WA_ShowWithoutActivating)`
 - PR #147, Add ctrl-a /  ctrl-e support for macOS
 - fix, Autocomplete Improvements

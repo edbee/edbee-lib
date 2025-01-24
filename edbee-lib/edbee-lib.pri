@@ -104,6 +104,7 @@ HEADERS += \
     $$PWD/edbee/data/factorykeymap.h \
     $$PWD/edbee/debug.h \
     $$PWD/edbee/edbee.h \
+    $$PWD/edbee/edbeeversion.h \
     $$PWD/edbee/exports.h \
     $$PWD/edbee/io/baseplistparser.h \
     $$PWD/edbee/io/jsonparser.h \
