@@ -12,6 +12,7 @@
 #include <QStringList>
 #include <QTextLayout>
 
+#include "edbee/models/textlinedata.h"
 #include "edbee/util/simpleprofiler.h"
 
 #include "edbee/models/chardocument/chartextdocument.h"
@@ -319,8 +320,8 @@ TextLayout *TextRenderer::textLayoutForLineForPlaceholder(int line)
         formatRange.length = text.length();
         formatRange.format = format;
         formatRanges.append(formatRange);
-        textLayout->setFormats(formatRanges);
 
+        textLayout->setFormats(formatRanges);
         textLayout->setText(text);
         textLayout->buildLayout();
 
@@ -400,6 +401,13 @@ TextLayout *TextRenderer::textLayoutForLineNormal(int line)
                 }
             }
         }
+
+        // append some extra formatting (if available)
+        edbee::LineAppendTextLayoutFormatListData* formatRangeLineData = dynamic_cast<edbee::LineAppendTextLayoutFormatListData*>(textDocument()->getLineData(line, edbee::LineAppendTextLayoutFormatListField));
+        if (formatRangeLineData) {
+            formatRanges.append(formatRangeLineData->value());
+        }
+
         textLayout->setFormats(formatRanges);
 
 #ifdef USE_CONTROL_PICTURES
