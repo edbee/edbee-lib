@@ -14,8 +14,16 @@ which needs to have at least the length of PredefinedFieldCount.
 
 ## General usage
 
+To set a file for a given line you can invoke the giveLineData method.
+
 ```cpp
 textDocument()->giveLineData(line, edbee::LineAppendTextLayoutFormatListField, data);
+```
+
+Removing can be done by supplying a nullptr to the data
+
+```cpp
+textDocument()->giveLineData(line, edbee::LineAppendTextLayoutFormatListField, nullptr);
 ```
 
 ## Predefined variable `LineAppendTextLayoutFormatListField`

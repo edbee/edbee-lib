@@ -1,6 +1,6 @@
 # Changelog
 
-- (2025-02-24) #151, Support adding line based QTextLayout format additions
+- (2025-02-27) [v0.10.0] #151, Add line based QTextLayout format additions
   Via edbee::LineData (LineAppendTextLayoutFormatListField). see: `edbee-lib/doc/line_data.md` for sample
 
 - (2025-01-24) [v0.9.0] #150, Add version number (EDBEE_VERSION / Edbee::instance()->version())
