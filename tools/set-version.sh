@@ -16,10 +16,12 @@ if [ -n "$4" ]; then
 fi
 target="../edbee-lib/edbee/edbeeversion.h"
 
+fullversion="$major.$minor.$patch$postfix_dash"
+
 cat <<C > $target
 #pragma once
 
-#define EDBEE_VERSION "$major.$minor.$patch$postfix_dash"
+#define EDBEE_VERSION "$fullversion"
 
 #define EDBEE_VERSION_MAJOR $major
 #define EDBEE_VERSION_MINOR $minor
@@ -27,4 +29,13 @@ cat <<C > $target
 #define EDBEE_VERSION_POSTFIX "$postfix"
 C
 
+echo $target
+echo "---------------"
 cat $target
+
+# Update the Doxyfile
+doxy_target="../edbee-lib/Doxyfile"
+sed -i '' "s/^PROJECT_NUMBER[[:space:]]*=.*/PROJECT_NUMBER = \"v$fullversion\"/" $doxy_target
+sed -i '' "s/^OUTPUT_DIRECTORY[[:space:]]*=.*/OUTPUT_DIRECTORY = \"..\/edbee-lib-doxydocs\/v$fullversion\"/" $doxy_target
+
+
