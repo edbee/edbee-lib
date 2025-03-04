@@ -7,7 +7,9 @@
 
 #include "edbee/exports.h"
 
-//#include <QAbstractScrollArea>
+// #include <QAbstractScrollArea>
+#include "models/texteditorconfig.h"
+
 #include <QStringList>
 #include <QWidget>
 
@@ -37,6 +39,9 @@ class EDBEE_EXPORT TextEditorWidget : public QWidget
     Q_OBJECT
 public:
 
+    explicit TextEditorWidget(TextEditorController *controller, QWidget *parent = 0);
+    explicit TextEditorWidget(TextDocument *document, QWidget *parent = 0);
+    explicit TextEditorWidget(TextEditorConfig *config, QWidget *parent = 0);
     explicit TextEditorWidget(QWidget *parent = 0);
     virtual ~TextEditorWidget();
 

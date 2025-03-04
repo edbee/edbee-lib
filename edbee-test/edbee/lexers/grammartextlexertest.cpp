@@ -87,7 +87,7 @@ void GrammarTextLexerTest::testHamlLexer()
 /// creates the main fixture document
 void GrammarTextLexerTest::createFixtureDocument( const QString& data )
 {
-    doc_ = new CharTextDocument(0);
+    doc_ = new CharTextDocument();
     doc_->setText( data );
 
 }

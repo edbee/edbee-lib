@@ -25,6 +25,7 @@
 #include "edbee/edbee.h"
 #include "edbee/texteditorcontroller.h"
 #include "edbee/models/change.h"
+#include "edbee/models/chardocument/chartextdocument.h"
 #include "edbee/models/textdocument.h"
 #include "edbee/models/texteditorconfig.h"
 #include "edbee/models/texteditorcommandmap.h"
@@ -41,15 +42,16 @@
 #include "edbee/debug.h"
 
 
+
 //#define DEBUG_DRAW_RENDER_CLIPPING_RECTANGLE 1
 
 namespace edbee {
 
 
 /// The default TextEditor widget constructor
-TextEditorWidget::TextEditorWidget(QWidget* parent)
+TextEditorWidget::TextEditorWidget(TextEditorController *controller, QWidget* parent)
     : QWidget(parent)
-    , controller_(nullptr)
+    , controller_(controller)
     , scrollAreaRef_(nullptr)
     , editCompRef_(nullptr)
     , autoCompleteCompRef_(nullptr)
@@ -58,9 +60,6 @@ TextEditorWidget::TextEditorWidget(QWidget* parent)
 {
     // auto initialize edbee if this hasn't been done already
     Edbee::instance()->autoInit();
-
-    // create the controller
-    controller_ = new TextEditorController(this);
 
     // setup the ui
     scrollAreaRef_ = new class TextEditorScrollArea(this);
@@ -101,6 +100,24 @@ TextEditorWidget::TextEditorWidget(QWidget* parent)
     setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Expanding );
 
     editCompRef_->installEventFilter(this);     // receive events for the ability to emit focus events
+
+}
+
+TextEditorWidget::TextEditorWidget(TextDocument *document, QWidget *parent)
+    : TextEditorWidget(new TextEditorController(document, this, nullptr), parent)
+{
+
+}
+
+TextEditorWidget::TextEditorWidget(TextEditorConfig *config, QWidget *parent)
+    : TextEditorWidget(new TextEditorController(new CharTextDocument(config), this, nullptr), parent)
+{
+
+}
+
+TextEditorWidget::TextEditorWidget(QWidget* parent)
+    : TextEditorWidget(new TextEditorController(this, nullptr), parent)
+{
 }
 
 

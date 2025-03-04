@@ -43,7 +43,12 @@ namespace edbee {
 /// The constructor
 /// @param widget the widget this controller is associated with
 /// @paarm parent the QObject parent of the controller
-TextEditorController::TextEditorController( TextEditorWidget* widget, QObject *parent)
+TextEditorController::TextEditorController(TextEditorWidget* widget, QObject *parent)
+    : TextEditorController( new CharTextDocument(), widget, parent )
+{
+}
+
+TextEditorController::TextEditorController(TextDocument *document, TextEditorWidget *widget, QObject *parent)
     : QObject(parent)
     , widgetRef_(widget)
     , textDocument_(nullptr)
@@ -59,7 +64,6 @@ TextEditorController::TextEditorController( TextEditorWidget* widget, QObject *p
     , autoScrollToCaret_(AutoScrollAlways)
     , borderedTextRanges_(nullptr)
 {
-
     // create the keymap
     keyMapRef_ = Edbee::instance()->defaultKeyMap();
     commandMapRef_ = Edbee::instance()->defaultCommandMap();
@@ -68,11 +72,12 @@ TextEditorController::TextEditorController( TextEditorWidget* widget, QObject *p
     textRenderer_ = new TextRenderer( this );
 
     // create a text document (this should happen AFTER the creation of the renderer)
-    giveTextDocument( new CharTextDocument() );
+    giveTextDocument( document );
 
     // Now all objects have been created we can init them
     textRenderer_->init();
     textRenderer_->setThemeByName( textDocument()->config()->themeName() );
+
 }
 
 

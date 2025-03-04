@@ -11,7 +11,7 @@
 #include <QHash>
 
 #include "edbee/models/textdocument.h"
-
+#include "edbee/models/texteditorconfig.h"
 
 namespace edbee {
 
@@ -28,7 +28,8 @@ class EDBEE_EXPORT CharTextDocument : public TextDocument
 Q_OBJECT
 
 public:
-    CharTextDocument( QObject* object=0 );
+    CharTextDocument( QObject* object );
+    CharTextDocument( TextEditorConfig *config = new TextEditorConfig(), QObject* object = nullptr );
     virtual ~CharTextDocument();
 
 

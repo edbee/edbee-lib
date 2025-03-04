@@ -11,6 +11,7 @@
 #include <QIcon>
 
 #include "edbee/models/textbuffer.h"
+#include "models/texteditorconfig.h"
 
 class QAction;
 
@@ -48,7 +49,8 @@ public:
     };
 
 
-    explicit TextEditorController( TextEditorWidget* widget=0, QObject *parent = 0);
+    explicit TextEditorController( TextEditorWidget* widget = nullptr, QObject *parent = nullptr );
+    explicit TextEditorController( TextDocument* document, TextEditorWidget* widget = nullptr, QObject *parent = nullptr );
     virtual ~TextEditorController();
 
 // public method
