@@ -1,5 +1,7 @@
 # Changelog
 
+- (2025-03-04) Update license headers
+- (2025-03-04) Update doxygen so it uses Doxygen Awesome
 - (2025-03-04) #156, Allow creation with predefined TextEditorConfig, TextEditorController or TextDocument
   Backwards incompatibility: ChartTextDocument can give a ambigious constructor when only nullptr is suppied
 

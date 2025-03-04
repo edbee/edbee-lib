@@ -1,7 +1,5 @@
-/**
- * Copyright 2011-2012 - Reliable Bits Software by Blommers IT. All Rights Reserved.
- * Author Rick Blommers
- */
+// edbee - Copyright (c) 2012-2025 by Rick Blommers and contributors
+// SPDX-License-Identifier: MIT
 
 #pragma once
 
@@ -133,7 +131,7 @@ private:
     bool renderBidiContolCharacters_;   ///< Renders dangers control characters as red marks
 
     bool autocompleteAutoShow_;         ///< Show autocomplete automatically, or only when manually triggered
-    int autocompleteMinimalCharacters_; ///< How manu characters need to be entered before autocomplete kicks in    
+    int autocompleteMinimalCharacters_; ///< How manu characters need to be entered before autocomplete kicks in
 };
 
 } // edbee

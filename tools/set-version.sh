@@ -19,6 +19,9 @@ target="../edbee-lib/edbee/edbeeversion.h"
 fullversion="$major.$minor.$patch$postfix_dash"
 
 cat <<C > $target
+// edbee - Copyright (c) 2012-2025 by Rick Blommers and contributors
+// SPDX-License-Identifier: MIT
+
 #pragma once
 
 #define EDBEE_VERSION "$fullversion"

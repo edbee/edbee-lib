@@ -1,7 +1,5 @@
-/**
- * Copyright 2011-2013 - Reliable Bits Software by Blommers IT. All Rights Reserved.
- * Author Rick Blommers
- */
+// edbee - Copyright (c) 2012-2025 by Rick Blommers and contributors
+// SPDX-License-Identifier: MIT
 
 #include "texttheme.h"
 
@@ -131,7 +129,7 @@ TextThemeStyler::TextThemeStyler( TextEditorController* controller )
 {
     connect( controller, SIGNAL(textDocumentChanged(edbee::TextDocument*,edbee::TextDocument*)), SLOT(textDocumentChanged(edbee::TextDocument*,edbee::TextDocument*)) );
     connect( Edbee::instance()->themeManager(), SIGNAL(themePointerChanged(QString,TextTheme*,TextTheme*)), SLOT(themePointerChanged(QString,TextTheme*,TextTheme*)) );
-    themeRef_ = Edbee::instance()->themeManager()->fallbackTheme();    
+    themeRef_ = Edbee::instance()->themeManager()->fallbackTheme();
 }
 
 

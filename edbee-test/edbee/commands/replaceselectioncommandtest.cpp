@@ -1,7 +1,5 @@
-/**
- * Copyright 2011-2012 - Reliable Bits Software by Blommers IT. All Rights Reserved.
- * Author Rick Blommers
- */
+// edbee - Copyright (c) 2012-2025 by Rick Blommers and contributors
+// SPDX-License-Identifier: MIT
 
 #include "replaceselectioncommandtest.h"
 
@@ -81,7 +79,7 @@ void ReplaceSelectionCommandTest::testUndo()
     TextDocument *doc = widget->textDocument();
     TextBuffer* buf = doc->buffer();
 
-    // check if we can set the txt  
+    // check if we can set the txt
     ctrl->replaceSelection("test");
     testEqual( buf->text(), "test" );
 

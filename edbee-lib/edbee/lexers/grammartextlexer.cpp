@@ -1,7 +1,5 @@
-/**
- * Copyright 2011-2013 - Reliable Bits Software by Blommers IT. All Rights Reserved.
- * Author Rick Blommers
- */
+// edbee - Copyright (c) 2012-2025 by Rick Blommers and contributors
+// SPDX-License-Identifier: MIT
 
 #include "grammartextlexer.h"
 
@@ -240,7 +238,7 @@ TextGrammarRule* GrammarTextLexer::findAndApplyNextGrammarRule( int currentDocOf
                 // add the found regexp
                 lineRangeList_->giveRange( new ScopedTextRange(startPos, endPos, scopeRef ));
                 //textScopes()->addScopedRange( startPos, endPos, foundRule->scopeName(), foundRule );
-            }           
+            }
 
             // next we need to add the 'captures'
             processCaptures( foundRegExp, &foundRule->matchCaptures() );

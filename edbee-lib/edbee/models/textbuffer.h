@@ -1,7 +1,5 @@
-/**
- * Copyright 2011-2012 - Reliable Bits Software by Blommers IT. All Rights Reserved.
- * Author Rick Blommers
- */
+// edbee - Copyright (c) 2012-2025 by Rick Blommers and contributors
+// SPDX-License-Identifier: MIT
 
 #pragma once
 
@@ -85,7 +83,7 @@ public:
     virtual QString textPart( int offset, int length ) const = 0;
 
     /// this method should replace the given text
-    /// And fire a 'text-replaced' signal    
+    /// And fire a 'text-replaced' signal
     virtual void replaceText( int offset, int length, const QChar* buffer, int bufferLength ) = 0;
 
     /// this method should return an array with all line offsets. A line offset pointsto the START of a line

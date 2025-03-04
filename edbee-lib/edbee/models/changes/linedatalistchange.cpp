@@ -1,7 +1,5 @@
-/**
- * Copyright 2011-2013 - Reliable Bits Software by Blommers IT. All Rights Reserved.
- * Author Rick Blommers
- */
+// edbee - Copyright (c) 2012-2025 by Rick Blommers and contributors
+// SPDX-License-Identifier: MIT
 
 #include "linedatalistchange.h"
 
@@ -96,7 +94,7 @@ void LineDataListChange::mergeStoredData(AbstractRangedChange* change)
     int newOldListSize = getMergedStoredLength( change);// qlog_info() << "CALCULATED: " << newOldListSize ;
 
     // no old data, we don't need to store anthing
-    if( this->oldListList_ == 0 && lineTextChange->oldListList_ == 0 ) {       
+    if( this->oldListList_ == 0 && lineTextChange->oldListList_ == 0 ) {
         contentLength_ = newOldListSize;    // also store the content list
         return;
     }

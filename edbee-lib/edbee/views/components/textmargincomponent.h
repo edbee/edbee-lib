@@ -1,7 +1,5 @@
-/**
- * Copyright 2011-2013 - Reliable Bits Software by Blommers IT. All Rights Reserved.
- * Author Rick Blommers
- */
+// edbee - Copyright (c) 2012-2025 by Rick Blommers and contributors
+// SPDX-License-Identifier: MIT
 
 #pragma once
 
@@ -25,7 +23,7 @@ class TextTheme;
 /// The textmargin component delegate
 /// You can override the methods in the class for adding functionality to the text-margin component
 class EDBEE_EXPORT TextMarginComponentDelegate {
-public:    
+public:
     TextMarginComponentDelegate();
     virtual ~TextMarginComponentDelegate() {}
 

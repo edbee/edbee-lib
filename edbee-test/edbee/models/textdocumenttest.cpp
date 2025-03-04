@@ -1,7 +1,5 @@
-/**
- * Copyright 2011-2013 - Reliable Bits Software by Blommers IT. All Rights Reserved.
- * Author Rick Blommers
- */
+// edbee - Copyright (c) 2012-2025 by Rick Blommers and contributors
+// SPDX-License-Identifier: MIT
 
 #include "textdocumenttest.h"
 
@@ -51,7 +49,7 @@ void TextDocumentTest::testLineData()
     buf->replaceText(1,0, "\n");
     testBuffer( buf, "a\naa\nbbb\nccc","0,2,5,9");
     testTrue( doc.getLineData( 0, 0 ) == 0 );
-    testTrue( doc.getLineData( 1, 0 ) == 0 );    
+    testTrue( doc.getLineData( 1, 0 ) == 0 );
     testTrue( doc.getLineData( 2, 0 ) != 0 );
 
     Q_ASSERT(doc.getLineData( 1, 0 )==0);

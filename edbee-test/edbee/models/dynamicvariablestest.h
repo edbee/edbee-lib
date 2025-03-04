@@ -1,7 +1,5 @@
-/**
- * Copyright 2011-2014 - Reliable Bits Software by Blommers IT. All Rights Reserved.
- * Author Rick Blommers
- */
+// edbee - Copyright (c) 2012-2025 by Rick Blommers and contributors
+// SPDX-License-Identifier: MIT
 
 #pragma once
 
@@ -17,7 +15,7 @@ class DynamicVariablesTest : public edbee::test::TestCase
 {
     Q_OBJECT
 
-private slots:    
+private slots:
     void clean();
 
     void testSize();

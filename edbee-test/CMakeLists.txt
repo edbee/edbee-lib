@@ -1,3 +1,6 @@
+# edbee - Copyright (c) 2012-2025 by Rick Blommers and contributors
+# SPDX-License-Identifier: MIT
+
 CMAKE_MINIMUM_REQUIRED(VERSION 3.1...3.20)
 
 IF(POLICY CMP0020)

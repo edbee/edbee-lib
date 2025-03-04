@@ -1,0 +1,10 @@
+html.dark-mode #top {
+  background: radial-gradient(#555, #1c1d1f);
+}
+
+html #top {
+}
+
+#main-nav {
+  padding-right: 40px; /* add some space for github */
+}

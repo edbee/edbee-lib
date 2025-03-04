@@ -1,7 +1,5 @@
-/**
- * Copyright 2011-2013 - Reliable Bits Software by Blommers IT. All Rights Reserved.
- * Author Rick Blommers
- */
+// edbee - Copyright (c) 2012-2025 by Rick Blommers and contributors
+// SPDX-License-Identifier: MIT
 
 #pragma once
 
@@ -24,7 +22,7 @@ class EDBEE_EXPORT TextEditorCommandMap : public QObject
 public:
     explicit TextEditorCommandMap(QObject *parent = 0);
     virtual ~TextEditorCommandMap();
-    
+
     void loadFactoryCommandMap();
 
     void give( const QString& key, TextEditorCommand* command );

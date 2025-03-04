@@ -1,7 +1,5 @@
-/**
- * Copyright 2011-2012 - Reliable Bits Software by Blommers IT. All Rights Reserved.
- * Author Rick Blommers
- */
+// edbee - Copyright (c) 2012-2025 by Rick Blommers and contributors
+// SPDX-License-Identifier: MIT
 
 #pragma once
 
@@ -291,7 +289,7 @@ public:
 //qlog_info() << "- move2: gapBegin_" << gapBegin_ << ", gapEnd_" << gapEnd_ << ", capacity_" << capacity_ << ", gapSize" << gapSize << "(charcount:"<<(offset - gapBegin_)<<")";
                 memmove( items_ + gapBegin_, items_ + gapEnd_, sizeof(T) * (offset - gapBegin_ ));  // memmove( target, source, size )
             }
-            gapBegin_ = offset;         
+            gapBegin_ = offset;
             gapEnd_   = gapBegin_ + gapSize; //qMin( gapBegin_ + gapSize, capacity_ );
 
         }
