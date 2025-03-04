@@ -27,9 +27,9 @@
 namespace edbee {
 
 /// The main contstructor of the chartext document
-CharTextDocument::CharTextDocument(QObject *object)
+CharTextDocument::CharTextDocument(QObject *object, TextEditorConfig *config)
     : TextDocument(object)
-    , config_(0)
+    , config_(config)
     , textBuffer_(0)
     , textScopes_(0)
     , textLexer_(0)

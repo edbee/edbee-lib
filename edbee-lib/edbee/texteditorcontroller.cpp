@@ -43,7 +43,7 @@ namespace edbee {
 /// The constructor
 /// @param widget the widget this controller is associated with
 /// @paarm parent the QObject parent of the controller
-TextEditorController::TextEditorController( TextEditorWidget* widget, QObject *parent)
+TextEditorController::TextEditorController( TextEditorWidget* widget, QObject *parent, TextEditorConfig* config)
     : QObject(parent)
     , widgetRef_(widget)
     , textDocument_(nullptr)
@@ -68,7 +68,7 @@ TextEditorController::TextEditorController( TextEditorWidget* widget, QObject *p
     textRenderer_ = new TextRenderer( this );
 
     // create a text document (this should happen AFTER the creation of the renderer)
-    giveTextDocument( new CharTextDocument() );
+    giveTextDocument( new CharTextDocument(nullptr, config) );
 
     // Now all objects have been created we can init them
     textRenderer_->init();

@@ -7,7 +7,9 @@
 
 #include "edbee/exports.h"
 
-//#include <QAbstractScrollArea>
+// #include <QAbstractScrollArea>
+#include "models/texteditorconfig.h"
+
 #include <QStringList>
 #include <QWidget>
 
@@ -38,6 +40,7 @@ class EDBEE_EXPORT TextEditorWidget : public QWidget
 public:
 
     explicit TextEditorWidget(QWidget *parent = 0);
+    explicit TextEditorWidget(QWidget *parent = 0, TextEditorConfig* config = new TextEditorConfig());
     virtual ~TextEditorWidget();
 
     void scrollPositionVisible( int xPosIn, int yPosIn );

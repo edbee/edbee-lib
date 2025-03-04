@@ -47,7 +47,7 @@ namespace edbee {
 
 
 /// The default TextEditor widget constructor
-TextEditorWidget::TextEditorWidget(QWidget* parent)
+TextEditorWidget::TextEditorWidget(QWidget* parent, TextEditorConfig* config)
     : QWidget(parent)
     , controller_(nullptr)
     , scrollAreaRef_(nullptr)
@@ -60,7 +60,7 @@ TextEditorWidget::TextEditorWidget(QWidget* parent)
     Edbee::instance()->autoInit();
 
     // create the controller
-    controller_ = new TextEditorController(this);
+    controller_ = new TextEditorController(this, nullptr, config);
 
     // setup the ui
     scrollAreaRef_ = new class TextEditorScrollArea(this);
