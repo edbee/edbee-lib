@@ -1,5 +1,8 @@
 # Changelog
 
+- (2025-03-04) #156, Allow creation with predefined TextEditorConfig, TextEditorController or TextDocument
+  Backwards incompatibility: ChartTextDocument can give a ambigious constructor when only nullptr is suppied
+
 - (2025-02-27) [v0.10.0] #151, Add line based QTextLayout format additions
   Via edbee::LineData (LineAppendTextLayoutFormatListField). see: `edbee-lib/doc/line_data.md` for sample
 

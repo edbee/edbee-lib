@@ -27,7 +27,12 @@
 namespace edbee {
 
 /// The main contstructor of the chartext document
-CharTextDocument::CharTextDocument(QObject *object, TextEditorConfig *config)
+CharTextDocument::CharTextDocument(QObject *object)
+    : edbee::CharTextDocument(new TextEditorConfig(), object)
+{
+}
+
+CharTextDocument::CharTextDocument(TextEditorConfig *config, QObject *object)
     : TextDocument(object)
     , config_(config)
     , textBuffer_(0)
@@ -41,7 +46,6 @@ CharTextDocument::CharTextDocument(QObject *object, TextEditorConfig *config)
     Q_ASSERT_GUI_THREAD;
 
     textBuffer_ = new CharTextBuffer();
-    config_ = new TextEditorConfig();
 
     textScopes_ = new TextDocumentScopes( this );
 

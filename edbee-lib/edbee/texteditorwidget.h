@@ -39,8 +39,10 @@ class EDBEE_EXPORT TextEditorWidget : public QWidget
     Q_OBJECT
 public:
 
+    explicit TextEditorWidget(TextEditorController *controller, QWidget *parent = 0);
+    explicit TextEditorWidget(TextDocument *document, QWidget *parent = 0);
+    explicit TextEditorWidget(TextEditorConfig *config, QWidget *parent = 0);
     explicit TextEditorWidget(QWidget *parent = 0);
-    explicit TextEditorWidget(QWidget *parent = 0, TextEditorConfig* config = new TextEditorConfig());
     virtual ~TextEditorWidget();
 
     void scrollPositionVisible( int xPosIn, int yPosIn );

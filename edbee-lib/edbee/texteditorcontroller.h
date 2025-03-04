@@ -49,7 +49,8 @@ public:
     };
 
 
-    explicit TextEditorController( TextEditorWidget* widget=0, QObject *parent = 0, TextEditorConfig* config = new TextEditorConfig());
+    explicit TextEditorController( TextEditorWidget* widget = nullptr, QObject *parent = nullptr );
+    explicit TextEditorController( TextDocument* document, TextEditorWidget* widget = nullptr, QObject *parent = nullptr );
     virtual ~TextEditorController();
 
 // public method
