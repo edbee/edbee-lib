@@ -1,5 +1,6 @@
 # Changelog
 
+- (2025-03-05) [v0.11.1] Regression, autoInit was invoked too late the new contructor setup of #156
 - (2025-03-04) Update license headers
 - (2025-03-04) Update doxygen so it uses Doxygen Awesome
 - (2025-03-04) #156, Allow creation with predefined TextEditorConfig, TextEditorController or TextDocument

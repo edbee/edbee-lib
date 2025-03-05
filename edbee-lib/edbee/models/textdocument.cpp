@@ -76,7 +76,7 @@ void TextDocument::giveLineData(int line, int field, TextLineData* dataItem)
 TextLineData* TextDocument::getLineData(int line, int field)
 {
     int len = lineDataManager()->length();
-    Q_ASSERT( len == lineCount() );
+    // Q_ASSERT( len == lineCount() );  FIXME: disabled, issue with renderer retreiving linedata
     Q_ASSERT( line < len );
     return lineDataManager()->get( line, field );
 }

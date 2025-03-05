@@ -43,6 +43,9 @@ CharTextDocument::CharTextDocument(TextEditorConfig *config, QObject *object)
 {
     Q_ASSERT_GUI_THREAD;
 
+    // auto initialize edbee if this hasn't been done already
+    Edbee::instance()->autoInit();
+
     textBuffer_ = new CharTextBuffer();
 
     textScopes_ = new TextDocumentScopes( this );

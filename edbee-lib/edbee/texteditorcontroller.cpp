@@ -62,6 +62,9 @@ TextEditorController::TextEditorController(TextDocument *document, TextEditorWid
     , autoScrollToCaret_(AutoScrollAlways)
     , borderedTextRanges_(nullptr)
 {
+    // auto initialize edbee if this hasn't been done already
+    Edbee::instance()->autoInit();
+
     // create the keymap
     keyMapRef_ = Edbee::instance()->defaultKeyMap();
     commandMapRef_ = Edbee::instance()->defaultCommandMap();

@@ -56,9 +56,6 @@ TextEditorWidget::TextEditorWidget(TextEditorController *controller, QWidget* pa
     , autoScrollMargin_(50)
     , readonly_(false)
 {
-    // auto initialize edbee if this hasn't been done already
-    Edbee::instance()->autoInit();
-
     // setup the ui
     scrollAreaRef_ = new class TextEditorScrollArea(this);
     scrollAreaRef_->setWidgetResizable(true);
