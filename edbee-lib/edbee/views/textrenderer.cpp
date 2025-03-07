@@ -299,7 +299,7 @@ TextLayout *TextRenderer::textLayoutForLineForPlaceholder(int line)
             option.setFlags( QTextOption::ShowTabsAndSpaces );        /// TODO: Make an option to show spaces and tabs
         }
 
-        textLayout->qTextLayout()->setFont( textWidget()->font() );
+        textLayout->qTextLayout()->setFont( textWidget()->config()->font() );
         textLayout->qTextLayout()->setTextOption( option );
 
         // add extra format (no format)
@@ -356,7 +356,7 @@ TextLayout *TextRenderer::textLayoutForLineNormal(int line)
             option.setFlags( QTextOption::ShowTabsAndSpaces );        /// TODO: Make an option to show spaces and tabs
         }
 
-        textLayout->qTextLayout()->setFont( textWidget()->font() );
+        textLayout->qTextLayout()->setFont( textWidget()->config()->font() );
         //qlog_info() << "font: " <<   textWidget()->font().pointSizeF();
         textLayout->qTextLayout()->setTextOption( option );
 

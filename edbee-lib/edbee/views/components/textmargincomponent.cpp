@@ -154,8 +154,8 @@ void TextMarginComponent::updateMarginFont()
 {
     delete marginFont_;
     if( renderer()->textWidget() ) {
-        const QFont& font = editorWidget()->font();
-        marginFont_ = new QFont( editorWidget()->font().family());
+        const QFont& font = editorWidget()->config()->font();
+        marginFont_ = new QFont( editorWidget()->config()->font().family());
         if( font.pointSizeF() > 0 ) marginFont_->setPointSizeF( font.pointSizeF() );
         if( font.pixelSize() > 0 ) marginFont_->setPixelSize( font.pixelSize() );
     } else {
