@@ -99,6 +99,12 @@ TextEditorController *TextEditorAutoCompleteComponent::controller() const
     return controllerRef_;
 }
 
+/// Returns the QListWidget used for the autocomplete
+QListWidget *TextEditorAutoCompleteComponent::listWidget() const
+{
+    return listWidgetRef_;
+}
+
 QSize TextEditorAutoCompleteComponent::sizeHint() const
 {
     if(!listWidgetRef_) return QSize();
@@ -520,6 +526,7 @@ FakeToolTip::FakeToolTip(TextEditorController *controller, QWidget *parent) :
     QWidget(parent, Qt::ToolTip | Qt::WindowStaysOnTopHint )
 {
     setFocusPolicy(Qt::NoFocus);
+    setAttribute(Qt::WA_ShowWithoutActivating);
     //setAttribute(Qt::WA_DeleteOnClose);
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 

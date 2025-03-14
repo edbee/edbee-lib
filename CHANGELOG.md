@@ -1,5 +1,9 @@
 # Changelog
 
+- (2025-03-14) Set attribute `Qt::WA_ShowWithoutActivating` to FakeToolTip
+- (2025-03-14) #152, Add methods to access the Autocomplete QListWidget:
+  - TextEditorWidget::autoCompleteComponent() for getting the autocomplete component
+  - TextEditorAutocompleteComponent::listWidget() for getting the listwidget
 - (2025-03-13) TextMarginComponent uses config font instead of the textWidget font
 - (2025-03-05) [v0.11.1] Regression, autoInit was invoked too late the new contructor setup of #156
 - (2025-03-04) Update license headers

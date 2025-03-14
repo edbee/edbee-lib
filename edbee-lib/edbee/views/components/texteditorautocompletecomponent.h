@@ -58,6 +58,7 @@ public:
     explicit TextEditorAutoCompleteComponent(TextEditorController* controller, TextEditorComponent *parent, TextMarginComponent *margin);
 
     TextEditorController* controller() const;
+    QListWidget* listWidget() const;
 
     QSize sizeHint() const;
 protected:

@@ -56,6 +56,7 @@ public:
     TextEditorComponent* textEditorComponent() const;
     TextMarginComponent* textMarginComponent() const;
     TextEditorScrollArea* textScrollArea() const;
+    TextEditorAutoCompleteComponent* autoCompleteComponent() const;
 
     void resetCaretTime();
     void fullUpdate();

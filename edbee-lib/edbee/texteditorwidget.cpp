@@ -216,6 +216,11 @@ TextEditorScrollArea* TextEditorWidget::textScrollArea() const
     return scrollAreaRef_;
 }
 
+/// Returns the autocomplete component
+TextEditorAutoCompleteComponent *TextEditorWidget::autoCompleteComponent() const
+{
+    return autoCompleteCompRef_;
+}
 
 /// This method resets the caret time
 void TextEditorWidget::resetCaretTime()
