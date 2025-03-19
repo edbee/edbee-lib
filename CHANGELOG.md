@@ -1,5 +1,6 @@
 # Changelog
 
+- (2025-03-19) #158, Cmake, Remove UiTools dependency
 - (2025-03-14) Set attribute `Qt::WA_ShowWithoutActivating` to FakeToolTip
 - (2025-03-14) #152, Add methods to access the Autocomplete QListWidget:
   - TextEditorWidget::autoCompleteComponent() for getting the autocomplete component
