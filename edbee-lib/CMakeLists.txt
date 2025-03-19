@@ -178,13 +178,13 @@ SET(HEADERS
 add_subdirectory(../vendor/oniguruma/ oniguruma)
 
 if(BUILD_WITH_QT5)
-  find_package(Qt5 REQUIRED COMPONENTS Core UiTools Widgets)
+  find_package(Qt5 REQUIRED COMPONENTS Core Widgets)
   message(STATUS "Building with Qt ${Qt5Core_VERSION}")
-  set(QT_LIBS Qt5::Core Qt5::UiTools Qt5::Widgets)
+  set(QT_LIBS Qt5::Core Qt5::Widgets)
 else()
-  find_package(Qt6 REQUIRED COMPONENTS Core UiTools Widgets Core5Compat)
+  find_package(Qt6 REQUIRED COMPONENTS Core Widgets Core5Compat)
   message(STATUS "Building with Qt ${Qt6Core_VERSION}")
-  set(QT_LIBS Qt6::Core Qt6::UiTools Qt6::Widgets Qt6::Core5Compat)
+  set(QT_LIBS Qt6::Core Qt6::Widgets Qt6::Core5Compat)
 endif()
 
 ADD_LIBRARY(edbee-lib STATIC
