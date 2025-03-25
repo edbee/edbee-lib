@@ -223,10 +223,12 @@ void TextEditorAutoCompleteComponent::showInfoTip()
     }
 
     if(!infoTip.isEmpty()) {
-      infoTipRef_->repaint();
-      infoTipRef_->move(newLoc);
-      infoTipRef_->show();
-      infoTipRef_->raise();
+        infoTipRef_->repaint();
+        infoTipRef_->move(newLoc);
+        infoTipRef_->show();
+        infoTipRef_->raise();
+    } else {
+        hideInfoTip();
     }
 }
 
