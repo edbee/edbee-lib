@@ -22,6 +22,7 @@
 #include "edbee/texteditorcommand.h"
 #include "edbee/texteditorcontroller.h"
 #include "edbee/texteditorwidget.h"
+#include "edbee/views/components/texteditorautocompletecomponent.h"
 #include "edbee/views/components/texteditorrenderer.h"
 #include "edbee/views/texteditorscrollarea.h"
 #include "edbee/views/textrenderer.h"
@@ -597,7 +598,7 @@ void TextEditorComponent::contextMenuEvent(QContextMenuEvent* event)
 void TextEditorComponent::repaintCarets()
 {
     bool visible = textRenderer()->isCaretVisible();
-    bool focus = hasFocus();
+    bool focus = hasFocus() || controller()->widget()->autoCompleteComponent()->isActive();
     if( focus != visible ) {
         textRenderer()->setCaretVisible(focus);
     } else {

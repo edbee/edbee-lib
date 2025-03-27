@@ -44,16 +44,16 @@ TextEditorAutoCompleteComponent::TextEditorAutoCompleteComponent(TextEditorContr
     layout->setSpacing(0);
     layout->setContentsMargins(0, 0, 0, 0);
 
-    this->setFocusPolicy(Qt::NoFocus);
-    this->setAttribute(Qt::WA_ShowWithoutActivating);
+    // this->setFocusPolicy(Qt::NoFocus);
+    // this->setAttribute(Qt::WA_ShowWithoutActivating);
 
     menuRef_ = new QMenu(this);
-    menuRef_->setFocusPolicy(Qt::NoFocus);
-    menuRef_->setAttribute(Qt::WA_ShowWithoutActivating);
+    // menuRef_->setFocusPolicy(Qt::NoFocus);
+    // menuRef_->setAttribute(Qt::WA_ShowWithoutActivating);
 
     listWidgetRef_ = new QListWidget(menuRef_);
-    listWidgetRef_->setFocusPolicy(Qt::NoFocus);
-    listWidgetRef_->setAttribute(Qt::WA_ShowWithoutActivating);
+    // listWidgetRef_->setFocusPolicy(Qt::NoFocus);
+    // listWidgetRef_->setAttribute(Qt::WA_ShowWithoutActivating);
 
     listWidgetRef_->installEventFilter(this);
 
@@ -90,6 +90,11 @@ TextEditorAutoCompleteComponent::TextEditorAutoCompleteComponent(TextEditorContr
     connect( listWidgetRef_, SIGNAL(itemClicked(QListWidgetItem*)), this, SLOT(listItemClicked(QListWidgetItem*)));
     connect( listWidgetRef_, SIGNAL(itemDoubleClicked(QListWidgetItem*)), this, SLOT(listItemDoubleClicked(QListWidgetItem*)));
     connect( listWidgetRef_, SIGNAL(currentItemChanged(QListWidgetItem*, QListWidgetItem*)), this, SLOT(showInfoTip()));
+}
+
+bool TextEditorAutoCompleteComponent::isActive()
+{
+    return menuRef_->isVisible();
 }
 
 
@@ -325,6 +330,13 @@ void TextEditorAutoCompleteComponent::hideEvent(QHideEvent *event)
 /// we need to intercept keypresses if the widget is visible
 bool TextEditorAutoCompleteComponent::eventFilter(QObject *obj, QEvent *event)
 {
+    if (event->type() == QEvent::FocusOut && obj == listWidgetRef_) {
+        menuRef_->close();
+        hide();
+        hideInfoTip();
+        return QObject::eventFilter(obj, event);
+    }
+
     if( event->type() == QEvent::Close && obj == menuRef_) {
         hide();
         hideInfoTip();
@@ -420,8 +432,7 @@ void TextEditorAutoCompleteComponent::updateList()
     // fills the autocomplete list with the curent word
     if( fillAutoCompleteList(doc, range, currentWord_)) {
         menuRef_->popup(menuRef_->pos());
-
-        editorComponentRef_->setFocus();
+        listWidgetRef_->setFocus();
 
         // position the widget
         showInfoTip();

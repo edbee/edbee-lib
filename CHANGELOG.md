@@ -1,5 +1,9 @@
 # Changelog
 
+- (2025-03-27) #152, Focus Changes Autocomplete
+  - removed force focus on editor to show blink caret (changed caret code to also show on autocomplete)
+  - hide autocomplete on focus lost autocomplete list
+  - removed setFocusPolicy/Qt::WA_ShowWithoutActivating hacks
 - (2025-03-25) #160, Hide Autocomplete Tooltip when empty
 - (2025-03-19) #158, Cmake, Remove UiTools dependency
 - (2025-03-14) Set attribute `Qt::WA_ShowWithoutActivating` to FakeToolTip

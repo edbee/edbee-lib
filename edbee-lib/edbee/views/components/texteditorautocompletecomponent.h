@@ -57,6 +57,8 @@ class EDBEE_EXPORT TextEditorAutoCompleteComponent : public QWidget
 public:
     explicit TextEditorAutoCompleteComponent(TextEditorController* controller, TextEditorComponent *parent, TextMarginComponent *margin);
 
+    bool isActive();
+
     TextEditorController* controller() const;
     QListWidget* listWidget() const;
 
@@ -97,6 +99,7 @@ private:
     bool canceled_;                             ///< Has the autocomplete been canceled
     QPointer<FakeToolTip> infoTipRef_;
 };
+
 
 class AutoCompleteDelegate : public QAbstractItemDelegate
 {
