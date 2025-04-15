@@ -135,7 +135,7 @@ TextAutoCompleteProviderList::~TextAutoCompleteProviderList()
 QList<TextAutoCompleteItem *> TextAutoCompleteProviderList::findAutoCompleteItemsForRange(TextDocument *document, const TextRange &range, const QString &word)
 {
     QList<TextAutoCompleteItem*> result;
-    foreach( TextAutoCompleteProvider* provider, providerList_) {
+    foreach( TextAutoCompleteProvider* provider, providerRefList_) {
         result.append(provider->findAutoCompleteItemsForRange(document,range,word));
     }
     if( parentProviderRef_ ) {
@@ -145,19 +145,57 @@ QList<TextAutoCompleteItem *> TextAutoCompleteProviderList::findAutoCompleteItem
 }
 
 
-/// adds a provider
-void TextAutoCompleteProviderList::giveProvider(TextAutoCompleteProvider *provider)
-{
-    providerList_.push_back(provider);
-}
-
-
 /// set the parent provider
 void TextAutoCompleteProviderList::setParentProvider(TextAutoCompleteProvider *provider)
 {
     parentProviderRef_ = provider;
 }
 
+
+/// adds a provider and give the ownership of the pointer to this providerlist
+void TextAutoCompleteProviderList::giveProvider(TextAutoCompleteProvider *provider)
+{
+    providerList_.push_back(provider);
+    providerRefList_.push_back(provider);
+}
+
+
+/// removes the give provider from the list, without deleting it.
+TextAutoCompleteProvider* TextAutoCompleteProviderList::takeProvider(TextAutoCompleteProvider* provider)
+{
+    Q_ASSERT_X(providerList_.contains(provider), "TextAutoCompleteProviderList::takeProvider", "You can only 'take' provider if they have been given. Please use removeProvider.");
+    providerList_.removeAll(provider);
+    providerRefList_.removeAll(provider);
+    return provider;
+}
+
+
+/// adds a provider as reference, while keeping the ownership
+void TextAutoCompleteProviderList::addProvider(TextAutoCompleteProvider *provider)
+{
+    providerRefList_.push_back(provider);
+}
+
+
+/// Removed the given provider from the list
+/// If the provider is owned it is deleted
+void TextAutoCompleteProviderList::removeProvider(TextAutoCompleteProvider* provider)
+{
+    providerRefList_.removeAll(provider);
+    if (providerList_.removeAll(provider) > 0) {
+        delete provider;
+    }
+}
+
+
+/// deletes all providers from the list
+/// Owend providers are deleted, others removed
+void TextAutoCompleteProviderList::removeAll()
+{
+    qDeleteAll(providerList_);
+    providerList_.clear();
+    providerRefList_.clear();
+}
 
 // -----------------------------
 /*

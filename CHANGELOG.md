@@ -1,5 +1,8 @@
 # Changelog
 
+- (2025-04-15) #161, AutocompleteProviderList, add support for removing provider and more control over ownership:
+  giveProvider, takeProvider, addProvider, removeProvider, removeAll
+
 - (2025-03-25) #160, Hide Autocomplete Tooltip when empty
 - (2025-03-19) #158, Cmake, Remove UiTools dependency
 - (2025-03-14) Set attribute `Qt::WA_ShowWithoutActivating` to FakeToolTip

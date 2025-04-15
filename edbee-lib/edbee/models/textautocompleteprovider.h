@@ -118,11 +118,20 @@ public:
     virtual ~TextAutoCompleteProviderList();
 
     virtual QList<TextAutoCompleteItem*> findAutoCompleteItemsForRange(TextDocument* document, const TextRange &range, const QString& word );
-    virtual void giveProvider(TextAutoCompleteProvider* provider);
     virtual void setParentProvider(TextAutoCompleteProvider* provider);
+
+    virtual void giveProvider(TextAutoCompleteProvider* provider);
+    virtual TextAutoCompleteProvider* takeProvider(TextAutoCompleteProvider* provider);
+
+    virtual void addProvider(TextAutoCompleteProvider* provider);
+
+    virtual void removeProvider(TextAutoCompleteProvider* provider);
+    virtual void removeAll();
+
 
 protected:
     QList<TextAutoCompleteProvider*> providerList_;         ///< The autocomplete provider list
+    QList<TextAutoCompleteProvider*> providerRefList_;		///< The autocomplete provider reference list (not owned)
     TextAutoCompleteProvider* parentProviderRef_;           ///< A reference to the global autocomplete provider
 };
 

@@ -54,7 +54,7 @@ CharTextDocument::CharTextDocument(TextEditorConfig *config, QObject *object)
     lineEndingRef_ = LineEnding::unixType();
 
     // create the text scopes and lexer
-    textLexer_ = new GrammarTextLexer( scopes() );
+    textLexer_ = new GrammarTextLexer( textScopes_ );
 
     // create the undo stack
     textUndoStack_ = new TextUndoStack(this);
