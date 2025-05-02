@@ -126,7 +126,7 @@ bool TextEditorAutoCompleteComponent::shouldDisplayAutoComplete(TextRange& range
 
     // expand the given range to word
     TextRange wordRange = range;
-    wordRange.expandToWord(doc, doc->config()->whitespaces(), doc->config()->charGroups() );
+    wordRange.expandToWord(doc, doc->config()->whitespaces(), QStringList() );
     wordRange.maxVar() = range.max(); // next go past the right caret!
     word = doc->textPart(wordRange.min(), wordRange.length()).trimmed();      // workaround for space select bug! #61
 
