@@ -17,27 +17,24 @@ class TextEditorController;
 /// Only commands with the same ID will be merged
 ///
 /// Every commands has got 16 bits to add subtype information (and generate another unique-number this way)
-enum CoalesceId {
-    CoalesceId_ForceMerge    = -1,           ///< FORCE coalescing
-    CoalesceId_None          = 0,            ///< NO coalescing
+constexpr int CoalesceId_ForceMerge    = -1;           ///< FORCE coalescing
+constexpr int CoalesceId_None          = 0;            ///< NO coalescing
 
-    CoalesceId_Selection     = 1 << 16,      ///< Selection coalescing  (we use 2 bytes for sub-types)
+constexpr int CoalesceId_Selection     = 1 << 16;      ///< Selection coalescing  (we use 2 bytes for sub-types)
 
-    CoalesceId_TextChanges   = 2 << 16,      ///< A textchange
-    CoalesceId_AppendChar    = 3 << 16,      ///< Appending of a character
+constexpr int CoalesceId_TextChanges   = 2 << 16;      ///< A textchange
+constexpr int CoalesceId_AppendChar    = 3 << 16;      ///< Appending of a character
 
-    CoalesceId_Remove        = 4 << 16,      ///< Removing of text
+constexpr int CoalesceId_Remove        = 4 << 16;      ///< Removing of text
 
-    CoalesceId_InsertNewLine = 6 << 16,
-    CoalesceId_Indent        = 7 << 16,
-    CoalesceId_CutLine       = 8 << 16,
-    CoalesceId_Paste         = 9 << 16,
-    CoalesceId_Duplicate     = 10 << 16,
-    CoalesceId_MoveLine      = 11 << 16,
+constexpr int CoalesceId_InsertNewLine = 6 << 16;
+constexpr int CoalesceId_Indent        = 7 << 16;
+constexpr int CoalesceId_CutLine       = 8 << 16;
+constexpr int CoalesceId_Paste         = 9 << 16;
+constexpr int CoalesceId_Duplicate     = 10 << 16;
+constexpr int CoalesceId_MoveLine      = 11 << 16;
 
-    CoalesceId_UserDefined   = 100 << 16
-};
-
+constexpr int CoalesceId_UserDefined   = 100 << 16;
 
 
 /// This is the abstract base class for a textcommand

@@ -1,5 +1,9 @@
 # Changelog
 
+- (2025-05-09) #163, Modern C++ improvements
+  - Fixed memcpy size type issue, which potentionally could be insecure
+  - Changed CoalesceId enum to regular integers to resolve type issues
+
 - (2025-04-15) #161, AutocompleteProviderList, add support for removing provider and more control over ownership:
   giveProvider, takeProvider, addProvider, removeProvider, removeAll
 

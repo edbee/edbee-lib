@@ -63,7 +63,7 @@ protected:
         if( offset < gapBegin() ) {
             int len = qMin( gapBegin_-offset, length ); // issue 141, added -offset
 //qlog_info() << "** A) len:"<<len;
-            memcpy( items_ + offset, data, sizeof(T)*len );
+            memcpy( items_ + offset, data, sizeof(T)*static_cast<size_t>(len) );
             data      += len;   // increase the pointer
             offset    += len;
             length    -= len;
@@ -71,7 +71,7 @@ protected:
 
         if( 0 < length ) {
 //qlog_info() << "** B) offset:"<<offset+",gapSize:"<<gapSize()<<",length:"<<length;
-            memcpy( items_ + offset + gapSize(), data, sizeof(T)*length );
+            memcpy( items_ + offset + gapSize(), data, sizeof(T)*static_cast<size_t>(length) );
         }
     }
 
@@ -127,13 +127,13 @@ public:
             int gapSizeRequired = newLength - length;
             ensureGapSize( gapSizeRequired );
             moveGapTo( offset + length );
-            memcpy( items_ + offset, data, sizeof(T) * newLength );
+            memcpy( items_ + offset, data, sizeof(T) * static_cast<size_t>(newLength) );
             gapBegin_ = offset + newLength;
 
         // delete operation
         } else {
             moveGapTo( offset );
-            memcpy( items_ + offset, data, sizeof(T) * newLength );
+            memcpy( items_ + offset, data, sizeof(T) * static_cast<size_t>(newLength) );
             gapBegin_ = offset + newLength;
             gapEnd_   = offset + gapSize + length;
         }
@@ -246,7 +246,7 @@ public:
         if( offset < gapBegin() ) {
             int len = qMin( gapBegin_-offset, length );
 //qlog_info() <<  " - 1: memcpy: offset=" << offset << ", len=" << len << items_[offset];
-            memcpy( data, items_ + offset, sizeof(T)*len );
+            memcpy( data, items_ + offset, sizeof(T)*static_cast<size_t>(len) );
             data      += len;   // increase the pointer
             offset    += len;
             length    -= len;
@@ -254,7 +254,7 @@ public:
 
         if( length > 0 ) {
 //qlog_info() <<  " - 2: memcpy:  offset="<<offset << "gapSize=" << gapSize()<< ", length=" << length << items_[offset + gapSize()];
-            memcpy( data, items_ + offset + gapSize(), sizeof(T)*length );
+            memcpy( data, items_ + offset + gapSize(), sizeof(T)*static_cast<size_t>(length) );
         }
     }
 
@@ -416,7 +416,7 @@ public:
     /// initializes the vector with a given string
     QCharGapVector( const QString& data, int gapSize ) : GapVector<QChar>( data.length() + gapSize )
     {
-        memcpy( items_, data.constData(), sizeof(QChar)*data.length() );
+        memcpy( items_, data.constData(), sizeof(QChar)*static_cast<size_t>(data.length()) );
         gapBegin_ = data.length();
         gapEnd_ = capacity_;
     }
@@ -428,7 +428,7 @@ public:
         delete items_;
         capacity_ = data.length() + gapSize;
         items_ = new QChar[capacity_];
-        memcpy( items_, data.constData(), sizeof(QChar)*data.length() );
+        memcpy( items_, data.constData(), sizeof(QChar)*static_cast<size_t>(data.length()) );
         gapBegin_ = data.length();
         gapEnd_ = capacity_;
         growSize_ = 16;
