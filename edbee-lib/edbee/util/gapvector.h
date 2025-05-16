@@ -58,11 +58,13 @@ protected:
     /// @param length the number of items to replace
     /// @param data the data pointer with the source data
     void replace( int offset, int length, const T* data ) {
-//qlog_info() << "** replace: " << offset << "," << length  << ": gapBegin:" << gapBegin();
+        Q_ASSERT( 0 <= offset && offset <= this->length() );
+        Q_ASSERT( length >= 0 );
+        Q_ASSERT( offset + length <= capacity_ );
+
         // copy the first part
         if( offset < gapBegin() ) {
             int len = qMin( gapBegin_-offset, length ); // issue 141, added -offset
-//qlog_info() << "** A) len:"<<len;
             memcpy( items_ + offset, data, sizeof(T)*static_cast<size_t>(len) );
             data      += len;   // increase the pointer
             offset    += len;
@@ -70,7 +72,6 @@ protected:
         }
 
         if( 0 < length ) {
-//qlog_info() << "** B) offset:"<<offset+",gapSize:"<<gapSize()<<",length:"<<length;
             memcpy( items_ + offset + gapSize(), data, sizeof(T)*static_cast<size_t>(length) );
         }
     }
@@ -82,6 +83,9 @@ protected:
     /// @param length the number of items to replace
     /// @param data the data pointer with the source data
     void fill( int offset, int length, const T& data ) {
+        Q_ASSERT( 0 <= offset && offset <= this->length() );
+        Q_ASSERT( length >= 0 );
+        Q_ASSERT( offset + length <= capacity_ );
 
         // copy the first part
         if( offset < gapBegin() ) {
@@ -102,18 +106,17 @@ public:
 
     /// this method replaces the given items
     /// @param offset the offset of the items to replace
-    /// @param lenth the number of items to replace
+    /// @param length the number of items to replace
     /// @param data an array with new items
     /// @param newLength the number of items in the new array
     void replace( int offset, int length, const T* data, int newLength ) {
         int currentLength=this->length();
+        Q_ASSERT( 0 <= length );
+        Q_ASSERT( 0 <= newLength );
         Q_ASSERT( 0 <= offset && ((offset+length) <= currentLength) );
-        Q_UNUSED(currentLength);
-//        Q_ASSERT(data && "You probably mean fill :)" );
+        Q_ASSERT( offset + length <= capacity_ );
+        Q_UNUSED( currentLength );
 
-//if( debug ) {
-//qlog_info() << "REPLACE: " << offset << length << newLength;
-//}
         int gapSize = this->gapSize();
 
         // Is it a 'delete' or 'insert' or 'replace' operation
@@ -141,7 +144,6 @@ public:
         Q_ASSERT( gapBegin_ <= gapEnd_ );
         Q_ASSERT( this->gapSize() <= capacity_ );
         Q_ASSERT( this->length() <= capacity_ );
-
     }
 
     /// this method replaces the given items with a single data item
@@ -150,7 +152,10 @@ public:
     /// @param newLength the number of times to repeat data
     void fill( int offset, int length, const T& data, int newLength ) {
         int currentLength=this->length();
+        Q_ASSERT( 0 <= length );
+        Q_ASSERT( 0 <= newLength );
         Q_ASSERT( 0 <= offset && ((offset+length) <= currentLength) );
+        Q_ASSERT( offset + length <= capacity_ );
         Q_UNUSED(currentLength);
 
         int gapSize = this->gapSize();
@@ -180,7 +185,6 @@ public:
         Q_ASSERT( gapBegin_ <= gapEnd_ );
         Q_ASSERT( this->gapSize() <= capacity_ );
         Q_ASSERT( this->length() <= capacity_ );
-
     }
 
     /// convenient append method
@@ -228,24 +232,20 @@ public:
     /// This method returns the 'raw' element at the given location
     /// This method does NOT take in account the gap
     T& rawAt( int index ) {
-        Q_ASSERT(index < capacity_);
+        Q_ASSERT(0 <= index && index < capacity_);
         return items_[index];
     }
 
 
     /// This method copies the given range to the data pointer
     void copyRange( QChar* data, int offset, int length ) const {
-
-//AB__CD"
-//qlog_info() << "copyRange" << offset << length;
-        if( !length ) { return; }
+        if( length <= 0 ) { return; }
         Q_ASSERT( 0 <= offset && offset < this->length() );
         Q_ASSERT( (offset+length) <= this->length() );
 
         // copy the first part
         if( offset < gapBegin() ) {
             int len = qMin( gapBegin_-offset, length );
-//qlog_info() <<  " - 1: memcpy: offset=" << offset << ", len=" << len << items_[offset];
             memcpy( data, items_ + offset, sizeof(T)*static_cast<size_t>(len) );
             data      += len;   // increase the pointer
             offset    += len;
@@ -253,7 +253,6 @@ public:
         }
 
         if( length > 0 ) {
-//qlog_info() <<  " - 2: memcpy:  offset="<<offset << "gapSize=" << gapSize()<< ", length=" << length << items_[offset + gapSize()];
             memcpy( data, items_ + offset + gapSize(), sizeof(T)*static_cast<size_t>(length) );
         }
     }
@@ -270,23 +269,19 @@ public:
     }
 
 
-
     //// moves the gap to the given position
     //// Warning when the gap is moved after the length the gap shrinks
     void moveGapTo( int offset ) {
-        Q_ASSERT( offset <= capacity_);
+        Q_ASSERT( 0 <= offset && offset <= capacity_);
         Q_ASSERT( offset <= length() );
         if( offset != gapBegin_ ) {
-//qlog_info() << "BEGIN moveGapTo: offset=" << offset << "/ gapBegin_"; // << gapBegin_ << getUnitTestString();
             int gapSize = this->gapSize();
 
             // move the the data right after the gap
             if (offset < gapBegin_ ) {
-//qlog_info() << "- move"  << offset << "," << gapBegin_ << "(charcount:" << (gapBegin_ - offset)<<")";
                 memmove( items_ + offset + gapSize, items_ + offset, sizeof(T) * (gapBegin_ - offset));   // memmove( target, source, size )
 
             } else {
-//qlog_info() << "- move2: gapBegin_" << gapBegin_ << ", gapEnd_" << gapEnd_ << ", capacity_" << capacity_ << ", gapSize" << gapSize << "(charcount:"<<(offset - gapBegin_)<<")";
                 memmove( items_ + gapBegin_, items_ + gapEnd_, sizeof(T) * (offset - gapBegin_ ));  // memmove( target, source, size )
             }
             gapBegin_ = offset;
@@ -300,9 +295,9 @@ public:
 #endif
     }
 
-
     /// this method makes sure there's enough room for the insertation
     void ensureGapSize( int requiredSize ) {
+        Q_ASSERT(0 <= requiredSize );
         if( gapSize() < requiredSize ) {
             while( growSize_ < capacity_ / 6) { growSize_ *= 2; }
             resize(capacity_ + requiredSize + growSize_ - gapSize() );
@@ -314,13 +309,14 @@ public:
     void resize(int newSize)
     {
         if( capacity_ >= newSize) return;
+        Q_ASSERT( 0 <= newSize );
+
         int lengte = length();
         Q_ASSERT( lengte <= capacity_);
 /// TODO: optimize, so data is moved only once
 /// in other words, gap movement is not required over here!!
 /// this can be done with 2 memcopies
 //qlog_info() << "BEGIN resize: capacity =" << capacity_<< " => " << newSize;
-
 
         moveGapTo( lengte );
         T *newChars = new T[ newSize ];
@@ -337,8 +333,6 @@ public:
 #ifdef GAP_VECTOR_CLEAR_GAP
         memset( items_+gapBegin_, 0, sizeof(T)*(gapEnd_-gapBegin_));
 #endif
-
-//qlog_info() << "END resize";
     }
 
 
@@ -392,6 +386,9 @@ public:
             s.append( QStringLiteral("%1").arg( "X" ));
             if( gapBegin==i ) s.append("[");
         }
+
+        s.append(" | ");
+        s.append( QStringLiteral("gapBegin: %1, gapEnd: %2, capacity: %3, length: %4").arg(gapBegin).arg(gapEnd).arg(capacity).arg(length()) );
         return s;
     }
 
@@ -460,9 +457,6 @@ public:
 //qlog_info() << "mid(" << offset << "," << length << ") => " << str.replace("\n","|")  << "  // " << getUnitTestString().replace("\n","|");
         return str;
     }
-
-
-
 };
 
 
@@ -550,147 +544,6 @@ public:
     T& operator[]( int offset ) {
         return items_[offset];
     }
-
-/*
-    /// This method copies the given range to the data pointer
-    void copyRange( QChar* data, int offset, int length ) const {
-
-//AB__CD"
-//qlog_info() << "copyRange" << offset << length;
-        if( !length ) { return; }
-        Q_ASSERT( 0 <= offset && offset < this->length() );
-        Q_ASSERT( (offset+length) <= this->length() );
-
-        // copy the first part
-        if( offset < gapBegin() ) {
-            int len = qMin( gapBegin_-offset, length );
-//qlog_info() <<  " - 1: memcpy: offset=" << offset << ", len=" << len << items_[offset];
-            memcpy( data, items_ + offset, sizeof(T)*len );
-            data      += len;   // increase the pointer
-            offset    += len;
-            length    -= len;
-        }
-
-        if( length > 0 ) {
-//qlog_info() <<  " - 2: memcpy:  offset="<<offset << "gapSize=" << gapSize()<< ", length=" << length << items_[offset + gapSize()];
-            memcpy( data, items_ + offset + gapSize(), sizeof(T)*length );
-        }
-    }
-*/
-
-    /// This method returns a direct pointer to the 0-terminated buffer
-    /// This pointer is only valid as long as the buffer doesn't change
-    /// WARNING, this method MOVES the gap! Which means this method should NOT be used for a lot of operations
-/*
-    T* data() {
-        ensureGapSize(1);
-        moveGapTo( length() );
-        items_[length()] = QChar(); // a \0 character
-        return items_;
-    }
-*/
-
-
-    //// moves the gap to the given position
-    //// Warning when the gap is moved after the length the gap shrinks
-/*
-    void moveGapTo( int offset ) {
-        Q_ASSERT( offset <= capacity_);
-        Q_ASSERT( offset <= length() );
-        if( offset != gapBegin_ ) {
-//qlog_info() << "BEGIN moveGapTo: offset=" << offset << "/ gapBegin_"; // << gapBegin_ << getUnitTestString();
-            int gapSize = this->gapSize();
-
-            // move the the data right after the gap
-            if (offset < gapBegin_ ) {
-//qlog_info() << "- move"  << offset << "," << gapBegin_ << "(charcount:" << (gapBegin_ - offset)<<")";
-                memmove( items_ + offset + gapSize, items_ + offset, sizeof(T) * (gapBegin_ - offset));   // memmove( target, source, size )
-
-            } else {
-//qlog_info() << "- move2: gapBegin_" << gapBegin_ << ", gapEnd_" << gapEnd_ << ", capacity_" << capacity_ << ", gapSize" << gapSize << "(charcount:"<<(offset - gapBegin_)<<")";
-                memmove( items_ + gapBegin_, items_ + gapEnd_, sizeof(T) * (offset - gapBegin_ ));  // memmove( target, source, size )
-            }
-            gapBegin_ = offset;
-            gapEnd_   = gapBegin_ + gapSize; //qMin( gapBegin_ + gapSize, capacity_ );
-        }
-        Q_ASSERT( gapBegin_ <= gapEnd_ );
-
-    }
-
-
-    /// this method makes sure there's enough room for the insertation
-    void ensureGapSize( int requiredSize ) {
-        if( gapSize() < requiredSize ) {
-            while( growSize_ < capacity_ / 6) { growSize_ *= 2; }
-            resize(capacity_ + requiredSize + growSize_ - gapSize() );
-        }
-    }
-
-
-    /// resizes the array of data
-    void resize(int newSize)
-    {
-        if( capacity_ >= newSize) return;
-        int lengte = length();
-        Q_ASSERT( lengte <= capacity_);
-/// TODO: optimize, so data is moved only once
-/// in other words, gap movement is not required over here!!
-/// this can be done with 2 memcopies
-//qlog_info() << "BEGIN resize: capacity =" << capacity_<< " => " << newSize;
-
-
-        moveGapTo( lengte );
-        T *newChars = new T[ newSize ];
-
-        if( capacity_ > 0 ) {
-            memmove( newChars, items_, sizeof(T)*lengte );
-            delete[] items_;
-        }
-        items_ = newChars;
-        capacity_ = newSize;
-        gapEnd_   = newSize;
-//qlog_info() << "END resize";
-    }
-
-
-    /// sets the growsize. The growsize if the amount to reserve extra
-    void setGrowSize( int size ) { growSize_=size; }
-
-    /// returns the growsize
-    int growSize() { return growSize_; }
-
-
-    /// Converts the 'gap-buffer' to a unit-test debugging string
-    QString getUnitTestString( QChar gapChar = '_' ) const {
-        QString s;
-        int gapBegin = this->gapBegin();
-        int gapEnd   = this->gapEnd();
-        int capacity = this->capacity();
-
-        for( int i=0; i<gapBegin; ++i ) {
-            if( items_[i].isNull() ) {
-                s.append("@");
-            } else {
-                s.append( items_[i] );
-            }
-        }
-        s.append( "[" );
-        for( int i=gapBegin; i<gapEnd; ++i ) {
-            s.append( gapChar );
-        }
-        s.append( ">" );
-        for( int i=gapEnd; i<capacity; ++i ) {
-            if( items_[i].isNull() ) {
-                s.append("@");
-            } else {
-                s.append( items_[i] );
-            }
-        }
-
-        return s;
-    }
-*/
-
 
 protected:
 

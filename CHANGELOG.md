@@ -1,5 +1,6 @@
 # Changelog
 
+- (2025-05-16) #163, Add extra assertations to gapvector
 - (2025-05-09) #162, Autocomplete word end detection now only ends on whitespace (improves '.' usage)
 - (2025-05-09) #163, Modern C++ improvements
   - Fixed memcpy size type issue, which potentionally could be insecure

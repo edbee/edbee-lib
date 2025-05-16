@@ -50,7 +50,7 @@ public:
     void appendOffset( int offset );
 
     /// TODO: temporary method (remove)
-    GapVector<int> offsetList() { return offsetList_; }
+    GapVector<int> & offsetList() { return offsetList_; }
 
 protected:
     int searchOffsetIgnoringOffsetDelta(int offset, int org_start, int org_end );
@@ -61,7 +61,6 @@ protected:
 public:
     QString toUnitTestString();
     void initForUnitTesting( int offsetDelta, int offsetDeltaIndex, ... );
-
 
 private:
 

@@ -63,7 +63,6 @@ QString CharTextBuffer::textPart(int pos, int length) const
 /// @param bufferLenth the length of the buffer
 void CharTextBuffer::replaceText(int offset, int length, const QChar* buffer, int bufferLength )
 {
-
     // make sure the length matches
     length = qMin( this->length()-offset, length );
 
@@ -75,9 +74,6 @@ void CharTextBuffer::replaceText(int offset, int length, const QChar* buffer, in
 
     TextBufferChange change( this, offset, length, buffer, bufferLength );
 
-//    emit textAboutToBeReplaced( offset, length, buffer, bufferLength );
-//    emit linesAboutToBeReplaced( change.line, change.lineCount, change.newLineCount );
-
     emit textAboutToBeChanged( change );
 
     // replace the text
@@ -88,10 +84,7 @@ void CharTextBuffer::replaceText(int offset, int length, const QChar* buffer, in
     // replace the line data and offsets
     lineOffsetList_.applyChange( change );
 
-//    emit linesReplaced( change.line, change.lineCount, change.newLineCount );
-//    emit textReplaced( offset, length, buffer, bufferLength );
     emit textChanged( change, oldText );
-
 }
 
 
@@ -111,13 +104,13 @@ int CharTextBuffer::lineFromOffset(int offset )
 /// @return the offset of the given line
 int CharTextBuffer::offsetFromLine(int line)
 {
-//    const QList<int>& lofs = lineOffsets_;
     if( line < 0 ) return 0;    // at the start
-//    if( line >= lofs.length() ) return length();    // at the end
-//    return lofs.at(line);
-    if( line >= lineOffsetList_.length()) { return length(); }
-    return lineOffsetList_.at(line);
 
+    if( line >= lineOffsetList_.length()) {
+        return length();
+    }
+
+    return lineOffsetList_.at(line);
 }
 
 

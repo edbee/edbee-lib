@@ -15,8 +15,9 @@ LineOffsetVector::LineOffsetVector()
     , offsetDelta_(0)
     , offsetDeltaIndex_(0)
 {
+    // make sure there's always line 0 in the buffer
     int v=0;
-    offsetList_.replace(0,0,&v,1);
+    offsetList_.replace( 0, 0, &v, 1);
 }
 
 
