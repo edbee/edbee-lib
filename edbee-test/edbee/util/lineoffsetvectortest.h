@@ -19,7 +19,6 @@ private slots:
     void testChangeOffsetDelta();
     void testTextReplaced();
     void testFindLineFromOffset();
-
 };
 
 

@@ -17,7 +17,7 @@ namespace edbee {
 void LineOffsetVectorTest::testMoveDeltaToIndex()
 {
     LineOffsetVector v;
-    v.initForUnitTesting( 3, 2, 2,4,6,8,-1);
+    v.initForUnitTesting(3, 2, 2, 4, 6, 8, std::string::npos);
     testLov(v,"2,4[3>6,8");
 
     // move to the left
@@ -41,7 +41,7 @@ void LineOffsetVectorTest::testMoveDeltaToIndex()
 void LineOffsetVectorTest::testChangeOffsetDelta()
 {
     LineOffsetVector v;
-    v.initForUnitTesting( 3, 2, 2,4,6,8,-1);
+    v.initForUnitTesting( 3, 2, 2, 4, 6, 8, std::string::npos);
     testLov(v,"2,4[3>6,8");
 
     // test the same location
@@ -49,12 +49,15 @@ void LineOffsetVectorTest::testChangeOffsetDelta()
     testLov(v,"2,4[7>6,8");
 
     // test an offset before the current location
-    v.changeOffsetDelta(1,-1);
-    testLov(v,"2[6>-2,6,8");
+    // v.changeOffsetDelta(1, -1); => Negative is invalid and results in assertation!!
+    // testLov(v,"2[6>-2,6,8");
+
+     v.changeOffsetDelta(1, -4);
+     testLov(v,"2[3>1,6,8");
 
     // test an offset after the current location
-    v.changeOffsetDelta(3,-2);
-    testLov(v,"2,4,12[4>8");
+    v.changeOffsetDelta(3, -2);
+    testLov(v,"2,4,9[1>8");
 
 }
 

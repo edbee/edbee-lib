@@ -13,8 +13,8 @@ namespace edbee {
 
 /// Initializes the textbuffer change
 /// @param buffer when buffer is 0 NO line calculation is done
-TextBufferChangeData::TextBufferChangeData(TextBuffer* buffer, int off, int len, const QChar *text, int textlen)
-    : offset_( off )
+TextBufferChangeData::TextBufferChangeData(TextBuffer* buffer, size_t off, size_t len, const QChar *text, size_t textlen)
+    : offset_(off)
     , length_(len)
     , newText_(text)
     , newTextLength_(textlen)
@@ -38,25 +38,26 @@ TextBufferChangeData::TextBufferChangeData(TextBuffer* buffer, int off, int len,
 
 /// Initializes the textbuffer change
 /// @param buffer when buffer is 0 NO line calculation is done
-TextBufferChangeData::TextBufferChangeData(LineOffsetVector* lineOffsets, int off, int len, const QChar *text, int textlen)
-    : offset_( off )
+TextBufferChangeData::TextBufferChangeData(LineOffsetVector* lineOffsets, size_t off, size_t len, const QChar *text, size_t textlen)
+    : offset_(off)
     , length_(len)
     , newText_(text)
     , newTextLength_(textlen)
     , newLineOffsets_()
 {
-    Q_ASSERT(lineOffsets );
+    Q_ASSERT(lineOffsets);
 
     // decide which lines
-    line_         = lineOffsets->findLineFromOffset( offset_ );
-    int endLine   = lineOffsets->findLineFromOffset( offset_ + length_ );
-    lineCount_    = endLine - line_;
-    Q_ASSERT(lineCount_>=0);
+    line_          = lineOffsets->findLineFromOffset(offset_);
+    size_t endLine = lineOffsets->findLineFromOffset(offset_ + length_);
+    Q_ASSERT(endLine >= line_);
+
+    lineCount_     = endLine - line_;
 
     // find the newlines in the text
-    for( int i=0; i< newTextLength_; ++i ) {
+    for (size_t i = 0; i < newTextLength_; ++i) {
         if( newText_[i] == '\n' ) {
-            newLineOffsets_.append( offset_ + i + 1 );    // +1 because it points to the start of the next line
+            newLineOffsets_.append(offset_ + i + 1);    // +1 because it points to the start of the next line
         }
     }
 }
@@ -64,17 +65,17 @@ TextBufferChangeData::TextBufferChangeData(LineOffsetVector* lineOffsets, int of
 
 TextBufferChange::TextBufferChange()
 {
-    d_ = new TextBufferChangeData( (TextBuffer*)0, 0, 0, 0, 0 );
+    d_ = new TextBufferChangeData((TextBuffer*)nullptr, 0, 0, 0, 0 );
 }
 
-TextBufferChange::TextBufferChange(TextBuffer* buffer, int off, int len, const QChar* text, int textlen)
+TextBufferChange::TextBufferChange(TextBuffer* buffer, size_t off, size_t len, const QChar* text, size_t textlen)
 {
-    d_ = new TextBufferChangeData( buffer, off, len, text, textlen );
+    d_ = new TextBufferChangeData(buffer, off, len, text, textlen);
 }
 
-TextBufferChange::TextBufferChange(LineOffsetVector* lineOffsets, int off, int len, const QChar *text, int textlen)
+TextBufferChange::TextBufferChange(LineOffsetVector* lineOffsets, size_t off, size_t len, const QChar *text, size_t textlen)
 {
-    d_ = new TextBufferChangeData( lineOffsets, off, len, text, textlen );
+    d_ = new TextBufferChangeData(lineOffsets, off, len, text, textlen);
 }
 
 TextBufferChange::TextBufferChange(const TextBufferChange& other) : d_(other.d_)
@@ -97,9 +98,9 @@ TextBuffer::TextBuffer(QObject *parent)
 /// @param offset the offset to replace
 /// @param length the of the text to replace
 /// @param text the new text to insert
-void TextBuffer::replaceText(int offset, int length, const QString& text)
+void TextBuffer::replaceText(size_t offset, size_t length, const QString& text)
 {
-    replaceText( offset, length, text.data(), text.length() );
+    replaceText( offset, length, text.data(), text.length());
 }
 
 
@@ -117,15 +118,17 @@ void TextBuffer::setText(const QString& text)
 }
 
 
-/// this method translates the given position to a column number.
+/// translates the given position to a column number.
 /// @param offset the character offset
 /// @param line the line index this position is on. (Use this argument for optimization if you already know this)
-int TextBuffer::columnFromOffsetAndLine( int offset, int line  )
+/// 			(default std::string::npos, use the current line index)
+int TextBuffer::columnFromOffsetAndLine(size_t offset, size_t line)
 {
-    if( line < 0 ) line = lineFromOffset( offset );
+    if( line == std::string::npos ) line = lineFromOffset(offset);
+
     // const QList<int>& lofs = lineOffsets();
     if( line < lineCount() ) {
-        int col = offset - offsetFromLine(line);
+        std::ptrdiff_t col = offset - offsetFromLine(line);
         if( col < 0 ) return 0;
         return qMin( lineLength(line), col );
     } else {
