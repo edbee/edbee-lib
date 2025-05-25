@@ -135,8 +135,8 @@ void TextEditorController::setTextDocument(TextDocument* doc)
         TextDocument* oldDocumentRef = textDocument();
         if( oldDocumentRef ) {
             oldDocumentRef->textUndoStack()->unregisterController(this);
-            disconnect( oldDocumentRef, SIGNAL(textChanged(edbee::TextBufferChange, QString)), this, SLOT(onTextChanged(edbee::TextBufferChange, QString)) );
-            disconnect( textDocumentRef_->lineDataManager(), SIGNAL(lineDataChanged(int,int,int)), this, SLOT(onLineDataChanged(int,int,int)));
+            disconnect(oldDocumentRef, SIGNAL(textChanged(edbee::TextBufferChange, QString)), this, SLOT(onTextChanged(edbee::TextBufferChange, QString)) );
+            disconnect(textDocumentRef_->lineDataManager(), SIGNAL(lineDataChanged(size_t,size_t,size_t)), this, SLOT(onLineDataChanged(size_t,size_t,size_t)));
         }
 
         // delete some old and dependent objects
@@ -155,8 +155,8 @@ void TextEditorController::setTextDocument(TextDocument* doc)
 
         textDocumentRef_->textUndoStack()->registerContoller(this);
 
-        connect( textDocumentRef_, SIGNAL(textChanged(edbee::TextBufferChange, QString)), this, SLOT(onTextChanged(edbee::TextBufferChange, QString)));
-        connect( textDocumentRef_->lineDataManager(), SIGNAL(lineDataChanged(int,int,int)), this, SLOT(onLineDataChanged(int,int,int)) );
+        connect(textDocumentRef_, SIGNAL(textChanged(edbee::TextBufferChange,QString)), this, SLOT(onTextChanged(edbee::TextBufferChange, QString)));
+        connect(textDocumentRef_->lineDataManager(), SIGNAL(lineDataChanged(size_t,size_t,size_t)), this, SLOT(onLineDataChanged(size_t,size_t,size_t)));
 
         // force an repaint when the grammar is changed
         connect( textDocumentRef_, &TextDocument::languageGrammarChanged, this, &TextEditorController::update );
@@ -402,10 +402,10 @@ void TextEditorController::onSelectionChanged(TextRangeSet* oldRangeSet)
 /// @param line the line number that had a data change
 /// @param length the number of lines changed
 /// @param newLength the new number of lines
-void TextEditorController::onLineDataChanged(int line, int length, int newLength)
+void TextEditorController::onLineDataChanged(size_t line, size_t length, size_t newLength)
 {
-    if( this->widgetRef_ ) {
-        widgetRef_->updateLine( line, qMax(length,newLength));
+    if (this->widgetRef_) {
+        widgetRef_->updateLine(line, qMax(length,newLength));
     }
 }
 

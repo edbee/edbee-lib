@@ -16,7 +16,7 @@ namespace edbee {
 /// @param length, the length of the change
 /// @param text , the new text
 /// @param executed, a boolean (mainly used for testing) to mark this change as exected
-TextChange::TextChange(int offset, int length, const QString& text)
+TextChange::TextChange(size_t offset, size_t length, const QString& text)
     : offset_(offset)
     , length_(length)
     , text_(text)
@@ -46,35 +46,15 @@ void TextChange::revert(TextDocument* document)
 }
 
 
-/// This method merges the old data with the new data
+/// Merges the old data with the new data
 /// @apram change the data to merge with
 void TextChange::mergeStoredData(AbstractRangedChange* change)
 {
     TextChange* singleTextChange = dynamic_cast<TextChange*>(change);
 
     QString newText;
-    newText.resize( getMergedStoredLength( change) );
-    mergeStoredDataViaMemcopy( newText.data(), text_.data(), singleTextChange->text_.data(), change, sizeof(QChar) );
-    /*
-      QString newText;
-      // we first need to 'take' the leading part of the new change
-      if( change->offset() < offset() ) {
-          newText.append( change->oldText(document).mid(0, offset() - change->offset() ) );
-      }
-
-      newText.append(oldText(document));
-
-      // then we need to append the remainer
-      int delta = offset()-change->offset();
-      int remainerOffset = newLength() + delta;
-      if( remainerOffset >= 0 ) {
-          if( remainerOffset < change->oldLength() ) {
-              //Q_ASSERT(false);    // need to figure out if this works
-              newText.append( change->oldText( document  ).mid(remainerOffset ) );
-          }
-      }
-
-    */
+    newText.resize( getMergedStoredLength(change));
+    mergeStoredDataViaMemcopy(newText.data(), text_.data(), singleTextChange->text_.data(), change, sizeof(QChar));
     text_ = newText;
 }
 
@@ -87,10 +67,10 @@ void TextChange::mergeStoredData(AbstractRangedChange* change)
 /// @return true on success else false
 bool TextChange::giveAndMerge( TextDocument* document, Change* textChange)
 {
-    Q_UNUSED( document );
-    TextChange* change = dynamic_cast<TextChange*>( textChange );
-    if( change ) {
-        return merge( change );
+    Q_UNUSED(document);
+    TextChange* change = dynamic_cast<TextChange*>(textChange);
+    if (change) {
+        return merge(change);
     }
     return false;
 }
@@ -106,7 +86,7 @@ QString TextChange::toString()
 
 /// Return the offset
 /// @return the offset of the change
-int TextChange::offset() const
+size_t TextChange::offset() const
 {
     return offset_;
 }
@@ -114,29 +94,29 @@ int TextChange::offset() const
 
 /// set the new offset
 /// @param offset the new offset
-void TextChange::setOffset(int offset)
+void TextChange::setOffset(size_t offset)
 {
     offset_ = offset;
 }
 
 
 /// This is the length in the document
-int TextChange::docLength() const
+size_t TextChange::docLength() const
 {
     return length_;
 }
 
 
 /// The content length is the length that's currently stored in memory.
-int TextChange::storedLength() const
+size_t TextChange::storedLength() const
 {
-    return text_.size();
+    return static_cast<size_t>(text_.size());
 }
 
 
 /// Set the length of the change
 /// @param len sets the length of the change
-void TextChange::setDocLength(int len)
+void TextChange::setDocLength(size_t len)
 {
     length_ = len;
 }
@@ -182,14 +162,12 @@ QString TextChange::testString()
 void TextChange::replaceText(TextDocument* document)
 {
     TextBuffer* buffer = document->buffer();
-    QString old = buffer->textPart( offset_, length_ );
+    QString old = buffer->textPart(offset_, length_);
 
-    buffer->replaceText( offset_, length_, text_ );
+    buffer->replaceText(offset_, length_, text_);
     length_ = text_.length();
     text_ = old;
 }
-
-
 
 
 } // edbee

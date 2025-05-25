@@ -18,31 +18,31 @@ namespace edbee {
 class EDBEE_EXPORT TextChange : public AbstractRangedChange
 {
 public:
-    TextChange(int offset, int length, const QString& text );
+    TextChange(size_t offset, size_t length, const QString& text );
     virtual ~TextChange();
 
     virtual void execute(TextDocument* document);
     virtual void revert(TextDocument* document);
 
 protected:
-    virtual void mergeStoredData( AbstractRangedChange* change );
+    virtual void mergeStoredData(AbstractRangedChange* change);
 
 public:
-    virtual bool giveAndMerge(TextDocument *document, Change* textChange );
+    virtual bool giveAndMerge(TextDocument *document, Change* textChange);
 
     virtual QString toString();
 
-    int offset() const;
-    void setOffset( int offset );
-    virtual int docLength() const;
-    virtual int storedLength() const;
+    size_t offset() const;
+    void setOffset(size_t offset);
+    virtual size_t docLength() const;
+    virtual size_t storedLength() const;
 
-    void setDocLength( int len );
+    void setDocLength(size_t len);
 
     QString storedText() const;
-    void setStoredText( const QString& text );
-    void appendStoredText( const QString& text );
-    const QString docText( TextDocument* doc ) const;
+    void setStoredText(const QString& text);
+    void appendStoredText(const QString& text);
+    const QString docText(TextDocument* doc) const;
 
     QString testString();
 
@@ -50,8 +50,8 @@ protected:
     void replaceText( TextDocument* document );
 
 private:
-    int offset_;            ///< The offset of the text
-    int length_;            ///< the length of the change in the document
+    size_t offset_;         ///< The offset of the text
+    size_t length_;         ///< the length of the change in the document
     QString text_;          ///< The text data
 };
 

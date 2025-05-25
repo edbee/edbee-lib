@@ -98,30 +98,20 @@ void TextLineDataTest::testSetTextLineDataIssue66()
     TextEditorController* controller = widget.controller();
     TextLineDataManager* tdm = doc->lineDataManager();
 
-
-qDebug()<<"\n ========================================";
-qDebug()<< "setText(a\\nb\\nc)" ;
     doc->setText("a\nb\nc");
     testEqual(filledTestString(*tdm), "---");
     qDebug() << "- a:" <<  filledTestString(*tdm);
 
-qDebug()<<"\n ========================================";
-qDebug()<< "setText(a\\nb)" ;
     doc->setText("a\nb");
     testEqual(filledTestString(*tdm), "--");
     qDebug() << "- b:" <<  filledTestString(*tdm);
     qDebug() << "G";
 
-qDebug()<<"\n ========================================";
-qDebug()<< "undo()";
     controller->undo();
     testEqual( filledTestString(*tdm), "---");
     qDebug() << "- c:" <<  filledTestString(*tdm);
     qDebug() << "H";
 
-//    exit(1);
-qDebug()<<"\n ========================================";
-qDebug()<< "setText(a)";
     doc->setText("a");
     qDebug() << "I";
 }

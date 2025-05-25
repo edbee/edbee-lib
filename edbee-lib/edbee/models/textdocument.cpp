@@ -45,10 +45,10 @@ TextDocument::~TextDocument()
 /// Decreasting the fieldcount  reults in the lost of the 'old' fields
 /// At least the 'PredefinedFieldCount' amont of fields are required
 /// This method EMPTIES the undo-stack. So after this call all undo history is gone!
-void TextDocument::setLineDataFieldsPerLine(int count)
+void TextDocument::setLineDataFieldsPerLine(size_t count)
 {
     Q_ASSERT( count >= PredefinedFieldCount );
-    lineDataManager()->setFieldsPerLine( count );
+    lineDataManager()->setFieldsPerLine(count);
     textUndoStack()->clear();
 }
 
@@ -60,13 +60,13 @@ void TextDocument::giveLineDataManager(TextLineDataManager* manager)
 }
 
 
-/// This method gives a given data item to a text line
-void TextDocument::giveLineData(int line, int field, TextLineData* dataItem)
+/// Gives a given data item to a text line
+void TextDocument::giveLineData(size_t line, size_t field, TextLineData* dataItem)
 {
-    Q_ASSERT(line < lineCount() );
-    LineDataChange* change = new LineDataChange( line, field );
-    change->giveLineData( dataItem );
-    executeAndGiveChange( change, true );
+    Q_ASSERT(line < lineCount());
+    LineDataChange* change = new LineDataChange(line, field);
+    change->giveLineData(dataItem);
+    executeAndGiveChange(change, true);
 }
 
 
@@ -74,12 +74,12 @@ void TextDocument::giveLineData(int line, int field, TextLineData* dataItem)
 /// @param line the line number to retrieve the line data for
 /// @param field the field to retrieve the data for
 /// @return TextLineData the associated line data
-TextLineData* TextDocument::getLineData(int line, int field)
+TextLineData* TextDocument::getLineData(size_t line, size_t field)
 {
-    int len = lineDataManager()->length();
+    size_t len = lineDataManager()->length();
     // Q_ASSERT( len == lineCount() );  FIXME: disabled, issue with renderer retreiving linedata
-    Q_ASSERT( line < len );
-    return lineDataManager()->get( line, field );
+    Q_ASSERT(line < len);
+    return lineDataManager()->get(line, field);
 }
 
 
@@ -87,7 +87,7 @@ TextLineData* TextDocument::getLineData(int line, int field)
 /// @param group the textchange group that groups the undo operations
 void TextDocument::beginUndoGroup(ChangeGroup* group)
 {
-    if( !group ) {
+    if (!group) {
         group = new ChangeGroup(nullptr);
     }
 //    if( documentFilter() ) {
@@ -100,7 +100,7 @@ void TextDocument::beginUndoGroup(ChangeGroup* group)
 /// Ends the current undo group
 /// @param coalesceId the coalesceId
 /// @param flatten should the operation be flatten (flattens undo-group trees)
-void TextDocument::endUndoGroup( int coalesceId, bool flatten)
+void TextDocument::endUndoGroup(int coalesceId, bool flatten)
 {
 //    if( documentFilter() ) {
 //        TextChangeGroup* group = textUndoStack()->currentGroup();
@@ -222,20 +222,20 @@ void TextDocument::replaceRangeSet(TextRangeSet& rangeSet, const QStringList& te
         TextRange& range = rangeSet.range(idx);
         QString text = texts.at(static_cast<qsizetype>(idx) % textsIn.size());  // rotating text-fetching
 
-        range.setCaret(range.caret() + delta);
-        range.setAnchor(range.anchor() + delta);
+        range.setCaretBounded(this, static_cast<ptrdiff_t>(range.caret()) + delta);
+        range.setAnchorBounded(this, static_cast<ptrdiff_t>(range.anchor()) + delta);
 
         delta += (text.length() - static_cast<ptrdiff_t>(range.length()));
 
         TextChangeWithCaret* change = new TextChangeWithCaret(range.min(), range.length(), text, -1);
 
-        Change* effectiveChange = executeAndGiveChange( change, false );
+        Change* effectiveChange = executeAndGiveChange(change, false);
         TextChangeWithCaret* effectiveChangeWithCaret = dynamic_cast<TextChangeWithCaret*>(effectiveChange);
 
         // when a new caret position is supplied (can only happen via a TextDocumentFilter)
         // access it and change the caret to the given position
-        int caret = 0;
-        if( effectiveChangeWithCaret && effectiveChangeWithCaret->caret() >= 0 ) {
+        size_t caret = 0;
+        if (effectiveChangeWithCaret && effectiveChangeWithCaret->caret() >= 0) {
           caret = effectiveChangeWithCaret->caret();
         // Default caret location is change-independent: old location + length new text
         } else {
@@ -243,7 +243,7 @@ void TextDocument::replaceRangeSet(TextRangeSet& rangeSet, const QStringList& te
         }
 
         // sticky selection, keeps the selection around the text
-        if(stickySelection) {
+        if (stickySelection) {
           range.set(range.min(), caret);
         } else {
           range.setCaret(caret);
@@ -251,7 +251,7 @@ void TextDocument::replaceRangeSet(TextRangeSet& rangeSet, const QStringList& te
         }
 
         // next range
-        if( rangeSet.rangeCount() < oldRangeCount ) {
+        if (rangeSet.rangeCount() < oldRangeCount) {
             qDebug() <<  "TEST TO SEE IF THIS REALLY HAPPENS!! I think it cannot happen. (but I'm not sure)";
             Q_ASSERT(false);
 

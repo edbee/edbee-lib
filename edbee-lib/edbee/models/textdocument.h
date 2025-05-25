@@ -54,13 +54,13 @@ public:
     /// Increasing the amount will result in a realoc
     /// Decreasting the fieldcount reults in the lost of the 'old' fields
     /// At least the 'PredefinedFieldCount' amont of fields are required
-    virtual void setLineDataFieldsPerLine(int count);
+    virtual void setLineDataFieldsPerLine(size_t count);
 
     /// this method can be used to give a 'custom' line data item to a given line
     virtual TextLineDataManager* lineDataManager() { return textLineDataManager_; }
     virtual void giveLineDataManager(TextLineDataManager* manager);
-    virtual void giveLineData(int line, int field, TextLineData* dataItem);
-    virtual TextLineData* getLineData(int line, int field);
+    virtual void giveLineData(size_t line, size_t field, TextLineData* dataItem);
+    virtual TextLineData* getLineData(size_t line, size_t field);
 //    virtual TextLineData* takeLineData( int line, int field ) = 0;
 
     /// Returns the document-scopes of this document
