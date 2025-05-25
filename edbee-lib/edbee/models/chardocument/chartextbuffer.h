@@ -16,7 +16,7 @@ namespace edbee {
 class EDBEE_EXPORT CharTextBuffer : public TextBuffer
 {
 public:
-    CharTextBuffer(QObject* parent=0);
+    CharTextBuffer(QObject* parent=nullptr);
 
     virtual size_t length() const;
     virtual QChar charAt(size_t offset) const;

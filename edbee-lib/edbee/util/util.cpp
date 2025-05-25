@@ -43,27 +43,27 @@ QString Util::convertTabsToSpaces(const QString& str, int tabSize )
 /// @param str the string to convert
 /// @param tabSize the tab size to use for conversion
 /// @return a vector with the character-offset in the given string that contains the given tab-column
-QList<int> Util::tabColumnOffsets(const QString& str, int tabSize)
+QList<size_t> Util::tabColumnOffsets(const QString& str, unsigned int tabSize)
 {
     // build the resut (column 0 is always available)
-    QList<int> offsets;
+    QList<size_t> offsets;
     offsets.push_back( 0);
 
-    int column = 0;
+    size_t column = 0;
 
     // iterate over all characters
-    for( int offset=0,cnt=str.size(); offset<cnt; ++offset ) {
-        QChar c = str.at(offset);
+    for (size_t offset = 0, cnt = static_cast<size_t>(str.size()); offset < cnt; ++offset) {
+        QChar c = str.at(static_cast<qsizetype>(offset));
 
         // when a tab character is found, we need to jump to the next column
-        if( c == '\t' ) {
-            int amount = tabSize - column % tabSize;
+        if (c == '\t') {
+            size_t amount = tabSize - column % tabSize;
             column += amount;
         } else {
             ++column;
         }
         // when we've reached another tab-column, we add the column
-        if( column % tabSize == 0 ) {
+        if (column % tabSize == 0) {
            offsets.push_back( offset+1 );
         }
     }

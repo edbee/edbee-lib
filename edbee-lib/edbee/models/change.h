@@ -100,11 +100,11 @@ public:
     virtual void giveChange( TextDocument* doc, Change* change );
     virtual Change* at( int idx );
     virtual Change* take( int idx );
-    virtual int size();
+    virtual size_t size();
     virtual void clear(bool performDelete=true);
     Change* last();
     Change* takeLast();
-    int recursiveSize();
+    size_t recursiveSize();
 
     virtual TextEditorController* controllerContext();
 

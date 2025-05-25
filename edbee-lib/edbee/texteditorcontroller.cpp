@@ -18,6 +18,7 @@
 #include "edbee/models/texteditorcommandmap.h"
 #include "edbee/models/texteditorconfig.h"
 #include "edbee/models/texteditorkeymap.h"
+#include "edbee/models/textlinedata.h" // leave it!, it's used by the connect
 #include "edbee/models/textrange.h"
 #include "edbee/models/textsearcher.h"
 #include "edbee/models/textundostack.h"

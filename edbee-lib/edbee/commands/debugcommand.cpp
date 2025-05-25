@@ -80,7 +80,7 @@ void DebugCommand::dumpUndoStack(TextEditorController* controller)
 /// dumps the character codes (around the FIRST caret)
 void DebugCommand::dumpCharacterCodes(TextEditorController *controller)
 {
-    static int count = 3;       // 2 chars before caret and 2 chars after caret
+    static size_t count = 3;       // 2 chars before caret and 2 chars after caret
 
     // get the current range
     TextSelection* sel = controller->textSelection();
@@ -89,7 +89,7 @@ void DebugCommand::dumpCharacterCodes(TextEditorController *controller)
     QString line;
 
     // iterate over the characters
-    int start = qMax(range.caret() - count, 0);
+    int start = qMax(range.caret() - count, 0u);
     int end = qMin(range.caret() + count, controller->textDocument()->length()-1 );
     for( int i=start; i<=end; ++i ) {
         QChar c = controller->textDocument()->charAt(i);

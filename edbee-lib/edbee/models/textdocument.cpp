@@ -22,7 +22,7 @@ namespace edbee {
 
 
 /// Constructs the textdocument
-TextDocument::TextDocument( QObject* obj )
+TextDocument::TextDocument(QObject* obj)
     : QObject(obj)
     , documentFilter_(nullptr)
     , documentFilterRef_(nullptr)
@@ -40,19 +40,20 @@ TextDocument::~TextDocument()
 }
 
 
-/// This method can be used to change the number of reserved fields by the document
+/// Changes the number of reserved fields by the document
 /// Increasing the amount will result in a realoc
 /// Decreasting the fieldcount  reults in the lost of the 'old' fields
 /// At least the 'PredefinedFieldCount' amont of fields are required
 /// This method EMPTIES the undo-stack. So after this call all undo history is gone!
-void TextDocument::setLineDataFieldsPerLine( int count )
+void TextDocument::setLineDataFieldsPerLine(int count)
 {
     Q_ASSERT( count >= PredefinedFieldCount );
     lineDataManager()->setFieldsPerLine( count );
     textUndoStack()->clear();
 }
 
-void TextDocument::giveLineDataManager(TextLineDataManager *manager)
+
+void TextDocument::giveLineDataManager(TextLineDataManager* manager)
 {
     delete textLineDataManager_;
     textLineDataManager_ = manager;
@@ -209,27 +210,25 @@ void TextDocument::replaceRangeSet(TextRangeSet& rangeSet, const QString& textIn
 /// replaces the given rangeset
 void TextDocument::replaceRangeSet(TextRangeSet& rangeSet, const QStringList& textsIn, bool stickySelection)
 {
-
     QStringList texts = textsIn;
     if( documentFilter() ) {
         documentFilter()->filterReplaceRangeSet( this, rangeSet, texts );
     }
 
     rangeSet.beginChanges();
-    int delta = 0;
-    int idx = 0, oldRangeCount = 0;
-    while( idx < (oldRangeCount = rangeSet.rangeCount())  ) {
+    ptrdiff_t delta = 0;
+    size_t idx = 0, oldRangeCount = 0;
+    while (idx < (oldRangeCount = rangeSet.rangeCount())) {
         TextRange& range = rangeSet.range(idx);
-        QString text = texts.at(idx%texts.size());  // rotating text-fetching
+        QString text = texts.at(static_cast<qsizetype>(idx) % textsIn.size());  // rotating text-fetching
 
-        //qlog_info() << idx << ">> " << text << " : delta="<<delta<<", " << range.toString();
-        range.setCaret( range.caret() + delta );
-        range.setAnchor( range.anchor() + delta );
-        //qlog_info() << "  => " << range.toString();
-        delta += (text.length() - range.length());
+        range.setCaret(range.caret() + delta);
+        range.setAnchor(range.anchor() + delta);
 
+        delta += (text.length() - static_cast<ptrdiff_t>(range.length()));
 
-        TextChangeWithCaret* change = new TextChangeWithCaret(range.min(),range.length(),text,-1);
+        TextChangeWithCaret* change = new TextChangeWithCaret(range.min(), range.length(), text, -1);
+
         Change* effectiveChange = executeAndGiveChange( change, false );
         TextChangeWithCaret* effectiveChangeWithCaret = dynamic_cast<TextChangeWithCaret*>(effectiveChange);
 
@@ -253,8 +252,8 @@ void TextDocument::replaceRangeSet(TextRangeSet& rangeSet, const QStringList& te
 
         // next range
         if( rangeSet.rangeCount() < oldRangeCount ) {
-qlog_info() <<  "TEST TO SEE IF THIS REALLY HAPPENS!! I think it cannot happen. (but I'm not sure)";
-Q_ASSERT(false);
+            qDebug() <<  "TEST TO SEE IF THIS REALLY HAPPENS!! I think it cannot happen. (but I'm not sure)";
+            Q_ASSERT(false);
 
         // else we stay at the same location
         } else {
@@ -372,21 +371,21 @@ void TextDocument::rawAppend(const QChar* chars, int length)
 
 /// Returns the length of the document in characters
 /// default implementation is to forward this call to the textbuffer
-int TextDocument::length()
+size_t TextDocument::length()
 {
     return buffer()->length();
 }
 
 
 /// Returns the number of lines
-int TextDocument::lineCount()
+size_t TextDocument::lineCount()
 {
     return buffer()->lineCount();
 }
 
 
 /// Returns the character at the given position
-QChar TextDocument::charAt(int idx)
+QChar TextDocument::charAt(size_t idx)
 {
     return buffer()->charAt(idx);
 }
@@ -397,9 +396,9 @@ QChar TextDocument::charAt(int idx)
 ///
 /// @param idx the index to retrieve
 /// @return the character at the given index or the null-character
-QChar TextDocument::charAtOrNull(int idx)
+QChar TextDocument::charAtOrNull(size_t idx)
 {
-    if( 0 <= idx && idx < length() ) {
+    if(idx < length() ) {
         return charAt(idx);
     }
     return QChar();
@@ -409,7 +408,7 @@ QChar TextDocument::charAtOrNull(int idx)
 /// Retrieves the character-offset of the given line
 /// @param line the line number (0-based) to retrieve the offset for
 /// @return the character offset
-int TextDocument::offsetFromLine(int line)
+size_t TextDocument::offsetFromLine(size_t line)
 {
     return buffer()->offsetFromLine(line);
 }
@@ -418,7 +417,7 @@ int TextDocument::offsetFromLine(int line)
 /// returns the line number which contains the given offset
 /// @param offset the character offset
 /// @return the line number (0 is the first line )
-int TextDocument::lineFromOffset(int offset)
+size_t TextDocument::lineFromOffset(size_t offset)
 {
     return buffer()->lineFromOffset(offset);
 }
@@ -426,9 +425,9 @@ int TextDocument::lineFromOffset(int offset)
 
 /// return the column position for the given offset and line
 /// @param offset the offset position
-/// @param line the line number which contains this offset. (When -1 the line number is calculated)
+/// @param line the line number which contains this offset. (When std::string::npos the line number is calculated)
 /// @return the column position of the given offset
-int TextDocument::columnFromOffsetAndLine(int offset, int line)
+size_t TextDocument::columnFromOffsetAndLine(size_t offset, size_t line)
 {
     return buffer()->columnFromOffsetAndLine(offset,line);
 }
@@ -438,16 +437,16 @@ int TextDocument::columnFromOffsetAndLine(int offset, int line)
 /// @param line the line number
 /// @param column the column position
 /// @return the character offset in the document
-int TextDocument::offsetFromLineAndColumn(int line, int column)
+size_t TextDocument::offsetFromLineAndColumn(size_t line, size_t column)
 {
-    return buffer()->offsetFromLineAndColumn(line,column);
+    return buffer()->offsetFromLineAndColumn(line, column);
 }
 
 
 /// Returns the length of the given line
 /// @param line the line number
 /// @return the line length
-int TextDocument::lineLength(int line)
+size_t TextDocument::lineLength(size_t line)
 {
     return buffer()->lineLength(line);
 }
@@ -456,7 +455,7 @@ int TextDocument::lineLength(int line)
 /// returns the length of the given lilne without the newline
 /// @param line the line number
 /// @return the length of the line excluding the newline character
-int TextDocument::lineLengthWithoutNewline(int line)
+size_t TextDocument::lineLengthWithoutNewline(size_t line)
 {
     return buffer()->lineLengthWithoutNewline(line);
 }
@@ -474,16 +473,16 @@ QString TextDocument::text()
 /// @param offset the character offset in the document
 /// @param length the length of the part in characters
 /// @return the text at the given positions
-QString TextDocument::textPart(int offset, int length)
+QString TextDocument::textPart(size_t offset, size_t length)
 {
-    return buffer()->textPart( offset, length );
+    return buffer()->textPart(offset, length);
 }
 
 
 /// Returns the given line without the trailing \n character
 /// @param line the line number to retrieve the data for
 /// @return the content at the given line
-QString TextDocument::lineWithoutNewline(int line)
+QString TextDocument::lineWithoutNewline(size_t line)
 {
     return buffer()->lineWithoutNewline(line);
 }
@@ -492,7 +491,7 @@ QString TextDocument::lineWithoutNewline(int line)
 //// Returns the contents at the given line inclusive the trailing \n character
 /// @pparam line the line number to retrieve
 /// @return the line at the given position
-QString TextDocument::line(int line)
+QString TextDocument::line(size_t line)
 {
     return buffer()->line(line);
 }

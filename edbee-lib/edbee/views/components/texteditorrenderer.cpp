@@ -78,7 +78,7 @@ void TextEditorRenderer::renderLineBackground(QPainter *painter,int line)
 }
 
 
-void TextEditorRenderer::renderLineSelection(QPainter *painter,int line)
+void TextEditorRenderer::renderLineSelection(QPainter *painter, int line)
 {
 //PROF_BEGIN_NAMED("render-selection")
     TextDocument* doc = renderer()->textDocument();
@@ -86,18 +86,17 @@ void TextEditorRenderer::renderLineSelection(QPainter *painter,int line)
     int lineHeight = renderer()->lineHeight();
 
 
-    int firstRangeIdx=0;
-    int lastRangeIdx=0;
+    size_t firstRangeIdx = 0;
+    size_t lastRangeIdx = 0;
 /// TODO: iprove ranges at line by calling rangesForOffsets first for only the visible offsets!
-    if( sel->rangesAtLine( line, firstRangeIdx, lastRangeIdx ) ) {
-
+    if (sel->rangesAtLine(line, firstRangeIdx, lastRangeIdx)) {
         TextLayout* textLayout = renderer()->textLayoutForLine(line);
         QRectF rect = textLayout->boundingRect();
 
         int lastLineColumn = doc->lineLength(line);
 
         // draw all 'ranges' on this line
-        for( int rangeIdx = firstRangeIdx; rangeIdx <= lastRangeIdx; ++rangeIdx ) {
+        for (size_t rangeIdx = firstRangeIdx; rangeIdx <= lastRangeIdx; ++rangeIdx ) {
             TextRange& range = sel->range(rangeIdx);
             int startColumn = doc->columnFromOffsetAndLine( range.min(), line );
             int endColumn   = doc->columnFromOffsetAndLine( range.max(), line );
@@ -126,10 +125,10 @@ void TextEditorRenderer::renderLineBorderedRanges(QPainter *painter,int line)
 //    QBrush brush(themeRef_->findHighlightBackgroundColor());
     painter->setRenderHint(QPainter::Antialiasing);
 
-    int firstRangeIdx=0;
-    int lastRangeIdx=0;
+    size_t firstRangeIdx=0;
+    size_t lastRangeIdx=0;
 /// TODO: improve ranges at line by calling rangesForOffsets first for only the visible offsets!
-    if( sel->rangesAtLine( line, firstRangeIdx, lastRangeIdx ) ) {
+    if (sel->rangesAtLine(line, firstRangeIdx, lastRangeIdx)) {
 
         TextLayout* textLayout = renderer()->textLayoutForLine(line);
         QRectF rect = textLayout->boundingRect();

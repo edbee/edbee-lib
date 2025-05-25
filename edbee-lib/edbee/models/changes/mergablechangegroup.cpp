@@ -20,11 +20,11 @@ namespace edbee {
 /// The default complex textchange constructor
 MergableChangeGroup::MergableChangeGroup(TextEditorController* controller)
     : ChangeGroup(controller)
-    , previousSelection_(0)
-    , newSelection_(0)
+    , previousSelection_(nullptr)
+    , newSelection_(nullptr)
 {
-    if( controller ) {
-       previousSelection_ = new TextRangeSet( *( controller->textSelection() ) );
+    if (controller) {
+       previousSelection_ = new TextRangeSet(*(controller->textSelection()));
     }
 }
 
@@ -48,7 +48,7 @@ bool MergableChangeGroup::isDiscardable()
 /// the group is closed, we must 'store' the selection
 void MergableChangeGroup::groupClosed()
 {
-    if( controller() ) {
+    if (controller()) {
         delete newSelection_;
         newSelection_ = new TextRangeSet( *(controller()->textSelection() ) ) ;
     }
@@ -345,9 +345,9 @@ Change*MergableChangeGroup::take(int idx)
 
 
 /// returns the number of elements
-int MergableChangeGroup::size()
+size_t MergableChangeGroup::size()
 {
-    return textChangeList_.size() + lineDataTextChangeList_.size() + miscChangeList_.size();
+    return static_cast<size_t>(textChangeList_.size() + lineDataTextChangeList_.size() + miscChangeList_.size());
 }
 
 

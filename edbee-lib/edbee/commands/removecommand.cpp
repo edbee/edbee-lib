@@ -20,9 +20,9 @@ namespace edbee {
 /// The remove command constructor
 /// @param removeMode the mode for removal
 /// @param direction the direction for the removal
-RemoveCommand::RemoveCommand( int removeMode, int direction  )
-    : removeMode_( removeMode )
-    , direction_( direction )
+RemoveCommand::RemoveCommand(RemoveMode removeMode, Direction direction)
+    : removeMode_(removeMode)
+    , direction_(direction)
 {
 }
 
@@ -32,7 +32,7 @@ RemoveCommand::RemoveCommand( int removeMode, int direction  )
 /// @return the coalesceId to use
 int RemoveCommand::coalesceId() const
 {
-    return CoalesceId_Remove + ( direction_ == Left ? 1 : 2 );
+    return CoalesceId_Remove + (direction_ == Left ? 1 : 2);
 }
 
 
@@ -42,38 +42,36 @@ int RemoveCommand::coalesceId() const
 /// @param caret the current caret position
 ///
 /// @return the new caret position
-int RemoveCommand::smartBackspace(TextDocument* doc, int caret )
+size_t RemoveCommand::smartBackspace(TextDocument* doc, size_t caret)
 {
     TextBuffer* buf = doc->buffer();
     TextEditorConfig* config = doc->config();
 
     // find the line column position
-    int line = doc->lineFromOffset( caret );
-    int lineStartOffset = doc->offsetFromLine(line);
-    int lineEndOffset = qMin( caret,doc->offsetFromLine(line+1)-1 );
+    size_t line = doc->lineFromOffset(caret);
+    size_t lineStartOffset = doc->offsetFromLine(line);
+    size_t lineEndOffset = qMin(caret, doc->offsetFromLine(line + 1) - 1);
 
     // searches for the start of the current line
-    int firstNoneWhitespaceCharPos = buf->findCharPosWithinRangeOrClamp( lineStartOffset, 1, config->whitespaceWithoutNewline(), false, lineStartOffset, lineEndOffset );
+    size_t firstNoneWhitespaceCharPos = buf->findCharPosWithinRangeOrClamp(lineStartOffset, 1, config->whitespaceWithoutNewline(), false, lineStartOffset, lineEndOffset);
 
     // only when the caret if before a characer
-    if( caret <= firstNoneWhitespaceCharPos && lineStartOffset < firstNoneWhitespaceCharPos ) {
-
+    if (caret <= firstNoneWhitespaceCharPos && lineStartOffset < firstNoneWhitespaceCharPos) {
         // retrieve the whitespace-start-part of the line
-        QString linePrefix = doc->textPart( lineStartOffset, firstNoneWhitespaceCharPos-lineStartOffset );
-        QList<int> lineColumnOffsets = Util().tabColumnOffsets( linePrefix, config->indentSize() );
-
+        QString linePrefix = doc->textPart(lineStartOffset, firstNoneWhitespaceCharPos-lineStartOffset);
+        QList<size_t> lineColumnOffsets = Util().tabColumnOffsets( linePrefix, config->indentSize());
 
         // when we're exactly at a columnOffset, we need to get the previous
-        int lastColumnOffset = lineColumnOffsets.last() + lineStartOffset;
-        if( lastColumnOffset == caret) {
-            lastColumnOffset = lineStartOffset + ( lineColumnOffsets.size() > 1 ?  lineColumnOffsets.at( lineColumnOffsets.size()-2 ): 0 );
+        size_t lastColumnOffset = lineColumnOffsets.last() + lineStartOffset;
+        if (lastColumnOffset == caret) {
+            lastColumnOffset = lineStartOffset + (lineColumnOffsets.size() > 1 ?  lineColumnOffsets.at(lineColumnOffsets.size() - 2): 0);
         }
 
         // we need to got the given number of characters
-        return qMax( 0, caret - ( caret - lastColumnOffset ) );
+        return qMax(0u, caret - (caret - lastColumnOffset));
 
     }
-    return qMax( 0, caret-1 );
+    return caret == 0 ? 0 : caret - 1;
 }
 
 
@@ -85,19 +83,19 @@ int RemoveCommand::smartBackspace(TextDocument* doc, int caret )
 void RemoveCommand::rangesForRemoveChar(TextEditorController* controller, TextRangeSet* ranges)
 {
     // there's already a selection, just delete that one
-    if( ranges->hasSelection() ) { return; }
+    if (ranges->hasSelection()) { return; }
 
     // when there isn't a selection we need to 'smart-move' the caret
 
     // when a tab char is used (or we're deleting right) the operation is pretty simple, just delete the character on the left
-    if( direction_ == Right || controller->textDocument()->config()->useTabChar() ) {
-        ranges->moveCarets( directionSign() );
+    if (direction_ == Right || controller->textDocument()->config()->useTabChar()) {
+        ranges->moveCarets(directionSign());
 
     // in the case of spaces, we need to some smart stuff :)
     } else {
-        for( int i=0,cnt=ranges->rangeCount(); i<cnt; ++i ) {
+        for (size_t i = 0, cnt = ranges->rangeCount(); i < cnt; ++i) {
             TextRange& range = ranges->range(i);
-            range.minVar() = smartBackspace( controller->textDocument(), range.min() );
+            range.minVar() = smartBackspace(controller->textDocument(), range.min());
         }
     }
 }
@@ -110,10 +108,10 @@ void RemoveCommand::rangesForRemoveChar(TextEditorController* controller, TextRa
 void RemoveCommand::rangesForRemoveWord(TextEditorController* controller, TextRangeSet* ranges)
 {
     // there's already a selection, just delete that one
-    if( ranges->hasSelection() ) { return; }
+    if (ranges->hasSelection()) { return; }
 
     TextEditorConfig* config = controller->textDocument()->config();
-    ranges->moveCaretsByCharGroup( directionSign(), config->whitespaceWithoutNewline(), config->charGroups() );
+    ranges->moveCaretsByCharGroup(directionSign(), config->whitespaceWithoutNewline(), config->charGroups());
 }
 
 
@@ -127,17 +125,15 @@ void RemoveCommand::rangesForRemoveLine(TextEditorController* controller, TextRa
 
     // process all carets
     int offset = direction_ == Left ? -1 : 0;
-    for( int rangeIdx=ranges->rangeCount()-1; rangeIdx >= 0; --rangeIdx ) {
+    for (size_t rangeIdx = ranges->rangeCount() - 1; rangeIdx >= 0; --rangeIdx) {
         TextRange& range = ranges->range(rangeIdx);
-        QChar chr = doc->charAtOrNull( range.caret() + offset );
-        if( chr == '\n' ) {
+        QChar chr = doc->charAtOrNull(range.caret() + offset);
+        if (chr == '\n') {
             range.moveCaret(doc,directionSign());
         } else {
             range.moveCaretToLineBoundary(doc, directionSign(), controller->textDocument()->config()->whitespaceWithoutNewline());
         }
     }
-
-
 }
 
 
@@ -147,21 +143,21 @@ void RemoveCommand::rangesForRemoveLine(TextEditorController* controller, TextRa
 void RemoveCommand::execute(TextEditorController* controller)
 {
     TextSelection* sel = controller->textSelection();
-    TextRangeSet* ranges = new TextRangeSet( *sel );
+    TextRangeSet* ranges = new TextRangeSet(*sel);
 
     int coalesceId = this->coalesceId();
 
     // depending on the delete mode we need to expand the selection
     ranges->beginChanges();
-    switch( removeMode_ ) {
+    switch (removeMode_) {
         case RemoveChar:
-            rangesForRemoveChar( controller, ranges );
+            rangesForRemoveChar(controller, ranges);
             break;
         case RemoveWord:
-            rangesForRemoveWord( controller, ranges );
+            rangesForRemoveWord(controller, ranges);
             break;
         case RemoveLine:
-            rangesForRemoveLine( controller, ranges );
+            rangesForRemoveLine(controller, ranges);
             break;
         default:
             Q_ASSERT(false);
@@ -169,16 +165,16 @@ void RemoveCommand::execute(TextEditorController* controller)
     ranges->endChanges();
 
     // when there still isn't a selection, simply delete/ignore this command
-    if( !ranges->hasSelection() ) {
+    if (!ranges->hasSelection()) {
         delete ranges;
         return;
     }
 
     // use the simple replacerangeset function
     TextDocument* doc = controller->textDocument();
-    doc->beginChanges( controller );
-    doc->replaceRangeSet( *ranges, "" );
-    doc->giveSelection( controller, ranges );
+    doc->beginChanges(controller);
+    doc->replaceRangeSet(*ranges, "");
+    doc->giveSelection(controller, ranges);
     doc->endChanges(coalesceId);
     emit controller->backspacePressed();
 }
@@ -189,17 +185,18 @@ QString RemoveCommand::toString()
 {
     // build the mode string
     QString mode;
-    switch( removeMode_ ) {
+    switch (removeMode_) {
         case RemoveChar: mode = "Char"; break;
         case RemoveWord: mode = "Word"; break;
         case RemoveLine: mode = "Line"; break;
         default: mode = "Unkown!";
     }
+
     // build the direction string
     QString dir = direction_ == Left ? "Left" : "Right";
 
     // next returnt he string
-    return QStringLiteral("RemoveCommand(%1,%2)").arg(mode).arg(dir);
+    return QStringLiteral("RemoveCommand(%1,%2)").arg(mode, dir);
 }
 
 

@@ -252,9 +252,9 @@ Change *ChangeGroup::take(int idx)
     return change;
 }
 
-int ChangeGroup::size()
+size_t ChangeGroup::size()
 {
-    return changeList_.size();
+    return static_cast<size_t>(changeList_.size());
 }
 
 void ChangeGroup::clear(bool performDelete)
@@ -284,12 +284,12 @@ Change* ChangeGroup::takeLast()
 
 /// The total number of items in the list (excluding the group items)
 /// @return the number of items recussive (iterating) all groups
-int ChangeGroup::recursiveSize()
+size_t ChangeGroup::recursiveSize()
 {
-    int itemCount = 0;
-    for( int i=0,cnt=changeList_.size(); i<cnt; ++i ) {
+    size_t itemCount = 0;
+    for (size_t i=0, cnt=size(); i < cnt; ++i) {
         ChangeGroup* group = dynamic_cast<ChangeGroup*>(changeList_[i]);
-        if( group ) {
+        if (group) {
             itemCount += group->size();
         } else {
             ++itemCount;

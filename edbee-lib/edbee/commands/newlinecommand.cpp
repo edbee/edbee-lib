@@ -21,7 +21,6 @@ namespace edbee {
 NewlineCommand::NewlineCommand(NewlineCommand::NewLineType method)
     : newLineType_(method)
 {
-
 }
 
 /// This method calculates the required 'smart' indent value at the given positon
@@ -36,34 +35,32 @@ QString NewlineCommand::calculateSmartIndent(TextEditorController* controller, T
     TextEditorConfig* config = doc->config();
 
     // find the line column position
-    int caretOffset = range.min();
-    int line = doc->lineFromOffset( range.min() );
+    size_t caretOffset = range.min();
+    int line = doc->lineFromOffset(range.min());
     int startOffset = doc->offsetFromLine(line);
-    int endOffset = qMin( caretOffset ,doc->offsetFromLine(line+1)-1 );
+    int endOffset = qMin( caretOffset ,doc->offsetFromLine(line + 1) - 1);
 
     // searches for the start of the current line
-    int charPos = buf->findCharPosWithinRangeOrClamp( startOffset, 1, config->whitespaceWithoutNewline(), false, startOffset, endOffset );
+    int charPos = buf->findCharPosWithinRangeOrClamp(startOffset, 1, config->whitespaceWithoutNewline(), false, startOffset, endOffset);
 
     // when the start is found
-    if( charPos > startOffset ) {
-
+    if (charPos > startOffset) {
         // we have found the column index. This isn't yet the column,
         // because when using tab-characters the column position can be different.
         // calculate the position by converting the tabs to spaces
-        int column = Util().convertTabsToSpaces( doc->textPart( startOffset, charPos-startOffset ), config->indentSize() ).length();
+        int column = Util().convertTabsToSpaces(doc->textPart( startOffset, charPos-startOffset ), config->indentSize()).length();
 
         // when a tab character is used, we need to add the given number of tabs
-        if( config->useTabChar() ) {
+        if (config->useTabChar()) {
             int tabs   = column / config->indentSize();
             int spaces = column % config->indentSize();
             result.append( QStringLiteral("\t").repeated(tabs));
-            if( spaces>0 ) {
-                result.append( QStringLiteral(" ").repeated(spaces));
+            if (spaces > 0) {
+                result.append(QStringLiteral(" ").repeated(spaces));
             }
-
         // else we can add spaces to the given column position
         } else {
-            result.append( QStringLiteral(" ").repeated( column) );
+            result.append(QStringLiteral(" ").repeated(column));
         }
     }
     return result;
@@ -78,9 +75,9 @@ void NewlineCommand::executeNormalNewline(TextEditorController* controller)
 
     // when no smarttab is enabled this function is simple
     // the current selection is simple replaced by a newline :)
-    if( !config->smartTab() )
+    if (!config->smartTab())
     {
-        controller->replaceSelection( "\n", CoalesceId_InsertNewLine+NormalNewline );
+        controller->replaceSelection("\n", CoalesceId_InsertNewLine+NormalNewline);
         return;
     }
 
@@ -89,16 +86,15 @@ void NewlineCommand::executeNormalNewline(TextEditorController* controller)
     QStringList texts;
 
     TextSelection* sel = controller->textSelection();
-    for( int i=0,cnt=sel->rangeCount(); i<cnt; ++i ) {
+    for (size_t i = 0, cnt = sel->rangeCount(); i < cnt; ++i) {
         TextRange& range = sel->range(i);
 
         // add the string to insert
-        texts.push_back( QStringLiteral("\n%1").arg( calculateSmartIndent( controller, range ) ) );
+        texts.push_back(QStringLiteral("\n%1").arg( calculateSmartIndent(controller, range)));
     }
 
     // next execute the replace command
-    controller->replaceSelection( texts, CoalesceId_InsertNewLine+NormalNewline );
-
+    controller->replaceSelection(texts, CoalesceId_InsertNewLine + NormalNewline);
 }
 
 
@@ -114,43 +110,40 @@ void NewlineCommand::executeSpecialNewline(TextEditorController* controller, boo
     bool smart = config->smartTab();
     doc->beginChanges(controller);
 
-
     // iterate over the selection via a dynamic rangeset
-    DynamicTextRangeSet sel( controller->textSelection() );
+    DynamicTextRangeSet sel(controller->textSelection());
     TextRangeSet* newSelection = new TextRangeSet(doc);
     int lastLine = -1;
     int lineDelta = nextLine ? 1 : 0;
-    for( int i=0; i<sel.rangeCount(); ++i ) {
+    for (size_t i = 0; i < sel.rangeCount(); ++i) {
 
         // only handle the line if it's another line then the previous
         TextRange& range = sel.range(i);
-        int line = doc->lineFromOffset( range.caret() );
-        if( line > lastLine ) {
-
+        int line = doc->lineFromOffset(range.caret());
+        if (line > lastLine) {
             // create a new range
-            int pos = doc->offsetFromLine(line+lineDelta)-1;
-            TextRange newRange( pos, pos );
+            int pos = doc->offsetFromLine(line + lineDelta) - 1;
+            TextRange newRange(pos, pos);
 
-            QString text = QStringLiteral("\n%1").arg( smart ? calculateSmartIndent( controller, newRange ) : "" );
+            QString text = QStringLiteral("\n%1").arg(smart ? calculateSmartIndent(controller, newRange) : "");
 
             // replaces the text
-            doc->replace( qMax(0,newRange.caret()), 0, text );
-            newRange.setCaret( pos +text.length()  );
+            doc->replace(qMax(0u, newRange.caret()), 0, text);
+            newRange.setCaret(pos + static_cast<size_t>(text.length()));
             newRange.reset();
 
             // add the range to the selection
-            newSelection->addRange( newRange );
+            newSelection->addRange(newRange);
             lastLine = line;
         }
     }
 
     // give the selection and end the changes
     doc->giveSelection( controller, newSelection);
-    doc->endChanges(CoalesceId_InsertNewLine + ( nextLine ? AddLineAfter : AddLineBefore ) );
+    doc->endChanges(CoalesceId_InsertNewLine + (nextLine ? AddLineAfter : AddLineBefore) );
 
     // the following call shouldn't be necessary
     controller->update();
-
 }
 
 
@@ -158,7 +151,7 @@ void NewlineCommand::executeSpecialNewline(TextEditorController* controller, boo
 /// @param controller the controller to execute this command for
 void NewlineCommand::execute(TextEditorController* controller)
 {
-    switch( newLineType_ )
+    switch (newLineType_)
     {
         case NormalNewline:
             executeNormalNewline(controller);

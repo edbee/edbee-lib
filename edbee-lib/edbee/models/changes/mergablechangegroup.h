@@ -51,7 +51,7 @@ public:
     virtual void giveChange( TextDocument* doc, Change* change );
     virtual Change* at( int idx );
     virtual Change* take( int idx );
-    virtual int size();
+    virtual size_t size();
     virtual void clear(bool performDelete=true);
 
     /// This method tries to merge the given change with the other change

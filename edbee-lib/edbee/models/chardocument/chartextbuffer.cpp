@@ -91,7 +91,7 @@ void CharTextBuffer::replaceText(size_t offset, size_t length, const QChar* buff
 /// @return the line from the given offset
 size_t CharTextBuffer::lineFromOffset(size_t offset)
 {
-//    int result = lineFromOffsetSearch(offset);
+    //  int result = lineFromOffsetSearch(offset);
     size_t result = lineOffsetList_.findLineFromOffset(offset);
     return result;
 }
@@ -102,8 +102,6 @@ size_t CharTextBuffer::lineFromOffset(size_t offset)
 /// @return the offset of the given line
 size_t CharTextBuffer::offsetFromLine(size_t line)
 {
-    if( line < 0 ) return 0;    // at the start
-
     if( line >= lineOffsetList_.length()) {
         return length();
     }

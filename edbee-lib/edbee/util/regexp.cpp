@@ -1,7 +1,6 @@
 // edbee - Copyright (c) 2012-2025 by Rick Blommers and contributors
 // SPDX-License-Identifier: MIT
 
-#include <QRegExp>
 
 // This is required for windows, to prevent linkage errors (somehow the sources of oniguruma assumes we're linking with a dll)
 
@@ -28,6 +27,9 @@
 #endif
 
 #include "regexp.h"
+
+#include <QRegExp>
+
 #include "edbee/debug.h"
 
 namespace edbee {

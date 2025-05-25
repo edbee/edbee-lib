@@ -317,13 +317,13 @@ void TextMarginComponent::renderLineNumber(QPainter* painter, int startLine, int
     int lineHeight = renderer()->lineHeight();
     int textWidth =  width-LineNumberRightPadding-MarginPaddingRight - delegate()->widthBeforeLineNumber();
 
-    for( int line=startLine; line<=endLine; ++line ) {
+    for (int line=startLine; line<=endLine; ++line) {
         int y = renderer()->yPosForLine(line);
 
         // highlight the selected lines
-        int firstIndex=0, lastIndex=0;
+        size_t firstIndex = 0, lastIndex = 0;
         if( renderer()->textSelection()->rangesAtLineExclusiveEnd(line, firstIndex, lastIndex) ) {
-            painter->setPen(selectedPenColor);
+
         } else {
             painter->setPen(penColor);
         }

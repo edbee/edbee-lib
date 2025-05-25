@@ -110,7 +110,7 @@ static const QString VTEXT(TextDocument* doc)
 /// Return a part of text, translating the virtual characters
 /// It prepends every newline with a space
 /// It assumes an extra space + newline is placed at the end of the document
-static const QString VTEXT_PART(TextDocument* doc, int offset, int length)
+static const QString VTEXT_PART(TextDocument* doc, size_t offset, size_t length)
 {
 #if ! defined(WINDOWS_END_LINE_READ_ERROR_FIX)
     if(length < 0) {

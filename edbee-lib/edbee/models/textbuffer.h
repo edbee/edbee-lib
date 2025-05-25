@@ -22,8 +22,8 @@ class LineOffsetVector;
 class EDBEE_EXPORT TextBufferChangeData : public QSharedData
 {
 public:
-    TextBufferChangeData( TextBuffer* buffer, size_t off, size_t len, const QChar* text, size_t textlen );
-    TextBufferChangeData( LineOffsetVector* lineOffsets, size_t off, size_t len, const QChar* text, size_t textlen );
+    TextBufferChangeData(TextBuffer* buffer, size_t off, size_t len, const QChar* text, size_t textlen);
+    TextBufferChangeData(LineOffsetVector* lineOffsets, size_t off, size_t len, const QChar* text, size_t textlen);
 
     // text information
     size_t offset_;             ///< The offset in the buffer
@@ -44,9 +44,9 @@ public:
 class EDBEE_EXPORT TextBufferChange {
 public:
     TextBufferChange();
-    TextBufferChange( TextBuffer* buffer, size_t off, size_t len, const QChar* text, size_t textlen );
-    TextBufferChange( LineOffsetVector* lineOffsets, size_t off, size_t len, const QChar* text, size_t textlen );
-    TextBufferChange( const TextBufferChange& other );
+    TextBufferChange(TextBuffer* buffer, size_t off, size_t len, const QChar* text, size_t textlen);
+    TextBufferChange(LineOffsetVector* lineOffsets, size_t off, size_t len, const QChar* text, size_t textlen);
+    TextBufferChange(const TextBufferChange& other);
 
     size_t offset() const { return d_->offset_; }
     size_t length() const { return d_->length_; }
@@ -54,7 +54,7 @@ public:
     size_t newTextLength() const { return d_->newTextLength_; }
     size_t line() const { return d_->line_; }
     size_t lineCount() const { return d_->lineCount_; }
-    inline size_t newLineCount() const { return d_->newLineOffsets_.size(); }
+    inline size_t newLineCount() const { return static_cast<size_t>(d_->newLineOffsets_.size()); }
     const QVector<size_t>& newLineOffsets() const { return d_->newLineOffsets_; }
 
 
@@ -121,20 +121,20 @@ public:
 
     QString text();
     void setText(const QString& text);
-    virtual int columnFromOffsetAndLine(size_t offset, size_t line = std::string::npos);
+    virtual size_t columnFromOffsetAndLine(size_t offset, size_t line = std::string::npos);
     virtual void appendText(const QString& text);
-    virtual int offsetFromLineAndColumn(int line, int col);
-    virtual QString line(int line);
-    virtual QString lineWithoutNewline(int line);
-
-    virtual int lineLength(int line);
-    virtual int lineLengthWithoutNewline(int line);
+    virtual size_t offsetFromLineAndColumn(size_t line, size_t col);
+    virtual QString line(size_t line);
+    virtual QString lineWithoutNewline(size_t line);
+    
+    virtual size_t lineLength(size_t line);
+    virtual size_t lineLengthWithoutNewline(size_t line);
     virtual void replaceText(const TextRange& range, const QString& text);
 
-    virtual int findCharPos(int offset, int direction, const QString& chars, bool equals);
-    virtual int findCharPosWithinRange(int offset, int direction, const QString& chars, bool equals, int beginRange, int endRange);
-    virtual int findCharPosOrClamp(int offset, int direction, const QString& chars, bool equals);
-    virtual int findCharPosWithinRangeOrClamp(int offset, int direction, const QString& chars, bool equals, int beginRange, int endRange);
+    virtual size_t findCharPos(size_t offset, int direction, const QString& chars, bool equals);
+    virtual size_t findCharPosWithinRange(size_t offset, int direction, const QString& chars, bool equals, size_t beginRange, size_t endRange);
+    virtual size_t findCharPosOrClamp(size_t offset, int direction, const QString& chars, bool equals);
+    virtual size_t findCharPosWithinRangeOrClamp(size_t offset, int direction, const QString& chars, bool equals, size_t beginRange, size_t endRange);
 
     virtual QString lineOffsetsAsString();
 

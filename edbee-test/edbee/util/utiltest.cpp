@@ -37,12 +37,12 @@ void UtilTest::testConvertTabsToSpaces()
 
 
 /// helper function to convert a QVector<int> to a string list
-static QString str( const QList<int>& list )
+static QString str(const QList<size_t>& list)
 {
     QString result;
-    foreach( int val, list ) {
-        if( !result.isEmpty() ) { result.append(","); }
-        result.append( QString::number(val) );
+    foreach(size_t val, list) {
+        if (!result.isEmpty()) { result.append(","); }
+        result.append(QString::number(val));
     }
     return result;
 }

@@ -119,7 +119,7 @@ public slots:
 //    void dumpGapvector();
 signals:
 
-    void lineDataChanged( int line, int length, int newLength );   ///< This signal is emitted if line-data is changed
+    void lineDataChanged(int line, int length, int newLength);   ///< This signal is emitted if line-data is changed
 
 private:
 

@@ -18,8 +18,8 @@ namespace edbee {
 /// @param anchor the start of the range
 /// @param caret the caret position of the range
 /// @param scope the text scope
-ScopedTextRange::ScopedTextRange(int anchor, int caret, TextScope* scope)
-    : TextRange(anchor,caret)
+ScopedTextRange::ScopedTextRange(size_t anchor, size_t caret, TextScope* scope)
+    : TextRange(anchor, caret)
     , scopeRef_(scope)
 {
     Q_ASSERT(scopeRef_);
@@ -623,61 +623,61 @@ void MultiLineScopedTextRangeSet::reset()
 
 
 /// Returns the number of ranges
-int MultiLineScopedTextRangeSet::rangeCount() const
+size_t MultiLineScopedTextRangeSet::rangeCount() const
 {
-    return scopedRangeList_.size();
+    return static_cast<size_t>(scopedRangeList_.size());
 }
 
 
 /// returns the given textrange
-TextRange& MultiLineScopedTextRangeSet::range(int idx)
+TextRange& MultiLineScopedTextRangeSet::range(size_t idx)
 {
-    Q_ASSERT( 0 <= idx && idx < rangeCount() );
-    return *(scopedRangeList_[idx]);
+    Q_ASSERT(idx < rangeCount());
+    return *(scopedRangeList_[static_cast<qsizetype>(idx)]);
 }
 
 
 /// returns the cont range
-const TextRange& MultiLineScopedTextRangeSet::constRange(int idx) const
+const TextRange& MultiLineScopedTextRangeSet::constRange(size_t idx) const
 {
-    Q_ASSERT( 0 <= idx && idx < rangeCount() );
-    return *(scopedRangeList_[idx]);
+    Q_ASSERT(idx < rangeCount());
+    return *(scopedRangeList_[static_cast<qsizetype>(idx)]);
 }
 
 
-/// This method adds a range with the default scope
-void MultiLineScopedTextRangeSet::addRange(int anchor, int caret)
+/// Adds a range with the default scope
+void MultiLineScopedTextRangeSet::addRange(size_t anchor, size_t caret)
 {
-    scopedRangeList_.append( new MultiLineScopedTextRange(anchor, caret,Edbee::instance()->scopeManager()->refEmptyScope() ) );
+    scopedRangeList_.append(new MultiLineScopedTextRange(anchor, caret,Edbee::instance()->scopeManager()->refEmptyScope()));
 }
 
 
 ///adds the given range
 void MultiLineScopedTextRangeSet::addRange(const TextRange& range)
 {
-    addRange( range.anchor(), range.caret() );
+    addRange(range.anchor(), range.caret());
 }
 
 
 ///' removes the given scope
-void MultiLineScopedTextRangeSet::removeRange(int idx)
+void MultiLineScopedTextRangeSet::removeRange(size_t idx)
 {
-    delete scopedRangeList_[idx];
-    scopedRangeList_.removeAt(idx);
+    delete scopedRangeList_[static_cast<qsizetype>(idx)];
+    scopedRangeList_.removeAt(static_cast<qsizetype>(idx));
 }
 
 
 /// removes all scopes
 void MultiLineScopedTextRangeSet::clear()
 {
-    qDeleteAll( scopedRangeList_ );
+    qDeleteAll(scopedRangeList_);
     scopedRangeList_.clear();
 }
 
 
 void MultiLineScopedTextRangeSet::toSingleRange()
 {
-    Q_ASSERT( false ); ///< NOT IMPLEMENTED
+    Q_ASSERT(false); ///< NOT IMPLEMENTED
     //scopedRangeList_.remove(1, scopedRangeList_.size()-1);
 }
 
@@ -690,7 +690,7 @@ void MultiLineScopedTextRangeSet::sortRanges()
 
 
 /// this method returns the scoped range
-MultiLineScopedTextRange& MultiLineScopedTextRangeSet::scopedRange(int idx)
+MultiLineScopedTextRange& MultiLineScopedTextRangeSet::scopedRange(size_t idx)
 {
     Q_ASSERT( 0 <= idx && idx < rangeCount() );
     return *(scopedRangeList_[idx]);

@@ -68,11 +68,11 @@ void TextSelection::moveCaretsByLine(TextEditorController* controller, TextRange
         //if( line >= doc->lineCount() ) { line = doc->lineCount()-1; }
 
         // calculate the correct column
-        int col = renderer->columnIndexForXpos(line,xpos);
-        int offset = doc->offsetFromLine(line);
-        int offsetNextLine = doc->offsetFromLine(line+1);
-        int newLinesToRemove = line+1 < doc->lineCount() ? 1 : 0;
-        range.setCaretBounded( doc, qMin( offset + col, offsetNextLine - newLinesToRemove ) );
+        size_t col = renderer->columnIndexForXpos(line, xpos);
+        size_t offset = doc->offsetFromLine(line);
+        size_t offsetNextLine = doc->offsetFromLine(line+1);
+        size_t newLinesToRemove = line + 1 < doc->lineCount() ? 1 : 0;
+        range.setCaretBounded(doc, qMin(offset + col, offsetNextLine - newLinesToRemove));
 
 //        cache->caretMovedFromOldOffsetToNewOffset( caret, range.caret() );  // when having multiple caret this doesn't work !
         newCache.add( range.caret(), xpos );
@@ -100,8 +100,8 @@ void TextSelection::moveCaretsByPage( TextEditorController* controller, TextRang
         TextRange& range = rangeSet->range(rangeIdx );
         int line   = doc->lineFromOffset( range.caret() );
         line += linesPerPage * amount;
-        int offset = doc->offsetFromLine(line);
-        range.setCaretBounded( doc, offset );
+        size_t offset = doc->offsetFromLine(line);
+        range.setCaretBounded(doc, offset);
 
     }
     rangeSet->processChangesIfRequired();

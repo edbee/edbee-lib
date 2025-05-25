@@ -18,7 +18,7 @@ namespace edbee {
 class EDBEE_EXPORT Util {
 public:
     QString convertTabsToSpaces( const QString& str, int tabSize );
-    QList<int> tabColumnOffsets( const QString& str, int tabSize );
+    QList<size_t> tabColumnOffsets(const QString& str, unsigned int tabSize);
 
 
     /// This method calculates 2 intersections between 2 ranges.

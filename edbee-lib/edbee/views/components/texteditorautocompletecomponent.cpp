@@ -211,18 +211,17 @@ void TextEditorAutoCompleteComponent::showInfoTip()
 
     infoTipRef_->resize(tipSize.width(), tipSize.height() - 4);
 
-    //position the list
-    positionWidgetForCaretOffset( qMax(0,range.caret() - currentWord_.length()) );
+    // position the list
+    positionWidgetForCaretOffset(qMax(0u, range.caret() - currentWord_.length()));
 
     QPoint newLoc(listWidgetRef_->parentWidget()->mapToGlobal(r.topRight()).x() + xOffset, listWidgetRef_->parentWidget()->mapToGlobal(r.topRight()).y() + 1);
-
     QRect screen = QApplication::primaryScreen()->availableGeometry();
 
-    if( newLoc.x() + infoTipRef_->width() > screen.x() + screen.width() && (menuRef_->x() - infoTipRef_->width() - 1) >= 0 ){
+    if (newLoc.x() + infoTipRef_->width() > screen.x() + screen.width() && (menuRef_->x() - infoTipRef_->width() - 1) >= 0 ){
         newLoc.setX(menuRef_->x() - infoTipRef_->width() - 1);
     }
 
-    if(!infoTip.isEmpty()) {
+    if (!infoTip.isEmpty()) {
         infoTipRef_->repaint();
         infoTipRef_->move(newLoc);
         infoTipRef_->show();

@@ -232,8 +232,6 @@ void LineOffsetVector::changeOffsetDelta(size_t index, std::ptrdiff_t delta)
     // (2) The new index is BEFORE the old index.
     } else if (index < offsetDeltaIndex_) {
 
-qDebug() << "changeOFfsetDelta(" << index << ", " << delta <<")";
-qDebug() << "  => " << this->toUnitTestString();
         // apply the 'negative' offset to the given location
         for (size_t i=index; i < offsetDeltaIndex_; ++i) {
 
@@ -244,10 +242,7 @@ qDebug() << "  => " << this->toUnitTestString();
             } else {
                 offsetList_[i] -= static_cast<size_t>(offsetDelta_ + delta);
             }
-qDebug() << "   -= (" << offsetDelta_ << " + " << delta << "), (" << (offsetDelta_ + delta) << ")";
-qDebug() << "   => " << offsetList_[i];
         }
-qDebug() << "-- (offsetDelta_ = "<< offsetDelta_ <<", offsetDeltaIndex_=" << offsetDeltaIndex_ <<", delta=" << delta<<")";
         offsetDeltaIndex_ = index;
         offsetDelta_ += delta;
 
