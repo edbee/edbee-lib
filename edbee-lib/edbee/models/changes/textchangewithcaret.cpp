@@ -15,6 +15,7 @@ TextChangeWithCaret::TextChangeWithCaret(size_t offset, size_t length, const QSt
 
 
 /// returns the caret position
+/// when std::string::npos (no caret is available)
 size_t TextChangeWithCaret::caret() const
 {
     return caret_;
@@ -23,6 +24,7 @@ size_t TextChangeWithCaret::caret() const
 
 /// Sets the caret position
 /// @param caret the caret to set
+/// when std::string::npos (no caret is available)
 void TextChangeWithCaret::setCaret(size_t caret)
 {
     caret_ = caret;

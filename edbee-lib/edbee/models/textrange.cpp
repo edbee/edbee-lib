@@ -322,8 +322,8 @@ void TextRange::moveCaretToLineBoundaryAtOffset(TextDocument *doc, size_t newOff
 /// 0 is a special case, it moves the caret to the start of the current line and expands to the end of the line. It does not add lines
 void TextRange::expandToFullLine(TextDocument* doc, int amount)
 {
-    int minOffset = min();
-    int maxOffset = max();
+    size_t minOffset = min();
+    size_t maxOffset = max();
 
     // select the current line (everse caret
     if (amount == 0) {
@@ -333,24 +333,24 @@ void TextRange::expandToFullLine(TextDocument* doc, int amount)
         anchor_ = maxOffset;
     } else if( amount > 0 ) {
         minOffset = doc->offsetFromLine(doc->lineFromOffset(minOffset));
-        maxOffset = doc->offsetFromLine(doc->lineFromOffset(maxOffset) + amount);
+        maxOffset = doc->offsetFromLine(doc->lineFromOffset(maxOffset) + static_cast<size_t>(amount));
 
         caret_ = maxOffset;
         anchor_ = minOffset;
     } else {
-        int minLine = doc->lineFromOffset(minOffset);
-        int minLineStartOffset = doc->offsetFromLine(minLine);
+        size_t minLine = doc->lineFromOffset(minOffset);
+        size_t minLineStartOffset = doc->offsetFromLine(minLine);
 
         // only select line above if the full line isn't selected yet
         if (minOffset == minLineStartOffset) {
             if (minOffset > 0) { --minOffset; }
         }
         ++amount;
-        minOffset = doc->offsetFromLine(doc->lineFromOffset(minOffset) + amount);
+        minOffset = doc->offsetFromLine(doc->lineFromOffset(minOffset) - static_cast<size_t>(qAbs(amount)));
 
         // select to eol if required
-        int maxLine = doc->lineFromOffset(maxOffset);
-        int maxLineStartOffset = doc->offsetFromLine(maxLine);
+        size_t maxLine = doc->lineFromOffset(maxOffset);
+        size_t maxLineStartOffset = doc->offsetFromLine(maxLine);
         if (maxLineStartOffset != maxOffset) {
             maxOffset = doc->offsetFromLine(doc->lineFromOffset(maxOffset) + 1);
         }
@@ -361,7 +361,7 @@ void TextRange::expandToFullLine(TextDocument* doc, int amount)
 }
 
 
-/// This method deselects the last character if it's a newline.
+/// Deselects the last character if it's a newline.
 void TextRange::deselectTrailingNewLine(TextDocument* doc)
 {
     if (caret_ != anchor_ && doc->charAtOrNull(max() - 1) == '\n') {
@@ -371,14 +371,14 @@ void TextRange::deselectTrailingNewLine(TextDocument* doc)
 
 
 /// Internal method, for finding a character group with the given character
-static QString findCharGroup( QChar c, const QString& whitespace, const QStringList& characterGroups)
+static QString findCharGroup(QChar c, const QString& whitespace, const QStringList& characterGroups)
 {
     QString foundGroup;
     if (whitespace.indexOf(c) >= 0) {
         foundGroup = whitespace;
     } else {
-        for (int i = 0, cnt = characterGroups.length(); i < cnt; ++i) {
-            if( characterGroups.at(i).indexOf(c) >=0 ) {
+        for (qsizetype i = 0, cnt = static_cast<qsizetype>(characterGroups.length()); i < cnt; ++i) {
+            if (characterGroups.at(i).indexOf(c) >= 0) {
                 foundGroup = characterGroups.at(i);
                 break;
             }
@@ -447,10 +447,10 @@ bool TextRange::equals(const TextRange& range)
 ///  (A)(B) or (B)(A)
 bool TextRange::touches(TextRange& range)
 {
-    int min1 = min();
-    int max1 = max();
-    int min2 = range.min();
-    int max2 = range.max();
+    size_t min1 = min();
+    size_t max1 = max();
+    size_t min2 = range.min();
+    size_t max2 = range.max();
     return (max1 == min2 || max2 == min1);
 }
 
@@ -643,13 +643,13 @@ QString TextRangeSetBase::getSelectedTextExpandedToFullLines()
 {
     TextDocument* doc = textDocument();
     QString buffer;
-    int lastLine = -1;
-    for (int i = 0, cnt = rangeCount(); i < cnt; ++i) {
+    size_t lastLine = std::string::npos;
+    for (size_t i = 0, cnt = rangeCount(); i < cnt; ++i) {
         TextRange& range = this->range(i);
-        int min = range.min();
-        int max = range.max();
-        int line = doc->lineFromOffset(min);
-        int maxLine = doc->lineFromOffset(max);
+        size_t min = range.min();
+        size_t max = range.max();
+        size_t line = doc->lineFromOffset(min);
+        size_t maxLine = doc->lineFromOffset(max);
 
         // skip the current line if it's the same as last one
         if (line == lastLine) { ++line; }
@@ -668,7 +668,7 @@ QString TextRangeSetBase::getSelectedTextExpandedToFullLines()
 QString TextRangeSetBase::rangesAsString() const
 {
     QString str;
-    for (int i = 0, cnt = rangeCount(); i < cnt; ++i) {
+    for (size_t i = 0, cnt = rangeCount(); i < cnt; ++i) {
         const TextRange& range = constRange(i);
         if (!str.isEmpty()) str.append(",");
         str.append(range.toString());
@@ -680,7 +680,7 @@ QString TextRangeSetBase::rangesAsString() const
 /// This method resets all anchors to the positions of the carets
 void TextRangeSetBase::resetAnchors()
 {
-    for (int i = 0, cnt = rangeCount(); i < cnt; ++i) {
+    for (size_t i = 0, cnt = rangeCount(); i < cnt; ++i) {
         TextRange& range = this->range(i);
         range.reset();
     }
@@ -690,7 +690,7 @@ void TextRangeSetBase::resetAnchors()
 /// This method moves all carets to the anchor positions
 void TextRangeSetBase::clearSelection()
 {
-    for (int i=0, cnt = rangeCount(); i < cnt; ++i) {
+    for (size_t i=0, cnt = rangeCount(); i < cnt; ++i) {
         TextRange& range = this->range(i);
         range.clearSelection();
     }
@@ -732,10 +732,10 @@ bool TextRangeSetBase::changing() const
 
 /// An union operation
 /// This method adds all text selection-items.
-/// Merges all ranges
+
 void TextRangeSetBase::addTextRanges(const TextRangeSetBase& sel)
 {
-    for (int i = 0, cnt = sel.rangeCount(); i < cnt; ++i) {
+    for (size_t i = 0, cnt = sel.rangeCount(); i < cnt; ++i) {
         addRange( sel.constRange(i) );
     }
     processChangesIfRequired(true );
@@ -743,11 +743,11 @@ void TextRangeSetBase::addTextRanges(const TextRangeSetBase& sel)
 
 
 /// The difference operation
-/// This method substracts the text-selection from the current selection
+/// Substracts the text-selection from the current selection
 void TextRangeSetBase::substractTextRanges(const TextRangeSetBase& sel)
 {
     ++changing_;
-    for (int i = 0, cnt = sel.rangeCount(); i < cnt; ++i) {
+    for (size_t i = 0, cnt = sel.rangeCount(); i < cnt; ++i) {
         const TextRange& r = sel.constRange(i);
         substractRange(r.min(), r.max());
     }
@@ -805,7 +805,7 @@ void TextRangeSetBase::substractRange(size_t minB, size_t maxB)
 /// Expands the selection so it selects full lines
 void TextRangeSetBase::expandToFullLines(int amount)
 {
-    for (int i = 0, cnt = rangeCount(); i < cnt; ++i) {
+    for (size_t i = 0, cnt = rangeCount(); i < cnt; ++i) {
         range(i).expandToFullLine(textDocument(), amount);
     }
     processChangesIfRequired();
@@ -815,7 +815,7 @@ void TextRangeSetBase::expandToFullLines(int amount)
 /// Expands the selection to full words
 void TextRangeSetBase::expandToWords(const QString& whitespace, const QStringList& characterGroups)
 {
-    for (int i = 0, cnt = rangeCount(); i < cnt; ++i) {
+    for (size_t i = 0, cnt = rangeCount(); i < cnt; ++i) {
         range(i).expandToWord(textDocument(), whitespace, characterGroups);
     }
     processChangesIfRequired();
@@ -824,10 +824,10 @@ void TextRangeSetBase::expandToWords(const QString& whitespace, const QStringLis
 
 /// Selects the word at the given offset
 /// @param offset the offset of the word to select
-void TextRangeSetBase::selectWordAt(int offset, const QString& whitespace, const QStringList& characterGroups)
+void TextRangeSetBase::selectWordAt(size_t offset, const QString& whitespace, const QStringList& characterGroups)
 {
-    TextRange newRange(offset,offset);
-    newRange.expandToWord( textDocument(), whitespace, characterGroups );
+    TextRange newRange(offset, offset);
+    newRange.expandToWord(textDocument(), whitespace, characterGroups);
     addRange(newRange);
     processChangesIfRequired();
 }
@@ -836,12 +836,12 @@ void TextRangeSetBase::selectWordAt(int offset, const QString& whitespace, const
 /// Toggles a word selection at the given location
 /// The idea is the following, double-click an empty place to select the word at the given location
 /// Double click an existing selection to remove the selection (and caret)
-void TextRangeSetBase::toggleWordSelectionAt(int offset, const QString& whitespace, const QStringList& characterGroups)
+void TextRangeSetBase::toggleWordSelectionAt(size_t offset, const QString& whitespace, const QStringList& characterGroups)
 {
-    int idx = rangeIndexAtOffset(offset);
+    size_t idx = rangeIndexAtOffset(offset);
 
     // range found
-    if (idx >= 0) {
+    if (idx != std::string::npos) {
         TextRange& found = this->range(idx);
 
         // found a range with selection
@@ -854,7 +854,7 @@ void TextRangeSetBase::toggleWordSelectionAt(int offset, const QString& whitespa
 
             // when this is the last range, just place the caret
             } else {
-                found.set(offset,offset);
+                found.set(offset, offset);
                 return;
             }
         }
@@ -864,30 +864,30 @@ void TextRangeSetBase::toggleWordSelectionAt(int offset, const QString& whitespa
 }
 
 
-/// This method moves the carets by character
+/// Moves the carets by character
 void TextRangeSetBase::moveCarets(int amount)
 {
-    for (int i = 0, cnt = rangeCount(); i < cnt; ++i) {
+    for (size_t i = 0, cnt = rangeCount(); i < cnt; ++i) {
         range(i).moveCaret(textDocument(), amount);
     }
     processChangesIfRequired();
 }
 
 
-/// This method moves the carets or deslects the given character
+/// Moves the carets or deslects the given character
 void TextRangeSetBase::moveCaretsOrDeselect(int amount)
 {
-    for (int i = 0, cnt = rangeCount(); i < cnt; ++i) {
+    for (size_t i = 0, cnt = rangeCount(); i < cnt; ++i) {
         range(i).moveCaretOrDeselect(textDocument(), amount);
     }
     processChangesIfRequired();
 }
 
 
-/// This method moves the carets
+/// Moves the carets
 void TextRangeSetBase::moveCaretsByCharGroup(int amount, const QString& whitespace, const QStringList& characterGroups)
 {
-    for (int rangeIdx=rangeCount() - 1; rangeIdx >= 0; --rangeIdx) {
+    for (size_t rangeIdx=rangeCount() - 1; rangeIdx != std::string::npos; --rangeIdx) {
         range(rangeIdx).moveCaretByCharGroup(textDocument(), amount, whitespace, characterGroups);
     }
     processChangesIfRequired();
@@ -900,29 +900,29 @@ void TextRangeSetBase::moveCaretsByCharGroup(int amount, const QString& whitespa
 void TextRangeSetBase::moveCaretsToLineBoundary(int direction , const QString& whitespace)
 {
     // process all carets
-    for (int rangeIdx = rangeCount() - 1; rangeIdx >= 0; --rangeIdx) {
+    for (size_t rangeIdx = rangeCount() - 1; rangeIdx != std::string::npos; --rangeIdx) {
         range(rangeIdx).moveCaretToLineBoundary(textDocument(), direction, whitespace);
     }
     processChangesIfRequired();
 }
 
 
-/// This method merges overlapping ranges
+/// Merges overlapping ranges
 /// @param joinBorders if joinborders is set, borders next to eachother are also interpretted as overlap. (inclusive/exclusive switch)
 void TextRangeSetBase::mergeOverlappingRanges(bool joinBorders)
 {
     // check the ranges
     beginChanges();
-    for (int i = rangeCount() - 1; i >= 0; --i) {
+    for (size_t i = rangeCount() - 1; i != std::string::npos; --i) {
         TextRange& range1 = range(i);
-        int min1 = range1.min();
-        int max1 = range1.max();
+        size_t min1 = range1.min();
+        size_t max1 = range1.max();
 
         // check overlap with all other ranges
-        for (int j = i - 1; j >= 0; --j) {
+        for (size_t j = i - 1; j != std::string::npos; --j) {
             TextRange& range2 = range(j);
-            int min2 = range2.min();
-            int max2 = range2.max();
+            size_t min2 = range2.min();
+            size_t max2 = range2.max();
 
             // Overlappping possibilities:
             // 1: [        ]
@@ -979,11 +979,11 @@ void TextRangeSetBase::mergeOverlappingRanges(bool joinBorders)
 }
 
 
-/// This method sets the first range item
+/// Sets the first range item
 /// @param anchor the anchor of the selection
 /// @param caret the caret position
 /// @param index the default range index (default 0)
-void TextRangeSetBase::setRange(int anchor, int caret, int index)
+void TextRangeSetBase::setRange(size_t anchor, size_t caret, size_t index)
 {
     range(index).set(anchor, caret);
 }
@@ -993,7 +993,7 @@ void TextRangeSetBase::setRange(int anchor, int caret, int index)
 /// Make sure the given index exists!!
 /// @param the range to use
 /// @param index the index of the range to change (when not given index 0 is assumed)
-void TextRangeSetBase::setRange(const TextRange& range, int index)
+void TextRangeSetBase::setRange(const TextRange& range, size_t index)
 {
     setRange(range.anchor(), range.caret(), index);
 }
@@ -1041,7 +1041,6 @@ void TextRangeSetBase::changeSpatial(size_t pos, size_t length, size_t newLength
     ptrdiff_t spos = static_cast<ptrdiff_t>(pos);
 
     beginChanges();
-    size_t i = rangeCount();
     for (size_t i = rangeCount() - 1; i != std::string::npos; --i) {
         TextRange& range = this->range(i);
 
@@ -1134,7 +1133,7 @@ TextRange& TextRangeSet::range(size_t idx)
 {
     Q_ASSERT(idx >= 0);
     Q_ASSERT(idx < static_cast<size_t>(selectionRanges_.size()));
-    return selectionRanges_[static_cast<size_t>(idx)];
+    return selectionRanges_[static_cast<qsizetype>(idx)];
 }
 
 
@@ -1142,7 +1141,7 @@ TextRange& TextRangeSet::range(size_t idx)
 const TextRange &TextRangeSet::constRange(size_t idx) const
 {
     Q_ASSERT(idx >= 0);
-    Q_ASSERT(idx < static_cast<qsizetype>(selectionRanges_.size()));
+    Q_ASSERT(idx < static_cast<size_t>(selectionRanges_.size()));
     return selectionRanges_.at(static_cast<qsizetype>(idx));
 }
 
@@ -1193,7 +1192,7 @@ void TextRangeSet::sortRanges()
 /// asserts all range site items are valied
 void TextRangeSet::assertValid() const
 {
-    for (size_t i = 0, cnt = selectionRanges_.size(); i < cnt; i++) {
+    for (qsizetype i = 0, cnt = selectionRanges_.size(); i < cnt; i++) {
         selectionRanges_.at(i).assertValid();
     }
 

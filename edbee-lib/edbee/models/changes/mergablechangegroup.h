@@ -49,8 +49,8 @@ public:
     void giveLineDataListTextChange( TextDocument* doc, LineDataListChange* change );
 
     virtual void giveChange( TextDocument* doc, Change* change );
-    virtual Change* at( int idx );
-    virtual Change* take( int idx );
+    virtual Change* at(size_t idx);
+    virtual Change* take(size_t idx);
     virtual size_t size();
     virtual void clear(bool performDelete=true);
 

@@ -152,8 +152,8 @@ public:
     // selection
     void expandToFullLines(int amount);
     void expandToWords(const QString& whitespace, const QStringList& characterGroups);
-    void selectWordAt(int offset , const QString& whitespace, const QStringList& characterGroups);
-    void toggleWordSelectionAt( int offset, const QString& whitespace, const QStringList& characterGroups);
+    void selectWordAt(size_t offset , const QString& whitespace, const QStringList& characterGroups);
+    void toggleWordSelectionAt(size_t offset, const QString& whitespace, const QStringList& characterGroups);
 
     // movement
     void moveCarets(int amount);
@@ -166,8 +166,8 @@ public:
     // void growSelectionAtBegin( int amount );
     void changeSpatial(size_t pos, size_t length, size_t newLength, bool sticky = false, bool performDelete = false);
 
-    void setRange(int anchor, int caret, int index = 0);
-    void setRange(const TextRange& range , int index = 0);
+    void setRange(size_t anchor, size_t caret, size_t index = 0);
+    void setRange(const TextRange& range, size_t index = 0);
 
     virtual void processChangesIfRequired(bool joinBorders=false);
 

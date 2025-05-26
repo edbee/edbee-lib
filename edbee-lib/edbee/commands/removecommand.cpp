@@ -59,7 +59,7 @@ size_t RemoveCommand::smartBackspace(TextDocument* doc, size_t caret)
     if (caret <= firstNoneWhitespaceCharPos && lineStartOffset < firstNoneWhitespaceCharPos) {
         // retrieve the whitespace-start-part of the line
         QString linePrefix = doc->textPart(lineStartOffset, firstNoneWhitespaceCharPos-lineStartOffset);
-        QList<size_t> lineColumnOffsets = Util().tabColumnOffsets( linePrefix, config->indentSize());
+        QList<size_t> lineColumnOffsets = Util().tabColumnOffsets(linePrefix, config->indentSize());
 
         // when we're exactly at a columnOffset, we need to get the previous
         size_t lastColumnOffset = lineColumnOffsets.last() + lineStartOffset;

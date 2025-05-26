@@ -307,40 +307,44 @@ void MergableChangeGroup::giveChange(TextDocument* doc, Change* change)
 
 
 ///returns the textchange at the given index
-Change* MergableChangeGroup::at(int idx)
+Change* MergableChangeGroup::at(size_t idx)
 {
+    qsizetype qidx = static_cast<qsizetype>(idx);
+
     // plain text changes
-    if( idx < textChangeList_.size() ) {
-        return textChangeList_.at(idx);
+    if (qidx < textChangeList_.size()) {
+        return textChangeList_.at(qidx);
     }
     // line-data changes
-    idx -= textChangeList_.size();
-    if( idx < lineDataTextChangeList_.size() ) {
-        return lineDataTextChangeList_.at(idx);
+    qidx -= textChangeList_.size();
+    if (qidx < lineDataTextChangeList_.size()) {
+        return lineDataTextChangeList_.at(qidx);
     }
     // other changes
-    idx -= lineDataTextChangeList_.size();
-    Q_ASSERT(idx < miscChangeList_.size() );
-    return miscChangeList_.at(idx);
+    qidx -= lineDataTextChangeList_.size();
+    Q_ASSERT(qidx < miscChangeList_.size() );
+    return miscChangeList_.at(qidx);
 }
 
 
 /// Takes the given item
-Change*MergableChangeGroup::take(int idx)
+Change*MergableChangeGroup::take(size_t idx)
 {
+    qsizetype qidx = static_cast<qsizetype>(idx);
+
     // plain text changes
-    if( idx < textChangeList_.size() ) {
-        return textChangeList_.takeAt(idx);
+    if (qidx < textChangeList_.size()) {
+        return textChangeList_.takeAt(qidx);
     }
     // line-data changes
-    idx -= textChangeList_.size();
-    if( idx < lineDataTextChangeList_.size() ) {
-        return lineDataTextChangeList_.takeAt(idx);
+    qidx -= textChangeList_.size();
+    if (qidx < lineDataTextChangeList_.size()) {
+        return lineDataTextChangeList_.takeAt(qidx);
     }
     // other changes
-    idx -= lineDataTextChangeList_.size();
-    Q_ASSERT(idx < miscChangeList_.size() );
-    return miscChangeList_.takeAt(idx);
+    qidx -= lineDataTextChangeList_.size();
+    Q_ASSERT(qidx < miscChangeList_.size());
+    return miscChangeList_.takeAt(qidx);
 }
 
 

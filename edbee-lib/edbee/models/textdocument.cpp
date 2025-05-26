@@ -227,7 +227,7 @@ void TextDocument::replaceRangeSet(TextRangeSet& rangeSet, const QStringList& te
 
         delta += (text.length() - static_cast<ptrdiff_t>(range.length()));
 
-        TextChangeWithCaret* change = new TextChangeWithCaret(range.min(), range.length(), text, -1);
+        TextChangeWithCaret* change = new TextChangeWithCaret(range.min(), range.length(), text, std::string::npos);
 
         Change* effectiveChange = executeAndGiveChange(change, false);
         TextChangeWithCaret* effectiveChangeWithCaret = dynamic_cast<TextChangeWithCaret*>(effectiveChange);
@@ -235,14 +235,14 @@ void TextDocument::replaceRangeSet(TextRangeSet& rangeSet, const QStringList& te
         // when a new caret position is supplied (can only happen via a TextDocumentFilter)
         // access it and change the caret to the given position
         size_t caret = 0;
-        if (effectiveChangeWithCaret && effectiveChangeWithCaret->caret() >= 0) {
-          caret = effectiveChangeWithCaret->caret();
+        if (effectiveChangeWithCaret && effectiveChangeWithCaret->caret() != std::string::npos) {
+            caret = effectiveChangeWithCaret->caret();
         // Default caret location is change-independent: old location + length new text
         } else {
-          caret = range.min() + text.length();
+            caret = range.min() + static_cast<size_t>(text.length());
         }
 
-        // sticky selection, keeps the selection around the text
+
         if (stickySelection) {
           range.set(range.min(), caret);
         } else {
