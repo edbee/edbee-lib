@@ -53,7 +53,7 @@ void TextChange::mergeStoredData(AbstractRangedChange* change)
     TextChange* singleTextChange = dynamic_cast<TextChange*>(change);
 
     QString newText;
-    newText.resize( getMergedStoredLength(change));
+    newText.resize(static_cast<qsizetype>(getMergedStoredLength(change)));
     mergeStoredDataViaMemcopy(newText.data(), text_.data(), singleTextChange->text_.data(), change, sizeof(QChar));
     text_ = newText;
 }
@@ -143,14 +143,14 @@ void TextChange::appendStoredText(const QString& text)
 }
 
 
-/// This method returns the text currently in the document
+/// Rketurns the text currently in the document
 const QString TextChange::docText(TextDocument* doc) const
 {
     return doc->textPart( offset_, length_ );
 }
 
 
-/// This method returns a string used for testing
+/// Returns a string used for testing
 QString TextChange::testString()
 {
     return QStringLiteral("%1:%2:%3").arg(offset_).arg(length_).arg(QString(text_).replace("\n","§"));
@@ -165,7 +165,7 @@ void TextChange::replaceText(TextDocument* document)
     QString old = buffer->textPart(offset_, length_);
 
     buffer->replaceText(offset_, length_, text_);
-    length_ = text_.length();
+    length_ = static_cast<size_t>(text_.length());
     text_ = old;
 }
 

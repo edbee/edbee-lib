@@ -20,12 +20,12 @@ class TextCodec;
 class EDBEE_EXPORT TextCodecManager {
 public:
     TextCodecManager();
-    ~TextCodecManager();
+    virtual ~TextCodecManager();
 
 public:
-    void giveTextCodec( TextCodec* codec );
+    void giveTextCodec(TextCodec* codec);
     QList<TextCodec*> codecList();
-    TextCodec* codecForName( const QString& name );
+    TextCodec* codecForName(const QString& name);
 
 private:
     QList<TextCodec*> codecList_;
@@ -33,11 +33,11 @@ private:
 };
 
 
-/// This class represents a single text codec
+/// Represents a single text codec
 /// The codec has a name and contains methods to create encoders and decoders
 class EDBEE_EXPORT TextCodec {
 public:
-    TextCodec( const QString& name, const QTextCodec* codec, QTextCodec::ConversionFlags flags );
+    TextCodec(const QString& name, const QTextCodec* codec, QTextCodec::ConversionFlags flags);
     const QTextCodec* codec();
     QTextEncoder* makeEncoder();
     QTextDecoder* makeDecoder();

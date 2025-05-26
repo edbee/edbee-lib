@@ -31,42 +31,44 @@ TextCodec *TextCodecDetector::globalPreferedCodec()
     return globalPreferedCodecRef_;
 }
 
-void TextCodecDetector::setGlobalPreferedCodec(TextCodec *codec)
+
+void TextCodecDetector::setGlobalPreferedCodec(TextCodec* codec)
 {
     globalPreferedCodecRef_ = codec;
 }
 
 
-
-TextCodecDetector::TextCodecDetector(const QByteArray* buffer, TextCodec *preferedCodec)
+TextCodecDetector::TextCodecDetector(const QByteArray* buffer, TextCodec* preferedCodec)
     : bufferRef_(buffer->constData())
-    , bufferLength_(buffer->size())
-    , preferedCodecRef_(0)
-    , fallbackCodecRef_(0)
+    , bufferLength_(static_cast<size_t>(buffer->size()))
+    , preferedCodecRef_(nullptr)
+    , fallbackCodecRef_(nullptr)
 {
-    setPreferedCodec( preferedCodec );
-    setFallbackCodec( 0 );
+    setPreferedCodec(preferedCodec);
+    setFallbackCodec(nullptr);
 }
 
-TextCodecDetector::TextCodecDetector(const char* buffer, int length, TextCodec *preferedCodec)
+
+TextCodecDetector::TextCodecDetector(const char* buffer, size_t length, TextCodec* preferedCodec)
     : bufferRef_(buffer)
     , bufferLength_(length)
-    , preferedCodecRef_(0)
-    , fallbackCodecRef_(0)
+    , preferedCodecRef_(nullptr)
+    , fallbackCodecRef_(nullptr)
 {
-    setPreferedCodec( preferedCodec );
-    setFallbackCodec( 0 );
+    setPreferedCodec(preferedCodec);
+    setFallbackCodec(0);
 }
+
 
 TextCodecDetector::~TextCodecDetector()
 {
-
 }
+
 
 /// This method returns the prefered codec
 void TextCodecDetector::setPreferedCodec(TextCodec* codec)
 {
-    if( codec ) {
+    if (codec) {
         preferedCodecRef_ = codec;
     } else {
         /// prefer UTF-8
@@ -80,17 +82,14 @@ void TextCodecDetector::setPreferedCodec(TextCodec* codec)
 /// @param codec the codec to use. When you use 0 the system codec is used
 void TextCodecDetector::setFallbackCodec(TextCodec* codec)
 {
-    if( codec ) {
+    if (codec) {
         fallbackCodecRef_ = codec;
     } else {
         /// prefer System
-        fallbackCodecRef_ = Edbee::instance()->codecManager()->codecForName("ISO-8859-1"); //QTextCodec::codecForLocale();    // is identical to: QTextCodec::codecForName(“System”)
+        fallbackCodecRef_ = Edbee::instance()->codecManager()->codecForName("ISO-8859-1"); // QTextCodec::codecForLocale();    // is identical to: QTextCodec::codecForName(“System”)
         Q_ASSERT(fallbackCodecRef_);
     }
 }
-
-
-
 
 
 /// Detects the encoding of the provided buffer.
@@ -121,11 +120,11 @@ TextCodec* TextCodecDetector::detectCodec()
 {
     // if the file has a Byte Order Marker, we can assume the file is in UTF-xx
     // otherwise, the file would not be human readable
-    if( hasUTF8Bom(bufferRef_,bufferLength_) ) return codecManager()->codecForName("UTF-8 with BOM");
-    if( hasUTF16LEBom(bufferRef_,bufferLength_) ) return codecManager()->codecForName("UTF-16LE with BOM");
-    if( hasUTF16BEBom(bufferRef_,bufferLength_) ) return codecManager()->codecForName("UTF-16BE with BOM");
-    if( hasUTF32LEBom(bufferRef_,bufferLength_) ) return codecManager()->codecForName("UTF-32LE with BOM");
-    if( hasUTF32BEBom(bufferRef_,bufferLength_) ) return codecManager()->codecForName("UTF-32BE with BOM");
+    if (hasUTF8Bom(bufferRef_,bufferLength_)) return codecManager()->codecForName("UTF-8 with BOM");
+    if (hasUTF16LEBom(bufferRef_,bufferLength_)) return codecManager()->codecForName("UTF-16LE with BOM");
+    if (hasUTF16BEBom(bufferRef_,bufferLength_)) return codecManager()->codecForName("UTF-16BE with BOM");
+    if (hasUTF32LEBom(bufferRef_,bufferLength_)) return codecManager()->codecForName("UTF-32LE with BOM");
+    if (hasUTF32BEBom(bufferRef_,bufferLength_)) return codecManager()->codecForName("UTF-32BE with BOM");
 
     // if a byte has its most significant bit set, the file is in UTF-8 or in the default encoding
     // otherwise, the file is in US-ASCII
@@ -136,8 +135,8 @@ TextCodec* TextCodecDetector::detectCodec()
     bool validU8Char = true;
 
     // TODO the buffer is not read up to the end, but up to length - 6
-    int length = bufferLength_;
-    int i = 0;
+    size_t length = bufferLength_;
+    size_t i = 0;
     while( i < length - 6 )
     {
         char b0 = bufferRef_[i];
@@ -230,44 +229,43 @@ TextCodec* TextCodecDetector::detectCodec()
 
 
 /// Has a Byte Order Marker for UTF-8
-bool TextCodecDetector::hasUTF8Bom( const char* bom, int length )
+bool TextCodecDetector::hasUTF8Bom(const char* bom, size_t length)
 {
-    if( length < 3 ) return false;
+    if (length < 3) return false;
     return (bom[0] == -17 && bom[1] == -69 && bom[2] == -65);
 }
 
+
 /// Has a Byte Order Marker for UTF-16 Low Endian
 /// (ucs-2le, ucs-4le, and ucs-16le).
-bool TextCodecDetector::hasUTF16LEBom( const char* bom, int length )
+bool TextCodecDetector::hasUTF16LEBom(const char* bom, size_t length)
 {
-    if( length < 2 ) return false;
+    if (length < 2) return false;
     return (bom[0] == -1 && bom[1] == -2);
 }
 
+
 /// Has a Byte Order Marker for UTF-16 Big Endian
 /// (utf-16 and ucs-2).
-bool TextCodecDetector::hasUTF16BEBom( const char* bom, int length )
+bool TextCodecDetector::hasUTF16BEBom(const char* bom, size_t length)
 {
-    if( length < 2 ) return false;
+    if (length < 2) return false;
     return (bom[0] == -2 && bom[1] == -1);
 }
 
 
-
 /// Has a Byte Order Marker for UTF-32 Low Endian
-bool TextCodecDetector::hasUTF32LEBom( const char* bom, int length )
+bool TextCodecDetector::hasUTF32LEBom(const char* bom, size_t length)
 {
-    if( length < 4 ) return false;
+    if (length < 4) return false;
     return (bom[0] == -1 && bom[1] == -2 && bom[2] == 0 && bom[3] == 0 );
 }
 
 /// Has a Byte Order Marker for UTF-32 Big Endian
-bool TextCodecDetector::hasUTF32BEBom( const char* bom, int length )
+bool TextCodecDetector::hasUTF32BEBom(const char* bom, size_t length)
 {
-    if( length < 4 ) return false;
+    if (length < 4) return false;
     return (bom[0] == 0 && bom[1] == 0 && bom[2] == -2 && bom[3] == -1);
 }
-
-
 
 } // edbee
