@@ -316,16 +316,16 @@ Change *TextDocument::executeAndGiveChange(Change* change, int coalesceId )
 /// @param coalesceId (default 0) the coalesceId to use. Whe using the same number changes could be merged to one change. CoalesceId of 0 means no merging
 void TextDocument::append(const QString& text, int coalesceId )
 {
-    replace( this->length(), 0, text, coalesceId );
+    replace(this->length(), 0, text, coalesceId);
 }
 
 
 /// Appends the given text
 /// @param text the text to append
 /// @param coalesceId (default 0) the coalesceId to use. Whe using the same number changes could be merged to one change. CoalesceId of 0 means no merging
-void TextDocument::replace( int offset, int length, const QString& text, int coalesceId )
+void TextDocument::replace(size_t offset, size_t length, const QString& text, int coalesceId)
 {
-    executeAndGiveChange( new TextChange( offset, length, text ), coalesceId);
+    executeAndGiveChange(new TextChange(offset, length, text), coalesceId);
 }
 
 
@@ -333,7 +333,7 @@ void TextDocument::replace( int offset, int length, const QString& text, int coa
 /// @param text the new document text
 void TextDocument::setText(const QString& text)
 {
-    replace( 0, length(), text, 0 );
+    replace(0, length(), text, 0);
 }
 
 
@@ -363,9 +363,9 @@ void TextDocument::rawAppend(QChar c)
 
 
 /// Appends an array of characters
-void TextDocument::rawAppend(const QChar* chars, int length)
+void TextDocument::rawAppend(const QChar* chars, size_t length)
 {
-    buffer()->rawAppend(chars,length);
+    buffer()->rawAppend(chars, length);
 }
 
 

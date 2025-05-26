@@ -116,15 +116,15 @@ public:
 
     // void giveChange( TextChange* change, bool merge  );
     virtual Change* giveChangeWithoutFilter(Change* change, int coalesceId) = 0;
-    void append(const QString& text, int coalesceId=0 );
-    void replace( int offset, int length, const QString& text, int coalesceId = 0);
+    void append(const QString& text, int coalesceId=0);
+    void replace(size_t offset, size_t length, const QString& text, int coalesceId = 0);
     void setText(const QString& text);
 
     // raw access for filling the document
     void rawAppendBegin();
     void rawAppendEnd();
     void rawAppend(QChar c);
-    void rawAppend(const QChar *chars, int length );
+    void rawAppend(const QChar *chars, size_t length);
 
 public:
 

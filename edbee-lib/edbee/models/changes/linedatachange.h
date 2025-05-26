@@ -16,35 +16,35 @@ class TextLineData;
 class EDBEE_EXPORT LineDataChange : public Change
 {
 public:
-    LineDataChange(int line, int field);
+    LineDataChange(size_t line, size_t field);
     virtual ~LineDataChange();
 
-    void giveLineData( TextLineData* lineData );
+    void giveLineData(TextLineData* lineData);
 
     virtual void execute(TextDocument* document);
     virtual void revert(TextDocument* doc);
 
     virtual bool giveAndMerge(TextDocument* document, Change* textChange );
 
-    virtual void applyLineDelta( int line, int length, int newLength );
+    virtual void applyLineDelta(size_t line, size_t length, size_t newLength);
 
     virtual QString toString();
 
-    int line() const;
-    void setLine( int line );
+    size_t line() const;
+    void setLine(size_t line);
 
-    int field() const;
-    void setField( int field );
-
-private:
-    void changeLineData( TextDocument* doc );
+    size_t field() const;
+    void setField(size_t field);
 
 private:
 
-    int line_;                      ///< The line number
-    int field_;                     ///< The field index
+    void changeLineData(TextDocument* doc);
+
+private:
+
+    size_t line_;                   ///< The line number
+    size_t field_;                  ///< The field index
     TextLineData* lineData_;        ///< The text-line data
-
 };
 
 } // edbee

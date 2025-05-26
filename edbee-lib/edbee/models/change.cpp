@@ -243,7 +243,6 @@ void ChangeGroup::giveChange(TextDocument* doc, Change* change)
 Change* ChangeGroup::at(size_t idx)
 {
     Q_ASSERT(idx < size());
-qDebug() << " idx = " << idx << ", size = " << size();
     return changeList_.at(static_cast<qsizetype>(idx));
 }
 
