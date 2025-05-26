@@ -156,7 +156,7 @@ signals:
     void languageGrammarChanged();
 
     /// Emits if the scoped range has been changed
-    void lastScopedOffsetChanged(int previousOffset, int lastScopedOffset);
+    void lastScopedOffsetChanged(size_t previousOffset, size_t lastScopedOffset);
 
 private:
     TextDocumentFilter* documentFilter_;            ///< The document filter if the filter is owned

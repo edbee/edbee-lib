@@ -69,7 +69,7 @@ CharTextDocument::CharTextDocument(TextEditorConfig* config, QObject* object)
     // forward the persisted state changes
     connect(textUndoStack_, SIGNAL(persistedChanged(bool)), this,  SIGNAL(persistedChanged(bool)));
 
-    connect(textScopes_, SIGNAL(lastScopedOffsetChanged(int,int)), this, SIGNAL(lastScopedOffsetChanged(int,int)));
+    connect(textScopes_, SIGNAL(lastScopedOffsetChanged(size_t,size_t)), this, SIGNAL(lastScopedOffsetChanged(size_t,size_t)));
 }
 
 
