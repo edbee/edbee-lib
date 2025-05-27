@@ -8,16 +8,16 @@
 #include <QChar>
 #include <QString>
 
-//#define GAP_VECTOR_CLEAR_GAP
+// #define GAP_VECTOR_CLEAR_GAP
 
 namespace edbee {
 
-/// This class is used to define a gap vector. A Gapvector is split in 2 parts. where the gap
+/// Is used to define a gap vector. A Gapvector is split in 2 parts. where the gap
 /// is moved to the insertation/changing point. So reducing the movement of fields
 template <typename T>
 class EDBEE_EXPORT GapVector {
 public:
-    GapVector( size_t capacity=16 ) : items_(nullptr), capacity_(0), gapBegin_(0), gapEnd_(0)  {
+    GapVector(size_t capacity = 16) : items_(nullptr), capacity_(0), gapBegin_(0), gapEnd_(0)  {
         items_    = new T[capacity];
         capacity_ = capacity;
         gapBegin_ = 0;
@@ -25,9 +25,11 @@ public:
         growSize_ = 16;
     }
 
+
     ~GapVector() {
         delete[] items_;
     }
+
 
     /// returns the used length of the data
     inline size_t length() const { return capacity_ - gapEnd_ + gapBegin_; }
@@ -35,6 +37,7 @@ public:
     inline size_t gapBegin() const { return gapBegin_; }
     inline size_t gapEnd() const { return gapEnd_; }
     inline size_t capacity() const { return capacity_; }
+
 
     /// clears the data
     void clear()
@@ -49,105 +52,68 @@ public:
 
 
 protected:
-    /// this method replaces the given text with the given data.
+
+    /// Replaces the given text with the given data.
     /// because the length of the source and target is the same in this method
     /// no gap-moving is required
     /// @param offset the target to move the data to
     /// @param length the number of items to replace
     /// @param data the data pointer with the source data
-    void replace( size_t offset, size_t length, const T* data ) {
-        Q_ASSERT( offset <= this->length() );
-        Q_ASSERT( offset + length <= capacity_ );
+    void replace(size_t offset, size_t length, const T* data) {
+        Q_ASSERT(offset <= this->length());
+        Q_ASSERT(offset + length <= capacity_);
 
         // copy the first part
-        if( offset < gapBegin() ) {
-            size_t len = qMin( gapBegin_-offset, length ); // issue 141, added -offset
-            memcpy( items_ + offset, data, static_cast<size_t>(sizeof(T))*len );
+        if (offset < gapBegin()) {
+            size_t len = qMin(gapBegin_ - offset, length); // issue 141, added -offset
+            memcpy(items_ + offset, data, static_cast<size_t>(sizeof(T)) * len);
             data      += len;   // increase the pointer
             offset    += len;
             length    -= len;
         }
 
-        if( 0 < length ) {
-            memcpy( items_ + offset + gapSize(), data, sizeof(T)*static_cast<size_t>(length) );
+        if (0 < length) {
+            memcpy(items_ + offset + gapSize(), data, sizeof(T)*static_cast<size_t>(length));
         }
     }
 
-    /// this method replaces the given text with the given data.
+
+    /// Replaces the given text with the given data.
     /// because the length of the source and target is the same in this method
     /// no gap-moving is required
     /// @param offset the target to move the data to
     /// @param length the number of items to replace
     /// @param data the data pointer with the source data
-    void fill( size_t offset, size_t length, const T& data ) {
-        Q_ASSERT( offset <= this->length() );
-        Q_ASSERT( offset + length <= capacity_ );
+    void fill(size_t offset, size_t length, const T& data) {
+        Q_ASSERT(offset <= this->length());
+        Q_ASSERT(offset + length <= capacity_);
 
         // copy the first part
-        if( offset < gapBegin() ) {
-            size_t len = qMin( gapBegin_-offset, length );
-            for( size_t i=0; i<len; ++i ) { items_ [offset + i] = data; }
+        if (offset < gapBegin()) {
+            size_t len = qMin(gapBegin_ - offset, length);
+            for (size_t i = 0; i < len; ++i) { items_ [offset + i] = data; }
             offset    += len;
             length    -= len;
         }
 
-        if( 0 < length ) {
+        if (0 < length) {
             offset += gapSize();
-            for( size_t i=0; i<length; ++i ) { items_ [offset + i] = data; }
+            for (size_t i = 0; i < length; ++i) { items_ [offset + i] = data; }
         }
     }
 
+
 public:
 
-
-    /// this method replaces the given items
+    /// Replaces the given items
     /// @param offset the offset of the items to replace
     /// @param length the number of items to replace
     /// @param data an array with new items
     /// @param newLength the number of items in the new array
-    void replace( size_t offset, size_t length, const T* data, size_t newLength ) {
+    void replace(size_t offset, size_t length, const T* data, size_t newLength) {
         size_t currentLength=this->length();
-        Q_ASSERT( (offset+length) <= currentLength );
-        Q_ASSERT( offset + length <= capacity_ );
-        Q_UNUSED( currentLength );
-
-        size_t gapSize = this->gapSize();
-
-        // Is it a 'delete' or 'insert' or 'replace' operation
-
-        // a replace operation (do not perform gap moving)
-        if( length == newLength ) {
-            replace( offset, length, data );
-
-        // insert operation
-        } else if( length < newLength ) {
-            size_t gapSizeRequired = newLength - length;
-            ensureGapSize( gapSizeRequired );
-            moveGapTo( offset + length );
-            memcpy( items_ + offset, data, sizeof(T) * static_cast<size_t>(newLength) );
-            gapBegin_ = offset + newLength;
-
-        // delete operation
-        } else {
-            moveGapTo( offset );
-            memcpy( items_ + offset, data, sizeof(T) * static_cast<size_t>(newLength) );
-            gapBegin_ = offset + newLength;
-            gapEnd_   = offset + gapSize + length;
-        }
-
-        Q_ASSERT( gapBegin_ <= gapEnd_ );
-        Q_ASSERT( this->gapSize() <= capacity_ );
-        Q_ASSERT( this->length() <= capacity_ );
-    }
-
-    /// this method replaces the given items with a single data item
-    /// @param offset the offset of the items to replace
-    /// @param lenth the number of items to replace
-    /// @param newLength the number of times to repeat data
-    void fill( size_t offset, size_t length, const T& data, size_t newLength ) {
-        size_t currentLength=this->length();
-        Q_ASSERT( (offset+length) <= currentLength );
-        Q_ASSERT( offset + length <= capacity_ );
+        Q_ASSERT((offset+length) <= currentLength);
+        Q_ASSERT(offset + length <= capacity_);
         Q_UNUSED(currentLength);
 
         size_t gapSize = this->gapSize();
@@ -155,55 +121,98 @@ public:
         // Is it a 'delete' or 'insert' or 'replace' operation
 
         // a replace operation (do not perform gap moving)
-        if( length == newLength ) {
-            fill( offset, length, data );
+        if (length == newLength) {
+            replace(offset, length, data);
 
         // insert operation
-        } else if( length < newLength ) {
+        } else if (length < newLength) {
             size_t gapSizeRequired = newLength - length;
-            ensureGapSize( gapSizeRequired );
-            moveGapTo( offset + length );
-            for( size_t i=0; i<newLength; ++i ) { items_[offset+i] = data; }
+            ensureGapSize(gapSizeRequired);
+            moveGapTo(offset + length);
+            memcpy(items_ + offset, data, sizeof(T) * static_cast<size_t>(newLength));
             gapBegin_ = offset + newLength;
 
         // delete operation
         } else {
-            moveGapTo( offset );
-            for( size_t i=0; i<newLength; ++i ) { items_[offset+i] = data; }
+            moveGapTo(offset);
+            memcpy(items_ + offset, data, sizeof(T) * static_cast<size_t>(newLength));
             gapBegin_ = offset + newLength;
             gapEnd_   = offset + gapSize + length;
         }
 
-        Q_ASSERT( gapBegin_ <= gapEnd_ );
-        Q_ASSERT( this->gapSize() <= capacity_ );
-        Q_ASSERT( this->length() <= capacity_ );
+        Q_ASSERT(gapBegin_ <= gapEnd_);
+        Q_ASSERT(this->gapSize() <= capacity_);
+        Q_ASSERT(this->length() <= capacity_);
     }
+
+
+    /// Replaces the given items with a single data item
+    /// @param offset the offset of the items to replace
+    /// @param lenth the number of items to replace
+    /// @param newLength the number of times to repeat data
+    void fill(size_t offset, size_t length, const T& data, size_t newLength) {
+        size_t currentLength=this->length();
+        Q_ASSERT((offset+length) <= currentLength);
+        Q_ASSERT(offset + length <= capacity_);
+        Q_UNUSED(currentLength);
+
+        size_t gapSize = this->gapSize();
+
+        // Is it a 'delete' or 'insert' or 'replace' operation
+
+        // a replace operation (do not perform gap moving)
+        if (length == newLength) {
+            fill(offset, length, data);
+
+        // insert operation
+        } else if (length < newLength) {
+            size_t gapSizeRequired = newLength - length;
+            ensureGapSize(gapSizeRequired);
+            moveGapTo( offset + length);
+            for (size_t i = 0; i < newLength; ++i) { items_[offset+i] = data; }
+            gapBegin_ = offset + newLength;
+
+        // delete operation
+        } else {
+            moveGapTo(offset);
+            for (size_t i = 0; i < newLength; ++i) { items_[offset+i] = data; }
+            gapBegin_ = offset + newLength;
+            gapEnd_   = offset + gapSize + length;
+        }
+
+        Q_ASSERT(gapBegin_ <= gapEnd_);
+        Q_ASSERT(this->gapSize() <= capacity_);
+        Q_ASSERT(this->length() <= capacity_);
+    }
+
 
     /// convenient append method
-    void append( T t ) {
-        replace( length(), 0, &t, 1 );
+    void append(T t) {
+        replace(length(), 0, &t, 1);
     }
+
 
     /// another append method
-    void append( const T* t, size_t length ) {
-        replace( this->length(), 0, t, length );
+    void append(const T* t, size_t length) {
+        replace(this->length(), 0, t, length);
     }
 
 
-    /// This method returns the item at the given index
-    T at( size_t offset ) const {
-        Q_ASSERT( offset < length() );
-        if( offset < gapBegin_ ) {
+    /// Returns the item at the given index
+    T at(size_t offset) const {
+        Q_ASSERT(offset < length());
+        if (offset < gapBegin_) {
             return items_[offset];
         } else {
             return items_[gapEnd_ + offset - gapBegin_];
         }
     }
 
-    /// This method sets an item at the given index
-    void set( size_t offset, const T& value ) {
-        Q_ASSERT( offset < length() );
-        if( offset < gapBegin_ ) {
+
+    /// Sets an item at the given index
+    void set(size_t offset, const T& value) {
+        Q_ASSERT(offset < length());
+        if (offset < gapBegin_) {
             items_[offset] = value;
         } else {
             items_[gapEnd_ + offset - gapBegin_] = value;
@@ -211,40 +220,41 @@ public:
     }
 
 
-    /// This method return an index
+    /// Returns an index
     T& operator[](size_t offset) const {
-        Q_ASSERT( offset < length() );
-        if( offset < gapBegin_ ) {
+        Q_ASSERT(offset < length());
+        if (offset < gapBegin_) {
             return items_[offset];
         } else {
             return items_[gapEnd_ + offset - gapBegin_];
         }
     }
 
-    /// This method returns the 'raw' element at the given location
+
+    /// Returns the 'raw' element at the given location
     /// This method does NOT take in account the gap
-    T& rawAt( size_t index ) {
-        Q_ASSERT( index < capacity_ );
+    T& rawAt(size_t index) {
+        Q_ASSERT(index < capacity_);
         return items_[index];
     }
 
 
-    /// This method copies the given range to the data pointer
-    void copyRange( QChar* data, size_t offset, size_t length ) const {
-        Q_ASSERT( offset < this->length() );
-        Q_ASSERT( (offset+length) <= this->length() );
+    /// Copies the given range to the data pointer
+    void copyRange(QChar* data, size_t offset, size_t length) const {
+        Q_ASSERT(offset < this->length());
+        Q_ASSERT((offset + length) <= this->length());
 
         // copy the first part
-        if( offset < gapBegin() ) {
-            size_t len = qMin( gapBegin_-offset, length );
-            memcpy( data, items_ + offset, sizeof(T)*static_cast<size_t>(len) );
+        if (offset < gapBegin()) {
+            size_t len = qMin(gapBegin_ - offset, length);
+            memcpy(data, items_ + offset, sizeof(T)*static_cast<size_t>(len));
             data      += len;   // increase the pointer
             offset    += len;
             length    -= len;
         }
 
-        if( length > 0 ) {
-            memcpy( data, items_ + offset + gapSize(), sizeof(T)*static_cast<size_t>(length) );
+        if (length > 0) {
+            memcpy(data, items_ + offset + gapSize(), sizeof(T)*static_cast<size_t>(length));
         }
     }
 
@@ -254,7 +264,7 @@ public:
     /// WARNING, this method MOVES the gap! Which means this method should NOT be used for a lot of operations
     T* data() {
         ensureGapSize(1);
-        moveGapTo( length() );
+        moveGapTo(length());
         items_[length()] = QChar(); // a \0 character
         return items_;
     }
@@ -262,35 +272,35 @@ public:
 
     //// moves the gap to the given position
     //// Warning when the gap is moved after the length the gap shrinks
-    void moveGapTo( size_t offset ) {
-        Q_ASSERT( offset <= capacity_);
-        Q_ASSERT( offset <= length() );
-        if( offset != gapBegin_ ) {
+    void moveGapTo(size_t offset) {
+        Q_ASSERT(offset <= capacity_);
+        Q_ASSERT(offset <= length());
+        if (offset != gapBegin_) {
             size_t gapSize = this->gapSize();
 
             // move the the data right after the gap
-            if (offset < gapBegin_ ) {
-                memmove( items_ + offset + gapSize, items_ + offset, sizeof(T) * (gapBegin_ - offset));   // memmove( target, source, size )
-
+            if (offset < gapBegin_) {
+                memmove(items_ + offset + gapSize, items_ + offset, sizeof(T) * (gapBegin_ - offset));   // memmove( target, source, size )
             } else {
-                memmove( items_ + gapBegin_, items_ + gapEnd_, sizeof(T) * (offset - gapBegin_ ));  // memmove( target, source, size )
+                memmove(items_ + gapBegin_, items_ + gapEnd_, sizeof(T) * (offset - gapBegin_));  // memmove( target, source, size )
             }
             gapBegin_ = offset;
-            gapEnd_   = gapBegin_ + gapSize; //qMin( gapBegin_ + gapSize, capacity_ );
+            gapEnd_   = gapBegin_ + gapSize; // qMin( gapBegin_ + gapSize, capacity_ );
 
         }
-        Q_ASSERT( gapBegin_ <= gapEnd_ );
+        Q_ASSERT(gapBegin_ <= gapEnd_);
 
 #ifdef GAP_VECTOR_CLEAR_GAP
         memset( items_+gapBegin_, 0, sizeof(T)*(gapEnd_-gapBegin_));
 #endif
     }
 
-    /// this method makes sure there's enough room for the insertation
-    void ensureGapSize( size_t requiredSize ) {
-        if( gapSize() < requiredSize ) {
-            while( growSize_ < capacity_ / 6) { growSize_ *= 2; }
-            resize(capacity_ + requiredSize + growSize_ - gapSize() );
+
+    /// Mkes sure there's enough room for the insertation
+    void ensureGapSize(size_t requiredSize) {
+        if (gapSize() < requiredSize) {
+            while (growSize_ < capacity_ / 6) { growSize_ *= 2; }
+            resize(capacity_ + requiredSize + growSize_ - gapSize());
         }
     }
 
@@ -298,20 +308,20 @@ public:
     /// resizes the array of data
     void resize(size_t newSize)
     {
-        if( capacity_ >= newSize) return;
+        if (capacity_ >= newSize) return;
 
         size_t lengte = length();
-        Q_ASSERT( lengte <= capacity_);
+        Q_ASSERT(lengte <= capacity_);
 /// TODO: optimize, so data is moved only once
 /// in other words, gap movement is not required over here!!
 /// this can be done with 2 memcopies
 //qlog_info() << "BEGIN resize: capacity =" << capacity_<< " => " << newSize;
 
-        moveGapTo( lengte );
-        T *newChars = new T[ newSize ];
+        moveGapTo(lengte);
+        T *newChars = new T[newSize];
 
-        if( capacity_ > 0 ) {
-            memmove( newChars, items_, sizeof(T)*lengte );
+        if (capacity_ > 0) {
+            memmove(newChars, items_, sizeof(T) * lengte);
             delete[] items_;
         }
         items_ = newChars;
@@ -326,69 +336,69 @@ public:
 
 
     /// sets the growsize. The growsize if the amount to reserve extra
-    void setGrowSize( size_t size ) { growSize_=size; }
+    void setGrowSize(size_t size) { growSize_ = size; }
 
     /// returns the growsize
     size_t growSize() { return growSize_; }
 
 
     /// Converts the 'gap-buffer' to a unit-test debugging string
-    QString getUnitTestString( QChar gapChar = '_' ) const {
+    QString getUnitTestString(QChar gapChar = '_') const {
         QString s;
         size_t gapBegin = this->gapBegin();
         size_t gapEnd   = this->gapEnd();
         size_t capacity = this->capacity();
 
-        for( size_t i=0; i<gapBegin; ++i ) {
-            if( items_[i].isNull() ) {
+        for (size_t i = 0; i < gapBegin; ++i) {
+            if (items_[i].isNull()) {
                 s.append("@");
             } else {
-                s.append( items_[i] );
+                s.append(items_[i]);
             }
         }
         s.append( "[" );
-        for( size_t i=gapBegin; i<gapEnd; ++i ) {
-            s.append( gapChar );
+        for (size_t i = gapBegin; i < gapEnd; ++i) {
+            s.append(gapChar);
         }
         s.append( ">" );
-        for( size_t i=gapEnd; i<capacity; ++i ) {
-            if( items_[i].isNull() ) {
+        for (size_t i=gapEnd; i<capacity; ++i) {
+            if (items_[i].isNull()) {
                 s.append("@");
             } else {
-                s.append( items_[i] );
+                s.append(items_[i]);
             }
         }
-
         return s;
     }
 
+
     /// Converts the 'gap-buffer' to a unit-test debugging string
-    QString getUnitTestString2( ) const {
+    QString getUnitTestString2() const {
         QString s;
         size_t gapBegin = this->gapBegin();
         size_t gapEnd   = this->gapEnd();
         size_t capacity = this->capacity();
 
-        for( size_t i=0; i<capacity;i++ ) {
-            if( i ) { s.append(","); }
-            if( gapEnd == i) s.append(">");
-            s.append( QStringLiteral("%1").arg( "X" ));
-            if( gapBegin==i ) s.append("[");
+        for (size_t i = 0; i < capacity; i++) {
+            if (i) { s.append(","); }
+            if (gapEnd == i) s.append(">");
+            s.append(QStringLiteral("%1").arg( "X" ));
+            if (gapBegin == i) s.append("[");
         }
 
         s.append(" | ");
-        s.append( QStringLiteral("gapBegin: %1, gapEnd: %2, capacity: %3, length: %4").arg(gapBegin).arg(gapEnd).arg(capacity).arg(length()) );
+        s.append(QStringLiteral("gapBegin: %1, gapEnd: %2, capacity: %3, length: %4").arg(gapBegin).arg(gapEnd).arg(capacity).arg(length()));
         return s;
     }
 
 
 protected:
 
-    T *items_;              ///< The item data
-    size_t capacity_;          ///< The number of reserved bytes
-    size_t gapBegin_;          ///< The start of the gap
-    size_t gapEnd_;            ///< The end of the gap
-    size_t growSize_;          ///< The size to grow extra
+    T *items_;           ///< The item data
+    size_t capacity_;    ///< The number of reserved bytes
+    size_t gapBegin_;    ///< The start of the gap
+    size_t gapEnd_;      ///< The end of the gap
+    size_t growSize_;    ///< The size to grow extra
 };
 
 
@@ -397,42 +407,44 @@ class EDBEE_EXPORT QCharGapVector : public GapVector<QChar>
 {
 public:
 
-    QCharGapVector( size_t size=16 ) : GapVector<QChar>(size){}
+    QCharGapVector(size_t size = 16) : GapVector<QChar>(size){}
 
     /// initializes the vector with a given string
-    QCharGapVector( const QString& data, size_t gapSize ) : GapVector<QChar>( static_cast<size_t>(data.length()) + gapSize )
+    QCharGapVector(const QString& data, size_t gapSize) : GapVector<QChar>(static_cast<size_t>(data.length()) + gapSize)
     {
-        memcpy( items_, data.constData(), sizeof(QChar) * static_cast<size_t>(data.length()) );
+        memcpy(items_, data.constData(), sizeof(QChar) * static_cast<size_t>(data.length()));
         gapBegin_ = static_cast<size_t>(data.length());
         gapEnd_ = capacity_;
     }
 
 
     /// Initializes the gapvector
-    void init( const QString& data, size_t gapSize )
+    void init(const QString& data, size_t gapSize)
     {
         delete items_;
         capacity_ = static_cast<size_t>(data.length()) + gapSize;
         items_ = new QChar[capacity_];
-        memcpy( items_, data.constData(), sizeof(QChar) * static_cast<size_t>(data.length()) );
+        memcpy(items_, data.constData(), sizeof(QChar) * static_cast<size_t>(data.length()));
         gapBegin_ = static_cast<size_t>(data.length());
         gapEnd_ = capacity_;
         growSize_ = 16;
     }
 
-    /// a convenient string replace function
-    void replaceString( size_t offset, size_t length, const QString& data ) {
-        replace( offset, length, data.constData(), static_cast<size_t>(data.length()) );
+
+    /// a string replace function
+    void replaceString(size_t offset, size_t length, const QString& data) {
+        replace(offset, length, data.constData(), static_cast<size_t>(data.length()));
     }
 
-    /// a convenient method to retrieve a QString part
-    QString mid( size_t offset, size_t length ) const
+
+    /// Retrieve a QString part
+    QString mid(size_t offset, size_t length) const
     {
         if (length == 0) return QString();
 
         QChar* data = new QChar[length];
         copyRange(data, offset, length);
-        QString str( data, static_cast<qsizetype>(length) );
+        QString str(data, static_cast<qsizetype>(length));
         delete[] data;
 
         return str;
@@ -446,7 +458,7 @@ public:
 template <typename T>
 class EDBEE_EXPORT NoGapVector {
 public:
-    NoGapVector( size_t capacity=16 ) {
+    NoGapVector(size_t capacity = 16) {
         Q_UNUSED(capacity);
     }
 
@@ -470,56 +482,58 @@ public:
 
 public:
 
-    /// this method replaces the given items
+    /// Replaces the given items
     /// @param offset the offset of the items to replace
     /// @param lenth the number of items to replace
     /// @param data an array with new items
     /// @param newLength the number of items in the new array
-    void replace( size_t offset, size_t length, const T* data, size_t newLength ) {
-        items_.remove(offset,length);
-        for( size_t i=0; i < newLength; i++ ) {
+    void replace(size_t offset, size_t length, const T* data, size_t newLength) {
+        items_.remove(offset, length);
+        for (size_t i = 0; i < newLength; i++) {
             items_.insert(offset+i,data[i]);
         }
     }
+
 
     /// this method replaces the given items with a single data item
     /// @param offset the offset of the items to replace
     /// @param lenth the number of items to replace
     /// @param newLength the number of times to repeat data
-    void fill( size_t offset, size_t length, const T& data, size_t newLength ) {
+    void fill(size_t offset, size_t length, const T& data, size_t newLength) {
         items_.remove(offset,length);
-        for( size_t i=0; i < newLength; i++ ) {
+        for (size_t i = 0; i < newLength; i++) {
             items_.insert(offset+i,data);
         }
-
     }
 
     /// convenient append method
-    void append( T t ) {
+    void append(T t) {
         items_.append(t);
     }
 
+
     /// another append method
-    void append( const T* t, size_t length ) {
-        for( size_t i=0; i < length; i++ ) {
+    void append(const T* t, size_t length) {
+        for (size_t i = 0; i < length; i++) {
             items_.append(t[i]);
         }
     }
 
 
     /// This method returns the item at the given index
-    T at( size_t offset ) const {
+    T at(size_t offset) const {
         return items_.at(offset);
     }
 
+
     /// This method sets an item at the given index
-    void set( size_t offset, const T& value ) {
+    void set(size_t offset, const T& value) {
         items_.replace(offset,value);
     }
 
 
     /// This method return an index
-    T& operator[]( size_t offset ) {
+    T& operator[](size_t offset) {
         return items_[offset];
     }
 
