@@ -387,6 +387,7 @@ size_t TextDocument::lineCount()
 /// Returns the character at the given position
 QChar TextDocument::charAt(size_t idx)
 {
+    Q_ASSERT(idx != std::string::npos);
     return buffer()->charAt(idx);
 }
 
@@ -410,6 +411,7 @@ QChar TextDocument::charAtOrNull(size_t idx)
 /// @return the character offset
 size_t TextDocument::offsetFromLine(size_t line)
 {
+    Q_ASSERT(line != std::string::npos);
     return buffer()->offsetFromLine(line);
 }
 
@@ -419,6 +421,7 @@ size_t TextDocument::offsetFromLine(size_t line)
 /// @return the line number (0 is the first line )
 size_t TextDocument::lineFromOffset(size_t offset)
 {
+    Q_ASSERT(offset != std::string::npos);
     return buffer()->lineFromOffset(offset);
 }
 
@@ -429,7 +432,7 @@ size_t TextDocument::lineFromOffset(size_t offset)
 /// @return the column position of the given offset
 size_t TextDocument::columnFromOffsetAndLine(size_t offset, size_t line)
 {
-    return buffer()->columnFromOffsetAndLine(offset,line);
+    return buffer()->columnFromOffsetAndLine(offset, line);
 }
 
 

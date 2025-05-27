@@ -1131,7 +1131,7 @@ TextRangeSet *TextRangeSet::clone() const
 /// returns the selection range
 TextRange& TextRangeSet::range(size_t idx)
 {
-    Q_ASSERT(idx >= 0);
+    Q_ASSERT(idx != std::string::npos);
     Q_ASSERT(idx < static_cast<size_t>(selectionRanges_.size()));
     return selectionRanges_[static_cast<qsizetype>(idx)];
 }

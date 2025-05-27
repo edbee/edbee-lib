@@ -27,7 +27,7 @@ RemoveCommand::RemoveCommand(RemoveMode removeMode, Direction direction)
 }
 
 
-/// This method returns the coalesceId to use
+/// Returns the coalesceId to use
 /// Currently all commands in the same direction will get the same coalesceId
 /// @return the coalesceId to use
 int RemoveCommand::coalesceId() const
@@ -59,7 +59,7 @@ size_t RemoveCommand::smartBackspace(TextDocument* doc, size_t caret)
     if (caret <= firstNoneWhitespaceCharPos && lineStartOffset < firstNoneWhitespaceCharPos) {
         // retrieve the whitespace-start-part of the line
         QString linePrefix = doc->textPart(lineStartOffset, firstNoneWhitespaceCharPos-lineStartOffset);
-        QList<size_t> lineColumnOffsets = Util().tabColumnOffsets(linePrefix, config->indentSize());
+        QList<size_t> lineColumnOffsets = Util().tabColumnOffsets(linePrefix, static_cast<unsigned int>(config->indentSize()));
 
         // when we're exactly at a columnOffset, we need to get the previous
         size_t lastColumnOffset = lineColumnOffsets.last() + lineStartOffset;
@@ -124,10 +124,10 @@ void RemoveCommand::rangesForRemoveLine(TextEditorController* controller, TextRa
     TextDocument* doc = controller->textDocument();
 
     // process all carets
-    int offset = direction_ == Left ? -1 : 0;
+    ptrdiff_t offset = direction_ == Left ? -1 : 0;
     for (size_t rangeIdx = ranges->rangeCount() - 1; rangeIdx >= 0; --rangeIdx) {
         TextRange& range = ranges->range(rangeIdx);
-        QChar chr = doc->charAtOrNull(range.caret() + offset);
+        QChar chr = doc->charAtOrNull(static_cast<size_t>(static_cast<ptrdiff_t>(range.caret()) + offset));
         if (chr == '\n') {
             range.moveCaret(doc,directionSign());
         } else {
@@ -207,6 +207,5 @@ int RemoveCommand::directionSign() const
 {
     return direction_ == Left ? -1 : 1;
 }
-
 
 } // edbee
