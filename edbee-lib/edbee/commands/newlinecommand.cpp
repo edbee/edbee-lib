@@ -36,31 +36,31 @@ QString NewlineCommand::calculateSmartIndent(TextEditorController* controller, T
 
     // find the line column position
     size_t caretOffset = range.min();
-    int line = doc->lineFromOffset(range.min());
-    int startOffset = doc->offsetFromLine(line);
-    int endOffset = qMin( caretOffset ,doc->offsetFromLine(line + 1) - 1);
+    size_t line = doc->lineFromOffset(range.min());
+    size_t startOffset = doc->offsetFromLine(line);
+    size_t endOffset = qMin( caretOffset ,doc->offsetFromLine(line + 1) - 1);
 
     // searches for the start of the current line
-    int charPos = buf->findCharPosWithinRangeOrClamp(startOffset, 1, config->whitespaceWithoutNewline(), false, startOffset, endOffset);
+    size_t charPos = buf->findCharPosWithinRangeOrClamp(startOffset, 1, config->whitespaceWithoutNewline(), false, startOffset, endOffset);
 
     // when the start is found
     if (charPos > startOffset) {
         // we have found the column index. This isn't yet the column,
         // because when using tab-characters the column position can be different.
         // calculate the position by converting the tabs to spaces
-        int column = Util().convertTabsToSpaces(doc->textPart( startOffset, charPos-startOffset ), config->indentSize()).length();
+        size_t column = static_cast<size_t>(Util().convertTabsToSpaces(doc->textPart(startOffset, charPos-startOffset), config->indentSize()).length());
 
         // when a tab character is used, we need to add the given number of tabs
         if (config->useTabChar()) {
-            int tabs   = column / config->indentSize();
-            int spaces = column % config->indentSize();
-            result.append( QStringLiteral("\t").repeated(tabs));
+            ptrdiff_t tabs   = static_cast<ptrdiff_t>(column) / config->indentSize();
+            ptrdiff_t spaces = static_cast<ptrdiff_t>(column) % config->indentSize();
+            result.append(QStringLiteral("\t").repeated(tabs));
             if (spaces > 0) {
                 result.append(QStringLiteral(" ").repeated(spaces));
             }
         // else we can add spaces to the given column position
         } else {
-            result.append(QStringLiteral(" ").repeated(column));
+            result.append(QStringLiteral(" ").repeated(static_cast<qsizetype>(column)));
         }
     }
     return result;
@@ -75,8 +75,7 @@ void NewlineCommand::executeNormalNewline(TextEditorController* controller)
 
     // when no smarttab is enabled this function is simple
     // the current selection is simple replaced by a newline :)
-    if (!config->smartTab())
-    {
+    if (!config->smartTab()) {
         controller->replaceSelection("\n", CoalesceId_InsertNewLine+NormalNewline);
         return;
     }
@@ -113,16 +112,16 @@ void NewlineCommand::executeSpecialNewline(TextEditorController* controller, boo
     // iterate over the selection via a dynamic rangeset
     DynamicTextRangeSet sel(controller->textSelection());
     TextRangeSet* newSelection = new TextRangeSet(doc);
-    int lastLine = -1;
-    int lineDelta = nextLine ? 1 : 0;
+    size_t lastLine = std::string::npos;
+    size_t lineDelta = nextLine ? 1 : 0;
     for (size_t i = 0; i < sel.rangeCount(); ++i) {
 
         // only handle the line if it's another line then the previous
         TextRange& range = sel.range(i);
-        int line = doc->lineFromOffset(range.caret());
-        if (line > lastLine) {
+        size_t line = doc->lineFromOffset(range.caret());
+        if (line > lastLine || lastLine == std::string::npos) {
             // create a new range
-            int pos = doc->offsetFromLine(line + lineDelta) - 1;
+            size_t pos = doc->offsetFromLine(line + lineDelta) - 1;
             TextRange newRange(pos, pos);
 
             QString text = QStringLiteral("\n%1").arg(smart ? calculateSmartIndent(controller, newRange) : "");
@@ -176,6 +175,5 @@ QString NewlineCommand::toString()
 {
     return "NewlineCommand";
 }
-
 
 } // edbee

@@ -37,5 +37,4 @@ private:
     NewLineType newLineType_;       ///< The current newline type
 };
 
-
 } // edbee
