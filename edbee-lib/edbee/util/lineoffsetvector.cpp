@@ -26,48 +26,45 @@ void LineOffsetVector::applyChange(TextBufferChange change)
     size_t line = change.line() + 1;    // line 0 may NEVER be replaced!
 
     // repace the lines
-    moveDeltaToIndex( line );
+    moveDeltaToIndex(line);
 
     offsetList_.replace(line, change.lineCount(), change.newLineOffsets().constData(), change.newLineCount());
 
     // Add the delta to all the lines
-    int endLine = line + change.newLineCount();
+    size_t endLine = line + change.newLineCount();
 
-    if( offsetDeltaIndex_ < endLine ) {
+    if (offsetDeltaIndex_ < endLine) {
         offsetDeltaIndex_ = endLine;
     }
 
-    Q_ASSERT(offsetDeltaIndex_ <= this->length() );
+    Q_ASSERT(offsetDeltaIndex_ <= this->length());
 
-    changeOffsetDelta(endLine, change.newTextLength() - change.length());
+    changeOffsetDelta(endLine, static_cast<ptrdiff_t>(change.newTextLength()) - static_cast<ptrdiff_t>(change.length()));
 }
 
-
-
-/*
-/// This method is should be called when text is replaced. This method
-/// updates all elements of the split vector and calculates all offsets
-/// @param offset the offset to change
-/// @param length the number of chars that are replaced
-/// @param text the new text
-void LineOffsetVector::textReplaced(int offset, int length, const QChar *newData , int newDataLength)
+// applies the given delta
+size_t applyDelta(size_t offset, ptrdiff_t delta)
 {
-    LineChange change;
-    prepareChange(offset,length, newData, newDataLength, &change);
-    applyChange( &change );
+    size_t uDelta = static_cast<size_t>(qAbs(delta));
 
+    if (delta < 0) {
+        Q_ASSERT(uDelta <= offset);
+        return offset - uDelta;
+    } else {
+        return offset + uDelta;
+    }
 }
-*/
 
 /// this method returns the line offset at the given line offset
 size_t LineOffsetVector::at(size_t idx) const
 {
     Q_ASSERT(idx < length());
     if (idx >= offsetDeltaIndex_) {
-        return offsetList_.at(idx) + offsetDelta_;
+        return applyDelta(offsetList_.at(idx), offsetDelta_);
     }
     return offsetList_.at(idx);
 }
+
 
 size_t LineOffsetVector::length() const
 {
@@ -75,14 +72,14 @@ size_t LineOffsetVector::length() const
 }
 
 
-/// this method searches the line from the given offset
+/// Searches the line from the given offset
 size_t LineOffsetVector::findLineFromOffset(size_t offset)
 {
-    if( offset == 0 ) return 0;
+    if (offset == 0) return 0;
     size_t offsetListLength = offsetList_.length();
     size_t offsetAtDelta = 0;
-    if( offsetDeltaIndex_ < offsetListLength ) {
-        offsetAtDelta = offsetList_.at(offsetDeltaIndex_) + offsetDelta_;
+    if (offsetDeltaIndex_ < offsetListLength) {
+        offsetAtDelta = applyDelta(offsetList_.at(offsetDeltaIndex_), offsetDelta_);
     } else {
         offsetAtDelta = offsetList_.at( offsetListLength - 1);
     }
@@ -94,31 +91,32 @@ size_t LineOffsetVector::findLineFromOffset(size_t offset)
 
     // binary search the right part
     } else {
-        line = searchOffsetIgnoringOffsetDelta(offset - offsetDelta_, offsetDeltaIndex_, offsetListLength);
+        line = searchOffsetIgnoringOffsetDelta(applyDelta(offset, - offsetDelta_), offsetDeltaIndex_, offsetListLength);
     }
     return line;
-
 }
 
-/// This method appends an offset to the end of the list
+
+/// Appends an offset to the end of the list
 /// It simply applies the current offsetDelta because it will always be AFTER the current offsetDelta
 void LineOffsetVector::appendOffset(size_t offset)
 {
-    this->offsetList_.append(offset - offsetDelta_);
+    this->offsetList_.append(applyDelta(offset, -offsetDelta_));
 }
 
+
 /// This method returns the offset to string
-QString LineOffsetVector::toUnitTestString()
+QString LineOffsetVector::toUnitTestString() const
 {
     QString s;
-    for( int i=0,cnt=offsetDeltaIndex_; i<cnt; ++i ) {
-        if( i != 0 ) { s.append(","); }
-        s.append( QStringLiteral("%1").arg( offsetList_[i] ) );
+    for (size_t i=0, cnt = offsetDeltaIndex_; i < cnt; ++i) {
+        if (i != 0) { s.append(","); }
+        s.append(QStringLiteral("%1").arg(offsetList_[i]));
     }
-    s.append( QStringLiteral("[%1>").arg( offsetDelta_ ) );
-    for( int i=offsetDeltaIndex_,cnt=offsetList_.length(); i<cnt; ++i ) {
-        if( i != offsetDeltaIndex_ ) { s.append(","); }
-        s.append( QStringLiteral("%1").arg( offsetList_[i] ) );
+    s.append(QStringLiteral("[%1>").arg(offsetDelta_ ));
+    for (size_t i = offsetDeltaIndex_, cnt = offsetList_.length(); i < cnt; ++i) {
+        if (i != offsetDeltaIndex_) { s.append(","); }
+        s.append(QStringLiteral("%1").arg( offsetList_[i]));
     }
     return s;
 }
@@ -127,7 +125,7 @@ QString LineOffsetVector::toUnitTestString()
 /// @param offsetDelta the offsetDelta to use
 /// @param offsetDeltaIndex the offsetDeltaIndex to use
 /// @param a list of integer offsets. Close the list with -1 !!!
-void LineOffsetVector::initForUnitTesting(size_t offsetDelta, size_t offsetDeltaIndex, ... )
+void LineOffsetVector::initForUnitTesting(ptrdiff_t offsetDelta, size_t offsetDeltaIndex, ... )
 {
     offsetDelta_ = offsetDelta;
     offsetDeltaIndex_ = offsetDeltaIndex;
@@ -142,7 +140,6 @@ void LineOffsetVector::initForUnitTesting(size_t offsetDelta, size_t offsetDelta
     }
     va_end(offsets);
 }
-
 
 
 /// Returns the line from the start position. This method uses a binary search.
@@ -190,12 +187,11 @@ void LineOffsetVector::moveDeltaToIndex(size_t index)
 
         // move to the right
         if (offsetDeltaIndex_ < index) {
-            for (int i=offsetDeltaIndex_; i < index; ++i) {
-                offsetList_[i] += offsetDelta_; // apply the delta
+            for (size_t i = offsetDeltaIndex_; i < index; ++i) {
+                offsetList_[i] = applyDelta(offsetList_[i], offsetDelta_); // apply the delta
             }
         // move to the left
         } else if (index < offsetDeltaIndex_) {
-
             // In this situation there are 2 solution.
             // (1) Make the delta 0 or (2) apply the 'negative index' to the items on the left
             size_t length         = offsetList_.length();
@@ -205,20 +201,21 @@ void LineOffsetVector::moveDeltaToIndex(size_t index)
             // prefer delta 0
             if (delta0cost <= negativeDeltaCost) {
                 for (size_t i=offsetDeltaIndex_; i < length; ++i) {
-                    offsetList_[i] += offsetDelta_;
+                    offsetList_[i] = applyDelta(offsetList_[i], offsetDelta_);
                 }
                 offsetDelta_ = 0;
+
             // else apply the negative delta
             } else {
-                for (size_t i=index; i < offsetDeltaIndex_; ++i) {
-                    offsetList_[i] -= offsetDelta_;
+                for (size_t i = index; i < offsetDeltaIndex_; ++i) {
+                    offsetList_[i] = applyDelta(offsetList_[i], -offsetDelta_);
                 }
             }
         }
     }
     offsetDeltaIndex_ = index;
-
 }
+
 
 /// This method moves the offset delta to the given location
 void LineOffsetVector::changeOffsetDelta(size_t index, std::ptrdiff_t delta)
@@ -231,7 +228,6 @@ void LineOffsetVector::changeOffsetDelta(size_t index, std::ptrdiff_t delta)
 
     // (2) The new index is BEFORE the old index.
     } else if (index < offsetDeltaIndex_) {
-
         // apply the 'negative' offset to the given location
         for (size_t i=index; i < offsetDeltaIndex_; ++i) {
 
@@ -251,7 +247,7 @@ void LineOffsetVector::changeOffsetDelta(size_t index, std::ptrdiff_t delta)
 
         // apply the old offsetsDelta to the indices before
         for (size_t i = offsetDeltaIndex_; i < index; ++i) {
-            offsetList_[i] += offsetDelta_;
+            offsetList_[i] = applyDelta(offsetList_[i], offsetDelta_);
         }
         offsetDeltaIndex_ = index;
         offsetDelta_ += delta;

@@ -17,7 +17,6 @@ private slots:
     void testRindexOf();
 
     void testScopeSelectorRanking();
-
 };
 
 } // edbee

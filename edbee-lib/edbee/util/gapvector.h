@@ -212,7 +212,7 @@ public:
 
 
     /// This method return an index
-    T& operator[]( size_t offset ) {
+    T& operator[](size_t offset) const {
         Q_ASSERT( offset < length() );
         if( offset < gapBegin_ ) {
             return items_[offset];

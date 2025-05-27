@@ -59,8 +59,8 @@ protected:
     void changeOffsetDelta(size_t index, std::ptrdiff_t delta);
 
 public:
-    QString toUnitTestString();
-    void initForUnitTesting(size_t offsetDelta, size_t offsetDeltaIndex, ...);
+    QString toUnitTestString() const;
+    void initForUnitTesting(ptrdiff_t offsetDelta, size_t offsetDeltaIndex, ...);
 
 private:
 
