@@ -34,7 +34,7 @@ public:
     // line informationm
     size_t line_;                    ///< The line number were the change occured
     size_t lineCount_;               ///< the number of lines that are involved.
-    QVector<size_t> newLineOffsets_; ///< A list of new line offset
+    QVector<int> newLineOffsets_; ///< A list of new line offset
 };
 
 
@@ -55,7 +55,7 @@ public:
     size_t line() const { return d_->line_; }
     size_t lineCount() const { return d_->lineCount_; }
     inline size_t newLineCount() const { return static_cast<size_t>(d_->newLineOffsets_.size()); }
-    const QVector<size_t>& newLineOffsets() const { return d_->newLineOffsets_; }
+    const QVector<int>& newLineOffsets() const { return d_->newLineOffsets_; }
 
 
 private:

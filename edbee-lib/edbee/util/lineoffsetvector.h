@@ -16,7 +16,7 @@ class TextBufferChange;
 
 
 
-/// Implements the vector for storing the line numbers at certain offsets
+/// This class implements the vector for storing the line numbers at certain offsets/
 /// The class allows the 'gap' position to contain a delta offset. Which means that
 ///
 /// all offsets after the gap are increased with the offsetDelta when searched. Inserting/deleting
@@ -25,7 +25,7 @@ class TextBufferChange;
 /// The line offset pointed at by each index is the first character in the given line.
 class EDBEE_EXPORT LineOffsetVector {
 public:
-/// a structure to describe the line change that happend
+    /// a structure to describe the line change that happend
 //    struct LineChange {
 //        int line;                   ///< the first line that's going to be replaced
 //        int lineCount;              ///< the number of lines that are replaced
@@ -39,34 +39,34 @@ public:
 
     void applyChange( TextBufferChange change );
 
-    size_t at(size_t idx) const;
-    size_t length() const;
+    int at( int idx ) const;
+    int length() const;
 
-    size_t findLineFromOffset(size_t offset);
+    int findLineFromOffset( int offset );
 
-    ptrdiff_t offsetDelta() { return offsetDelta_; }
-    size_t offsetDeltaIndex() { return offsetDeltaIndex_; }
+    int offsetDelta() { return offsetDelta_; }
+    int offsetDeltaIndex() { return offsetDeltaIndex_; }
 
-    void appendOffset(size_t offset);
+    void appendOffset( int offset );
 
     /// TODO: temporary method (remove)
-    GapVector<size_t> & offsetList() { return offsetList_; }
+    GapVector<int> & offsetList() { return offsetList_; }
 
 protected:
-    size_t searchOffsetIgnoringOffsetDelta(size_t offset, size_t org_start, size_t org_end );
+    int searchOffsetIgnoringOffsetDelta(int offset, int org_start, int org_end );
 
-    void moveDeltaToIndex(size_t index);
-    void changeOffsetDelta(size_t index, std::ptrdiff_t delta);
+    void moveDeltaToIndex( int index );
+    void changeOffsetDelta( int index, int delta );
 
 public:
-    QString toUnitTestString() const;
-    void initForUnitTesting(ptrdiff_t offsetDelta, size_t offsetDeltaIndex, ...);
+    QString toUnitTestString();
+    void initForUnitTesting( int offsetDelta, int offsetDeltaIndex, ... );
 
 private:
 
-    GapVector<size_t> offsetList_; ///< All offsets
-    ptrdiff_t offsetDelta_;        ///< The offset delta at the given offset index
-    size_t offsetDeltaIndex_;      ///< The index that contains the offset delta
+    GapVector<int> offsetList_;    ///< All offsets
+    int offsetDelta_;              ///< The offset delta at the given offset index
+    int offsetDeltaIndex_;         ///< The index that contains the offset delta
 
 
 friend class LineOffsetVectorTest;
