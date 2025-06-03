@@ -15,7 +15,6 @@ namespace edbee {
 class TextBufferChange;
 
 
-
 /// This class implements the vector for storing the line numbers at certain offsets/
 /// The class allows the 'gap' position to contain a delta offset. Which means that
 ///
@@ -23,6 +22,10 @@ class TextBufferChange;
 /// text this way usually only results in the changine of the offset delta. Which means speeeed
 ///
 /// The line offset pointed at by each index is the first character in the given line.
+///
+/// NOTE: The offsetDelta can be negative! If data is deleted negative offsets
+///   make sure the offsets can be displaced quickly
+///
 class EDBEE_EXPORT LineOffsetVector {
 public:
     /// a structure to describe the line change that happend
@@ -34,12 +37,12 @@ public:
 //        QVector<int> newOffsets;    ///< the new offsets
 //    };
 
-
     LineOffsetVector();
 
-    void applyChange( TextBufferChange change );
+    void applyChange(TextBufferChange change);
 
-    int at( int idx ) const;
+
+    int at(int idx) const;
     int length() const;
 
     int findLineFromOffset( int offset );
@@ -56,21 +59,22 @@ protected:
     int searchOffsetIgnoringOffsetDelta(int offset, int org_start, int org_end );
 
     void moveDeltaToIndex( int index );
-    void changeOffsetDelta( int index, int delta );
+    void changeOffsetDelta( int index, ptrdiff_t delta );
 
 public:
     QString toUnitTestString();
     void initForUnitTesting( int offsetDelta, int offsetDeltaIndex, ... );
 
+    void assertValid();
+
 private:
 
     GapVector<int> offsetList_;    ///< All offsets
-    int offsetDelta_;              ///< The offset delta at the given offset index
+    int offsetDelta_;           ///< The offset delta at the given offset index (can be negative!!)
     int offsetDeltaIndex_;         ///< The index that contains the offset delta
 
 
 friend class LineOffsetVectorTest;
-
 
 };
 

@@ -259,7 +259,7 @@ void copyRange(QChar* data, Tsize offset, size_t length) const {
 }
 
 
-/// This method returns a direct pointer to the 0-terminated buffer
+/// Returns a direct pointer to the 0-terminated buffer
 /// This pointer is only valid as long as the buffer doesn't change
 /// WARNING, this method MOVES the gap! Which means this method should NOT be used for a lot of operations
 T* data() {
@@ -495,7 +495,7 @@ public:
 }
 
 
-/// this method replaces the given items with a single data item
+/// Replaces the given items with a single data item
 /// @param offset the offset of the items to replace
 /// @param lenth the number of items to replace
 /// @param newLength the number of times to repeat data
@@ -506,13 +506,13 @@ void fill(Tsize offset, Tsize length, const T& data, Tsize newLength) {
   }
 }
 
-/// convenient append method
+/// Appends an item
 void append(T t) {
   items_.append(t);
 }
 
 
-/// another append method
+/// Appends a list of items
 void append(const T* t, Tsize length) {
   for (Tsize i = 0; i < length; i++) {
     items_.append(t[i]);
@@ -520,19 +520,19 @@ void append(const T* t, Tsize length) {
 }
 
 
-/// This method returns the item at the given index
+/// Returns the item at the given index
 T at(Tsize offset) const {
   return items_.at(offset);
 }
 
 
-/// This method sets an item at the given index
+/// Sets an item at the given index
 void set(Tsize offset, const T& value) {
   items_.replace(offset,value);
 }
 
 
-/// This method return an index
+/// Return an index
 T& operator[](Tsize offset) {
   return items_[offset];
 }
