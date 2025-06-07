@@ -70,6 +70,7 @@ TextBufferChange::TextBufferChange()
     d_ = new TextBufferChangeData((TextBuffer*)nullptr, 0, 0, 0, 0);
 }
 
+
 TextBufferChange::TextBufferChange(TextBuffer* buffer, size_t off, size_t len, const QChar* text, size_t textlen)
 {
     d_ = new TextBufferChangeData(buffer, off, len, text, textlen);
@@ -80,10 +81,27 @@ TextBufferChange::TextBufferChange(LineOffsetVector* lineOffsets, size_t off, si
     d_ = new TextBufferChangeData(lineOffsets, off, len, text, textlen);
 }
 
+
 TextBufferChange::TextBufferChange(const TextBufferChange& other) : d_(other.d_)
 {
 }
 
+
+const QString TextBufferChange::toDebugString() const
+{
+    QString s;
+    s.append("TextBufferChange: ");
+    s.append(QStringLiteral(" | (offset: %1, line: %2").arg(offset()).arg(line()));
+    s.append(QStringLiteral(" | length: %1 => %2").arg(length()).arg(newTextLength()));
+    s.append(QStringLiteral(" | lines: %1 => %2").arg(lineCount()).arg(newLineCount()));
+    s.append(" | offsets: ");
+    for (qsizetype i = 0, cnt = newLineOffsets().length(); i < cnt; ++i) {
+        if (i) s.append(", ");
+        s.append(QStringLiteral("%1").arg(newLineOffsets().at(i)));
+    }
+    s.append(QStringLiteral(" | text: %1").arg(newText()));
+    return s;
+}
 
 
 //=====================================================
