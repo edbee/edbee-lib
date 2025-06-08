@@ -42,9 +42,9 @@ public:
     virtual void reset();
 
 // calculation functions
-    int lineHeight();
-    int rawLineIndexForYpos( int y );
-    int lineIndexForYpos( int y );
+    size_t lineHeight();
+    size_t rawLineIndexForYpos(size_t y);
+    size_t lineIndexForYpos(size_t y);
     int totalWidth();
     int totalHeight();
     int emWidth();
@@ -54,18 +54,18 @@ public:
 
     int columnIndexForXpos( int line, int x );
     int xPosForColumn( int line, int column );
-    int xPosForOffset( int offset );
-    int yPosForLine( int line );
-    int yPosForOffset( int offset );
+    size_t xPosForOffset(size_t offset);
+    size_t yPosForLine(size_t line);
+    size_t yPosForOffset(size_t offset);
 
 // Document access functions (Document vs Placeholder text)
     int lineCount();
     QString getLine(int index);
 
 // caching
-    TextLayout* textLayoutForLine( int line );
-    TextLayout* textLayoutForLineForPlaceholder( int line );
-    TextLayout* textLayoutForLineNormal( int line );
+    TextLayout* textLayoutForLine(size_t line);
+    TextLayout* textLayoutForLineForPlaceholder(size_t line);
+    TextLayout* textLayoutForLineNormal(size_t line);
 
 // rendering
     void renderBegin(const QRect& rect );
@@ -101,14 +101,14 @@ public:
     void setTheme( TextTheme* theme );
 
 // temporary getters only valid while rendering!!
-    const QRect* clipRect() { return clipRectRef_; }                ///< This method is valid only while rendering!
-    int startOffset() { return startOffset_; }                      ///< This method is valid only while rendering!
-    int endOffset() { return endOffset_; }                          ///< This method is valid only while rendering!
-    int startLine() { return startLine_; }                          ///< This method is valid only while rendering!
-    int endLine() { return endLine_; }                              ///< This method is valid only while rendering!
+    const QRect* clipRect() { return clipRectRef_; } ///< This method is valid only while rendering!
+    size_t startOffset() { return startOffset_; }  ///< This method is valid only while rendering!
+    size_t endOffset() { return endOffset_; }      ///< This method is valid only while rendering!
+    size_t startLine() { return startLine_; }      ///< This method is valid only while rendering!
+    size_t endLine() { return endLine_; }          ///< This method is valid only while rendering!
 
 private:
-    void updateWidthCacheForRange( int offset, int length );
+    void updateWidthCacheForRange(int offset, int length);
 
 protected slots:
 
@@ -119,7 +119,7 @@ protected slots:
 
 public slots:
 
-    void invalidateTextLayoutCaches(int fromLine=0);
+    void invalidateTextLayoutCaches(size_t fromLine = 0);
     void invalidateCaches();
 
 signals:
@@ -128,23 +128,23 @@ signals:
 
 private:
 
-    TextEditorController* controllerRef_;    ///< A reference to the widget it is rendering
+    TextEditorController* controllerRef_;   ///< A reference to the widget it is rendering
     qint64 caretTime_;                      ///< The current time of the caret. -1 means that the caret is disabled
     qint64 caretBlinkRate_;                 ///< The caret blink rate
 
-    QCache<int,TextLayout> cachedTextLayoutList_;   ///< A list of cached text layouts
+    QCache<size_t, TextLayout> cachedTextLayoutList_;   ///< A list of cached text layouts
 
-    QRect viewport_;                                ///< The current (total) viewport. (This is updated from the window)
-    int totalWidthCache_;                           ///< The total width cache
+    QRect viewport_;                    ///< The current (total) viewport. (This is updated from the window)
+    int totalWidthCache_;               ///< The total width cache
 
-    TextThemeStyler* textThemeStyler_;              ///< The current theme styler
+    TextThemeStyler* textThemeStyler_;  ///< The current theme styler
 
     // temporary variables only valid the int the current context
-    const QRect* clipRectRef_;                ///< A reference to the clipping rectangle
-    int startOffset_;                         ///< The start offset that needs rendering
-    int endOffset_;                           ///< The end opffset that needs rendering
-    int startLine_;                           ///< The first line that needs rendering
-    int endLine_;                             ///< The last line that needs rendering
+    const QRect* clipRectRef_; ///< A reference to the clipping rectangle
+    size_t startOffset_;       ///< The start offset that needs rendering
+    size_t endOffset_;         ///< The end opffset that needs rendering
+    size_t startLine_;         ///< The first line that needs rendering
+    size_t endLine_;           ///< The last line that needs rendering
 
     TextDocument* placeHolderDocument_;
 };

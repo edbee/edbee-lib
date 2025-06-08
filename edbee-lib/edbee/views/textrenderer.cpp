@@ -31,7 +31,6 @@
 
 namespace edbee {
 
-
 /// The default textrenderer constructor
 TextRenderer::TextRenderer(TextEditorController* controller)
     : QObject(nullptr)
@@ -45,9 +44,9 @@ TextRenderer::TextRenderer(TextEditorController* controller)
     , endOffset_(0)
     , startLine_(0)
     , endLine_(0)
-    , placeHolderDocument_(0)
+    , placeHolderDocument_(nullptr)
 {
-    connect( controller, SIGNAL(textDocumentChanged(edbee::TextDocument*,edbee::TextDocument*)), this, SLOT(textDocumentChanged(edbee::TextDocument*,edbee::TextDocument*)));
+    connect(controller, SIGNAL(textDocumentChanged(edbee::TextDocument*,edbee::TextDocument*)), this, SLOT(textDocumentChanged(edbee::TextDocument*,edbee::TextDocument*)));
     textThemeStyler_ = new TextThemeStyler(controller);
     placeHolderDocument_ = new CharTextDocument();
 }
@@ -80,30 +79,28 @@ void TextRenderer::reset()
 
 
 /// This method returns the (maximum) line-height in pixels
-int TextRenderer::lineHeight()
+size_t TextRenderer::lineHeight()
 {
-
-/// TODO: cache the height :-)
     QFontMetrics fm = textWidget()->fontMetrics();
-    return fm.ascent() + fm.descent() + fm.leading() + config()->extraLineSpacing(); // (the 1 is for the base line).
+    return static_cast<size_t>(fm.ascent() + fm.descent() + fm.leading() + config()->extraLineSpacing()); // (the 1 is for the base line).
 }
 
 
 /// This method converts the give y position to a line index
 /// Warning this returns a RAW line index, which means it can be an invalid line
 /// @param y the y position
-int TextRenderer::rawLineIndexForYpos(int y)
+size_t TextRenderer::rawLineIndexForYpos(size_t y)
 {
     return y / lineHeight();
 }
 
 
 /// This method returns a valid line index for the given y-pos
-/// If the y-position isn't on a line it returns a value < 0
-int TextRenderer::lineIndexForYpos(int y)
+/// If the y-position isn't on a line it returns std::string::npos
+size_t TextRenderer::lineIndexForYpos(size_t y)
 {
-    int line = rawLineIndexForYpos(y);
-    if( line >= textDocument()->lineCount() ) return -1;
+    size_t line = rawLineIndexForYpos(y);
+    if(line >= textDocument()->lineCount()) return std::string::npos;
     return line;
 }
 
@@ -112,12 +109,11 @@ int TextRenderer::lineIndexForYpos(int y)
 /// This method takes the maximum line length and multiplies it with the widest character.
 int TextRenderer::totalWidth()
 {
-    if( !totalWidthCache_ ) {
-        for( int line=0,cnt=textDocument()->lineCount(); line<cnt; ++line ) {
-            TextLayout* layout = textLayoutForLine( line );
-            totalWidthCache_ = qMax( qRound(layout->boundingRect().right()+0.5), totalWidthCache_ );
+    if (!totalWidthCache_) {
+        for (size_t line = 0, cnt = textDocument()->lineCount(); line < cnt; ++line) {
+            TextLayout* layout = textLayoutForLine(line);
+            totalWidthCache_ = qMax(qRound(layout->boundingRect().right() + 0.5), totalWidthCache_);
         }
-
     }
     return totalWidthCache_;
 
@@ -201,39 +197,37 @@ int TextRenderer::xPosForColumn(int line, int column)
 
 
 /// This method returns the x-coordinate for the given offset
-int TextRenderer::xPosForOffset(int offset)
+size_t TextRenderer::xPosForOffset(size_t offset)
 {
-    int line = textDocument()->lineFromOffset(offset);
-    int x = 0;
-    if( line >= 0 )
-    {
-        int lineStartOffset = textDocument()->offsetFromLine(line);
-        int col = offset - lineStartOffset;
-        x += xPosForColumn( line, col );
-    }
+    size_t line = textDocument()->lineFromOffset(offset);
+    size_t x = 0;
+
+    size_t lineStartOffset = textDocument()->offsetFromLine(line);
+    size_t col = offset - lineStartOffset;
+    x += xPosForColumn(line, col);
     return x;
 }
 
 
-/// This method returns the y position for the given line
-int TextRenderer::yPosForLine(int line)
+/// Returns the y position for the given line
+size_t TextRenderer::yPosForLine(size_t line)
 {
     return line * lineHeight();
 }
 
 
-/// This method returns the offset position for the given line
-int TextRenderer::yPosForOffset(int offset)
+/// Returns the offset position for the given line
+size_t TextRenderer::yPosForOffset(size_t offset)
 {
-    int line = textDocument()->lineFromOffset(offset);
+    size_t line = textDocument()->lineFromOffset(offset);
     return yPosForLine(line);
 }
 
-/// This method returns the textlayout for the given line
-TextLayout *TextRenderer::textLayoutForLine(int line)
+/// Returns the textlayout for the given line
+TextLayout *TextRenderer::textLayoutForLine(size_t line)
 {
-    Q_ASSERT( line >= 0 );
-/// FIXME:  Invalide TextLayout cache when required!!!
+    Q_ASSERT(line >= 0);
+    /// FIXME:  Invalide TextLayout cache when required!!!
     if( controller()->textDocument()->length() == 0){
         return textLayoutForLineForPlaceholder(line);
     } else {
@@ -279,28 +273,26 @@ static bool isControlCharacter(QChar charCode)
  }
 
 
-TextLayout *TextRenderer::textLayoutForLineForPlaceholder(int line)
+TextLayout *TextRenderer::textLayoutForLineForPlaceholder(size_t line)
 {
-    Q_ASSERT( line >= 0 );
-/// FIXME:  Invalide TextLayout cache when required!!!
-
+    /// FIXME:  Invalide TextLayout cache when required!!!
     TextDocument* doc = textDocument();
-    if( line >= doc->lineCount() ) return nullptr;
+    if (line >= doc->lineCount()) return nullptr;
 
     TextLayout* textLayout = cachedTextLayoutList_.object(line);
-    if( !textLayout ) {
+    if (!textLayout) {
         textLayout = new TextLayout(textDocument());
         textLayout->setCacheEnabled(true);
         int tabWidth = controllerRef_->widget()->fontMetrics().horizontalAdvance('M');
 
         QTextOption option;
         option.setTabStopDistance(config()->indentSize() * tabWidth);
-        if( config()->showWhitespaceMode() == TextEditorConfig::ShowWhitespaces ) {
-            option.setFlags( QTextOption::ShowTabsAndSpaces );        /// TODO: Make an option to show spaces and tabs
+        if (config()->showWhitespaceMode() == TextEditorConfig::ShowWhitespaces) {
+            option.setFlags( QTextOption::ShowTabsAndSpaces );  /// TODO: Make an option to show spaces and tabs
         }
 
-        textLayout->qTextLayout()->setFont( textWidget()->font() );
-        textLayout->qTextLayout()->setTextOption( option );
+        textLayout->qTextLayout()->setFont(textWidget()->font());
+        textLayout->qTextLayout()->setTextOption(option);
 
         // add extra format (no format)
         QTextCharFormat format;
@@ -309,13 +301,12 @@ TextLayout *TextRenderer::textLayoutForLineForPlaceholder(int line)
         color.setAlpha(180);
         format.setForeground(color);
 
-
         QString text = doc->lineWithoutNewline(line);
 
         QVector<QTextLayout::FormatRange> formatRanges;
         QTextLayout::FormatRange formatRange;
         formatRange.start = 0;
-        formatRange.length = text.length();
+        formatRange.length = static_cast<int>(text.length());
         formatRange.format = format;
         formatRanges.append(formatRange);
 
@@ -324,27 +315,23 @@ TextLayout *TextRenderer::textLayoutForLineForPlaceholder(int line)
         textLayout->buildLayout();
 
         // update the width cache
-        totalWidthCache_ = qMax( totalWidthCache_, qRound(textLayout->boundingRect().width()+0.5));
+        totalWidthCache_ = qMax(totalWidthCache_, qRound(textLayout->boundingRect().width() + 0.5));
 
         // add to the cache
-        cachedTextLayoutList_.insert( line, textLayout );
-//qlog_info() << "Cache Line: " << line;
-
+        cachedTextLayoutList_.insert(line, textLayout);
     }
     return textLayout;
 }
 
 
-TextLayout *TextRenderer::textLayoutForLineNormal(int line)
+TextLayout *TextRenderer::textLayoutForLineNormal(size_t line)
 {
-    Q_ASSERT( line >= 0 );
-/// FIXME:  Invalide TextLayout cache when required!!!
-
+    /// FIXME:  Invalide TextLayout cache when required!!!
     TextDocument* doc = textDocument();
-    if( line >= doc->lineCount() ) return nullptr;
+    if (line >= doc->lineCount()) return nullptr;
 
     TextLayout* textLayout = cachedTextLayoutList_.object(line);
-    if( !textLayout ) {
+    if (!textLayout) {
         textLayout = new TextLayout(textDocument());
         textLayout->setCacheEnabled(true);
         int tabWidth = controllerRef_->widget()->fontMetrics().horizontalAdvance('M');
@@ -352,12 +339,11 @@ TextLayout *TextRenderer::textLayoutForLineNormal(int line)
         QTextOption option;
         option.setTabStopDistance(config()->indentSize() * tabWidth);
 
-        if( config()->showWhitespaceMode() == TextEditorConfig::ShowWhitespaces ) {
-            option.setFlags( QTextOption::ShowTabsAndSpaces );        /// TODO: Make an option to show spaces and tabs
+        if (config()->showWhitespaceMode() == TextEditorConfig::ShowWhitespaces) {
+            option.setFlags( QTextOption::ShowTabsAndSpaces ); /// TODO: Make an option to show spaces and tabs
         }
 
         textLayout->qTextLayout()->setFont( textWidget()->font() );
-        //qlog_info() << "font: " <<   textWidget()->font().pointSizeF();
         textLayout->qTextLayout()->setTextOption( option );
 
         // add extra format
@@ -366,16 +352,14 @@ TextLayout *TextRenderer::textLayoutForLineNormal(int line)
 
         TextLayoutBuilder textLayoutBuilder(textLayout, text, formatRanges);
 
-        if( config()->renderBidiContolCharacters() ) {
-
+        if (config()->renderBidiContolCharacters()) {
             QTextCharFormat textFormat;
             textFormat.setBackground(Qt::red); //QBrush(QColor::red()));
             textFormat.setForeground(Qt::white); //QBrush(QColor::red()));
 
-            for( int i=0; i<text.size(); ++i ) {
+            for (int i=0; i<text.size(); ++i) {
                 QChar c = text.at(i);
                 if( isControlCharacter(c) ) {
-
                   QString str = QString("[U+%1]").arg(QString::number(c.unicode(),16));
                   //QString newString = "⚠️";
                   // text.replace(i, 1, str);
@@ -395,7 +379,6 @@ TextLayout *TextRenderer::textLayoutForLineNormal(int line)
                   formatRanges.append(formatRange);
                   */
                   textLayoutBuilder.replace(i, 1, str, textFormat);
-
                 }
             }
         }
@@ -427,70 +410,61 @@ TextLayout *TextRenderer::textLayoutForLineNormal(int line)
             }
         }
 #endif
-
-
-
-        textLayout->setText( text );
+        textLayout->setText(text);
         textLayout->buildLayout();
 
         // update the width cache
-        totalWidthCache_ = qMax( totalWidthCache_, qRound(textLayout->boundingRect().width()+0.5));
+        totalWidthCache_ = qMax(totalWidthCache_, qRound(textLayout->boundingRect().width() + 0.5));
 
         // add to the cache
-        cachedTextLayoutList_.insert( line, textLayout );
-
-//qlog_info() << "Cache Line: " << line;
-
+        cachedTextLayoutList_.insert(line, textLayout);
     }
     return textLayout;
 }
 
 
 /// This method starts rendering
-void TextRenderer::renderBegin( const QRect& rect )
+void TextRenderer::renderBegin(const QRect& rect)
 {
-
-//PROF_BEGIN
     TextDocument* doc = textDocument();
 
     clipRectRef_ = &rect;
 
-    int y = rect.y();
-
     // the first line to render
-    int calculatedEndLine = rawLineIndexForYpos( y + rect.height() ) + 1;   // add 1 line extra (for half visible lines)
+    int y = rect.y();
+    Q_ASSERT(y >= 0);
+    int yPos = y + rect.height();
+    Q_ASSERT(yPos >= 0);
+
+    size_t calculatedEndLine = rawLineIndexForYpos(static_cast<size_t>(yPos)) + 1;   // add 1 line extra (for half visible lines)
 
     // assign the 'work' variables
-    int lineCount = doc->lineCount();
-    startLine_   = qBound( 0, rawLineIndexForYpos( y ), lineCount-1 );
-    endLine_     = qBound( 0, calculatedEndLine, lineCount-1 );
+    size_t lineCount = doc->lineCount();
+    startLine_   = qBound(0u, rawLineIndexForYpos(static_cast<size_t>(y)), lineCount - 1);
+    endLine_     = qBound(0u, calculatedEndLine, lineCount - 1 );
 
     Q_ASSERT( startLine_ <= endLine_ );
-
-//    qlog_info() << ">> render startLine" << startLine_ << " t/m endLine=" << endLine_  << "  ==> " << ( endLine_ - startLine_ ) << " y="<<y<<",height="<<rect.height()<<"-------------------" ;
     startOffset_ = doc->offsetFromLine(startLine_);
-    endOffset_   = doc->offsetFromLine(endLine_+1);
-
+    endOffset_   = doc->offsetFromLine(endLine_ + 1);
 
     // Make sure  the cache-data is filled
-//PROF_BEGIN_NAMED("layouts")
-    for( int line = startLine_; line <= endLine_; ++line  ) {
-        textLayoutForLine( line );  // make sure the cache is filled
+    //PROF_BEGIN_NAMED("layouts")
+    for (size_t line = startLine_; line <= endLine_; ++line) {
+        textLayoutForLine(line);  // make sure the cache is filled
     }
-//PROF_END
+    //PROF_END
 
-/// TODO: move this lexing stuff to the controller
+    /// TODO: move this lexing stuff to the controller
     // prepare the style
-    if( textDocument()->textLexer() ) {
-//PROF_BEGIN_NAMED("lexer")
-        textDocument()->textLexer()->lexRange( startOffset_, endOffset_ );
-//PROF_END
+    if (textDocument()->textLexer()) {
+        //PROF_BEGIN_NAMED("lexer")
+        textDocument()->textLexer()->lexRange(startOffset_, endOffset_);
+        //PROF_END
     }
-
 }
 
 /// This method starts rendering
-void TextRenderer::renderEnd( const QRect& rect )
+void TextRenderer::renderEnd(const QRect& rect)
 {
     Q_UNUSED(rect)
 }
@@ -499,7 +473,7 @@ void TextRenderer::renderEnd( const QRect& rect )
 /// This method returns the document
 TextDocument* TextRenderer::textDocument()
 {
-    if( controllerRef_->textDocument()->length() == 0 ){
+    if (controllerRef_->textDocument()->length() == 0){
         // return placeholder textdocument
         return placeHolderDocument_;
     }
@@ -550,7 +524,7 @@ void TextRenderer::setViewport(const QRect& viewport)
 /// sets the caret time on 0
 void TextRenderer::resetCaretTime()
 {
-    if( caretTime_ >= 0 ) {
+    if (caretTime_ >= 0) {
         caretTime_ = QDateTime::currentMSecsSinceEpoch();
     }
 }
@@ -559,8 +533,8 @@ void TextRenderer::resetCaretTime()
 /// this method returns true if the caret is visible
 bool TextRenderer::shouldRenderCaret()
 {
-    if( caretTime_ < 0 ) { return false; }
-    if( !caretBlinkRate_ ) { return true; }
+    if (caretTime_ < 0) { return false; }
+    if (!caretBlinkRate_) { return true; }
     qint64 time = QDateTime::currentMSecsSinceEpoch() - caretTime_;
     return (time % caretBlinkRate_) < (caretBlinkRate_>> 1);
 }
@@ -607,7 +581,7 @@ void TextRenderer::setThemeByName(const QString& name)
 /// @param theme the them to set
 void TextRenderer::setTheme(TextTheme* theme)
 {
-    textThemeStyler_->setTheme( theme );
+    textThemeStyler_->setTheme(theme);
     invalidateCaches();
     emit themeChanged(theme);
 }
@@ -632,20 +606,19 @@ void TextRenderer::textDocumentChanged(edbee::TextDocument *oldDocument, edbee::
 void TextRenderer::textChanged(edbee::TextBufferChange change, QString oldText)
 {
     Q_UNUSED(oldText)
-    int lineCount = qMax( change.lineCount(), change.newLineCount()) + 1;
+    size_t lineCount = qMax(change.lineCount(), change.newLineCount()) + 1;
 
     // Unfortunately when the line-count is changed we need to invalidate all
     // because we cannot move the cached layouts easy in the layout list
-    if( change.lineCount() - change.newLineCount() ) {
+    if (change.lineCount() - change.newLineCount()) {
         cachedTextLayoutList_.clear();
     } else {
-
         // invalidate all if there are to many lines
-        if( lineCount > cachedTextLayoutList_.size()/2 ) {
+        if (lineCount > static_cast<size_t>(cachedTextLayoutList_.size()) / 2) {
             cachedTextLayoutList_.clear();
         } else {
-            for( int i=0,cnt=lineCount; i<cnt; ++i ) {
-                cachedTextLayoutList_.remove( change.line() + i );
+            for(size_t i = 0, cnt = lineCount; i < cnt; ++i) {
+                cachedTextLayoutList_.remove(change.line() + i);
             }
         }
     }
@@ -656,19 +629,18 @@ void TextRenderer::textChanged(edbee::TextBufferChange change, QString oldText)
 void TextRenderer::lastScopedOffsetChanged(size_t previousOffset, size_t newOffset)
 {
     Q_UNUSED(newOffset)
-    int lastValidLine = textDocument()->lineFromOffset(previousOffset);
+    size_t lastValidLine = textDocument()->lineFromOffset(previousOffset);
     invalidateTextLayoutCaches(lastValidLine);
 }
 
 
 /// Invalidates the QTextLayout caches
-void TextRenderer::invalidateTextLayoutCaches(int fromLine)
+void TextRenderer::invalidateTextLayoutCaches(size_t fromLine)
 {
-//qlog_info() << "** invalidateTextLayoutCache("<<fromLine<<") **";
-    if( fromLine ) {
-        QList<int> keys = cachedTextLayoutList_.keys();
-        foreach( int key, keys ) {
-            if( key >= fromLine) {
+    if (fromLine) {
+        QList<size_t> keys = cachedTextLayoutList_.keys();
+        foreach (size_t key, keys) {
+            if (key >= fromLine) {
                 cachedTextLayoutList_.remove(key);
             }
         }
