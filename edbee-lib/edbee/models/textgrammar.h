@@ -26,23 +26,22 @@ public:
 
     /// the instructions
     enum Instruction {
-        MainRule,                   ///< The main rule has no regexp matches
-        RuleList,                   ///< A list of rules (no regexp)
-        SingleLineRegExp,           ///< A single line regexp
-        MultiLineRegExp,            ///< A multi-line regexp (begin end)
-        IncludeCall,                ///< Includes another scope
-        Parser                      ///< A full parser (not yet supported, by added as idea for the future). But could be marked by multiple regexps
+        MainRule,         ///< The main rule has no regexp matches
+        RuleList,         ///< A list of rules (no regexp)
+        SingleLineRegExp, ///< A single line regexp
+        MultiLineRegExp,  ///< A multi-line regexp (begin end)
+        IncludeCall,      ///< Includes another scope
+        Parser            ///< A full parser (not yet supported, by added as idea for the future). But could be marked by multiple regexps
     };
 
-
-    TextGrammarRule( TextGrammar* grammar, Instruction instruction );
+    TextGrammarRule(TextGrammar* grammar, Instruction instruction);
     ~TextGrammarRule();
 
-    static TextGrammarRule* createMainRule( TextGrammar* grammar, const QString& scopeName );
-    static TextGrammarRule* createRuleList( TextGrammar* grammar );
-    static TextGrammarRule* createSingleLineRegExp( TextGrammar* grammar, const QString& scopeName, const QString& regExp );
-    static TextGrammarRule* createMultiLineRegExp( TextGrammar* grammar, const QString& scopeName, const QString& contentScopeName, const QString& beginRegExp, const QString& endRegExp );
-    static TextGrammarRule* createIncludeRule( TextGrammar* grammar, const QString& includeName );
+    static TextGrammarRule* createMainRule(TextGrammar* grammar, const QString& scopeName);
+    static TextGrammarRule* createRuleList(TextGrammar* grammar );
+    static TextGrammarRule* createSingleLineRegExp(TextGrammar* grammar, const QString& scopeName, const QString& regExp);
+    static TextGrammarRule* createMultiLineRegExp(TextGrammar* grammar, const QString& scopeName, const QString& contentScopeName, const QString& beginRegExp, const QString& endRegExp);
+    static TextGrammarRule* createIncludeRule(TextGrammar* grammar, const QString& includeName);
 
     inline bool isMainRule() { return instruction_ == MainRule; }
     inline bool isRuleList() { return instruction_ == RuleList; }
@@ -50,8 +49,8 @@ public:
     inline bool isSingleLineRegExp() { return instruction_ == SingleLineRegExp; }
     inline bool isIncludeCall() { return instruction_ == IncludeCall; }
 
-    int ruleCount() const { return ruleList_.size(); }
-    TextGrammarRule* rule( int idx ) const;
+    qsizetype ruleCount() const { return ruleList_.size(); }
+    TextGrammarRule* rule(qsizetype idx) const;
     void giveRule( TextGrammarRule* rule );
 
     void giveMatchRegExp( RegExp* regExp );
@@ -124,26 +123,26 @@ private:
 class EDBEE_EXPORT TextGrammar {
 public:
 
-    TextGrammar( const QString& name, const QString& displayName );
-    ~TextGrammar();
+    TextGrammar(const QString& name, const QString& displayName);
+    virtual ~TextGrammar();
 
-    void giveMainRule( TextGrammarRule* mainRule );
+    void giveMainRule(TextGrammarRule* mainRule);
 
     QString name() const;
     QString displayName() const;
     TextGrammarRule* mainRule() const;
     QStringList fileExtensions() const;
 
-    void giveToRepos( const QString& name, TextGrammarRule* rule);
-    TextGrammarRule* findFromRepos( const QString& name, TextGrammarRule* defValue = 0  );
-    void addFileExtension( const QString& ext );
+    void giveToRepos(const QString& name, TextGrammarRule* rule);
+    TextGrammarRule* findFromRepos( const QString& name, TextGrammarRule* defValue = nullptr);
+    void addFileExtension(const QString& ext);
 
 private:
     QString name_;                               ///< the display name of this
     QString displayName_;                        ///< the name to display
-    TextGrammarRule *mainRule_;                      ///< the 'main' rule of this grammar
-    QMap<QString, TextGrammarRule*> repository_;     ///< A map with all named grammar rules
-    QStringList fileExtensions_;                  ///< A list with all file-extensions
+    TextGrammarRule *mainRule_;                  ///< the 'main' rule of this grammar
+    QMap<QString, TextGrammarRule*> repository_; ///< A map with all named grammar rules
+    QStringList fileExtensions_;                 ///< A list with all file-extensions
 };
 
 
@@ -158,11 +157,11 @@ protected:
     virtual ~TextGrammarManager();
 
 public:
-    TextGrammar* readGrammarFile(const QString& file );
-    void readAllGrammarFilesInPath(const QString& path );
+    TextGrammar* readGrammarFile(const QString& file);
+    void readAllGrammarFilesInPath(const QString& path);
 
-    TextGrammar* get( const QString& name );
-    void giveGrammar( TextGrammar* grammar );
+    TextGrammar* get(const QString& name);
+    void giveGrammar(TextGrammar* grammar);
 
     QList<QString> grammarNames();
     QList<TextGrammar*> grammars();

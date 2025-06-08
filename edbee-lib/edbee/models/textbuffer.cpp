@@ -283,6 +283,7 @@ size_t TextBuffer::findCharPosOrClamp(size_t offset, int direction, const QStrin
 
 /// See documentation at findCharPosWithinRange.
 /// This method searches a char position within the given rang (from the given ofset)
+/// @returns the given position or clamps at the begin/endrange (depending on the direction)
 size_t TextBuffer::findCharPosWithinRangeOrClamp(size_t offset, int direction, const QString& chars, bool equals, size_t beginRange, size_t endRange)
 {
     size_t pos = findCharPosWithinRange(offset, direction, chars, equals, beginRange, endRange);

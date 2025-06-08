@@ -88,12 +88,12 @@ TextGrammarRule* TextGrammarRule::createSingleLineRegExp(TextGrammar* grammar, c
 /// @param beginRegExp the start regexp to use
 /// @param endRegExp the end regular expression to use
 /// @return TextGrammarRule the multiple grammar rule
-TextGrammarRule* TextGrammarRule::createMultiLineRegExp( TextGrammar* grammar, const QString& scopeName, const QString& contentScopeName, const QString& beginRegExp, const QString& endRegExp )
+TextGrammarRule* TextGrammarRule::createMultiLineRegExp(TextGrammar* grammar, const QString& scopeName, const QString& contentScopeName, const QString& beginRegExp, const QString& endRegExp)
 {
-    TextGrammarRule* rule = new TextGrammarRule( grammar, MultiLineRegExp );
+    TextGrammarRule* rule = new TextGrammarRule(grammar, MultiLineRegExp);
     rule->setScopeName(scopeName);
     rule->setContentScopeName(contentScopeName);
-    rule->giveMatchRegExp( TextGrammarRule::createRegExp( beginRegExp ));
+    rule->giveMatchRegExp(TextGrammarRule::createRegExp(beginRegExp));
     rule->setEndRegExpString( endRegExp );
     return rule;
 }
@@ -101,9 +101,9 @@ TextGrammarRule* TextGrammarRule::createMultiLineRegExp( TextGrammar* grammar, c
 
 /// returns the child rule at the given index
 /// @param idx the index of the grammar rule
-TextGrammarRule* TextGrammarRule::rule(int idx) const
+TextGrammarRule* TextGrammarRule::rule(qsizetype idx) const
 {
-    Q_ASSERT( 0 <= idx && idx < ruleCount() );
+    Q_ASSERT( 0 <= idx && idx < ruleCount());
     return ruleList_.at(idx);
 }
 
@@ -137,7 +137,7 @@ void TextGrammarRule::setEndRegExpString(const QString& str)
 QString TextGrammarRule::toString(bool includePatterns)
 {
     QString r;
-    switch( instruction_ ) {
+    switch (instruction_) {
         case MainRule: r.append("MainRule"); break;
         case RuleList: r.append("RuleList"); break;
         case SingleLineRegExp: r.append("SingleLineRegExp"); break;
@@ -147,16 +147,16 @@ QString TextGrammarRule::toString(bool includePatterns)
         default: r.append("Unkown");
     }
 
-    r.append(":").append( scopeName_ );
-    if( instruction_ == IncludeCall ) {
+    r.append(":").append(scopeName_);
+    if (instruction_ == IncludeCall) {
         r.append(" ");
         r.append(includeName());
     }
 
-    if( includePatterns && matchRegExp_ ) { r.append(", begin: ").append( matchRegExp_->pattern() ); }
-    if( includePatterns && !endRegExpString_.isEmpty() ) { r.append(", end: ").append( endRegExpString_ ); }
-    r.append( QStringLiteral(", %1 subrules").arg(ruleCount() ) );
-    r.append( QStringLiteral(", %1 captures").arg(matchCaptures().size()));
+    if (includePatterns && matchRegExp_) { r.append(", begin: ").append(matchRegExp_->pattern()); }
+    if (includePatterns && !endRegExpString_.isEmpty()) { r.append(", end: ").append(endRegExpString_); }
+    r.append(QStringLiteral(", %1 subrules").arg(ruleCount()));
+    r.append(QStringLiteral(", %1 captures").arg(matchCaptures().size()));
     return r;
 }
 
@@ -166,13 +166,12 @@ QString TextGrammarRule::toString(bool includePatterns)
 /// @return the RegExp object
 RegExp* TextGrammarRule::createRegExp(const QString& regexp)
 {
-    RegExp* result = new RegExp( regexp, RegExp::EngineOniguruma ); //, Qt::CaseSensitive, QRegExp::RegExp2 );
-    if( !result->isValid() ) {
+    RegExp* result = new RegExp(regexp, RegExp::EngineOniguruma); //, Qt::CaseSensitive, QRegExp::RegExp2 );
+    if (!result->isValid()) {
         qlog_warn() << "Error in regexp: " << result->errorString() << "\n" << regexp;
     }
     return result;
 }
-
 
 
 //==========================
@@ -184,7 +183,7 @@ RegExp* TextGrammarRule::createRegExp(const QString& regexp)
 TextGrammar::TextGrammar(const QString& name, const QString& displayName)
     : name_(name)
     , displayName_(displayName)
-    , mainRule_(0)
+    , mainRule_(nullptr)
 {
 
 }
@@ -193,7 +192,7 @@ TextGrammar::TextGrammar(const QString& name, const QString& displayName)
 /// The textgrammar destructor
 TextGrammar::~TextGrammar()
 {
-    qDeleteAll( repository_ );
+    qDeleteAll(repository_);
     repository_.clear();
     delete mainRule_;
 }
@@ -236,10 +235,10 @@ QStringList TextGrammar::fileExtensions() const
 }
 
 
-/// This method adds the given grammar rule to the repos
+/// Adds the given grammar rule to the repos
 void TextGrammar::giveToRepos(const QString& name, TextGrammarRule* rule)
 {
-    repository_.insert(name,rule);
+    repository_.insert(name, rule);
 }
 
 
@@ -247,9 +246,9 @@ void TextGrammar::giveToRepos(const QString& name, TextGrammarRule* rule)
 /// @param name the name of the rule
 /// @param defValue the grammar rule to return if not found
 /// @return the found grammar rule (or the defValue if not found)
-TextGrammarRule *TextGrammar::findFromRepos(const QString& name, TextGrammarRule* defValue )
+TextGrammarRule *TextGrammar::findFromRepos(const QString& name, TextGrammarRule* defValue)
 {
-    return repository_.value(name, defValue );
+    return repository_.value(name, defValue);
 }
 
 
@@ -266,20 +265,20 @@ void TextGrammar::addFileExtension(const QString& ext)
 
 /// The text grammar manager constructor
 TextGrammarManager::TextGrammarManager()
-    : defaultGrammarRef_(0)
+    : defaultGrammarRef_(nullptr)
 {
 
     // always make sure there's a default grammar
-    defaultGrammarRef_ = new TextGrammar( "text.plain", "Plain Text" );
-    defaultGrammarRef_->giveMainRule( TextGrammarRule::createMainRule(defaultGrammarRef_,"text.plain") );
-    giveGrammar( defaultGrammarRef_ );
+    defaultGrammarRef_ = new TextGrammar("text.plain", "Plain Text");
+    defaultGrammarRef_->giveMainRule( TextGrammarRule::createMainRule(defaultGrammarRef_,"text.plain"));
+    giveGrammar(defaultGrammarRef_);
 }
 
 
 /// The detstructor (deletes all grammars)
 TextGrammarManager::~TextGrammarManager()
 {
-    qDeleteAll( grammarMap_ );
+    qDeleteAll(grammarMap_);
     grammarMap_.clear();
 }
 
@@ -292,16 +291,16 @@ TextGrammarManager::~TextGrammarManager()
 TextGrammar* TextGrammarManager::readGrammarFile(const QString& file)
 {
     lastErrorMessage_.clear();
-    TextGrammar* grammar = nullptr;
-    QString lastErrorMessage;
 
+    TextGrammar* grammar = nullptr;
     TmLanguageParser parser;
+
     grammar = parser.parse(file);
-    if(grammar) {
+    if (grammar) {
         giveGrammar(grammar);
     } else {
         QFileInfo fileInfo(file);
-        lastErrorMessage_ = QObject::tr("Error reading file %1:%2").arg(fileInfo.absoluteFilePath()).arg(parser.lastErrorMessage());
+        lastErrorMessage_ = QObject::tr("Error reading file %1:%2").arg(fileInfo.absoluteFilePath(), parser.lastErrorMessage());
         qlog_warn() << lastErrorMessage_;
     }
     return grammar;
@@ -310,14 +309,12 @@ TextGrammar* TextGrammarManager::readGrammarFile(const QString& file)
 
 /// reads all grammar files in the given path
 /// @param path the path to read all grammar files from
-void TextGrammarManager::readAllGrammarFilesInPath(const QString& path )
+void TextGrammarManager::readAllGrammarFilesInPath(const QString& path)
 {
-//    qlog_info() << "readAllGrammarFilesInPath(" << path << ")";
     QDir dir(path);
     QStringList filters = { "*.tmLanguage", "*.tmLanguage.json" };
-    foreach( QFileInfo fileInfo, dir.entryInfoList( filters, QDir::Files, QDir::Name ) ) {
-//        qlog_info() << "- parse" << fileInfo.baseName() << ".";
-        readGrammarFile( fileInfo.absoluteFilePath());
+    foreach (QFileInfo fileInfo, dir.entryInfoList( filters, QDir::Files, QDir::Name) ) {
+        readGrammarFile(fileInfo.absoluteFilePath());
     }
 }
 
@@ -325,56 +322,56 @@ void TextGrammarManager::readAllGrammarFilesInPath(const QString& path )
 /// This method returns the given language grammar
 TextGrammar* TextGrammarManager::get(const QString &name)
 {
-    return grammarMap_.value(name,0);
+    return grammarMap_.value(name, nullptr);
 }
 
 
-/// This method gives a language grammar to the document
+/// Gives a language grammar to the document
 /// @param grammar the grammar to give
 void TextGrammarManager::giveGrammar(TextGrammar* grammar)
 {
     const QString name = grammar->name();
 
     // when the grammar already exists delete it
-    if( grammarMap_.contains(name)) {
+    if (grammarMap_.contains(name)) {
         TextGrammar* oldGrammar = grammarMap_.take(name);
 
         // when the old grammar was the default, replace the default (feels pretty dirty)
-        if( defaultGrammarRef_ == oldGrammar ) {
+        if (defaultGrammarRef_ == oldGrammar) {
             defaultGrammarRef_ = grammar;
         }
 
         // clearup the old one
         delete oldGrammar;
     }
-    grammarMap_.insert(name,grammar);
+    grammarMap_.insert(name, grammar);
 }
 
 
-/// This method returns all grammar names
+/// Returns all grammar names
 QList<QString> TextGrammarManager::grammarNames()
 {
     return grammarMap_.keys();
 }
 
 
-/// This method returns the values
+/// Returns the values
 QList<TextGrammar*> TextGrammarManager::grammars()
 {
     return grammarMap_.values();
 }
 
 
-/// This method is used to compare the grammarnames of textgrammars
+/// ompares the grammarnames of textgrammars
 /// @param g1 the first grammar
 /// @param g2 the second grammar to compare
-static bool grammarsDisplayNameSorterLessThen( const TextGrammar* g1, const TextGrammar* g2 )
+static bool grammarsDisplayNameSorterLessThen(const TextGrammar* g1, const TextGrammar* g2)
 {
     return g1->displayName().toLower() < g2->displayName().toLower();
 }
 
 
-/// This utility function returns all grammars sorted on displayname
+/// Returns all grammars sorted on displayname
 /// Warning, this method sorts the grammars so calling this method multiple times is not what you want to do
 /// @return the list of grammars sorted on displayname
 QList<TextGrammar*> TextGrammarManager::grammarsSortedByDisplayName()
@@ -390,9 +387,10 @@ QList<TextGrammar*> TextGrammarManager::grammarsSortedByDisplayName()
 /// @return the defaultGrammar if no grammar was found
 TextGrammar* TextGrammarManager::detectGrammarWithFilename(const QString& fileName)
 {
-    foreach( TextGrammar* grammar, grammarMap_.values() ) {
-        foreach( QString ext, grammar->fileExtensions() ) {
-            if( fileName.endsWith( QStringLiteral(".%1").arg(ext) ) ) return grammar;
+    auto grammarMapValues = grammarMap_.values();
+    foreach (TextGrammar* grammar, grammarMapValues) {
+        foreach (QString ext, grammar->fileExtensions()) {
+            if (fileName.endsWith( QStringLiteral(".%1").arg(ext))) return grammar;
         }
     }
     return this->defaultGrammar();
