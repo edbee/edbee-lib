@@ -43,7 +43,7 @@ namespace edbee {
 /// @param widget the widget this controller is associated with
 /// @paarm parent the QObject parent of the controller
 TextEditorController::TextEditorController(TextEditorWidget* widget, QObject *parent)
-    : TextEditorController( new CharTextDocument(), widget, parent )
+    : TextEditorController(new CharTextDocument(), widget, parent)
 {
 }
 
@@ -71,15 +71,14 @@ TextEditorController::TextEditorController(TextDocument *document, TextEditorWid
     commandMapRef_ = Edbee::instance()->defaultCommandMap();
 
     // create the text renderer
-    textRenderer_ = new TextRenderer( this );
+    textRenderer_ = new TextRenderer(this);
 
     // create a text document (this should happen AFTER the creation of the renderer)
-    giveTextDocument( document );
+    giveTextDocument(document);
 
     // Now all objects have been created we can init them
     textRenderer_->init();
     textRenderer_->setThemeByName( textDocument()->config()->themeName() );
-
 }
 
 
@@ -100,11 +99,11 @@ TextEditorController::~TextEditorController()
 /// This method is called to reset the caret timer and update the ui
 void TextEditorController::notifyStateChange()
 {
-    if( widgetRef_ ) {
+    if (widgetRef_) {
         widgetRef_->resetCaretTime();
 
         // scrolling is only required when focused (When scrolling without focus the sync-editor goes wacko :P )
-        if( autoScrollToCaret_ == AutoScrollAlways || (autoScrollToCaret_ == AutoScrollWhenFocus && hasFocus())   ) {
+        if (autoScrollToCaret_ == AutoScrollAlways || (autoScrollToCaret_ == AutoScrollWhenFocus && hasFocus())) {
             scrollOffsetVisible( textSelection()->range(0).caret() );
         }
 
@@ -117,8 +116,8 @@ void TextEditorController::notifyStateChange()
 /// @param doc the new document for this controller
 void TextEditorController::giveTextDocument(TextDocument* doc)
 {
-    if( doc != textDocument_ ) {
-        setTextDocument( doc );
+    if (doc != textDocument_) {
+        setTextDocument(doc);
         textDocument_ = doc;        // this is all that's required for getting the ownership
     }
 }
@@ -130,12 +129,12 @@ void TextEditorController::setTextDocument(TextDocument* doc)
 {
     Q_ASSERT_GUI_THREAD;
 
-    if( doc != textDocumentRef_ ) {
+    if (doc != textDocumentRef_) {
         // disconnect the old document
         TextDocument* oldDocumentRef = textDocument();
-        if( oldDocumentRef ) {
+        if (oldDocumentRef) {
             oldDocumentRef->textUndoStack()->unregisterController(this);
-            disconnect(oldDocumentRef, SIGNAL(textChanged(edbee::TextBufferChange, QString)), this, SLOT(onTextChanged(edbee::TextBufferChange, QString)) );
+            disconnect(oldDocumentRef, SIGNAL(textChanged(edbee::TextBufferChange, QString)), this, SLOT(onTextChanged(edbee::TextBufferChange, QString)));
             disconnect(textDocumentRef_->lineDataManager(), SIGNAL(lineDataChanged(size_t,size_t,size_t)), this, SLOT(onLineDataChanged(size_t,size_t,size_t)));
         }
 
@@ -145,17 +144,16 @@ void TextEditorController::setTextDocument(TextDocument* doc)
 
         // create the document
         textDocumentRef_ = doc;
-        textCaretCache_ = new TextCaretCache( textDocumentRef_, textRenderer_ ); // warning the cache needs to be created BEFORE the selection!!!
-        textSelection_ = new TextSelection( this );
+        textCaretCache_ = new TextCaretCache(textDocumentRef_, textRenderer_); // warning the cache needs to be created BEFORE the selection!!!
+        textSelection_ = new TextSelection(this);
         textSelection_->addRange(0,0);  // add at least one cursor :-)
 
         delete borderedTextRanges_;
         borderedTextRanges_ = new DynamicTextRangeSet(textDocument());
 
-
         textDocumentRef_->textUndoStack()->registerContoller(this);
 
-        connect(textDocumentRef_, SIGNAL(textChanged(edbee::TextBufferChange,QString)), this, SLOT(onTextChanged(edbee::TextBufferChange, QString)));
+        connect(textDocumentRef_, SIGNAL(textChanged(edbee::TextBufferChange,QString)), this, SLOT(onTextChanged(edbee::TextBufferChange,QString)));
         connect(textDocumentRef_->lineDataManager(), SIGNAL(lineDataChanged(size_t,size_t,size_t)), this, SLOT(onLineDataChanged(size_t,size_t,size_t)));
 
         // force an repaint when the grammar is changed
@@ -165,7 +163,7 @@ void TextEditorController::setTextDocument(TextDocument* doc)
         connect( textDocumentRef_->config(), &TextEditorConfig::configChanged, this, &TextEditorController::updateAfterConfigChange );
 
         // create the new document
-        emit textDocumentChanged( oldDocumentRef, textDocumentRef_ );
+        emit textDocumentChanged(oldDocumentRef, textDocumentRef_);
 
         // delete the old stuff
         delete textDocument_;
@@ -181,14 +179,14 @@ void TextEditorController::setTextDocument(TextDocument* doc)
 //   - AutoScrollNever => Never perform automatic scrolling
 void TextEditorController::setAutoScrollToCaret(TextEditorController::AutoScrollToCaret autoScroll)
 {
-     autoScrollToCaret_ = autoScroll;
+    autoScrollToCaret_ = autoScroll;
 }
 
 
 /// Returns the autoScrollToCaret setting
 TextEditorController::AutoScrollToCaret TextEditorController::autoScrollToCaret() const
 {
-     return autoScrollToCaret_;
+    return autoScrollToCaret_;
 }
 
 
@@ -199,25 +197,23 @@ bool TextEditorController::hasFocus()
 }
 
 
-/// This method creates an editor action that is
+/// Creates an editor action that is unconnected
 /// @param command the command that needs to be executed.
 /// @param text description of the command
 /// @param icon the optional icon of the command
 /// @param owner the QObject owner of this action
 /// @return the newly created QAction
-QAction* TextEditorController::createUnconnectedAction(const QString& command, const QString& text, const QIcon& icon, QObject* owner )
+QAction* TextEditorController::createUnconnectedAction(const QString& command, const QString& text, const QIcon& icon, QObject* owner)
 {
-    // create the action
-    QAction* action = new QAction( icon, text, owner );
+    QAction* action = new QAction(icon, text, owner);
 
     // set the key if there's an assigned keyboard command
     TextEditorKey* key = keyMap()->get(command);
-    if( keyMap()->get( command ) ) {
+    if (keyMap()->get(command)) {
         action->setShortcut( key->sequence() );
     }
 
-    // set the data
-    action->setData( command );
+    action->setData(command);
     return action;
 }
 
@@ -231,10 +227,8 @@ QAction* TextEditorController::createUnconnectedAction(const QString& command, c
 /// @return the newly created QAction
 QAction* TextEditorController::createAction(const QString& command, const QString& text, const QIcon& icon , QObject* owner)
 {
-    // create the action
     QAction* action = createUnconnectedAction( command, text, icon, owner );
-    /// connect the signal to executeCommand
-    connect( action, SIGNAL(triggered()), SLOT(executeCommand()) );
+    connect( action, SIGNAL(triggered()), SLOT(executeCommand()));
     return action;
 }
 
@@ -370,11 +364,8 @@ DynamicVariables* TextEditorController::dynamicVariables() const
 
 
 /// This slot is placed if a piece of text is replaced
-void TextEditorController::onTextChanged( edbee::TextBufferChange change, QString oldText )
+void TextEditorController::onTextChanged(edbee::TextBufferChange change, QString oldText)
 {
-    /// update the selection
-//    textSelection()->changeSpatial( change.offset(), change.length(), change.newTextLength() );
-
     /// TODO: improve this:
     if( widgetRef_) {
         widget()->updateGeometryComponents();
@@ -415,7 +406,7 @@ void TextEditorController::onLineDataChanged(size_t line, size_t length, size_t 
 /// A lot of changes don't require an updates, but some do
 void TextEditorController::updateAfterConfigChange()
 {
-    textRenderer()->setThemeByName( textDocument()->config()->themeName() );
+    textRenderer()->setThemeByName(textDocument()->config()->themeName());
 
     // we need to figure out a better way to do this
     QFont font = textDocument()->config()->font();
@@ -428,115 +419,112 @@ void TextEditorController::updateAfterConfigChange()
 
 /// This method updates the status text. This is the text as displayed in the lower status bar
 /// @param extraText the extra text to show in the status bar
-void TextEditorController::updateStatusText( const QString& extraText )
+void TextEditorController::updateStatusText(const QString& extraText)
 {
     QString text;
     TextDocument* doc = textDocument();
 
-    if( !doc->textUndoStack()->isPersisted() ) {
+    if (!doc->textUndoStack()->isPersisted()) {
         text.append("[*] ");
     }
 
     // add the ranges
-    if( textSelection_->rangeCount() > 1 ) {
-        text.append( QObject::tr("%1 ranges").arg(textSelection_->rangeCount() ) );
+    if (textSelection_->rangeCount() > 1) {
+        text.append(QObject::tr("%1 ranges").arg(textSelection_->rangeCount()));
     } else {
         TextRange& range = textSelection_->range(0);
-        int caret = range.caret();
-        int line = doc->lineFromOffset( caret ) ;
-        int col  = doc->columnFromOffsetAndLine( caret, line ) + 1;
+        size_t caret = range.caret();
+        size_t line = doc->lineFromOffset(caret) ;
+        size_t col  = doc->columnFromOffsetAndLine(caret, line) + 1;
         text.append( QObject::tr("Line %1, Column %2").arg(line+1).arg(col) );
 
-        if( textDocument()->config()->showCaretOffset() ) {
-            text.append( QObject::tr(", Offset %1").arg(caret) );
+        if (textDocument()->config()->showCaretOffset()) {
+            text.append(QObject::tr(", Offset %1").arg(caret));
         }
 
-        if( range.length() > 0 ) {
-            text.append( QObject::tr(" | %1 chars selected").arg(range.length()) );
+        if (range.length() > 0) {
+            text.append(QObject::tr(" | %1 chars selected").arg(range.length()));
 
         // add the current scopes
         } else {
             text.append( QObject::tr(" | scope: ") );
 
             QString str;
-            QVector<TextScope*> scopes = textDocument()->scopes()->scopesAtOffset( caret ) ;
-            for( int i=0,cnt=scopes.size(); i<cnt; ++i ) {
+            QVector<TextScope*> scopes = textDocument()->scopes()->scopesAtOffset(caret) ;
+            for (qsizetype i = 0, cnt = scopes.size(); i < cnt; ++i) {
                 TextScope* scope = scopes[i];
-                str.append( scope->name() );
+                str.append(scope->name());
                 str.append(" ");
             }
-            text.append( str );
-            text.append( QObject::tr(" (%1)").arg( textDocument()->scopes()->lastScopedOffset() ) );
+            text.append(str);
+            text.append(QObject::tr(" (%1)").arg( textDocument()->scopes()->lastScopedOffset()));
         }
     }
 
-    // add the extra text
-    if( !extraText.isEmpty() ) {
+    if(!extraText.isEmpty()) {
         text.append(" | " );
         text.append(extraText);
     }
-    emit updateStatusTextSignal( text );
+    emit updateStatusTextSignal(text);
 }
 
 
 /// updates the main widget
 void TextEditorController::update()
 {
-    if( widgetRef_ ) {
+    if (widgetRef_) {
         widgetRef_->fullUpdate();
     }
 }
 
 
 /// Asserts the view shows the given position
-void TextEditorController::scrollPositionVisible(int xPos, int yPos)
+void TextEditorController::scrollPositionVisible(size_t xPos, size_t yPos)
 {
-    emit widgetRef_->scrollPositionVisible( xPos, yPos );
+    emit widgetRef_->scrollPositionVisible(xPos, yPos);
 }
 
 
 /// Assets the view shows the given offset
-void TextEditorController::scrollOffsetVisible(int offset)
+void TextEditorController::scrollOffsetVisible(size_t offset)
 {
     TextRenderer* renderer = textRenderer();
-    int xPos = renderer->xPosForOffset(offset);
-    int yPos = renderer->yPosForOffset(offset);
-    scrollPositionVisible( xPos, yPos );
+    size_t xPos = renderer->xPosForOffset(offset);
+    size_t yPos = renderer->yPosForOffset(offset);
+    scrollPositionVisible(xPos, yPos);
 }
 
 
-/// This method makes sure caret 1 is visible
+/// Scrolls so the first caret is visible
 void TextEditorController::scrollCaretVisible()
 {
-    scrollOffsetVisible( textSelection()->range(0).caret() );
+    scrollOffsetVisible(textSelection()->range(0).caret());
 }
 
 
-/// This method adds a text change on the stack that simply stores the current text-selection
+/// Adds a text change on the stack that simply stores the current text-selection
 /// @param coalsceId the coalescing identifier for merging/coalescing undo operations
 void TextEditorController::storeSelection(int coalesceId)
 {
     SelectionChange* change = new SelectionChange(this);
-    change->giveTextRangeSet( new TextRangeSet( *textSelection() ) );
-    textDocument()->executeAndGiveChange( change, coalesceId );
+    change->giveTextRangeSet(new TextRangeSet(*textSelection()));
+    textDocument()->executeAndGiveChange(change, coalesceId);
 }
 
 
-/// This method executes the command
-void TextEditorController::executeCommand( edbee::TextEditorCommand* textCommand )
+void TextEditorController::executeCommand(edbee::TextEditorCommand* textCommand)
 {
     // Only readonly commands can be executed in readonly mode
-    if( readonly() && !textCommand->readonly() ) {
+    if (readonly() && !textCommand->readonly()) {
         updateStatusText( "Cannot edit a readonly document!" );
         return;
     }
 
-    emit commandToBeExecuted( textCommand  );
-    textCommand->execute( this );
-    emit commandExecuted( textCommand );
+    emit commandToBeExecuted(textCommand);
+    textCommand->execute(this);
+    emit commandExecuted(textCommand);
 
-    // TODO: move this to a nicer place!!
-    updateStatusText( textCommand->toString() );
+    updateStatusText(textCommand->toString());
 }
 
 
@@ -550,11 +538,11 @@ void TextEditorController::executeCommand(const QString& name)
 {
     // check if an empty command name has been supplied
     QString commandName = name;
-    if( commandName.isEmpty() ) {
+    if (commandName.isEmpty()) {
 
         // when the command name is blank  try to get the data of the QAction command
         QAction* action= qobject_cast<QAction*>(sender());
-        if( !action ) {
+        if (!action) {
             qlog_warn() << "executeCommand was triggered without argument and without QAction data attribute!";
             return;
         }
@@ -563,14 +551,16 @@ void TextEditorController::executeCommand(const QString& name)
 
     // try to retrieve the command
     TextEditorCommand* command = commandMap()->get(commandName);
-    if( command ) { executeCommand( command ); }
+    if (command) { executeCommand(command); }
 }
+
 
 /// Return the readonly state.
 bool TextEditorController::readonly() const
 {
     return widget()->readonly();
 }
+
 
 /// Sets the readonly state
 void TextEditorController::setReadonly(bool value)
@@ -579,47 +569,47 @@ void TextEditorController::setReadonly(bool value)
 }
 
 
-/// replaces the given text (single ranges)
+/// Replaces the given text (single ranges)
 /// @param offset the character offset in the document
 /// @param length the number of characters to replace
 /// @param text the text to replace
 /// @param coalesceId the identifier for grouping undo operations
-void TextEditorController::replace(int offset, int length, const QString& text, int coalesceId, bool stickySelection)
+void TextEditorController::replace(size_t offset, size_t length, const QString& text, int coalesceId, bool stickySelection)
 {
 //    SelectionTextChange* change = new SelectionTextChange(this);
     TextRangeSet ranges(textDocument());
-    ranges.addRange(offset, offset+length);
-    replaceRangeSet(ranges,text,coalesceId, stickySelection);
+    ranges.addRange(offset, offset + length);
+    replaceRangeSet(ranges, text, coalesceId, stickySelection);
 }
 
 
-/// This method replaces the selection with the given text
+/// Replaces the selection with the given text
 /// @param text the text to replace the selection with
 /// @param coalesceId the identifier for grouping undo operations
 void TextEditorController::replaceSelection(const QString& text, int coalesceId, bool stickySelection)
 {
-    replaceRangeSet( *dynamic_cast<TextRangeSet*>( textSelection() ), text, coalesceId, stickySelection);
+    replaceRangeSet(*dynamic_cast<TextRangeSet*>(textSelection()), text, coalesceId, stickySelection);
 }
 
 
-/// This method replaces the given selection with the given texts
+/// Replaces the given selection with the given texts
 /// @param texts the list of texts that need to be replaced
 /// @param coalesceID the identifier for grouping undo operation
 void TextEditorController::replaceSelection(const QStringList& texts, int coalesceId, bool stickySelection)
 {
-    replaceRangeSet(*dynamic_cast<TextRangeSet*>( textSelection() ), texts, coalesceId, stickySelection);
+    replaceRangeSet(*dynamic_cast<TextRangeSet*>(textSelection()), texts, coalesceId, stickySelection);
 }
 
 
-///  Replaces the given rangeset with the given text
+/// Replaces the given rangeset with the given text
 /// @param rangeset the ranges to replace
 /// @param text the text to replace the selection with
 /// @param coalesceId the identifier for grouping undo operations
 void TextEditorController::replaceRangeSet(edbee::TextRangeSet& rangeSet, const QString& text, int coalesceId, bool stickySelection)
 {
-    if(readonly()) return;
+    if (readonly()) return;
 
-    textDocument()->beginChanges( this );
+    textDocument()->beginChanges(this);
     textDocument()->replaceRangeSet(rangeSet, text, stickySelection);
     textDocument()->endChanges(coalesceId);
     notifyStateChange();
@@ -632,16 +622,16 @@ void TextEditorController::replaceRangeSet(edbee::TextRangeSet& rangeSet, const 
 /// @param coalesceId the identifier for grouping undo operations
 void TextEditorController::replaceRangeSet(edbee::TextRangeSet& rangeSet, const QStringList& texts, int coalesceId, bool stickySelection)
 {
-    if(readonly()) return;
+    if (readonly()) return;
 
-    textDocument()->beginChanges( this );
-    textDocument()->replaceRangeSet( rangeSet, texts, stickySelection);
-    textDocument()->endChanges( coalesceId );
+    textDocument()->beginChanges(this);
+    textDocument()->replaceRangeSet(rangeSet, texts, stickySelection);
+    textDocument()->endChanges(coalesceId);
     notifyStateChange();
 }
 
 
-/// This method creates a command that moves the caret to the given line/column position
+/// Creates a command that moves the caret to the given line/column position
 /// A negative number means that we're counting from the end
 /// This method assumes line 0 is the first line!
 ///
@@ -650,24 +640,24 @@ void TextEditorController::replaceRangeSet(edbee::TextRangeSet& rangeSet, const 
 ///     moveCaretTo( -1, -2 ) => Moves the caret to the character before the last character
 ///
 /// The rangeIndex is used to specify which range to move.. (Defaults to -1 which changes to a single range)
-void TextEditorController::moveCaretTo(int line, int col, bool keepAnchors, int rangeIndex )
+void TextEditorController::moveCaretTo(ptrdiff_t line, ptrdiff_t col, bool keepAnchors, size_t rangeIndex)
 {
-    if( line < 0) {
-        line = textDocument()->lineCount() + line;
-        if( line < 0 ) { line = 0; }
+    if (line < 0) {
+        line = static_cast<ptrdiff_t>(textDocument()->lineCount()) + line;
+        if (line < 0) { line = 0; }
     }
-    int offset = textDocument()->offsetFromLine(line);
-    int lineLength = textDocument()->lineLength(line);
-    if( col < 0 ){
-        col = lineLength + col;
+    Q_ASSERT(line >= 0);
+
+    size_t uline = static_cast<size_t>(line);
+    size_t offset = textDocument()->offsetFromLine(uline);
+    size_t lineLength = textDocument()->lineLength(uline);
+    if (col < 0){
+        col = static_cast<ptrdiff_t>(lineLength) + col;
     }
 
-    int minusNewLineChar = textDocument()->lineCount()-1 == line ? 0 : 1;
-    offset += qBound(0, col, qMax(lineLength-minusNewLineChar, 0));
-
-//textDocument()->offsetFromLineAndColumn(line,col)
-
-    return moveCaretToOffset( offset , keepAnchors, rangeIndex );
+    ptrdiff_t minusNewLineChar = textDocument()->lineCount() - 1 == uline ? 0 : 1;
+    offset += static_cast<size_t>(qBound(0, col, qMax(static_cast<ptrdiff_t>(lineLength) - minusNewLineChar, 0)));
+    return moveCaretToOffset(offset, keepAnchors, rangeIndex);
 }
 
 
@@ -675,49 +665,49 @@ void TextEditorController::moveCaretTo(int line, int col, bool keepAnchors, int 
 /// @param offset the offset to move the caret to
 /// @param keepAnchors should the anchors stay at the current position (extending the selection range)
 /// The rangeIndex is used to specify which range to move.. (Defaults to -1 which changes to a single range)
-void TextEditorController::moveCaretToOffset(int offset, bool keepAnchors, int rangeIndex)
+void TextEditorController::moveCaretToOffset(size_t offset, bool keepAnchors, size_t rangeIndex)
 {
 //    SelectionCommand* command = new SelectionCommand( SelectionCommand::MoveCaretToExactOffset, offset, keepAnchors );
-    SelectionCommand command( SelectionCommand::MoveCaretToExactOffset, offset, keepAnchors, rangeIndex );
-    return executeCommand( &command );
+    SelectionCommand command(SelectionCommand::MoveCaretToExactOffset, static_cast<ptrdiff_t>(offset), keepAnchors, rangeIndex);
+    return executeCommand(&command);
 }
 
 /// Move the caret and the anchor to the given offset
 /// @param caret the caret location
 /// @param anchor the anchor location
-/// The rangeIndex is used to specify which range to move.. (Defaults to -1 which changes to a single range)
-void TextEditorController::moveCaretAndAnchorToOffset(int caret, int anchor, int rangeIndex)
+/// The rangeIndex is used to specify which range to move.. (Defaults to std::string::npos which changes to a single range)
+void TextEditorController::moveCaretAndAnchorToOffset(size_t caret, size_t anchor, size_t rangeIndex)
 {
-    SelectionCommand command( SelectionCommand::MoveCaretToExactOffset, caret, true, rangeIndex);
+    SelectionCommand command(SelectionCommand::MoveCaretToExactOffset, static_cast<ptrdiff_t>(caret), true, rangeIndex);
     command.setAnchor(anchor);
-    return executeCommand( &command );
+    return executeCommand(&command);
 }
 
 
 /// Adds a new caret to the selection
 /// @param line the line number
 /// @param col the column
-void TextEditorController::addCaretAt(int line, int col)
+void TextEditorController::addCaretAt(size_t line, size_t col)
 {
-    return addCaretAtOffset( textDocument()->offsetFromLineAndColumn(line,col) );
+    return addCaretAtOffset(textDocument()->offsetFromLineAndColumn(line,col));
 }
 
 
 /// Adds a carert at the given offset
 /// @param offset the character offset to add the caret
-void TextEditorController::addCaretAtOffset(int offset)
+void TextEditorController::addCaretAtOffset(size_t offset)
 {
-    SelectionCommand command( SelectionCommand::AddCaretAtOffset, offset );
-    return executeCommand( &command );
+    SelectionCommand command(SelectionCommand::AddCaretAtOffset, static_cast<ptrdiff_t>(offset));
+    return executeCommand(&command);
 }
 
 
 /// This method changes the text selection
-void TextEditorController::changeAndGiveTextSelection(edbee::TextRangeSet* rangeSet, int coalesceId )
+void TextEditorController::changeAndGiveTextSelection(edbee::TextRangeSet* rangeSet, int coalesceId)
 {
     SelectionChange* change = new SelectionChange(this);
-    change->giveTextRangeSet( rangeSet );
-    textDocument()->executeAndGiveChange( change, coalesceId );
+    change->giveTextRangeSet(rangeSet);
+    textDocument()->executeAndGiveChange(change, coalesceId);
 }
 
 
@@ -725,7 +715,7 @@ void TextEditorController::changeAndGiveTextSelection(edbee::TextRangeSet* range
 /// controller based operations are undone. When supplying false a Document operation is being undone
 void TextEditorController::undo(bool soft)
 {
-    textDocument()->textUndoStack()->undo( soft ? this : nullptr, soft );
+    textDocument()->textUndoStack()->undo( soft ? this : nullptr, soft);
 }
 
 
@@ -734,17 +724,17 @@ void TextEditorController::undo(bool soft)
 /// @param soft perform a soft undo?
 void TextEditorController::redo(bool soft)
 {
-    textDocument()->textUndoStack()->redo( soft ? this : nullptr, soft );
+    textDocument()->textUndoStack()->redo(soft ? this : nullptr, soft);
 }
 
 
 
 /// Starts an undo group
 /// @param group the undogroup to use (defaults to a MergableChangeGroup)
-void TextEditorController::beginUndoGroup( edbee::ChangeGroup* group )
+void TextEditorController::beginUndoGroup(edbee::ChangeGroup* group)
 {
-    if( !group ) {
-        group = new ChangeGroup( this );
+    if (!group) {
+        group = new ChangeGroup(this);
     }
     textDocument()->beginUndoGroup(group);
 }
