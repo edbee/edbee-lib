@@ -11,7 +11,7 @@
 #include <QVector>
 
 #include "edbee/io/tmthemeparser.h"
-#include "edbee/models/textbuffer.h"
+//#include "edbee/models/textbuffer.h"
 #include "edbee/models/textdocument.h"
 #include "edbee/models/textdocumentscopes.h"
 #include "edbee/texteditorcontroller.h"
@@ -23,10 +23,10 @@ namespace edbee {
 
 
 TextThemeRule::TextThemeRule(const QString& name, const QString& selector, QColor foreground, QColor background, bool bold, bool italic, bool underline)
-    : name_( name )
-    , scopeSelector_(0)
-    , foregroundColor_( foreground )
-    , backgroundColor_( background )
+    : name_(name)
+    , scopeSelector_(nullptr)
+    , foregroundColor_(foreground)
+    , backgroundColor_(background)
     , bold_(bold)
     , italic_(italic)
     , underline_(underline)
@@ -42,16 +42,16 @@ TextThemeRule::~TextThemeRule()
 /// This method checks if the given scopelist matches the scope selector
 bool TextThemeRule::matchesScopeList(const TextScopeList* scopes)
 {
-    return ( scopeSelector_->calculateMatchScore( scopes ) >= 0 ) ;
+    return (scopeSelector_->calculateMatchScore(scopes) >= 0);
 }
 
 void TextThemeRule::fillFormat(QTextCharFormat* format)
 {
-    if( foregroundColor_.isValid() ) { format->setForeground(foregroundColor_ ); }
-    if( backgroundColor_.isValid() ) { format->setBackground(backgroundColor_ ); }
-    if( bold_ ) { format->setFontWeight( QFont::Bold ); }  //QFont::Black
-    if( italic_) { format->setFontItalic(true); }
-    if( underline_ ) { format->setFontUnderline(true); }
+    if (foregroundColor_.isValid()) { format->setForeground(foregroundColor_); }
+    if (backgroundColor_.isValid()) { format->setBackground(backgroundColor_); }
+    if (bold_) { format->setFontWeight(QFont::Bold); }  //QFont::Black
+    if (italic_) { format->setFontItalic(true); }
+    if (underline_) { format->setFontUnderline(true); }
 }
 
 //=================================================
@@ -60,42 +60,24 @@ void TextThemeRule::fillFormat(QTextCharFormat* format)
 TextTheme::TextTheme()
     : name_("Default Theme")
     , uuid_("")
-    , backgroundColor_( 0xffeeeeee )
-    , caretColor_( 0xff000000  )
-    , foregroundColor_( 0xff222222 )
-    , lineHighlightColor_(0xff999999 )
-    , selectionColor_( 0xff9999ff)
-
-    // thTheme settings
-//    , backgroundColor_(0xff272822)
-//    , caretColor_(0xffF8F8F0)
-//    , foregroundColor_(0xffF8F8F2)
-//    , invisiblesColor_(0xff3B3A32)
-//    , lineHighlightColor_(0xff3E3D32)
-//    , selectionColor_(0xff49483E)
-//    , findHighlightBackgroundColor_(0xffFFE792)
-//    , findHighlightForegroundColor_(0xff000000)
-//    , selectionBorderColor_(0xff222218)
-//    , activeGuideColor_(0x9D550FB0)
-//    , bracketForegroundColor_(0xF8F8F2A5)
-//    , bracketOptions_("underline")
-//    , bracketContentsForegroundColor_(0xF8F8F2A5)
-//    , bracketContentsOptions_("underline")
-//    , tagsOptions_("stippled_underline")
-
+    , backgroundColor_(0xffeeeeee)
+    , caretColor_(0xff000000  )
+    , foregroundColor_(0xff222222)
+    , lineHighlightColor_(0xff999999)
+    , selectionColor_(0xff9999ff)
 {
     QPalette pal = QApplication::palette();
-    backgroundColor_ = pal.color( QPalette::Window);
-    foregroundColor_ = pal.color( QPalette::WindowText );
-    selectionColor_ = pal.color( QPalette::Highlight );
-//    giveThemeRule( new TextThemeRule("Comment","comment", QColor("#75715E") ));
-//    giveThemeRule( new TextThemeRule("String","string", QColor("#E6DB74") ));
+    backgroundColor_ = pal.color(QPalette::Window);
+    foregroundColor_ = pal.color(QPalette::WindowText);
+    selectionColor_ = pal.color(QPalette::Highlight);
 }
+
 
 TextTheme::~TextTheme()
 {
     qDeleteAll(themeRules_);
 }
+
 
 /// The text theme
 void TextTheme::giveThemeRule(TextThemeRule* rule)
@@ -103,17 +85,14 @@ void TextTheme::giveThemeRule(TextThemeRule* rule)
     themeRules_.append(rule);
 }
 
-void TextTheme::fillFormatForTextScopeList( const TextScopeList* scopeList, QTextCharFormat* format)
-{
-//    format->setForeground( foregroundColor() );
-//    format->setBackground( backgroundColor() );
 
-    foreach( TextThemeRule* rule, themeRules_ ) {
-        if( rule->matchesScopeList( scopeList ) ) {
+void TextTheme::fillFormatForTextScopeList(const TextScopeList* scopeList, QTextCharFormat* format)
+{
+    foreach (TextThemeRule* rule, themeRules_) {
+        if (rule->matchesScopeList(scopeList)) {
             rule->fillFormat(format);
         }
     }
-
 }
 
 
@@ -122,13 +101,13 @@ void TextTheme::fillFormatForTextScopeList( const TextScopeList* scopeList, QTex
 
 /// Constructs the theme styler
 /// @param controller the controller to use this styler for
-TextThemeStyler::TextThemeStyler( TextEditorController* controller )
-    : controllerRef_( controller )
+TextThemeStyler::TextThemeStyler(TextEditorController* controller)
+    : controllerRef_(controller)
     , themeName_()
-    , themeRef_(0)
+    , themeRef_(nullptr)
 {
-    connect( controller, SIGNAL(textDocumentChanged(edbee::TextDocument*,edbee::TextDocument*)), SLOT(textDocumentChanged(edbee::TextDocument*,edbee::TextDocument*)) );
-    connect( Edbee::instance()->themeManager(), SIGNAL(themePointerChanged(QString,TextTheme*,TextTheme*)), SLOT(themePointerChanged(QString,TextTheme*,TextTheme*)) );
+    connect(controller, SIGNAL(textDocumentChanged(edbee::TextDocument*,edbee::TextDocument*)), SLOT(textDocumentChanged(edbee::TextDocument*,edbee::TextDocument*)));
+    connect(Edbee::instance()->themeManager(), SIGNAL(themePointerChanged(QString,TextTheme*,TextTheme*)), SLOT(themePointerChanged(QString,TextTheme*,TextTheme*)));
     themeRef_ = Edbee::instance()->themeManager()->fallbackTheme();
 }
 
@@ -145,7 +124,7 @@ TextThemeStyler::~TextThemeStyler()
 ///
 /// @param lineIdx the line index
 /// @return the array of ranges
-QVector<QTextLayout::FormatRange> TextThemeStyler::getLineFormatRanges( int lineIdx )
+QVector<QTextLayout::FormatRange> TextThemeStyler::getLineFormatRanges(size_t lineIdx)
 {
     TextDocumentScopes* scopes = controller()->textDocument()->scopes();
 
@@ -154,7 +133,7 @@ QVector<QTextLayout::FormatRange> TextThemeStyler::getLineFormatRanges( int line
 
     // get all textranges on the given line
     ScopedTextRangeList* scopedRanges = scopes->scopedRangesAtLine(lineIdx);
-    if( scopedRanges == 0 || scopedRanges->size() == 0 ) { return formatRangeList; }
+    if (scopedRanges == 0 || scopedRanges->size() == 0) { return formatRangeList; }
 
 
     // build format ranges from these (nested) scope ranges
@@ -166,46 +145,45 @@ QVector<QTextLayout::FormatRange> TextThemeStyler::getLineFormatRanges( int line
     //  [ ][xx][#########][xxxx][ ][kkkkkkk][  ]
     //
     QStack<ScopedTextRange*> activeRanges;
-    activeRanges.append( scopedRanges->at(0) );
+    activeRanges.append(scopedRanges->at(0));
 
-    int lastOffset = 0; //lineStartOffset;
-    for( int i=1, cnt=scopedRanges->size(); i<cnt; ++i ) {
+    size_t lastOffset = 0;
+    for (size_t i = 1, cnt = scopedRanges->size(); i < cnt; ++i) {
         ScopedTextRange* range = scopedRanges->at(i);
-        int min = range->min();  // find the minimum position
+        size_t min = range->min();
 
         // unwind the stack if required
-        while( activeRanges.size() > 1 ) {
+        while (activeRanges.size() > 1) {
             ScopedTextRange* activeRange = activeRanges.last();
-            int activeRangeMax = activeRange->max();
+            size_t activeRangeMax = activeRange->max();
 
             // when the 'min' is behind the end of the textrange on the stack we need to pop the stack
-            if( activeRangeMax <= min ) {
-                appendFormatRange( formatRangeList, lastOffset, activeRangeMax-1, activeRanges );
+            if (activeRangeMax <= min) {
+                appendFormatRange(formatRangeList, lastOffset, activeRangeMax - 1, activeRanges);
                 activeRanges.pop();
                 lastOffset = activeRangeMax;
-                Q_ASSERT( !activeRanges.empty() );
+                Q_ASSERT(!activeRanges.empty());
             } else {
                 break;
             }
         }
 
         // add a new 'range' if a new one is started and there's a 'gap'
-        if( lastOffset < min ) {
-            appendFormatRange( formatRangeList, lastOffset, min-1, activeRanges );
+        if (lastOffset < min)  {
+            appendFormatRange(formatRangeList, lastOffset, min - 1, activeRanges);
             lastOffset = min;
         }
 
         // push the new range to the stack
-        activeRanges.push_back( range );
-
+        activeRanges.push_back(range);
     }
 
     // next we must unwind the stack
-    while( !activeRanges.isEmpty() ) {
+    while (!activeRanges.isEmpty()) {
         ScopedTextRange* activeRange = activeRanges.last();
-        int activeRangeMax = activeRange->max();
-        if( lastOffset < activeRange->max() ) {
-            appendFormatRange(formatRangeList, lastOffset, activeRangeMax-1, activeRanges );
+        size_t activeRangeMax = activeRange->max();
+        if (lastOffset < activeRange->max()) {
+            appendFormatRange(formatRangeList, lastOffset, activeRangeMax-1, activeRanges);
             lastOffset = activeRange->max();
         }
         activeRanges.pop();
@@ -225,7 +203,7 @@ void TextThemeStyler::setThemeByName(const QString& themeName)
     themeRef_= Edbee::instance()->themeManager()->theme(themeName_);
 
     // when no theme is found, fallback to the fallback theme
-    if( !themeRef_) {
+    if (!themeRef_) {
         qlog_warn() << "Theme not set:" << themeName_;
         themeName_ = "";
         themeRef_= Edbee::instance()->themeManager()->fallbackTheme();
@@ -248,7 +226,7 @@ void TextThemeStyler::setTheme(TextTheme* theme)
 {
     themeName_ = QString();
     themeRef_ = theme;
-    if( !themeRef_) {
+    if (!themeRef_) {
         themeName_ = "";
         themeRef_= Edbee::instance()->themeManager()->fallbackTheme();
     }
@@ -263,28 +241,28 @@ TextTheme* TextThemeStyler::theme() const
 
 
 
-/// This method returns the character format for the given text scope
-QTextCharFormat TextThemeStyler::getTextScopeFormat( QVector<ScopedTextRange*>& activeRanges )
+/// Returns the character format for the given text scope
+QTextCharFormat TextThemeStyler::getTextScopeFormat(QVector<ScopedTextRange*>& activeRanges)
 {
 //    ScopedTextRange* range = activeRanges.last();
     QTextCharFormat format;
 
     TextScopeList scopeList(activeRanges);
-    theme()->fillFormatForTextScopeList( &scopeList, &format );
+    theme()->fillFormatForTextScopeList(&scopeList, &format);
     return format;
 }
 
 
 /// helper function to create a format range
-void TextThemeStyler::appendFormatRange(QVector<QTextLayout::FormatRange> &rangeList, int start, int end,  QVector<ScopedTextRange*>& activeRanges )
+void TextThemeStyler::appendFormatRange(QVector<QTextLayout::FormatRange>& rangeList, size_t start, size_t end, QVector<ScopedTextRange*>& activeRanges )
 {
     // only append a format if the lexer style is different then default
-    if( activeRanges.size() > 1  ) {
+    if (activeRanges.size() > 1) {
         QTextLayout::FormatRange formatRange;
-        formatRange.start  = start;
-        formatRange.length = end - start + 1;
-        formatRange.format = getTextScopeFormat( activeRanges );
-        rangeList.append( formatRange );
+        formatRange.start  = static_cast<int>(start);
+        formatRange.length = static_cast<int>(end - start + 1);
+        formatRange.format = getTextScopeFormat(activeRanges);
+        rangeList.append(formatRange);
     }
 }
 
@@ -297,17 +275,15 @@ void TextThemeStyler::textDocumentChanged(edbee::TextDocument *oldDocument, edbe
 /// invalidates all layouts
 void TextThemeStyler::invalidateLayouts()
 {
-    //    formateRangeListCache_.clear();
 }
 
-void TextThemeStyler::themePointerChanged(const QString& name, TextTheme* oldTheme, TextTheme *newTheme)
+void TextThemeStyler::themePointerChanged(const QString& name, TextTheme* oldTheme, TextTheme* newTheme)
 {
-    if( name == themeName_ ) {
+    if (name == themeName_) {
         themeRef_ = newTheme;
     } else {
-        if( oldTheme == themeRef_ ) {
+        if (oldTheme == themeRef_) {
             Q_ASSERT(false && "The old theme is deleted but it's not the same theme name. This shouldn't happen");
-            // If it happens a solution is to set the fallback theme
         }
     }
 }
@@ -362,24 +338,24 @@ void TextThemeManager::listAllThemes(const QString& themePath)
 
 /// Returns the theme name at the given index
 /// @param idx the index of the theme to retrieve
-QString TextThemeManager::themeName(int idx)
+QString TextThemeManager::themeName(qsizetype idx)
 {
     return themeNames_.at(idx);
 }
 
 
-/// This method loads the given theme file.
+/// Loads the given theme file.
 /// The theme manager stays owner of the given theme
 /// @param filename the filename of the theme to load
 /// @param name the name of the theme (if the name isn't given the basenaem of the fileName is used (excluding the .tmTheme extension)
 /// @return the loaded theme or 0 if the theme couldn' be loaded
-TextTheme* TextThemeManager::readThemeFile( const QString& fileName, const QString& nameIn )
+TextTheme* TextThemeManager::readThemeFile(const QString& fileName, const QString& nameIn)
 {
     lastErrorMessage_.clear();
 
     // check if the file exists
     QFile file(fileName);
-    if( file.exists() && file.open(QIODevice::ReadOnly) ) {
+    if (file.exists() && file.open(QIODevice::ReadOnly)) {
 
         // parse the theme
         TmThemeParser parser;
@@ -394,7 +370,7 @@ TextTheme* TextThemeManager::readThemeFile( const QString& fileName, const QStri
 
             setTheme(name,theme);
         } else {
-            lastErrorMessage_ = QObject::tr("Error parsing theme %1:%2").arg(file.fileName()).arg( parser.lastErrorMessage());
+            lastErrorMessage_ = QObject::tr("Error parsing theme %1:%2").arg(file.fileName(), parser.lastErrorMessage());
         }
         file.close();
         return theme;
@@ -416,7 +392,7 @@ TextTheme* TextThemeManager::theme(const QString& name)
     if( name.isEmpty() ) { return 0; }
     TextTheme* theme=themeMap_.value(name);
     if( !theme && !themePath_.isEmpty()) {
-        QString filename = QStringLiteral("%1/%2.tmTheme").arg(themePath_).arg(name);
+        QString filename = QStringLiteral("%1/%2.tmTheme").arg(themePath_, name);
         theme = readThemeFile( filename );
         if( !theme ) {
             qlog_warn() << this->lastErrorMessage();
