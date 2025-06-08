@@ -43,7 +43,7 @@ public:
 
     inline size_t length() const { return (caret_ > anchor_) ? caret_ - anchor_ : anchor_ - caret_; }
 
-    void fixCaretForUnicode(TextDocument* doc, int direction);
+    void fixCaretForUnicode(TextDocument* doc, ptrdiff_t direction);
 
     void setAnchor(size_t anchor) { anchor_ = anchor; }
     void setAnchorBounded(TextDocument* doc, size_t anchor);
@@ -61,20 +61,20 @@ public:
 
     QString toString() const;
 
-    void moveCaret(TextDocument* doc, int amount);
-    void moveCaretOrDeselect( TextDocument* doc, int amount);
-    size_t moveWhileChar(TextDocument* doc, size_t pos, int amount, const QString& chars);
-    size_t moveUntilChar(TextDocument* doc, size_t pos, int amount, const QString& chars);
-    void moveCaretWhileChar(TextDocument* doc, int amount, const QString& chars);
-    void moveCaretUntilChar(TextDocument* doc, int amount, const QString& chars);
-    void moveAnchortWhileChar(TextDocument* doc, int amount, const QString& chars);
-    void moveAnchorUntilChar(TextDocument* doc, int amount, const QString& chars);
-    void moveCaretByCharGroup(TextDocument* doc, int amount, const QString& whitespace, const QStringList& characterGroups);
-    void moveCaretToLineBoundary(TextDocument* doc, int amount, const QString& whitespace);
+    void moveCaret(TextDocument* doc, ptrdiff_t amount);
+    void moveCaretOrDeselect( TextDocument* doc, ptrdiff_t amount);
+    size_t moveWhileChar(TextDocument* doc, size_t pos, ptrdiff_t amount, const QString& chars);
+    size_t moveUntilChar(TextDocument* doc, size_t pos, ptrdiff_t amount, const QString& chars);
+    void moveCaretWhileChar(TextDocument* doc, ptrdiff_t amount, const QString& chars);
+    void moveCaretUntilChar(TextDocument* doc, ptrdiff_t amount, const QString& chars);
+    void moveAnchortWhileChar(TextDocument* doc, ptrdiff_t amount, const QString& chars);
+    void moveAnchorUntilChar(TextDocument* doc, ptrdiff_t amount, const QString& chars);
+    void moveCaretByCharGroup(TextDocument* doc, ptrdiff_t amount, const QString& whitespace, const QStringList& characterGroups);
+    void moveCaretToLineBoundary(TextDocument* doc, ptrdiff_t amount, const QString& whitespace);
     void moveCaretToWordBoundaryAtOffset(TextDocument* doc, size_t offset);
     void moveCaretToLineBoundaryAtOffset(TextDocument* doc, size_t offset);
 
-    void expandToFullLine(TextDocument* doc, int amount);
+    void expandToFullLine(TextDocument* doc, ptrdiff_t amount);
     void deselectTrailingNewLine(TextDocument* doc);
     void expandToWord(TextDocument* doc, const QString& whitespace, const QStringList& characterGroups);
     void expandToIncludeRange(TextRange& range);
@@ -150,16 +150,16 @@ public:
     void substractRange(size_t min, size_t max);
 
     // selection
-    void expandToFullLines(int amount);
+    void expandToFullLines(ptrdiff_t amount);
     void expandToWords(const QString& whitespace, const QStringList& characterGroups);
     void selectWordAt(size_t offset , const QString& whitespace, const QStringList& characterGroups);
     void toggleWordSelectionAt(size_t offset, const QString& whitespace, const QStringList& characterGroups);
 
     // movement
-    void moveCarets(int amount);
-    void moveCaretsOrDeselect(int amount);
-    void moveCaretsByCharGroup(int amount, const QString& whitespace, const QStringList& charGroups);
-    void moveCaretsToLineBoundary(int direction, const QString& whitespace);
+    void moveCarets(ptrdiff_t amount);
+    void moveCaretsOrDeselect(ptrdiff_t amount);
+    void moveCaretsByCharGroup(ptrdiff_t amount, const QString& whitespace, const QStringList& charGroups);
+    void moveCaretsToLineBoundary(ptrdiff_t direction, const QString& whitespace);
     //    void moveCaretsByLine( int amount );  //< Impossible to do without view when having a flexible font, guess that's why it wasn't implemented
 
     // changing
@@ -171,7 +171,7 @@ public:
 
     virtual void processChangesIfRequired(bool joinBorders=false);
 
-  // getters
+      // getters
     TextDocument* textDocument() const;
     //TextBuffer* textBuffer() const { return textBufferRef_; }
 

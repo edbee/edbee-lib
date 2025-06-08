@@ -1,10 +1,11 @@
 // edbee - Copyright (c) 2012-2025 by Rick Blommers and contributors
 // SPDX-License-Identifier: MIT
 
+#include "textrange.h"
+
 #include <QStringList>
 
 #include "textdocument.h"
-#include "textrange.h"
 #include "texteditorconfig.h"
 #include "edbee/debug.h"
 
@@ -19,7 +20,7 @@ bool TextRange::lessThan(TextRange &r1, TextRange &r2)
 
 /// Makes sure the caret isn't in-between a unicode boundary
 /// refs #19 - Dirty hack to improve caret-movement by skipping non-BMP characters
-void TextRange::fixCaretForUnicode(TextDocument *doc, int direction)
+void TextRange::fixCaretForUnicode(TextDocument *doc, ptrdiff_t direction)
 {
     if (caret_ >= doc->length()) return;
 
@@ -90,7 +91,7 @@ QString TextRange::toString() const
 /// Moves the caret the given amount
 /// @param doc the document to move the caret for
 /// @param amount the amount to move
-void TextRange::moveCaret(TextDocument* doc, int amount)
+void TextRange::moveCaret(TextDocument* doc, ptrdiff_t amount)
 {
     setCaretBounded(doc, static_cast<ptrdiff_t>(caret_) + amount);
     fixCaretForUnicode(doc, amount);
@@ -100,7 +101,7 @@ void TextRange::moveCaret(TextDocument* doc, int amount)
 /// move the caret or deselect the given amount
 /// @param doc the document to move the caret in
 /// @param amount the amount to move
-void TextRange::moveCaretOrDeselect(TextDocument* doc, int amount)
+void TextRange::moveCaretOrDeselect(TextDocument* doc, ptrdiff_t amount)
 {
     // when there's a selection clear it (move the caret to the right side
     if (hasSelection()) {
@@ -125,7 +126,7 @@ void TextRange::moveCaretOrDeselect(TextDocument* doc, int amount)
 /// @param var the initial position
 /// @param amount the amount to move
 /// returns the new position
-size_t TextRange::moveWhileChar(TextDocument* doc, size_t pos, int amount, const QString& chars)
+size_t TextRange::moveWhileChar(TextDocument* doc, size_t pos, ptrdiff_t amount, const QString& chars)
 {
     size_t docLength = doc->length();
     if (amount < 0) {
@@ -145,7 +146,7 @@ size_t TextRange::moveWhileChar(TextDocument* doc, size_t pos, int amount, const
 
 /// This method charactes until the given chargroup is found
 /// When moving to the LEFT the cursor is placed AFTER the found character
-size_t TextRange::moveUntilChar(TextDocument* doc, size_t pos, int amount, const QString& chars)
+size_t TextRange::moveUntilChar(TextDocument* doc, size_t pos, ptrdiff_t amount, const QString& chars)
 {
     size_t docLength = doc->length();
     if (amount < 0) {
@@ -164,32 +165,32 @@ size_t TextRange::moveUntilChar(TextDocument* doc, size_t pos, int amount, const
 
 
 /// moves the caret while a character is moving
-void TextRange::moveCaretWhileChar(TextDocument* doc, int amount, const QString& chars)
+void TextRange::moveCaretWhileChar(TextDocument* doc, ptrdiff_t amount, const QString& chars)
 {
     caret_ = moveWhileChar(doc, caret_, amount, chars);
 }
 
 
-void TextRange::moveCaretUntilChar(TextDocument *doc, int amount, const QString& chars)
+void TextRange::moveCaretUntilChar(TextDocument *doc, ptrdiff_t amount, const QString& chars)
 {
     caret_ = moveUntilChar(doc, caret_, amount, chars);
 }
 
 
-void TextRange::moveAnchortWhileChar(TextDocument *doc, int amount, const QString &chars)
+void TextRange::moveAnchortWhileChar(TextDocument *doc, ptrdiff_t amount, const QString &chars)
 {
     anchor_ = moveWhileChar(doc, anchor_, amount, chars);
 }
 
 
-void TextRange::moveAnchorUntilChar(TextDocument *doc, int amount, const QString &chars)
+void TextRange::moveAnchorUntilChar(TextDocument *doc, ptrdiff_t amount, const QString &chars)
 {
     anchor_ = moveWhileChar(doc, anchor_, amount, chars);
 }
 
 
 /// Moves the caret to/from the given seperator
-void TextRange::moveCaretByCharGroup(TextDocument *doc, int amount, const QString& whitespace, const QStringList& characterGroups)
+void TextRange::moveCaretByCharGroup(TextDocument *doc, ptrdiff_t amount, const QString& whitespace, const QStringList& characterGroups)
 {
     size_t count = static_cast<size_t>(qAbs(amount));
 
@@ -248,7 +249,7 @@ void TextRange::moveCaretByCharGroup(TextDocument *doc, int amount, const QStrin
 /// @param doc the document this range operates on
 /// @param amount the direction to move to
 /// @par    am whitespace the characters that need to be interpreted as whitespace
-void TextRange::moveCaretToLineBoundary(TextDocument* doc, int amount, const QString& whitespace)
+void TextRange::moveCaretToLineBoundary(TextDocument* doc, ptrdiff_t amount, const QString& whitespace)
 {
     TextBuffer* buf     = doc->buffer();
     size_t caret           = caret_;
@@ -320,7 +321,7 @@ void TextRange::moveCaretToLineBoundaryAtOffset(TextDocument *doc, size_t newOff
 /// -1 means expand lines to top (and add extra lines)
 /// 1 means expand lines at the bottom (and add extras lines)
 /// 0 is a special case, it moves the caret to the start of the current line and expands to the end of the line. It does not add lines
-void TextRange::expandToFullLine(TextDocument* doc, int amount)
+void TextRange::expandToFullLine(TextDocument* doc, ptrdiff_t amount)
 {
     size_t minOffset = min();
     size_t maxOffset = max();
@@ -803,7 +804,7 @@ void TextRangeSetBase::substractRange(size_t minB, size_t maxB)
 
 
 /// Expands the selection so it selects full lines
-void TextRangeSetBase::expandToFullLines(int amount)
+void TextRangeSetBase::expandToFullLines(ptrdiff_t amount)
 {
     for (size_t i = 0, cnt = rangeCount(); i < cnt; ++i) {
         range(i).expandToFullLine(textDocument(), amount);
@@ -865,7 +866,7 @@ void TextRangeSetBase::toggleWordSelectionAt(size_t offset, const QString& white
 
 
 /// Moves the carets by character
-void TextRangeSetBase::moveCarets(int amount)
+void TextRangeSetBase::moveCarets(ptrdiff_t amount)
 {
     for (size_t i = 0, cnt = rangeCount(); i < cnt; ++i) {
         range(i).moveCaret(textDocument(), amount);
@@ -875,7 +876,7 @@ void TextRangeSetBase::moveCarets(int amount)
 
 
 /// Moves the carets or deslects the given character
-void TextRangeSetBase::moveCaretsOrDeselect(int amount)
+void TextRangeSetBase::moveCaretsOrDeselect(ptrdiff_t amount)
 {
     for (size_t i = 0, cnt = rangeCount(); i < cnt; ++i) {
         range(i).moveCaretOrDeselect(textDocument(), amount);
@@ -885,7 +886,7 @@ void TextRangeSetBase::moveCaretsOrDeselect(int amount)
 
 
 /// Moves the carets
-void TextRangeSetBase::moveCaretsByCharGroup(int amount, const QString& whitespace, const QStringList& characterGroups)
+void TextRangeSetBase::moveCaretsByCharGroup(ptrdiff_t amount, const QString& whitespace, const QStringList& characterGroups)
 {
     for (size_t rangeIdx=rangeCount() - 1; rangeIdx != std::string::npos; --rangeIdx) {
         range(rangeIdx).moveCaretByCharGroup(textDocument(), amount, whitespace, characterGroups);
@@ -897,7 +898,7 @@ void TextRangeSetBase::moveCaretsByCharGroup(int amount, const QString& whitespa
 /// Moves all carets to the given line boundary (line-boundary automatically switches between column 0 and first non-whitespace character)
 /// @param direction the direction < 0 to the start of the line (or first char)  > 0 to the end of the line
 /// @param whitespace the characters to see as whitespace
-void TextRangeSetBase::moveCaretsToLineBoundary(int direction , const QString& whitespace)
+void TextRangeSetBase::moveCaretsToLineBoundary(ptrdiff_t direction, const QString& whitespace)
 {
     // process all carets
     for (size_t rangeIdx = rangeCount() - 1; rangeIdx != std::string::npos; --rangeIdx) {
@@ -1032,7 +1033,7 @@ void TextRangeSetBase::changeSpatial(size_t pos, size_t length, size_t newLength
 {
     if (rangeCount() == 0) return;
 
-    int stickyDelta = sticky ? 0 : -1;
+    ptrdiff_t stickyDelta = sticky ? 0 : -1;
 
     // change the ranges
     ptrdiff_t endPos = static_cast<ptrdiff_t>(pos + length);
