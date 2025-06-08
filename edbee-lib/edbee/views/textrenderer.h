@@ -46,21 +46,17 @@ public:
     size_t rawLineIndexForYpos(size_t y);
     size_t lineIndexForYpos(size_t y);
     int totalWidth();
-    int totalHeight();
+    size_t totalHeight();
     int emWidth();
     int nrWidth();
-    int viewHeightInLines();
-    int firstVisibleLine();
+    size_t viewHeightInLines();
+    size_t firstVisibleLine();
 
-    int columnIndexForXpos( int line, int x );
-    int xPosForColumn( int line, int column );
+    size_t columnIndexForXpos(size_t line, size_t x);
+    size_t xPosForColumn(size_t line, size_t column);
     size_t xPosForOffset(size_t offset);
     size_t yPosForLine(size_t line);
     size_t yPosForOffset(size_t offset);
-
-// Document access functions (Document vs Placeholder text)
-    int lineCount();
-    QString getLine(int index);
 
 // caching
     TextLayout* textLayoutForLine(size_t line);
@@ -135,7 +131,7 @@ private:
     QCache<size_t, TextLayout> cachedTextLayoutList_;   ///< A list of cached text layouts
 
     QRect viewport_;                    ///< The current (total) viewport. (This is updated from the window)
-    int totalWidthCache_;               ///< The total width cache
+    int totalWidthCache_;            ///< The total width cache
 
     TextThemeStyler* textThemeStyler_;  ///< The current theme styler
 

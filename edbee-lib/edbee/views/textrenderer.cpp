@@ -136,7 +136,7 @@ int TextRenderer::totalWidth()
 
 
 /// This method returns the total height
-int TextRenderer::totalHeight()
+size_t TextRenderer::totalHeight()
 {
     return textDocument()->lineCount() * lineHeight() + lineHeight();
 }
@@ -157,46 +157,48 @@ int TextRenderer::nrWidth()
 }
 
 
-/// This method returns the number of lines
-int TextRenderer::viewHeightInLines()
+/// Returns the number of lines
+size_t TextRenderer::viewHeightInLines()
 {
-    int result = viewportHeight() / lineHeight() -1;
+    ptrdiff_t height = viewportHeight();
+    Q_ASSERT(height >= 0);
+    size_t result = static_cast<size_t>(viewportHeight()) / lineHeight() - 1;
     return result;
 }
 
 
-/// This method returns the first visible line
-int TextRenderer::firstVisibleLine()
+/// Returns the first visible line
+size_t TextRenderer::firstVisibleLine()
 {
-    return viewportY() / lineHeight();
+    if (viewportY() < 0) return 0;
+    size_t y = static_cast<size_t>(viewportY());
+    return y / lineHeight();
 }
 
 
-/// This method returns the (closet) valid column for the given x-position
-int TextRenderer::columnIndexForXpos(int line, int x )
+/// Returns the (closet) valid column for the given x-position
+size_t TextRenderer::columnIndexForXpos(size_t line, size_t x )
 {
-    TextLayout* layout = textLayoutForLine( line );
-    if(!layout) return 0;
+    TextLayout* layout = textLayoutForLine(line);
+    if (!layout) return 0;
 
-    //x -= sideBarLeftWidth();
-
-    return layout->xToCursor( x );
+    return layout->xToCursor(static_cast<qreal>(x));
 }
 
 
-/// This method returns the x position for the given column
-int TextRenderer::xPosForColumn(int line, int column)
+/// Returns the x position for the given column
+size_t TextRenderer::xPosForColumn(size_t line, size_t column)
 {
-    TextLayout* layout = textLayoutForLine( line );
-    qreal x = 0;// sideBarLeftWidth();
-    if(layout) {
+    TextLayout* layout = textLayoutForLine(line);
+    qreal x = 0;
+    if (layout) {
         x += layout->cursorToX(column);
     }
-    return qRound(x);
+    return static_cast<size_t>(qRound(x));
 }
 
 
-/// This method returns the x-coordinate for the given offset
+/// Returns the x-coordinate for the given offset
 size_t TextRenderer::xPosForOffset(size_t offset)
 {
     size_t line = textDocument()->lineFromOffset(offset);
