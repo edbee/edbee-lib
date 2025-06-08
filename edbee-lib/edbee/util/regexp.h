@@ -37,6 +37,8 @@ public:
     enum Engine {
         EngineOniguruma = 1,
         EngineQRegExp = 2
+        // EngineQRegularExpression = 3,
+
 //        QRegExp::RegExp	0	A rich Perl-like pattern matching syntax. This is the default.
 //        QRegExp::RegExp2	3	Like RegExp, but with greedy quantifiers. (Introduced in Qt 4.2.)
 //        QRegExp::Wildcard	1	This provides a simple pattern matching syntax similar to that used by shells (command interpreters) for "file globbing". See QRegExp wildcard matching.
@@ -50,9 +52,7 @@ public:
         SyntaxFixedString       /// A plain fixed string
     };
 
-
-
-    RegExp( const QString& pattern, bool caseSensitive=true, Syntax syntax=SyntaxDefault, Engine engine=EngineOniguruma );
+    RegExp(const QString& pattern, bool caseSensitive=true, Syntax syntax=SyntaxDefault, Engine engine=EngineOniguruma);
     virtual ~RegExp();
 
     static QString escape( const QString& str, Engine engine=EngineOniguruma );
@@ -62,19 +62,16 @@ public:
     QString pattern() const ;
 
 
-    int	indexIn( const QString& str, int offset = 0 ); // const;
-    int indexIn( const QChar* str, int offset, int length );
-    int lastIndexIn( const QString& str, int offset=-1 );
-    int lastIndexIn( const QChar* str, int offset, int length );
-    int pos( int nth = 0 ) const;
-    int len( int nth = 0 ) const;
-    QString cap( int nth = 0) const;
-
+    int	indexIn(const QString& str, int offset = 0); // const;
+    int indexIn(const QChar* str, int offset, int length);
+    int lastIndexIn(const QString& str, int offset = -1);
+    int lastIndexIn(const QChar* str, int offset, int length);
+    int pos(int nth = 0) const;
+    int len(int nth = 0) const;
+    QString cap(int nth = 0) const;
 
     /// matched length is equal to pos-0-length
     int matchedLength() { return len(0); }
-
-    //    int cap( int nth = 0 ) const;
 
 private:
     RegExpEngine* d_;       ///< The private data member
