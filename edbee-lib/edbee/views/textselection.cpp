@@ -9,16 +9,16 @@
 #include "edbee/views/textrenderer.h"
 #include "edbee/views/textcaretcache.h"
 
-
 #include "edbee/debug.h"
+
 
 namespace edbee {
 
 /// Constructs the textextselection object
 /// @param controller the controller this selection is for
 TextSelection::TextSelection(TextEditorController* controller)
-    : TextRangeSet( controller->textDocument())
-    , textControllerRef_( controller )
+    : TextRangeSet(controller->textDocument())
+    , textControllerRef_(controller)
 {
 }
 
@@ -26,7 +26,7 @@ TextSelection::TextSelection(TextEditorController* controller)
 /// A copy constructor for copying a text-selection
 TextSelection::TextSelection(const TextSelection& selection)
     : TextRangeSet(selection)
-    , textControllerRef_( selection.textControllerRef_ )
+    , textControllerRef_(selection.textControllerRef_)
 {
 }
 
@@ -59,12 +59,12 @@ void TextSelection::moveCaretsByLine(TextEditorController* controller, TextRange
         TextRange& range = rangeSet->range(rangeIdx);
 
         size_t caret = range.caret();
-        int xpos  = cache->xpos(caret);   // the (original) caret x-position
+        size_t xpos  = cache->xpos(caret);   // the (original) caret x-position
 
         // change the line
         ptrdiff_t sline = static_cast<ptrdiff_t>(doc->lineFromOffset(caret)) + amount;
         if (sline < 0) { sline = 0; }
-        size_t line = sline;
+        size_t line = static_cast<size_t>(sline);
         //if( line >= doc->lineCount() ) { line = doc->lineCount()-1; }
 
         // calculate the correct column
@@ -93,11 +93,11 @@ void TextSelection::moveCaretsByPage(TextEditorController* controller, TextRange
 {
     TextRenderer* renderer = controller->textRenderer();
     TextDocument* doc      = controller->textDocument();
-    int linesPerPage = renderer->viewHeightInLines();
+    size_t linesPerPage = renderer->viewHeightInLines();
     for (size_t rangeIdx = rangeSet->rangeCount() - 1; rangeIdx != std::string::npos; --rangeIdx) {
         TextRange& range = rangeSet->range(rangeIdx);
-        ptrdiff_t line = doc->lineFromOffset(range.caret());
-        line += linesPerPage * amount;
+        ptrdiff_t line = static_cast<ptrdiff_t>(doc->lineFromOffset(range.caret()));
+        line += static_cast<ptrdiff_t>(linesPerPage) * amount;
         if (line < 0) { line = 0; }
         size_t offset = doc->offsetFromLine(static_cast<size_t>(line));
         range.setCaretBounded(doc, offset);
@@ -112,8 +112,6 @@ void TextSelection::addRangesByLine(TextEditorController* controller, TextRangeS
 {
     TextDocument* doc      = controller->textDocument();
     TextRenderer* renderer = controller->textRenderer();
-
-
     TextCaretCache* cache = controller->textCaretCache();
 
     if (!cache->isFilled()) {
@@ -129,14 +127,15 @@ void TextSelection::addRangesByLine(TextEditorController* controller, TextRangeS
         size_t xpos = cache->xpos(offset);   // the (original) caret x-position
 
         // change the line
-        ptrdiff_t line = static_cast<ptrdiff_t>(doc->lineFromOffset(offset)) + amount;
-        if (line >= 0) {
+        ptrdiff_t sline = static_cast<ptrdiff_t>(doc->lineFromOffset(offset)) + amount;
+        if (sline >= 0) {
+            size_t line = static_cast<size_t>(sline);
 
             // calculate the correct column
-            int col = renderer->columnIndexForXpos(line, xpos);
+            size_t col = renderer->columnIndexForXpos(line, xpos);
             size_t lineOffset = doc->offsetFromLine(line);
             size_t offsetNextLine = doc->offsetFromLine(line + 1);
-            int newLinesToRemove = line + 1 < doc->lineCount() ? 1 : 0;
+            size_t newLinesToRemove = line + 1 < doc->lineCount() ? 1 : 0;
 
             offset = qMin(lineOffset + col, offsetNextLine - newLinesToRemove);
             if (offset >= 0 && offset <= doc->length()) {
@@ -158,7 +157,7 @@ TextEditorController* TextSelection::textEditorController() const
 
 
 /// This method process the changes if required
-void TextSelection::processChangesIfRequired( bool joinBorders)
+void TextSelection::processChangesIfRequired(bool joinBorders)
 {
     TextRangeSet::processChangesIfRequired(joinBorders);
     if (!changing()) {
