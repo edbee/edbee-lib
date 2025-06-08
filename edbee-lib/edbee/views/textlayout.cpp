@@ -184,7 +184,7 @@ void TextLayoutBuilder::replace(size_t index, size_t length, const QString repla
     QTextLayout::FormatRange formatRange;
     formatRange.format = format;
     formatRange.start = static_cast<int>(index);
-    formatRange.length = static_cast<qsizetype>(replacement.length());
+    formatRange.length = static_cast<int>(replacement.length());
     baseFormatRanges_.append(formatRange);
 }
 

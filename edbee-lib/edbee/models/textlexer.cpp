@@ -11,8 +11,8 @@
 namespace edbee {
 
 TextLexer::TextLexer( TextDocumentScopes* scopes)
-    : textDocumentScopesRef_( scopes )
-    , grammarRef_(0)
+    : textDocumentScopesRef_(scopes)
+    , grammarRef_(nullptr)
 {
 }
 
@@ -20,7 +20,7 @@ void TextLexer::setGrammar(TextGrammar* grammar)
 {
     Q_ASSERT(grammar);
     grammarRef_ = grammar;
-    textScopes()->setDefaultScope( grammarRef_->mainRule()->scopeName(), grammarRef_->mainRule() );
+    textScopes()->setDefaultScope(grammarRef_->mainRule()->scopeName(), grammarRef_->mainRule());
     textScopes()->removeScopesAfterOffset(0); // invalidate the complete scopes
 }
 
@@ -29,6 +29,5 @@ TextDocument* TextLexer::textDocument()
 {
     return textDocumentScopesRef_->textDocument();
 }
-
 
 } // edbee
