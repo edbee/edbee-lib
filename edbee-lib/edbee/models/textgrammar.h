@@ -51,28 +51,28 @@ public:
 
     qsizetype ruleCount() const { return ruleList_.size(); }
     TextGrammarRule* rule(qsizetype idx) const;
-    void giveRule( TextGrammarRule* rule );
+    void giveRule(TextGrammarRule* rule);
 
-    void giveMatchRegExp( RegExp* regExp );
-    void setEndRegExpString( const QString& str );
+    void giveMatchRegExp(RegExp* regExp);
+    void setEndRegExpString(const QString& str);
 
     Instruction instruction() const { return instruction_; }
-    void setInstruction( Instruction ins ) { instruction_ = ins; }
+    void setInstruction(Instruction ins) { instruction_ = ins; }
     QString scopeName() const  { return scopeName_; }
-    void setScopeName( const QString& scopeName ) { scopeName_ = scopeName; }
+    void setScopeName(const QString& scopeName) { scopeName_ = scopeName; }
     RegExp* matchRegExp() const { return matchRegExp_; }
     QString endRegExpString() const { return endRegExpString_; }
-    const QMap<int,QString>& matchCaptures() { return matchCaptures_; }
-    const QMap<int,QString>& endCaptures() { return endCaptures_; }
+    const QMap<size_t, QString>& matchCaptures() { return matchCaptures_; }
+    const QMap<size_t, QString>& endCaptures() { return endCaptures_; }
     QString contentScopeName() const { return contentScopeName_; }
-    void setContentScopeName( const QString& name) { contentScopeName_ = name; }
+    void setContentScopeName(const QString& name) { contentScopeName_ = name; }
 
     /// the include name is stored in the content-scopename
-    QString includeName() { return contentScopeName_;  }
-    void setIncludeName( const QString& name ) { contentScopeName_ = name; }
+    QString includeName() { return contentScopeName_; }
+    void setIncludeName(const QString& name) { contentScopeName_ = name; }
 
-    void setCapture( int idx, const QString& name ) { matchCaptures_.insert(idx,name); }
-    void setEndCapture( int idx, const QString& name ) { endCaptures_.insert(idx,name); }
+    void setCapture(size_t idx, const QString& name) { matchCaptures_.insert(idx, name); }
+    void setEndCapture(size_t idx, const QString& name) { endCaptures_.insert(idx, name); }
 
     QString toString(bool includePatterns=true);
 
@@ -81,7 +81,7 @@ public:
     class Iterator
     {
     public:
-        Iterator( const TextGrammarRule* rule ) : index_(0), ruleRef_(rule){}
+        Iterator(const TextGrammarRule* rule) : index_(0), ruleRef_(rule) {}
         bool hasNext() { return index_ < ruleRef_->ruleCount(); }
         TextGrammarRule* next() { return ruleRef_->rule(index_++); }
     private:
@@ -90,29 +90,28 @@ public:
     };
 
     Iterator* createIterator() { return new Iterator(this); }
-
     TextGrammar* grammar() { return grammarRef_; }
 
 private:
 
-    static RegExp* createRegExp( const QString& regexp );
+    static RegExp* createRegExp(const QString& regexp);
 
 
 private:
-    TextGrammar* grammarRef_;        ///< The grammar this rule belongs toe
-    Instruction instruction_;            ///< THe instruction to execute
-    QString scopeName_;                  ///< the scope name of this grammar
+    TextGrammar* grammarRef_;             ///< The grammar this rule belongs toe
+    Instruction instruction_;             ///< THe instruction to execute
+    QString scopeName_;                   ///< the scope name of this grammar
 
-    RegExp* matchRegExp_;                ///< The begin-matcher (or simple matcher)
-    //RegExp* endRegExp_;                  ///< The end regular expression matcher
-    QString endRegExpString_;            ///< The end regexp is a string
+    RegExp* matchRegExp_;                 ///< The begin-matcher (or simple matcher)
+    //RegExp* endRegExp_;                 ///< The end regular expression matcher
+    QString endRegExpString_;             ///< The end regexp is a string
 
-    QMap<int,QString> matchCaptures_;    ///< all captures that need to be performed
-    QMap<int,QString> endCaptures_;      ///< all end captures that need to be performed
+    QMap<size_t, QString> matchCaptures_; ///< all captures that need to be performed
+    QMap<size_t, QString> endCaptures_;   ///< all end captures that need to be performed
 
-    QString contentScopeName_;           ///< The content scopename
+    QString contentScopeName_;            ///< The content scopename
 
-    QList<TextGrammarRule*> ruleList_;   ///< Sub-rules to execute
+    QList<TextGrammarRule*> ruleList_;    ///< Sub-rules to execute
 };
 
 

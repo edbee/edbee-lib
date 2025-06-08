@@ -40,8 +40,8 @@ TextGrammarRule::~TextGrammarRule()
 /// @return the main grammar rule
 TextGrammarRule* TextGrammarRule::createMainRule(TextGrammar* grammar, const QString& scopeName)
 {
-    TextGrammarRule* rule = new TextGrammarRule( grammar, MainRule );
-    rule->setScopeName( scopeName );
+    TextGrammarRule* rule = new TextGrammarRule(grammar, MainRule);
+    rule->setScopeName(scopeName);
     return rule;
 }
 
@@ -51,7 +51,7 @@ TextGrammarRule* TextGrammarRule::createMainRule(TextGrammar* grammar, const QSt
 /// @return the TextGrammarRule that include the rule list
 TextGrammarRule* TextGrammarRule::createRuleList(TextGrammar* grammar)
 {
-    TextGrammarRule* rule = new TextGrammarRule( grammar, RuleList );
+    TextGrammarRule* rule = new TextGrammarRule(grammar, RuleList);
     return rule;
 }
 
@@ -62,7 +62,7 @@ TextGrammarRule* TextGrammarRule::createRuleList(TextGrammar* grammar)
 /// @return an include grammar rule
 TextGrammarRule* TextGrammarRule::createIncludeRule(TextGrammar* grammar, const QString& includeName)
 {
-    TextGrammarRule* rule = new TextGrammarRule( grammar, IncludeCall );
+    TextGrammarRule* rule = new TextGrammarRule(grammar, IncludeCall);
     rule->setIncludeName(includeName);
     return rule;
 }
@@ -75,9 +75,9 @@ TextGrammarRule* TextGrammarRule::createIncludeRule(TextGrammar* grammar, const 
 /// @return the created grammar rule
 TextGrammarRule* TextGrammarRule::createSingleLineRegExp(TextGrammar* grammar, const QString& scopeName, const QString& regExp)
 {
-    TextGrammarRule* rule = new TextGrammarRule( grammar, SingleLineRegExp );
-    rule->setScopeName( scopeName );
-    rule->giveMatchRegExp( TextGrammarRule::createRegExp( regExp ) );
+    TextGrammarRule* rule = new TextGrammarRule(grammar, SingleLineRegExp);
+    rule->setScopeName(scopeName);
+    rule->giveMatchRegExp(TextGrammarRule::createRegExp(regExp));
     return rule;
 }
 
@@ -94,7 +94,7 @@ TextGrammarRule* TextGrammarRule::createMultiLineRegExp(TextGrammar* grammar, co
     rule->setScopeName(scopeName);
     rule->setContentScopeName(contentScopeName);
     rule->giveMatchRegExp(TextGrammarRule::createRegExp(beginRegExp));
-    rule->setEndRegExpString( endRegExp );
+    rule->setEndRegExpString(endRegExp);
     return rule;
 }
 

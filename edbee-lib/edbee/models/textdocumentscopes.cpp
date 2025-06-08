@@ -198,7 +198,7 @@ TextGrammarRule* MultiLineScopedTextRange::grammarRule() const
 
 
 /// Gives the end regular expression
-void MultiLineScopedTextRange::giveEndRegExp( RegExp* regExp)
+void MultiLineScopedTextRange::giveEndRegExp(RegExp* regExp)
 {
     endRegExp_ = regExp;
 }
