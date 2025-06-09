@@ -16,17 +16,17 @@
 
 namespace edbee {
 
-TextDocumentSerializer::TextDocumentSerializer( TextDocument* textDocument )
+TextDocumentSerializer::TextDocumentSerializer(TextDocument* textDocument)
     : textDocumentRef_(textDocument)
-    , blockSize_( 8192 )
-    , filterRef_(0)
+    , blockSize_(8192)
+    , filterRef_(nullptr)
 {
 }
 
 
 /// loads the file data for the given (opened) ioDevice
 /// @return true on success,
-bool TextDocumentSerializer::loadWithoutOpening( QIODevice* ioDevice )
+bool TextDocumentSerializer::loadWithoutOpening(QIODevice* ioDevice)
 {
     errorString_.clear();
 
@@ -34,69 +34,67 @@ bool TextDocumentSerializer::loadWithoutOpening( QIODevice* ioDevice )
     textDocumentRef_->rawAppendBegin();
 
     // read the file in blocks of 4096 bytes
-    TextCodec* detectedCodec = 0;
-    const LineEnding* detectedLineEnding = 0;
+    TextCodec* detectedCodec = nullptr;
+    const LineEnding* detectedLineEnding = nullptr;
 
-    QTextDecoder* textDecoder=0;
+    QTextDecoder* textDecoder = nullptr;
 
     // read the buffer
     QByteArray bytes(blockSize_ + 1, 0);
     QString remainingBuffer;
 
     /// TODO: atEnd doesn't seem to work !?!
-/// TODO: implement isStopRequested to stop loading if required
-    while( /*ioDeviceRef_->atEnd() &&*/ true /*!isStopRequested()*/ ) {
+    /// TODO: implement isStopRequested to stop loading if required
+    while (/*ioDeviceRef_->atEnd() &&*/ true /*!isStopRequested()*/) {
 
-        int bytesRead = ioDevice->read( bytes.data(), blockSize_ - 1);
-        if( bytesRead > 0 ) {
+        qsizetype bytesRead = ioDevice->read( bytes.data(), blockSize_ - 1);
+        if (bytesRead > 0) {
             bytes[bytesRead + 1] = 0; // 0 terminate the read bytes
 
             // In the first block we're need to detect the correct encoding
-            if( !detectedCodec ) {
-                TextCodecDetector codecDetector(bytes.constData(), bytesRead);
+            if (!detectedCodec) {
+                TextCodecDetector codecDetector(bytes.constData(), static_cast<size_t>(bytesRead));
                 detectedCodec = codecDetector.detectCodec();
                 Q_ASSERT(detectedCodec);
                 textDecoder = detectedCodec->makeDecoder();
             }
 
             // convert the bytes to a string
-            QString newBuffer = textDecoder->toUnicode( bytes.constData(), bytesRead );
+            QString newBuffer = textDecoder->toUnicode(bytes.constData(), static_cast<int>(bytesRead));
 
             // next detect the line ending. When no line ending is detected 0 is returned!
-            if( !detectedLineEnding ) {
-                detectedLineEnding = LineEnding::detect( newBuffer );
+            if (!detectedLineEnding) {
+                detectedLineEnding = LineEnding::detect(newBuffer);
             }
 
-            // when we detected a line ending
-            if( detectedLineEnding ) {
+            // when detectng a line ending
+            if (detectedLineEnding) {
                 remainingBuffer.append( newBuffer );
-                remainingBuffer = appendBufferToDocument( remainingBuffer );
-            // else we need to append it to the rest
+                remainingBuffer = appendBufferToDocument(remainingBuffer);
+            // else append it to the rest
             } else {
-                remainingBuffer.append( newBuffer );
+                remainingBuffer.append(newBuffer);
             }
         }
 
-        // we're done
-        if( bytesRead <= 0 ) break;
+        if (bytesRead <= 0) break;
     }
 
     // When no line ending could be detected, take the unix line ending
-    if( !detectedLineEnding ) detectedLineEnding = LineEnding::get(LineEnding::UnixType); // fallback to unix
-    if( !detectedCodec ) {  detectedCodec = TextCodecDetector::globalPreferedCodec();  }
+    if (!detectedLineEnding) detectedLineEnding = LineEnding::get(LineEnding::UnixType); // fallback to unix
+    if (!detectedCodec) {  detectedCodec = TextCodecDetector::globalPreferedCodec(); }
 
     // set the detected items
     delete textDecoder;
-    textDocumentRef_->setEncoding( detectedCodec );
-    textDocumentRef_->setLineEnding( detectedLineEnding );
+    textDocumentRef_->setEncoding(detectedCodec);
+    textDocumentRef_->setLineEnding(detectedLineEnding);
 
     // append the remaing line ending
-    remainingBuffer = appendBufferToDocument( remainingBuffer );
-    //fileDocument_->appendLine( remainingBuffer, FsFileDocument::Line::StateUnkown ) ;  // append the last line
+    remainingBuffer = appendBufferToDocument(remainingBuffer);
 
     // next detect the file type
-//    FileType *fileType = app()->fileTypeManager()->detectFileType( virtualFile()->fileName() );
-//    fileDocument_->setFileType( fileType );
+    // FileType *fileType = app()->fileTypeManager()->detectFileType(virtualFile()->fileName());
+    // fileDocument_->setFileType(fileType);
 
     // start raw appending
     textDocumentRef_->rawAppendEnd();
@@ -107,17 +105,17 @@ bool TextDocumentSerializer::loadWithoutOpening( QIODevice* ioDevice )
 
 /// executes the file loading for the given (unopened) ioDevice
 /// @return true on success,
-bool TextDocumentSerializer::load( QIODevice* ioDevice )
+bool TextDocumentSerializer::load( QIODevice* ioDevice)
 {
     errorString_.clear();
 
     // open the device
-    if( !ioDevice->open( QIODevice::ReadOnly ) ) {
+    if (!ioDevice->open(QIODevice::ReadOnly)) {
         errorString_ = ioDevice->errorString();
         return false;
 
     }
-    bool result = loadWithoutOpening( ioDevice );
+    bool result = loadWithoutOpening(ioDevice);
     ioDevice->close();
 
     return result;
@@ -133,26 +131,26 @@ bool TextDocumentSerializer::saveWithoutOpening(QIODevice *ioDevice)
     // get the codec en encoder
     TextCodec* codec = textDocumentRef_->encoding();
     QTextEncoder* encoder = codec->makeEncoder();
-    QString lineEnding( textDocumentRef_->lineEnding()->chars() );
+    QString lineEnding(textDocumentRef_->lineEnding()->chars());
 
     // work via a buffer
     QByteArray buffer;
-    for( int lineIdx=0,cnt=textDocumentRef_->lineCount(); lineIdx<cnt; ++lineIdx ) {
+    for (size_t lineIdx = 0, cnt = textDocumentRef_->lineCount(); lineIdx < cnt; ++lineIdx) {
         QString line = textDocumentRef_->lineWithoutNewline(lineIdx);
-        if( filter() ) {
+        if (filter()) {
             // if this line is not selected move to the next
-            if( !filter()->saveLineSelector( this, lineIdx, line ) ) { continue; }
+            if(!filter()->saveLineSelector( this, lineIdx, line) ) { continue; }
         }
-        buffer.append( encoder->fromUnicode( line) );
+        buffer.append(encoder->fromUnicode(line));
 
         // no newline after the last line
-        if( lineIdx+1<cnt ) {
-            buffer.append( encoder->fromUnicode( lineEnding ) );
+        if (lineIdx + 1 < cnt) {
+            buffer.append(encoder->fromUnicode(lineEnding));
         }
 
         // flush the bufer
-        if( buffer.size() >= blockSize_ ) {
-            if( ioDevice->write(buffer) < 0 ) {
+        if (buffer.size() >= blockSize_) {
+            if (ioDevice->write(buffer) < 0) {
                 errorString_ = ioDevice->errorString();
                 buffer.clear();
                 break;
@@ -162,8 +160,8 @@ bool TextDocumentSerializer::saveWithoutOpening(QIODevice *ioDevice)
     }
 
     // flush the last part of the buffer
-    if( buffer.size() ) {
-        if( ioDevice->write(buffer) < 0 ) {
+    if (buffer.size()) {
+        if (ioDevice->write(buffer) < 0) {
             errorString_ = ioDevice->errorString();
         }
         buffer.clear();
@@ -180,7 +178,7 @@ bool TextDocumentSerializer::save(QIODevice* ioDevice)
     errorString_.clear();
 
     // open the device
-    if( !ioDevice->open( QIODevice::WriteOnly ) ) {
+    if (!ioDevice->open(QIODevice::WriteOnly)) {
         errorString_ = ioDevice->errorString();
         return false;
     }
@@ -198,27 +196,25 @@ bool TextDocumentSerializer::save(QIODevice* ioDevice)
 QString TextDocumentSerializer::appendBufferToDocument(const QString& strIn)
 {
     // The code blow is to translate all newlines to the correct format
-    int lastPos = 0;
-    for( int pos=0, len=strIn.length(); pos<len; ++pos ) {
-
+    qsizetype lastPos = 0;
+    for (qsizetype pos=0, len = strIn.length(); pos < len; ++pos ) {
         // we found an 'wrong' endline
         QChar c = strIn.at(pos);
-        if( c  == '\r' ) {
+        if (c  == '\r') {
             // append the buffer
-            if( pos-lastPos-1 >= 0 ) {
-                textDocumentRef_->rawAppend( strIn.data() + lastPos, pos-lastPos);
+            if (pos - lastPos - 1 >= 0) {
+                textDocumentRef_->rawAppend(strIn.data() + lastPos, static_cast<size_t>(pos - lastPos));
                 lastPos = pos;
             }
 
             // lookahead to check if it's a '\n'
-            if( pos+1 < strIn.length() ) {
+            if (pos + 1 < strIn.length()) {
                 pos += 1;
                 QChar c2 = strIn.at(pos);
-                if( c2 != '\n' ) {
+                if (c2 != '\n') {
                     pos -= 1;
                 }
                 lastPos = pos;
-                //textDocumentRef_->rawAppend('\n');
             // we need to process the last line-end (later)
             } else {
                 return "\r";
@@ -226,8 +222,8 @@ QString TextDocumentSerializer::appendBufferToDocument(const QString& strIn)
         }
     }
 
-    if( strIn.length()-lastPos > 0 ) {
-        textDocumentRef_->rawAppend( strIn.data() + lastPos, strIn.length()-lastPos);
+    if (strIn.length() - lastPos > 0) {
+        textDocumentRef_->rawAppend(strIn.data() + lastPos, static_cast<size_t>(strIn.length() - lastPos));
     }
     return "";
 }
