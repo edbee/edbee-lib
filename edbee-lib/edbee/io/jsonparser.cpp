@@ -1,31 +1,28 @@
 // edbee - Copyright (c) 2012-2025 by Rick Blommers and contributors
 // SPDX-License-Identifier: MIT
 
+#include "jsonparser.h"
+
 #include <QFile>
 #include <QIODevice>
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
 
-#include "jsonparser.h"
-
 #include "edbee/debug.h"
 
 namespace edbee {
 
 
-/// Constructs the jsonparser
 JsonParser::JsonParser()
     : errorMessage_()
     , errorOffset_(0)
     , errorLine_(0)
     , errorColumn_(0)
 {
-
 }
 
 
-/// The parser destructor
 JsonParser::~JsonParser()
 {
 }
@@ -34,12 +31,12 @@ JsonParser::~JsonParser()
 /// loads the given keymap file returns true on  success
 /// @param filename the filename to parse
 /// @return true if the file was parsed
-bool JsonParser::parse(const QString& fileName )
+bool JsonParser::parse(const QString& fileName)
 {
     clearErrors();
     QFile file(fileName);
-    if( file.open( QIODevice::ReadOnly ) ) {
-        bool result = parse( &file );
+    if (file.open(QIODevice::ReadOnly)) {
+        bool result = parse(&file);
         file.close();
         return result;
     } else {
@@ -52,12 +49,12 @@ bool JsonParser::parse(const QString& fileName )
 /// Parses the given QIODevice
 /// @param device the device to parse the json data
 /// @return true if the file was successfully parsed
-bool JsonParser::parse( QIODevice* device )
+bool JsonParser::parse(QIODevice* device)
 {
     clearErrors();
     bool opened = false;
-    if( !device->isOpen() ) {
-        if( !device->open( QIODevice::ReadOnly) ) {
+    if (!device->isOpen()) {
+        if (!device->open( QIODevice::ReadOnly)) {
             errorMessage_ = device->errorString();
             return false;
         }
@@ -65,8 +62,8 @@ bool JsonParser::parse( QIODevice* device )
     }
 
     QByteArray bytesIn = device->readAll();
-    bool result = parse( bytesIn );
-    if( opened ) device->close();
+    bool result = parse(bytesIn);
+    if (opened) device->close();
     return result;
 }
 
@@ -77,19 +74,19 @@ bool JsonParser::parse( QIODevice* device )
 bool JsonParser::parse(const QByteArray& bytesIn)
 {
     clearErrors();
-    QByteArray bytes = stripCommentsFromJson( bytesIn );
+    QByteArray bytes = stripCommentsFromJson(bytesIn);
     QJsonParseError parseResult;
-    QJsonDocument document = QJsonDocument::fromJson( bytes, &parseResult );
-    if( parseResult.error != QJsonParseError::NoError ) {
+    QJsonDocument document = QJsonDocument::fromJson(bytes, &parseResult);
+    if (parseResult.error != QJsonParseError::NoError) {
         errorMessage_ = parseResult.errorString();
         errorOffset_ = parseResult.offset;
 
         // convert the offset to a column and offset
         errorLine_ = errorColumn_ = 0;
-        for( int i=0, cnt=qMin( errorOffset_,bytes.size()); i<cnt; ++i ) {
+        for (qsizetype i = 0, cnt = qMin(errorOffset_, bytes.size()); i < cnt; ++i) {
             ++errorColumn_;
-            if( bytes.at(i) == '\n' ) {
-                errorColumn_= 0;
+            if (bytes.at(i) == '\n') {
+                errorColumn_ = 0;
                 ++errorLine_;
             }
         }
@@ -139,36 +136,38 @@ int JsonParser::errorColumn() const
 /// Returns the full eror message
 QString JsonParser::fullErrorMessage() const
 {
-    if( !errorLine() ) return errorMessage();
+    if (!errorLine()) return errorMessage();
     return QObject::tr("%1 @ line %2").arg(errorMessage()).arg(errorLine());
 }
 
 
 /// reads all bytes from the io device, while removing comments and keeping the number of lines
 /// quick and dirty 'lexer' that replaces every comment by spaces (so the number of charactes keeps the same)
-QByteArray JsonParser::stripCommentsFromJson( const QByteArray& bytesIn )
+QByteArray JsonParser::stripCommentsFromJson(const QByteArray& bytesIn)
 {
     QByteArray result;
+
     enum {
         StateNormal,
         StateString,
         StateLineComment,
         StateBlockComment
     } state = StateNormal;
-    for( int i=0,cnt=bytesIn.size(); i<cnt; ++i ) {
+
+    for (qsizetype i=0, cnt = bytesIn.size(); i < cnt; ++i) {
         char c = bytesIn.at(i);
-        switch( state ) {
+        switch (state) {
             case StateNormal:
                 // a '/'
                 if( c == '/' ) {
-                    char c2 = ((i+1)<cnt) ? bytesIn.at(i+1) : 0;
-                    if( c2 == '/') {
+                    char c2 = ((i + 1) < cnt) ? bytesIn.at(i + 1) : 0;
+                    if (c2 == '/') {
                         i++;
                         state = StateLineComment;
                         result.append(' ');
                         result.append(' ');
                         break;
-                    } else if ( c2 == '*') {
+                    } else if (c2 == '*') {
                         i++;
                         state = StateBlockComment;
                         result.append(' ');
@@ -176,32 +175,32 @@ QByteArray JsonParser::stripCommentsFromJson( const QByteArray& bytesIn )
                         break;
                     }
                 // start of a string
-                } else if( c == '\"') {
+                } else if (c == '\"') {
                     state = StateString;
                 }
                 result.append(c);
                 break;
 
             case StateString:
-                if( c == '\\' ) {
-                    char c2 = ((i+1)<cnt) ? bytesIn.at(i+1) : 0;
-                    if( c2 == '\"') {
+                if (c == '\\') {
+                    char c2 = (( i + 1) < cnt) ? bytesIn.at(i + 1) : 0;
+                    if (c2 == '\"') {
                         i++;
                         result.append('\\');
                         result.append('\"');
                         break;
                     }
-                } else if( c == '\"') {
+                } else if (c == '\"') {
                     state = StateNormal;
                 }
                 result.append(c);
                 break;
 
             case StateLineComment:
-                if( c == '\r') {
+                if (c == '\r') {
                     result.append('\r');
                 }
-                else if( c == '\n' ) {
+                else if (c == '\n') {
                     result.append(c);
                     state = StateNormal;
                 } else {
@@ -210,15 +209,15 @@ QByteArray JsonParser::stripCommentsFromJson( const QByteArray& bytesIn )
                 break;
 
             case StateBlockComment:
-                if( c == '*') {
-                    char c2 = ((i+1)<cnt) ? bytesIn.at(i+1) : 0;
-                    if( c2 == '/') {
+                if (c == '*') {
+                    char c2 = ((i + 1) < cnt) ? bytesIn.at(i + 1) : 0;
+                    if (c2 == '/') {
                         i++;
                         state = StateNormal;
                         result.append(' ');
                     }
                     result.append(' ');
-                } else if( c == '\r' || c == '\n' ) {
+                } else if (c == '\r' || c == '\n') {
                     result.append(c);
                 } else {
                     result.append(' ');
