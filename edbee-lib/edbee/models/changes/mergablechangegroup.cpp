@@ -17,7 +17,6 @@
 namespace edbee {
 
 
-/// The default complex textchange constructor
 MergableChangeGroup::MergableChangeGroup(TextEditorController* controller)
     : ChangeGroup(controller)
     , previousSelection_(nullptr)
@@ -29,10 +28,12 @@ MergableChangeGroup::MergableChangeGroup(TextEditorController* controller)
 }
 
 
-/// The default destructor
 MergableChangeGroup::~MergableChangeGroup()
 {
-    clear(true);
+    qDeleteAll(textChangeList_);
+    qDeleteAll(lineDataTextChangeList_);
+    qDeleteAll(miscChangeList_);
+
     delete newSelection_;
     delete previousSelection_;
 }
@@ -50,7 +51,7 @@ void MergableChangeGroup::groupClosed()
 {
     if (controller()) {
         delete newSelection_;
-        newSelection_ = new TextRangeSet( *(controller()->textSelection() ) ) ;
+        newSelection_ = new TextRangeSet(*(controller()->textSelection())) ;
     }
 }
 
@@ -59,32 +60,32 @@ void MergableChangeGroup::groupClosed()
 /// @param document the document to execute this operation for
 void MergableChangeGroup::execute(TextDocument* document)
 {
-    ChangeGroup::execute( document );
-    if( newSelection_ ) {
-        TextRangeSet* currentSelection = dynamic_cast<TextRangeSet*>( controller()->textSelection() );
+    ChangeGroup::execute(document);
+    if (newSelection_) {
+        TextRangeSet* currentSelection = dynamic_cast<TextRangeSet*>(controller()->textSelection());
         *currentSelection = *newSelection_ ;
     }
 }
 
 
-/// this method is called to revert the operation
+/// Can be called to revert the operation
 /// reverts the given operation
-void MergableChangeGroup::revert( TextDocument* document )
+void MergableChangeGroup::revert(TextDocument* document)
 {
     ChangeGroup::revert(document);
-    if( previousSelection_) {
-        TextRangeSet* currentSelection = dynamic_cast<TextRangeSet*>( controller()->textSelection() );
+    if (previousSelection_) {
+        TextRangeSet* currentSelection = dynamic_cast<TextRangeSet*>(controller()->textSelection());
         *currentSelection = *previousSelection_;
     }
 }
 
 
-/// This method adds the given delta to the changes
-void MergableChangeGroup::addOffsetDeltaToChanges(QList<AbstractRangedChange*>& changes, int fromIndex, int delta)
+/// Adds the given delta to the changes
+void MergableChangeGroup::addOffsetDeltaToChanges(QList<AbstractRangedChange*>& changes, size_t fromIndex, ptrdiff_t delta)
 {
-    for(int i = fromIndex; i<changes.size(); ++i ) {
+    for (qsizetype i = static_cast<qsizetype>(fromIndex), cnt = changes.size(); i < cnt; ++i) {
         AbstractRangedChange* s2 = changes.at(i);
-        s2->addOffset( delta );
+        s2->addOffset(delta);
     }
 }
 
@@ -92,37 +93,37 @@ void MergableChangeGroup::addOffsetDeltaToChanges(QList<AbstractRangedChange*>& 
 /// This method finds the insert index for the given offset
 /// @param offset the offset of the change
 /// @return the inertindex used for inserting the data
-int MergableChangeGroup::findInsertIndexForOffset(QList<AbstractRangedChange*>& changes, int offset)
+qsizetype MergableChangeGroup::findInsertIndexForOffset(QList<AbstractRangedChange*>& changes, size_t offset)
 {
-    int insertIndex = 0;
-    for( int i=0,cnt=changes.size(); i<cnt; ++i ){
+    qsizetype insertIndex = 0;
+    for (qsizetype i=0, cnt = changes.size(); i < cnt; ++i){
         AbstractRangedChange* change = changes.at(i);
-        if( change->offset() < offset ) {
-            insertIndex = i+1;
+        if (change->offset() < offset) {
+            insertIndex = i + 1;
         }
     }
     return insertIndex;
 }
 
 
-/// This method tries to merge the given textchagne
+/// Tries to merge the given textchagne
 /// @param newChange the new change to merge
 /// @param delta (out) the delta applied to this change
 /// @return the merged index or -1 if not merged!
-int MergableChangeGroup::mergeChange(QList<AbstractRangedChange*>& changes, TextDocument* doc, AbstractRangedChange* newChange, int& delta)
+qsizetype MergableChangeGroup::mergeChange(QList<AbstractRangedChange*>& changes, TextDocument* doc, AbstractRangedChange* newChange, ptrdiff_t& delta)
 {
-    for( int i=0,cnt=changes.size(); i<cnt; ++i ){
+    for (qsizetype i=0, cnt = changes.size(); i < cnt; ++i){
         AbstractRangedChange* change = changes.at(i);
 
         // we need the previous length and new-length to know how the delta is changed of the other items
-        int prevNewLength = change->docLength();
-        int prevContentLength = change->storedLength();
+        ptrdiff_t prevNewLength = static_cast<ptrdiff_t>(change->docLength());
+        ptrdiff_t prevContentLength = static_cast<ptrdiff_t>(change->storedLength());
 
         // try to merge it
-        if( change->giveAndMerge( doc, newChange ) ) {
+        if (change->giveAndMerge(doc, newChange)) {
 
             // apply the delta (newLength and length is reversed when in undo state!)
-            delta += (change->docLength()-prevNewLength) - (change->storedLength()-prevContentLength);
+            delta += (static_cast<ptrdiff_t>(change->docLength()) - prevNewLength) - (static_cast<ptrdiff_t>(change->storedLength()) - prevContentLength);
             return i;
         }
     }
@@ -135,23 +136,24 @@ int MergableChangeGroup::mergeChange(QList<AbstractRangedChange*>& changes, Text
 /// @param orgStartOffset the offset of the orgingal merged textchange
 /// @param orgEndoOffset the end offset of the original merged textchange
 /// @param delta the current delta used for offset calculating
-void MergableChangeGroup::inverseMergeRemainingOverlappingChanges(QList<AbstractRangedChange*>& changes, TextDocument* doc, int mergedAtIndex, int orgStartOffset, int orgEndOffset, int delta)
+void MergableChangeGroup::inverseMergeRemainingOverlappingChanges(QList<AbstractRangedChange*>& changes, TextDocument* doc, qsizetype mergedAtIndex, size_t orgStartOffset, size_t orgEndOffset, ptrdiff_t delta)
 {
     AbstractRangedChange* mergedChange = changes.at(mergedAtIndex);
-    for( int i=mergedAtIndex+1; i<changes.size(); ++i ) {
+
+    for (qsizetype i = mergedAtIndex + 1; i < changes.size(); ++i) {
         AbstractRangedChange* nextChange= changes.at(i);
 
         // only perform merging if the change overlapped a previous change
-        if( nextChange->offset() < orgEndOffset && orgStartOffset < (nextChange->offset() + nextChange->docLength())   ) {
+        if (nextChange->offset() < orgEndOffset && orgStartOffset < (nextChange->offset() + nextChange->docLength())) {
 
             // take the delta of the previous change before the merge
-            int tmpDelta = mergedChange->storedLength() - mergedChange->docLength() + delta;
+            ptrdiff_t tmpDelta = static_cast<ptrdiff_t>(mergedChange->storedLength()) - static_cast<ptrdiff_t>(mergedChange->docLength()) + delta;
 
             // alter the delta, so we find the correct merge index
             nextChange->addOffset(tmpDelta);
 
             // notice the 'inversion of the merge. We apply the merged change to the next change
-            if( nextChange->giveAndMerge( doc, mergedChange) ) {
+            if (nextChange->giveAndMerge(doc, mergedChange) ) {
                 mergedChange = nextChange;
                 changes.removeAt(mergedAtIndex);
                 --i;
@@ -172,46 +174,45 @@ void MergableChangeGroup::giveChangeToList(QList<AbstractRangedChange*>& changes
 {
     //qlog_info() << "giveSingleTextChange" << newChange->toString();
     // remember the orginal ranges so we know which changes are affected by this new change
-    int orgStartOffset = newChange->offset();
-    int orgEndOffset = newChange->offset() + newChange->storedLength();
+    size_t orgStartOffset = newChange->offset();
+    size_t orgEndOffset = newChange->offset() + newChange->storedLength();
 
     // some variables to remebmer
-    int addDeltaFromIndex = size();         // From which change index should we add delta?!
-    int delta = 0;
+    ptrdiff_t addDeltaFromIndex = 0; //static_cast<ptrdiff_t>(size());  // From which change index should the delta be added
+    ptrdiff_t delta = 0;
 
     // First try to merge this new change
-    int mergedAtIndex = mergeChange( changes, doc, newChange, delta );
+    qsizetype mergedAtIndex = mergeChange(changes, doc, newChange, delta);
 
     // when we could merge the change,
     // we need to try to merge it with next overlapping changes
-    if( mergedAtIndex >= 0 ) {
-
-        inverseMergeRemainingOverlappingChanges( changes, doc, mergedAtIndex, orgStartOffset, orgEndOffset, delta );
+    if (mergedAtIndex >= 0) {
+        inverseMergeRemainingOverlappingChanges(changes, doc, mergedAtIndex, orgStartOffset, orgEndOffset, delta);
         addDeltaFromIndex = mergedAtIndex + 1;
 
     // not merged? then we need to add the change at the given index
     } else {
-
         // find the insert index
-        int insertIndex = findInsertIndexForOffset( changes, newChange->offset() );
+        qsizetype insertIndex = findInsertIndexForOffset(changes, newChange->offset());
 
         // just insert change
-        textChangeList_.insert( insertIndex, newChange);
-        addDeltaFromIndex = insertIndex+1;
+        textChangeList_.insert(insertIndex, newChange);
+        addDeltaFromIndex = insertIndex + 1;
 
         // apply the delta (newLength and length is reversed when in undo state!)
         delta += newChange->storedLength() - newChange->docLength();
     }
 
     // next apply the delta to the following change
-    addOffsetDeltaToChanges( changes, addDeltaFromIndex, delta);
+    Q_ASSERT(addDeltaFromIndex >= 0);
+    addOffsetDeltaToChanges( changes, static_cast<size_t>(addDeltaFromIndex), delta);
 }
 
 
 /// Gives a single textchange
 void MergableChangeGroup::giveSingleTextChange(TextDocument* doc, TextChange* change)
 {
-    giveChangeToList( textChangeList_, doc, change );
+    giveChangeToList(textChangeList_, doc, change);
 }
 
 
@@ -219,7 +220,7 @@ void MergableChangeGroup::giveSingleTextChange(TextDocument* doc, TextChange* ch
 void MergableChangeGroup::giveLineDataListTextChange(TextDocument* doc, LineDataListChange* newChange)
 {
     Q_UNUSED(doc);
-    this->lineDataTextChangeList_.append(newChange);    // no merge for the moment
+    lineDataTextChangeList_.append(newChange);  // no merge for the moment
 /* TODO:  Work in progress below. This algorithm seems identical to the one used with SingleTextChanges
  *  we need to abstract the interfaces and create a general merge-ranges operation
  *
@@ -259,7 +260,6 @@ void MergableChangeGroup::giveLineDataListTextChange(TextDocument* doc, LineData
         s2->addDeltaToLine(delta);
     }
 */
-
 }
 
 
@@ -268,38 +268,36 @@ void MergableChangeGroup::giveChange(TextDocument* doc, Change* change)
 {
     // a single text change
     TextChange* textChange = dynamic_cast<TextChange*>(change);
-    if( textChange ) {
-        //textChangeList_.append(textChange);
-        giveSingleTextChange( doc, textChange);
+    if (textChange) {
+        giveSingleTextChange(doc, textChange);
         return;
     }
 
     // a list text change
     LineDataListChange* lineDataTextChange = dynamic_cast<LineDataListChange*>(change);
-    if( lineDataTextChange ) {
-        giveLineDataListTextChange(doc,lineDataTextChange);
+    if (lineDataTextChange) {
+        giveLineDataListTextChange(doc, lineDataTextChange);
         return;
     }
 
     // a selection change simply is moved to the new selection object
     SelectionChange* selectionChange = dynamic_cast<SelectionChange*>(change);
-    if( selectionChange ) {
+    if (selectionChange) {
         delete newSelection_;
         newSelection_ = selectionChange->takeRangeSet();
 
-        /// we can simply delete the change, the ComplexTextChange automatically records the last change selection on the undoGroupEnd
+        /// Simply delete the change, the ComplexTextChange automatically records the last change selection on the undoGroupEnd
         delete change;
         return;
     }
 
     // a group changes, just add all the groups
     ChangeGroup* group = dynamic_cast<ChangeGroup*>(change);
-    if( group ) {
+    if (group) {
         moveChangesFromGroup(doc,group);
         delete group;
         return;
     }
-
 
     // other changes are (currently) added to a misch change list. And are pretty scary for now :)
     miscChangeList_.append(change);
@@ -322,7 +320,7 @@ Change* MergableChangeGroup::at(size_t idx)
     }
     // other changes
     qidx -= lineDataTextChangeList_.size();
-    Q_ASSERT(qidx < miscChangeList_.size() );
+    Q_ASSERT(qidx < miscChangeList_.size());
     return miscChangeList_.at(qidx);
 }
 
@@ -359,7 +357,7 @@ size_t MergableChangeGroup::size()
 void MergableChangeGroup::clear(bool performDelete)
 {
     // delete
-    if( performDelete ) {
+    if(performDelete) {
         qDeleteAll(textChangeList_);
         qDeleteAll(lineDataTextChangeList_);
         qDeleteAll(miscChangeList_);
@@ -372,13 +370,12 @@ void MergableChangeGroup::clear(bool performDelete)
 }
 
 
-/// this method tries to merge the textchange with this text change
+/// Tries to merge the textchange with this text change
 bool MergableChangeGroup::giveAndMerge(TextDocument* document, Change* textChange)
 {
-    giveChange( document, textChange );
+    giveChange(document, textChange);
     return true;
 }
-
 
 
 /// Converts this textchange to a textual representation
@@ -397,11 +394,11 @@ QString MergableChangeGroup::toString()
 QString MergableChangeGroup::toSingleTextChangeTestString()
 {
     QString result;
-    foreach( AbstractRangedChange* abstractChange, textChangeList_ ) {
+    foreach (AbstractRangedChange* abstractChange, textChangeList_) {
         TextChange* change = dynamic_cast<TextChange*>(abstractChange);
-        if( change ) {
-            if( !result.isEmpty() ) result.append(",");
-            result.append( QStringLiteral("%1:%2:%3").arg(change->offset()).arg(change->docLength()).arg(change->storedText()) );
+        if (change) {
+            if (!result.isEmpty()) result.append(",");
+            result.append(QStringLiteral("%1:%2:%3").arg(change->offset()).arg(change->docLength()).arg(change->storedText()));
         }
     }
     return result;
@@ -410,60 +407,53 @@ QString MergableChangeGroup::toSingleTextChangeTestString()
 
 /// Moves all textchanges from the given group to this group
 /// @param group the group to move the selection from
-void MergableChangeGroup::moveChangesFromGroup( TextDocument* doc, ChangeGroup* group )
+void MergableChangeGroup::moveChangesFromGroup(TextDocument* doc, ChangeGroup* group)
 {
-//qlog_info() << "moveChangeFromGroup **************** (MERGE)";
-//qlog_info() << "A:" << this->toString();
-//qlog_info() << "B:" << group->toString();
+    //qlog_info() << "moveChangeFromGroup **************** (MERGE)";
+    //qlog_info() << "A:" << this->toString();
+    //qlog_info() << "B:" << group->toString();
 
     // process all changes
-    for( int i=0,cnt=group->size(); i<cnt; ++i ) {
-
+    for (size_t i = 0, cnt = group->size(); i < cnt; ++i) {
         Change* change = group->at(i);
 
         // handle nested groups
-        if( change->isGroup() ) {
-            ChangeGroup* childGroup = dynamic_cast<ChangeGroup*>( change );
-            if( childGroup ) {
-                moveChangesFromGroup( doc, childGroup );
+        if (change->isGroup()) {
+            ChangeGroup* childGroup = dynamic_cast<ChangeGroup*>(change);
+            if (childGroup) {
+                moveChangesFromGroup(doc, childGroup);
                 delete childGroup;
                 continue;
             }
         }
 
         // merge the the change
-        giveChange( doc, change );
+        giveChange(doc, change);
     }
     group->clear(false); // no delete we've taken the ownership
 
-//qlog_info() << "=1>:" << this->toString();
-
     // next we need to compress the changes (merging changes that are next to eachother)
     compressChanges(doc);
-//qlog_info() << "************************";
-//qlog_info() << "=2>:" << this->toString();
 
     // when it's a complex text change, also move the selection to this group
     MergableChangeGroup* complexGroup = dynamic_cast<MergableChangeGroup*>(group);
-    if( complexGroup ) {
-        qSwap( newSelection_, complexGroup->newSelection_ );
+    if (complexGroup)  {
+        qSwap(newSelection_, complexGroup->newSelection_);
     }
 }
-
 
 
 /// merges the given textchange as a group.
 /// @param document the document this merge is for
 /// @param textChange the textchange to merge
 /// @return true if the textchange was merged as group.
-bool MergableChangeGroup::mergeAsGroup(TextDocument* document, Change* textChange )
+bool MergableChangeGroup::mergeAsGroup(TextDocument* document, Change* textChange)
 {
     Q_UNUSED(document);
+    if (!textChange->isGroup()) { return false; }
 
-    // make sure it's a group
-    if( !textChange->isGroup() ) { return false; }
     ChangeGroup* group = dynamic_cast<ChangeGroup*>(textChange);
-    if( !group ) { return false; }
+    if(!group) { return false; }
 
     // move all changes from the other group to this group
     moveChangesFromGroup(document, group);
@@ -481,7 +471,7 @@ bool MergableChangeGroup::mergeAsSelection(TextDocument* document, Change* textC
 {
     Q_UNUSED(document);
     SelectionChange* selectionChange = dynamic_cast<SelectionChange*>(textChange);
-    if( !selectionChange ) { return false; }
+    if (!selectionChange) { return false; }
 
     // simply take the selection from the textchange and make this the new selection
     delete newSelection_;
@@ -496,11 +486,11 @@ bool MergableChangeGroup::mergeAsSelection(TextDocument* document, Change* textC
 void MergableChangeGroup::compressTextChanges(TextDocument* document)
 {
     // compress single text changes
-    for( int i=0; i<textChangeList_.size(); ++i ) {
+    for (qsizetype i = 0;  i< textChangeList_.size(); ++i) {
         AbstractRangedChange* change1 = textChangeList_.at(i);
 
         // find the next text change
-        for( int j=i+1; j<textChangeList_.size(); ++j ) {
+        for (qsizetype j = i + 1; j < textChangeList_.size(); ++j) {
             AbstractRangedChange* change2 = textChangeList_.at(j);
             if( change1->giveAndMerge( document, change2 ) ) {
                 textChangeList_.takeAt(j);  // just take it, the item is already deleted by the merge

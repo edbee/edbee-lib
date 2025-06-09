@@ -22,7 +22,7 @@ public:
 
     /// Set the offset
     virtual void setOffset(size_t value) = 0;
-    void addOffset(size_t amount);
+    void addOffset(ptrdiff_t amount);
 
     /// Set the old length
     virtual void setDocLength(size_t value) = 0;

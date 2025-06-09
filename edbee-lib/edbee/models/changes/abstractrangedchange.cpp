@@ -15,9 +15,11 @@ AbstractRangedChange::~AbstractRangedChange()
 
 /// Adds the given amount to the offset
 /// @param amount the offset to add
-void AbstractRangedChange::addOffset(size_t amount)
+void AbstractRangedChange::addOffset(ptrdiff_t amount)
 {
-    setOffset(offset() + amount);
+    ptrdiff_t newOffset = static_cast<ptrdiff_t>(offset()) + amount;
+    Q_ASSERT(newOffset >= 0);
+    setOffset(static_cast<size_t>(newOffset));
 }
 
 

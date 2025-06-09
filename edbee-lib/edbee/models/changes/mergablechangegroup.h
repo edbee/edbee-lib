@@ -23,7 +23,7 @@ class TextRangeSet;
 class EDBEE_EXPORT MergableChangeGroup : public ChangeGroup
 {
 public:
-    MergableChangeGroup( TextEditorController* controller );
+    MergableChangeGroup(TextEditorController* controller);
     virtual ~MergableChangeGroup();
 
     // this change cannot be optimized away
@@ -34,21 +34,19 @@ public:
     virtual void revert(TextDocument* document);
 
 private:
-    void addOffsetDeltaToChanges( QList<AbstractRangedChange*>& changes, int fromIndex, int delta );
-    int findInsertIndexForOffset( QList<AbstractRangedChange*>& changes, int offset );
-    int mergeChange( QList<AbstractRangedChange*>& changes, TextDocument* doc, AbstractRangedChange* newChange, int& delta );
-    void inverseMergeRemainingOverlappingChanges( QList<AbstractRangedChange*>& changes, TextDocument* doc, int mergedAtIndex, int orgStartOffset, int orgEndOffset , int delta);
+    void addOffsetDeltaToChanges(QList<AbstractRangedChange*>& changes, size_t fromIndex, ptrdiff_t delta);
+    qsizetype findInsertIndexForOffset(QList<AbstractRangedChange*>& changes, size_t offset);
+    qsizetype mergeChange(QList<AbstractRangedChange*>& changes, TextDocument* doc, AbstractRangedChange* newChange, ptrdiff_t& delta);
+    void inverseMergeRemainingOverlappingChanges(QList<AbstractRangedChange*>& changes, TextDocument* doc, qsizetype mergedAtIndex, size_t orgStartOffset, size_t orgEndOffset, ptrdiff_t delta);
 
-    void giveChangeToList(  QList<AbstractRangedChange*>& changes, TextDocument* doc, AbstractRangedChange* change );
-    void giveAndMergeChangeToList(  QList<AbstractRangedChange*>& changes, TextDocument* doc, AbstractRangedChange* change );
-
-//TODO:     void giveAbstractRangedTextChange( TextDocument* doc, QList<AbstractRangedTextChange* changeList>& changes, AbstractRangedTextChange* change );
+    void giveChangeToList(QList<AbstractRangedChange*>& changes, TextDocument* doc, AbstractRangedChange* change);
+    void giveAndMergeChangeToList(QList<AbstractRangedChange*>& changes, TextDocument* doc, AbstractRangedChange* change);
 
 public:
-    void giveSingleTextChange( TextDocument* doc, TextChange* change);
-    void giveLineDataListTextChange( TextDocument* doc, LineDataListChange* change );
+    void giveSingleTextChange(TextDocument* doc, TextChange* change);
+    void giveLineDataListTextChange(TextDocument* doc, LineDataListChange* change);
 
-    virtual void giveChange( TextDocument* doc, Change* change );
+    virtual void giveChange(TextDocument* doc, Change* change);
     virtual Change* at(size_t idx);
     virtual Change* take(size_t idx);
     virtual size_t size();
@@ -59,20 +57,20 @@ public:
     /// It's the choice of this merge operation if the execution is required
     /// @param textChange the textchange to merge
     /// @return true if the merge has been successfull. False if nothing has been merged and executed
-    virtual bool giveAndMerge( TextDocument* document, Change* textChange );
+    virtual bool giveAndMerge(TextDocument* document, Change* textChange);
 
     virtual QString toString();
     QString toSingleTextChangeTestString();
 
-    void moveChangesFromGroup( TextDocument* doc, ChangeGroup* group);
+    void moveChangesFromGroup(TextDocument* doc, ChangeGroup* group);
 
 protected:
 
-    bool mergeAsGroup( TextDocument* document, Change* textChange );
-    bool mergeAsSelection( TextDocument* document, Change* textChange );
+    bool mergeAsGroup(TextDocument* document, Change* textChange);
+    bool mergeAsSelection(TextDocument* document, Change* textChange);
 
-    void compressTextChanges( TextDocument* document );
-    void compressChanges( TextDocument* document );
+    void compressTextChanges(TextDocument* document);
+    void compressChanges(TextDocument* document);
 
 private:
 
@@ -80,10 +78,8 @@ private:
     QList<LineDataListChange*> lineDataTextChangeList_;     ///<The list with liendata text changes
     QList<Change*> miscChangeList_;                         ///< Other textchanges
 
-
     TextRangeSet* previousSelection_;
     TextRangeSet* newSelection_;
-
 };
 
 } // edbee
