@@ -30,8 +30,8 @@ LineDataListChange::LineDataListChange(TextLineDataManager* manager, size_t line
 /// Destructs the linedata textchange
 LineDataListChange::~LineDataListChange()
 {
-    if( oldListList_ ) {
-        for (size_t i=0; i < contentLength_; ++i) {
+    if (oldListList_) {
+        for (size_t i = 0; i < contentLength_; ++i) {
             TextLineDataList* list = oldListList_[i];
             if (list) {
                 list->destroy(managerRef_);
@@ -131,12 +131,12 @@ void LineDataListChange::mergeStoredData(AbstractRangedChange* change)
             TextLineDataList* list = lineTextChange->oldListList_[i];
 
             // find it in this change
-            for( int j=0; j<newOldListSize && !found; ++j ) {
-                found = ( list == newOldListList_[j] );
+            for (size_t j = 0; j < newOldListSize && !found; ++j) {
+                found = (list == newOldListList_[j]);
             }
 
             // delete the old list if not found
-            if( !found ) {
+            if (!found) {
                 delete list;
             }
         }
@@ -173,7 +173,7 @@ QString LineDataListChange::toString()
 
 
 /// Returns the line
-size_t LineDataListChange::offset () const
+size_t LineDataListChange::offset() const
 {
     return offset_;
 }

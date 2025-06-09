@@ -26,7 +26,7 @@ public:
     virtual void revert(TextDocument* doc);
 
     virtual void mergeStoredData(AbstractRangedChange* change);
-    virtual bool giveAndMerge(TextDocument* document, Change* textChange );
+    virtual bool giveAndMerge(TextDocument* document, Change* textChange);
 
     virtual QString toString();
 
