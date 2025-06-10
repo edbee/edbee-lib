@@ -42,7 +42,7 @@ public:
 
 
     void draw(QPainter *p, const QPointF &pos, const QVector<QTextLayout::FormatRange> &selections = QVector<QTextLayout::FormatRange>(), const QRectF &clip = QRectF()) const;
-    void drawCursor(QPainter *painter, const QPointF &position, size_t cursorPosition, size_t width) const;
+    void drawCursor(QPainter *painter, const QPointF &position, size_t cursorPosition, int width) const;
 
     void setFormats(const QVector<QTextLayout::FormatRange> &formats);
     void setText(const QString &string);

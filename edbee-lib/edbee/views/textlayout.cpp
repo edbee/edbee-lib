@@ -96,10 +96,10 @@ void TextLayout::draw(QPainter *p, const QPointF &pos, const QVector<QTextLayout
 }
 
 
-void TextLayout::drawCursor(QPainter *painter, const QPointF &position, size_t cursorPosition, size_t width) const
+void TextLayout::drawCursor(QPainter *painter, const QPointF &position, size_t cursorPosition, int width) const
 {
     size_t virtualCursorPosition = toVirtualCursorPosition(cursorPosition);
-    qtextLayout_->drawCursor(painter, position, static_cast<int>(virtualCursorPosition), static_cast<int>(width));
+    qtextLayout_->drawCursor(painter, position, static_cast<int>(virtualCursorPosition), width);
 }
 
 
