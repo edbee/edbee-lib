@@ -59,7 +59,7 @@ void TextSelection::moveCaretsByLine(TextEditorController* controller, TextRange
         TextRange& range = rangeSet->range(rangeIdx);
 
         size_t caret = range.caret();
-        size_t xpos  = cache->xpos(caret);   // the (original) caret x-position
+        int xpos  = cache->xpos(caret);   // the (original) caret x-position
 
         // change the line
         ptrdiff_t sline = static_cast<ptrdiff_t>(doc->lineFromOffset(caret)) + amount;
@@ -124,7 +124,7 @@ void TextSelection::addRangesByLine(TextEditorController* controller, TextRangeS
         TextRange& range = rangeSet->range(rangeIdx);
 
         size_t offset = amount > 0 ? range.max() : range.min();
-        size_t xpos = cache->xpos(offset);   // the (original) caret x-position
+        int xpos = cache->xpos(offset);   // the (original) caret x-position
 
         // change the line
         ptrdiff_t sline = static_cast<ptrdiff_t>(doc->lineFromOffset(offset)) + amount;

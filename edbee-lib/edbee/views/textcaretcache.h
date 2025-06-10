@@ -24,8 +24,8 @@ public:
     void fill(TextRangeSet& selection);
     void replaceAll(TextCaretCache& cache);
 
-    size_t xpos(size_t offset);
-    void add(size_t offset, size_t xpos);
+    int xpos(size_t offset);
+    void add(size_t offset, int xpos);
     void add(size_t offset);
 
     void caretMovedFromOldOffsetToNewOffset(size_t oldOffset, size_t newOffset);
@@ -35,9 +35,9 @@ public:
 
 private:
 
-    TextDocument* textDocumentRef_;   ///< A reference to the current buffer
-    TextRenderer* textRendererRef_;   ///< A reference to the renderer
-    QHash<size_t, size_t> xPosCache_; ///< The x-pos cache
+    TextDocument* textDocumentRef_; ///< A reference to the current buffer
+    TextRenderer* textRendererRef_; ///< A reference to the renderer
+    QHash<size_t, int> xPosCache_;  ///< The x-pos cache
 };
 
 } // edbee

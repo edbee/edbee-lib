@@ -33,7 +33,7 @@ class FakeToolTip : public QWidget
     Q_OBJECT
 
 public:
-    explicit FakeToolTip(TextEditorController *controller, QWidget *parent = 0);
+    explicit FakeToolTip(TextEditorController *controller, QWidget *parent = nullptr);
     void setText(const QString text);
     QTextDocument* tipText;
     TextEditorController* controller();
@@ -42,9 +42,10 @@ private:
     TextEditorController* controllerRef_;       ///< A reference to the controller
 
 protected:
-    void paintEvent(QPaintEvent *e);
-    void resizeEvent(QResizeEvent *e);
+    void paintEvent(QPaintEvent* e);
+    void resizeEvent(QResizeEvent* e);
 };
+
 
 // inspiration:
 // http://doc.qt.io/qt-5/qtwidgets-tools-customcompleter-example.html
@@ -55,7 +56,7 @@ class EDBEE_EXPORT TextEditorAutoCompleteComponent : public QWidget
 {
     Q_OBJECT
 public:
-    explicit TextEditorAutoCompleteComponent(TextEditorController* controller, TextEditorComponent *parent, TextMarginComponent *margin);
+    explicit TextEditorAutoCompleteComponent(TextEditorController* controller, TextEditorComponent* parent, TextMarginComponent* margin);
 
     TextEditorController* controller() const;
     QListWidget* listWidget() const;
@@ -66,11 +67,11 @@ protected:
     bool shouldDisplayAutoComplete(TextRange& range, QString& word);
     void hideInfoTip();
     bool fillAutoCompleteList(TextDocument *document, const TextRange &range, const QString& word );
-
-    void positionWidgetForCaretOffset(int offset);
+    
+    void positionWidgetForCaretOffset(size_t offset);
     bool eventFilter(QObject* obj, QEvent* event);
 
-    void hideEvent(QHideEvent *event);
+    void hideEvent(QHideEvent* event);
     //void focusOutEvent(QFocusEvent *event);
     //void moveEvent(QMoveEvent *event);
 
@@ -81,8 +82,8 @@ public slots:
     void updateList();
     void backspacePressed();
     void textKeyPressed();
-    void listItemClicked(QListWidgetItem*item);
-    void listItemDoubleClicked(QListWidgetItem*item);
+    void listItemClicked(QListWidgetItem* item);
+    void listItemDoubleClicked(QListWidgetItem* item);
     void selectItemOnHover(QModelIndex modelIndex);
     void showInfoTip();
 
@@ -98,20 +99,18 @@ private:
     QPointer<FakeToolTip> infoTipRef_;
 };
 
+
 class AutoCompleteDelegate : public QAbstractItemDelegate
 {
     Q_OBJECT
 
 public:
-    AutoCompleteDelegate(TextEditorController *controller, QObject *parent = 0);
+    AutoCompleteDelegate(TextEditorController* controller, QObject* parent = nullptr);
 
     TextEditorController* controller() const;
 
-    void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
-
+    void paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const override;
     QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index ) const override;
-
-public slots:
 
 private:
     TextEditorController* controllerRef_;       ///< A reference to the controller

@@ -30,7 +30,7 @@ void TextCaretCache::clear()
 void TextCaretCache::fill(TextRangeSet& selection)
 {
     clear();
-    for (size_t i = 0, cnt = selection.rangeCount(); i<cnt; ++i) {
+    for (size_t i = 0, cnt = selection.rangeCount(); i < cnt; ++i) {
         TextRange& range = selection.range(i);
         add(range.caret());
         if (range.hasSelection()) {
@@ -47,7 +47,7 @@ void TextCaretCache::replaceAll(TextCaretCache& cache)
 }
 
 
-size_t TextCaretCache::xpos(size_t offset)
+int TextCaretCache::xpos(size_t offset)
 {
 #ifdef STRICT_CHECK_ON_CACHE
     Q_ASSERT(xPosCache_.contains(offset));
@@ -62,9 +62,9 @@ size_t TextCaretCache::xpos(size_t offset)
 
 
 /// Adds an xposition for the given offset
-void TextCaretCache::add(size_t offset, size_t xpos)
+void TextCaretCache::add(size_t offset, int xpos)
 {
-    xPosCache_.insert(offset,xpos);
+    xPosCache_.insert(offset, xpos);
 }
 
 
@@ -73,7 +73,7 @@ void TextCaretCache::add(size_t offset)
 {
     size_t line = textDocumentRef_->lineFromOffset(offset);
     size_t col  = textDocumentRef_->columnFromOffsetAndLine(offset, line);
-    size_t xpos = textRendererRef_->xPosForColumn(line, col);
+    int xpos = textRendererRef_->xPosForColumn(line, col);
     add(offset, xpos);
 }
 
@@ -81,7 +81,7 @@ void TextCaretCache::add(size_t offset)
 void TextCaretCache::caretMovedFromOldOffsetToNewOffset(size_t oldOffset, size_t newOffset)
 {
     Q_ASSERT(xPosCache_.contains(oldOffset));
-    size_t xpos = xPosCache_.take(oldOffset);
+    int xpos = xPosCache_.take(oldOffset);
     xPosCache_.insert(newOffset, xpos);
 }
 

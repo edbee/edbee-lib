@@ -327,7 +327,7 @@ TextLayout *TextRenderer::textLayoutForLineForPlaceholder(size_t line)
 }
 
 
-TextLayout *TextRenderer::textLayoutForLineNormal(size_t line)
+TextLayout* TextRenderer::textLayoutForLineNormal(size_t line)
 {
     /// FIXME:  Invalide TextLayout cache when required!!!
     TextDocument* doc = textDocument();
@@ -360,7 +360,7 @@ TextLayout *TextRenderer::textLayoutForLineNormal(size_t line)
             textFormat.setBackground(Qt::red); //QBrush(QColor::red()));
             textFormat.setForeground(Qt::white); //QBrush(QColor::red()));
 
-            for (int i=0; i<text.size(); ++i) {
+            for (int i = 0; i < text.size(); ++i) {
                 QChar c = text.at(i);
                 if( isControlCharacter(c) ) {
                   QString str = QString("[U+%1]").arg(QString::number(c.unicode(),16));
@@ -381,7 +381,7 @@ TextLayout *TextRenderer::textLayoutForLineNormal(size_t line)
                   formatRange.format.setToolTip(str);
                   formatRanges.append(formatRange);
                   */
-                  textLayoutBuilder.replace(i, 1, str, textFormat);
+                  textLayoutBuilder.replace(static_cast<size_t>(i), 1, str, textFormat);
                 }
             }
         }
@@ -439,11 +439,11 @@ void TextRenderer::renderBegin(const QRect& rect)
     int yPos = y + rect.height();
     Q_ASSERT(yPos >= 0);
 
-    size_t calculatedEndLine = rawLineIndexForYpos(static_cast<size_t>(yPos)) + 1;   // add 1 line extra (for half visible lines)
+    size_t calculatedEndLine = rawLineIndexForYpos(yPos) + 1;   // add 1 line extra (for half visible lines)
 
     // assign the 'work' variables
     size_t lineCount = doc->lineCount();
-    startLine_   = qBound(0u, rawLineIndexForYpos(static_cast<size_t>(y)), lineCount - 1);
+    startLine_   = qBound(0u, rawLineIndexForYpos(y), lineCount - 1);
     endLine_     = qBound(0u, calculatedEndLine, lineCount - 1 );
 
     Q_ASSERT( startLine_ <= endLine_ );
