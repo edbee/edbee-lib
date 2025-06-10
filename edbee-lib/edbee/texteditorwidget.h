@@ -37,13 +37,13 @@ class EDBEE_EXPORT TextEditorWidget : public QWidget
     Q_OBJECT
 public:
 
-    explicit TextEditorWidget(TextEditorController *controller, QWidget *parent = 0);
-    explicit TextEditorWidget(TextDocument *document, QWidget *parent = 0);
-    explicit TextEditorWidget(TextEditorConfig *config, QWidget *parent = 0);
-    explicit TextEditorWidget(QWidget *parent = 0);
+    explicit TextEditorWidget(TextEditorController *controller, QWidget *parent = nullptr);
+    explicit TextEditorWidget(TextDocument *document, QWidget *parent = nullptr);
+    explicit TextEditorWidget(TextEditorConfig *config, QWidget *parent = nullptr);
+    explicit TextEditorWidget(QWidget *parent = nullptr);
     virtual ~TextEditorWidget();
-
-    void scrollPositionVisible( int xPosIn, int yPosIn );
+    
+    void scrollPositionVisible(int xPosIn, int yPosIn);
 
     // a whole bunch of getters
     TextEditorController* controller() const;
@@ -63,10 +63,10 @@ public:
 
     QScrollBar* horizontalScrollBar() const;
     QScrollBar* verticalScrollBar() const;
-    void setVerticalScrollBar( QScrollBar* scrollBar );
-    void setHorizontalScrollBar( QScrollBar* scrollBar );
+    void setVerticalScrollBar(QScrollBar* scrollBar);
+    void setHorizontalScrollBar(QScrollBar* scrollBar);
 	int autoScrollMargin() const;
-    void setAutoScrollMargin(int amount=50);
+    void setAutoScrollMargin(int amount = 50);
     void setPlaceholderText(const QString& text);
 
     virtual bool readonly() const;
@@ -76,14 +76,14 @@ public:
 protected:
 
     virtual void resizeEvent(QResizeEvent* event);
-    bool eventFilter(QObject *obj, QEvent *event );
+    bool eventFilter(QObject *obj, QEvent *event);
 
 signals:
     void focusIn(QWidget* event);
     void focusOut(QWidget* event);
 
-    void verticalScrollBarChanged( QScrollBar* newScrollBar );
-    void horizontalScrollBarChanged(  QScrollBar* newScrollBar );
+    void verticalScrollBarChanged(QScrollBar* newScrollBar);
+    void horizontalScrollBarChanged(QScrollBar* newScrollBar);
 
 protected slots:
 
@@ -92,10 +92,10 @@ protected slots:
 
 public slots:
 
-    void scrollTopToLine( int line );
-    virtual void updateLineAtOffset(int offset);
-    virtual void updateAreaAroundOffset(int offset, int width=8);
-    virtual void updateLine( int line, int length=1 );
+    void scrollTopToLine(size_t line);
+    virtual void updateLineAtOffset(size_t offset);
+    virtual void updateAreaAroundOffset(size_t offset, int width = 8);
+    virtual void updateLine(size_t line, size_t length = 1);
     virtual void updateComponents();
 
     virtual void updateGeometryComponents();
@@ -104,11 +104,10 @@ public slots:
 
 private:
 
-    TextEditorController* controller_;                    ///< This method returns the controller
-
-    TextEditorScrollArea* scrollAreaRef_;                 ///< The scrollarea of the widget
-    TextEditorComponent* editCompRef_;                    ///< The editor ref
-    TextMarginComponent* marginCompRef_;                  ///< The margin components
+    TextEditorController* controller_;                     ///< This controller of the widget
+    TextEditorScrollArea* scrollAreaRef_;                  ///< The scrollarea of the widget
+    TextEditorComponent* editCompRef_;                     ///< The editor ref
+    TextMarginComponent* marginCompRef_;                   ///< The margin components
     TextEditorAutoCompleteComponent* autoCompleteCompRef_; ///< The autocomplete list widget
 
     int autoScrollMargin_;                                 ///< Customize the autoscroll margin

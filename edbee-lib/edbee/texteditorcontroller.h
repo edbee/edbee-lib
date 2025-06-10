@@ -113,7 +113,7 @@ public slots:
     virtual void update();
 
     // scrolling
-    virtual void scrollPositionVisible(size_t xPos, size_t yPos);
+    virtual void scrollPositionVisible(int xPos, int yPos);
     virtual void scrollOffsetVisible(size_t offset);
     virtual void scrollCaretVisible();
 
@@ -128,6 +128,7 @@ public slots:
 
     // caret movements
     virtual void moveCaretTo(ptrdiff_t line, ptrdiff_t col, bool keepAnchors, size_t rangeIndex = std::string::npos);
+    virtual void moveCaretTo(size_t line, size_t col, bool keepAnchors, size_t rangeIndex = std::string::npos);
     virtual void moveCaretToOffset(size_t offset, bool keepAnchors, size_t rangeIndex=std::string::npos);
     virtual void moveCaretAndAnchorToOffset(size_t caret, size_t anchor, size_t rangeIndex = std::string::npos);
     virtual void addCaretAt(size_t line, size_t col);

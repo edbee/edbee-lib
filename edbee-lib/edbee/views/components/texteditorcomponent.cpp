@@ -418,8 +418,8 @@ void TextEditorComponent::mousePressEvent(QMouseEvent* event)
         int y = event->pos().y();
 
 
-        int line = renderer->rawLineIndexForYpos( y );
-        int col = renderer->columnIndexForXpos( line, x );
+        size_t line = renderer->rawLineIndexForYpos(y);
+        int col = renderer->columnIndexForXpos(line, x);
 
         if( event->button() == Qt::LeftButton ) {
             registerClickEvent();
@@ -432,14 +432,14 @@ void TextEditorComponent::mousePressEvent(QMouseEvent* event)
                 return;
             }
 
-            if( event->modifiers()&Qt::ControlModifier ) {
+            if (event->modifiers()&Qt::ControlModifier) {
                 controller()->addCaretAt( line, col );
             } else {
                 controller()->moveCaretTo( line, col, event->modifiers()&Qt::ShiftModifier );
             }
         }
         if( QApplication::clipboard()->supportsSelection() && event->button() == Qt::MiddleButton ) { // X11 / linux support middle button paste
-            controller()->moveCaretTo( line, col, false ); // clear actual selection and put cursor under mouse
+            controller()->moveCaretTo(line, col, false); // clear actual selection and put cursor under mouse
             controller()->replaceSelection( QApplication::clipboard()->text(QClipboard::Selection), CoalesceId_Paste );
             controller()->updateStatusText();
         }
@@ -516,7 +516,7 @@ void TextEditorComponent::mouseMoveEvent(QMouseEvent* event )
 #else
         auto eventPos = event->position().toPoint();
 #endif
-        int line = renderer->rawLineIndexForYpos( eventPos.y() );
+        size_t line = renderer->rawLineIndexForYpos(eventPos.y());
         int col = 0;
         if( line >= 0 ) { col = renderer->columnIndexForXpos( line, eventPos.x() ); }
         if( line < 0 ) { line = 0; }
@@ -622,12 +622,11 @@ void TextEditorComponent::repaintCarets()
 }
 
 
-
 /// updates the given line so it will be repainted
-void TextEditorComponent::updateLineAtOffset(int offset)
+void TextEditorComponent::updateLineAtOffset(size_t offset)
 {
     TextRenderer* renderer = textRenderer();
-    int yPos = renderer->yPosForOffset( offset ) - textEditorRenderer_->extraPixelsToUpdateAroundLines();
+    size_t yPos = renderer->yPosForOffset(offset) - textEditorRenderer_->extraPixelsToUpdateAroundLines();
 
 // the text-only line:
 //    viewport()->update( renderer->viewportX(), yPos - renderer->viewportY(), renderer->viewportWidth(), renderer->lineHeight()  );

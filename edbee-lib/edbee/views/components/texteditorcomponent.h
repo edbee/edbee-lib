@@ -55,20 +55,20 @@ protected:
     virtual void keyPressEvent( QKeyEvent* event );
     virtual void keyReleaseEvent ( QKeyEvent* event );
     void inputMethodEvent( QInputMethodEvent* m );
-    QVariant inputMethodQuery( Qt::InputMethodQuery p ) const;
+    QVariant inputMethodQuery( Qt::InputMethodQuery p) const;
     void registerClickEvent();
-    virtual void mousePressEvent( QMouseEvent* event );
-    virtual void mouseReleaseEvent( QMouseEvent* event );
-    virtual void mouseDoubleClickEvent( QMouseEvent* event );
-    virtual void mouseMoveEvent( QMouseEvent* event );
-    virtual void focusInEvent( QFocusEvent* event );
-    virtual void focusOutEvent( QFocusEvent* event );
+    virtual void mousePressEvent(QMouseEvent* event);
+    virtual void mouseReleaseEvent(QMouseEvent* event);
+    virtual void mouseDoubleClickEvent(QMouseEvent* event);
+    virtual void mouseMoveEvent(QMouseEvent* event );
+    virtual void focusInEvent(QFocusEvent* event);
+    virtual void focusOutEvent(QFocusEvent* event);
     virtual void contextMenuEvent(QContextMenuEvent* event);
 
 public slots:
 
     void repaintCarets();
-    virtual void updateLineAtOffset(int offset);
+    virtual void updateLineAtOffset(size_t offset);
     virtual void updateAreaAroundOffset(int offset, int width=8);
     virtual void updateLine( int line, int length );
 

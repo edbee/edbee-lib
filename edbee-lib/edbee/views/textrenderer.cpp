@@ -11,7 +11,7 @@
 #include <QTextLayout>
 
 #include "edbee/models/textlinedata.h"
-#include "edbee/util/simpleprofiler.h"
+//#include "edbee/util/simpleprofiler.h"
 
 #include "edbee/models/chardocument/chartextdocument.h"
 #include "edbee/models/textdocument.h"
@@ -79,25 +79,26 @@ void TextRenderer::reset()
 
 
 /// This method returns the (maximum) line-height in pixels
-size_t TextRenderer::lineHeight()
+int TextRenderer::lineHeight()
 {
     QFontMetrics fm = textWidget()->fontMetrics();
-    return static_cast<size_t>(fm.ascent() + fm.descent() + fm.leading() + config()->extraLineSpacing()); // (the 1 is for the base line).
+    return fm.ascent() + fm.descent() + fm.leading() + config()->extraLineSpacing(); // (the 1 is for the base line).
 }
 
 
 /// This method converts the give y position to a line index
 /// Warning this returns a RAW line index, which means it can be an invalid line
 /// @param y the y position
-size_t TextRenderer::rawLineIndexForYpos(size_t y)
+size_t TextRenderer::rawLineIndexForYpos(int y)
 {
-    return y / lineHeight();
+    Q_ASSERT(y >= 0);
+    return static_cast<size_t>(y / lineHeight());
 }
 
 
 /// This method returns a valid line index for the given y-pos
 /// If the y-position isn't on a line it returns std::string::npos
-size_t TextRenderer::lineIndexForYpos(size_t y)
+size_t TextRenderer::lineIndexForYpos(int y)
 {
     size_t line = rawLineIndexForYpos(y);
     if(line >= textDocument()->lineCount()) return std::string::npos;
@@ -136,9 +137,9 @@ int TextRenderer::totalWidth()
 
 
 /// This method returns the total height
-size_t TextRenderer::totalHeight()
+int TextRenderer::totalHeight()
 {
-    return textDocument()->lineCount() * lineHeight() + lineHeight();
+    return static_cast<int>(textDocument()->lineCount()) * lineHeight() + lineHeight();
 }
 
 
@@ -162,7 +163,7 @@ size_t TextRenderer::viewHeightInLines()
 {
     ptrdiff_t height = viewportHeight();
     Q_ASSERT(height >= 0);
-    size_t result = static_cast<size_t>(viewportHeight()) / lineHeight() - 1;
+    size_t result = static_cast<size_t>(viewportHeight()) / static_cast<size_t>(lineHeight()) - 1;
     return result;
 }
 
@@ -172,12 +173,12 @@ size_t TextRenderer::firstVisibleLine()
 {
     if (viewportY() < 0) return 0;
     size_t y = static_cast<size_t>(viewportY());
-    return y / lineHeight();
+    return y / static_cast<size_t>(lineHeight());
 }
 
 
 /// Returns the (closet) valid column for the given x-position
-size_t TextRenderer::columnIndexForXpos(size_t line, size_t x )
+size_t TextRenderer::columnIndexForXpos(size_t line, int x )
 {
     TextLayout* layout = textLayoutForLine(line);
     if (!layout) return 0;
@@ -187,22 +188,22 @@ size_t TextRenderer::columnIndexForXpos(size_t line, size_t x )
 
 
 /// Returns the x position for the given column
-size_t TextRenderer::xPosForColumn(size_t line, size_t column)
+int TextRenderer::xPosForColumn(size_t line, size_t column)
 {
     TextLayout* layout = textLayoutForLine(line);
     qreal x = 0;
     if (layout) {
         x += layout->cursorToX(column);
     }
-    return static_cast<size_t>(qRound(x));
+    return qRound(x);
 }
 
 
 /// Returns the x-coordinate for the given offset
-size_t TextRenderer::xPosForOffset(size_t offset)
+int TextRenderer::xPosForOffset(size_t offset)
 {
     size_t line = textDocument()->lineFromOffset(offset);
-    size_t x = 0;
+    int x = 0;
 
     size_t lineStartOffset = textDocument()->offsetFromLine(line);
     size_t col = offset - lineStartOffset;
@@ -212,14 +213,14 @@ size_t TextRenderer::xPosForOffset(size_t offset)
 
 
 /// Returns the y position for the given line
-size_t TextRenderer::yPosForLine(size_t line)
+int TextRenderer::yPosForLine(size_t line)
 {
-    return line * lineHeight();
+    return static_cast<int>(line) * lineHeight();
 }
 
 
 /// Returns the offset position for the given line
-size_t TextRenderer::yPosForOffset(size_t offset)
+int TextRenderer::yPosForOffset(size_t offset)
 {
     size_t line = textDocument()->lineFromOffset(offset);
     return yPosForLine(line);

@@ -396,7 +396,7 @@ void TextEditorController::onSelectionChanged(TextRangeSet* oldRangeSet)
 void TextEditorController::onLineDataChanged(size_t line, size_t length, size_t newLength)
 {
     if (this->widgetRef_) {
-        widgetRef_->updateLine(line, qMax(length,newLength));
+        widgetRef_->updateLine(line, qMax(length, newLength));
     }
 }
 
@@ -479,7 +479,7 @@ void TextEditorController::update()
 
 
 /// Asserts the view shows the given position
-void TextEditorController::scrollPositionVisible(size_t xPos, size_t yPos)
+void TextEditorController::scrollPositionVisible(int xPos, int yPos)
 {
     emit widgetRef_->scrollPositionVisible(xPos, yPos);
 }
@@ -489,8 +489,8 @@ void TextEditorController::scrollPositionVisible(size_t xPos, size_t yPos)
 void TextEditorController::scrollOffsetVisible(size_t offset)
 {
     TextRenderer* renderer = textRenderer();
-    size_t xPos = renderer->xPosForOffset(offset);
-    size_t yPos = renderer->yPosForOffset(offset);
+    int xPos = renderer->xPosForOffset(offset);
+    int yPos = renderer->yPosForOffset(offset);
     scrollPositionVisible(xPos, yPos);
 }
 
@@ -639,7 +639,7 @@ void TextEditorController::replaceRangeSet(edbee::TextRangeSet& rangeSet, const 
 ///     moveCaretTo( 2, 1 ) => Moves the caret to the 3rd line and 2nd column
 ///     moveCaretTo( -1, -2 ) => Moves the caret to the character before the last character
 ///
-/// The rangeIndex is used to specify which range to move.. (Defaults to -1 which changes to a single range)
+/// The rangeIndex is used to specify which range to move.. (Defaults to std::string::npos which changes to a single range)
 void TextEditorController::moveCaretTo(ptrdiff_t line, ptrdiff_t col, bool keepAnchors, size_t rangeIndex)
 {
     if (line < 0) {
@@ -658,6 +658,19 @@ void TextEditorController::moveCaretTo(ptrdiff_t line, ptrdiff_t col, bool keepA
     ptrdiff_t minusNewLineChar = textDocument()->lineCount() - 1 == uline ? 0 : 1;
     offset += static_cast<size_t>(qBound(0, col, qMax(static_cast<ptrdiff_t>(lineLength) - minusNewLineChar, 0)));
     return moveCaretToOffset(offset, keepAnchors, rangeIndex);
+}
+
+/// Creates a command that moves the caret to the given line/column position
+/// A negative number means that we're counting from the end
+/// This method assumes line 0 is the first line!
+///
+/// For example:
+///     moveCaretTo( 2, 1 ) => Moves the caret to the 3rd line and 2nd column
+///
+/// The rangeIndex is used to specify which range to move.. (Defaults to std::string::npos which changes to a single range)
+void TextEditorController::moveCaretTo(size_t line, size_t col, bool keepAnchors, size_t rangeIndex)
+{
+    moveCaretTo(static_cast<ptrdiff_t>(line), static_cast<ptrdiff_t>(col), keepAnchors, rangeIndex);
 }
 
 

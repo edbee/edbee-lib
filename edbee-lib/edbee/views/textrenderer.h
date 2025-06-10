@@ -42,21 +42,21 @@ public:
     virtual void reset();
 
 // calculation functions
-    size_t lineHeight();
-    size_t rawLineIndexForYpos(size_t y);
-    size_t lineIndexForYpos(size_t y);
+    int lineHeight();
+    size_t rawLineIndexForYpos(int y);
+    size_t lineIndexForYpos(int y);
     int totalWidth();
-    size_t totalHeight();
+    int totalHeight();
     int emWidth();
     int nrWidth();
     size_t viewHeightInLines();
     size_t firstVisibleLine();
 
-    size_t columnIndexForXpos(size_t line, size_t x);
-    size_t xPosForColumn(size_t line, size_t column);
-    size_t xPosForOffset(size_t offset);
-    size_t yPosForLine(size_t line);
-    size_t yPosForOffset(size_t offset);
+    size_t columnIndexForXpos(size_t line, int x);
+    int xPosForColumn(size_t line, size_t column);
+    int xPosForOffset(size_t offset);
+    int yPosForLine(size_t line);
+    int yPosForOffset(size_t offset);
 
 // caching
     TextLayout* textLayoutForLine(size_t line);
@@ -75,7 +75,7 @@ public:
     TextEditorController* controller();
     TextEditorWidget* textWidget();
 
-    void setViewport( const QRect& viewport );
+    void setViewport(const QRect& viewport);
 
     void resetCaretTime();
     bool shouldRenderCaret();
