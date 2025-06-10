@@ -17,11 +17,10 @@ namespace edbee {
 /// You can use this class like this:   Util().converTabsToSpaces()
 class EDBEE_EXPORT Util {
 public:
-    QString convertTabsToSpaces( const QString& str, int tabSize );
+    QString convertTabsToSpaces(const QString& str, int tabSize);
     QList<size_t> tabColumnOffsets(const QString& str, unsigned int tabSize);
 
-
-    /// This method calculates 2 intersections between 2 ranges.
+    /// Calculates 2 intersections between 2 ranges.
     /// @param exclusive if it is exclusive then an overlap will not be included. In other words:
     ///			- Inclusive:  end < begin
     ///			- Exclusive:  end <= begin
@@ -29,19 +28,19 @@ public:
     /// @param resultEnd a pointer to the variable receiving the result
     /// @return false => no overlap, true => overlap
     template<typename T>
-    bool intersection( T begin1, T end1, T begin2, T end2, bool exclusive=false, T* resultBegin=0, T* resultEnd=0 )
+    bool intersection(T begin1, T end1, T begin2, T end2, bool exclusive = false, T* resultBegin = nullptr, T* resultEnd=nullptr)
     {
-        if( exclusive ) {
-            if( end1 <= begin2 ) return false;
-            if( end2 <= begin1 ) return false;
+        if (exclusive) {
+            if (end1 <= begin2) return false;
+            if (end2 <= begin1) return false;
         } else {
-            if( end1 < begin2 ) return false;
-            if( end2 < begin1 ) return false;
+            if (end1 < begin2) return false;
+            if (end2 < begin1) return false;
         }
 
         // assign the result
-        if( resultBegin ) { *resultBegin = qMax(begin1,begin2);  }
-        if( resultEnd ) { *resultEnd = qMin(end1,end2); }
+        if (resultBegin) { *resultBegin = qMax(begin1, begin2); }
+        if (resultEnd) { *resultEnd = qMin(end1, end2); }
         return true;
     }
 };

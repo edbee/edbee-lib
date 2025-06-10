@@ -16,21 +16,21 @@ namespace edbee {
 /// @param str the string where to convert the tabs to space
 /// @param tabSize the size of a single tab. This needs to be at least 1
 /// @return A string with all tabs converted to spaces
-QString Util::convertTabsToSpaces(const QString& str, int tabSize )
+QString Util::convertTabsToSpaces(const QString& str, int tabSize)
 {
     Q_ASSERT(tabSize > 0);
 
     QString result;
-    result.reserve( str.length() );
+    result.reserve( str.length());
 
     // append all characters to the result
-    for( int i=0,cnt=str.size(); i<cnt; ++i ) {
+    for (qsizetype i=0, cnt = str.size(); i<cnt; ++i ) {
         QChar c = str.at(i);
 
         // when a tab character is used it is converted to the correct column
         if( c == '\t' ) {
             int amount = tabSize - result.length() % tabSize;
-            result.append( QStringLiteral(" ").repeated(amount) );
+            result.append(QStringLiteral(" ").repeated(amount));
         } else {
             result.append(c);
         }
@@ -47,7 +47,7 @@ QList<size_t> Util::tabColumnOffsets(const QString& str, unsigned int tabSize)
 {
     // build the resut (column 0 is always available)
     QList<size_t> offsets;
-    offsets.push_back( 0);
+    offsets.push_back(0);
 
     size_t column = 0;
 
@@ -69,7 +69,6 @@ QList<size_t> Util::tabColumnOffsets(const QString& str, unsigned int tabSize)
     }
     return offsets;
 }
-
 
 
 } // edbee
