@@ -25,26 +25,26 @@ class TextGrammarRule;
 class EDBEE_EXPORT GrammarTextLexer : public TextLexer
 {
 public:
-    GrammarTextLexer( TextDocumentScopes* scopes );
+    GrammarTextLexer(TextDocumentScopes* scopes);
     virtual ~GrammarTextLexer();
 
-    virtual void textChanged( const TextBufferChange& change );
+    virtual void textChanged(const TextBufferChange& change);
 
 private:
-    virtual bool lexLine(int line, int& currentDocOffset );
+    virtual bool lexLine(size_t line, size_t& currentDocOffset );
 
 public:
-    virtual void lexLines( int line, int lineCount );
-    virtual void lexRange( int beginOffset, int endOffset );
+    virtual void lexLines(size_t line, size_t lineCount);
+    virtual void lexRange(size_t beginOffset, size_t endOffset);
 
 private:
 
     RegExp* createEndRegExp( RegExp* startRegExp, const QString &endRegExpStringIn);
 
-    void findNextGrammarRule(const QString &line, int offsetInLine, TextGrammarRule *activeRule, TextGrammarRule *&foundRule, RegExp*& foundRegExp, int& foundPosition );
-    void processCaptures( RegExp *foundRegExp, const QMap<int,QString>* foundCaptures );
+    void findNextGrammarRule(const QString &line, size_t offsetInLine, TextGrammarRule *activeRule, TextGrammarRule *&foundRule, RegExp*& foundRegExp, size_t& foundPosition);
+    void processCaptures(RegExp *foundRegExp, const QMap<size_t, QString>* foundCaptures);
 
-    TextGrammarRule* findAndApplyNextGrammarRule(int currentDocOffset, const QString& line, int& offsetInLine  );
+    TextGrammarRule* findAndApplyNextGrammarRule(size_t currentDocOffset, const QString& line, size_t& offsetInLine);
 
     MultiLineScopedTextRange* activeMultiLineRange();
     ScopedTextRange* activeScopedTextRange();

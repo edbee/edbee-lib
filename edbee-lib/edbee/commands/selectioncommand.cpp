@@ -21,17 +21,16 @@ namespace edbee {
 /// @param unit the unit of this command
 /// @param amount the number of steps
 /// @param keepSelection when true the anchor stays put (and the selection is expanded)
-SelectionCommand::SelectionCommand(SelectionType unit, int amount, bool keepSelection , int rangeIndex)
+SelectionCommand::SelectionCommand(SelectionType unit, ptrdiff_t amount, bool keepSelection , size_t rangeIndex)
     : unit_(unit)
     , amount_(amount)
-    , anchor_(-1)
+    , anchor_(std::string::npos)
     , keepSelection_(keepSelection)
     , rangeIndex_(rangeIndex)
 {
 }
 
 
-/// The descructor of the command
 SelectionCommand::~SelectionCommand()
 {
 }
@@ -42,24 +41,24 @@ SelectionCommand::~SelectionCommand()
 int SelectionCommand::commandId()
 {
     int coalesceId = CoalesceId_Selection + unit_* 10;
-    if( amount_ > 0 ) { coalesceId +=1 ; }
+    if (amount_ > 0) { coalesceId +=1 ; }
     return coalesceId;
 }
 
 
 /// execute the given selection command
 /// @param controller the controller to execute the selection for
-void SelectionCommand::execute( TextEditorController* controller )
+void SelectionCommand::execute(TextEditorController* controller)
 {
     // save the selection state
     TextDocument* document = controller->textDocument();
-    TextRangeSet* currentSelection = dynamic_cast<TextRangeSet*>( controller->textSelection() );
+    TextRangeSet* currentSelection = dynamic_cast<TextRangeSet*>(controller->textSelection());
     TextRangeSet* sel = new TextRangeSet(*currentSelection);  // start with the current selection
 
     bool resetAnchors = !keepSelection_;
 
     // handle the select operation
-    switch( unit_ ) {
+    switch (unit_) {
         // character movement
         case MoveCaretByCharacter:
             sel->moveCarets(amount_);
@@ -68,7 +67,7 @@ void SelectionCommand::execute( TextEditorController* controller )
         // This results in clearing the selection if a selection is present or it results in a movement of the caret.
         // When clearing a selection the caret is placed next to the selection (which side depends on the direction)
         case MoveCaretsOrDeselect:
-            if( keepSelection_ ) {
+            if (keepSelection_) {
                 sel->moveCarets(amount_);
             } else {
                 sel->moveCaretsOrDeselect(amount_);
@@ -76,11 +75,11 @@ void SelectionCommand::execute( TextEditorController* controller )
             break;
 
         case MoveCaretByWord:
-            sel->moveCaretsByCharGroup(amount_, document->config()->whitespaceWithoutNewline(), document->config()->charGroups() );
+            sel->moveCaretsByCharGroup(amount_, document->config()->whitespaceWithoutNewline(), document->config()->charGroups());
             break;
 
         case MoveCaretByLine:
-            TextSelection::moveCaretsByLine( controller, sel, amount_ );
+            TextSelection::moveCaretsByLine(controller, sel, amount_);
             break;
 
         case MoveCaretToWordBoundary:
@@ -105,32 +104,34 @@ void SelectionCommand::execute( TextEditorController* controller )
         case MoveCaretByPage:
         {
             // make sure the first line of the window is scrolled
-            TextRenderer* renderer   = controller->textRenderer();
-            TextEditorWidget* widget = controller->widget();
-            int firstVisibleLine = renderer->firstVisibleLine();
-            int linesPerPage     = renderer->viewHeightInLines();
+            TextRenderer* renderer     = controller->textRenderer();
+            TextEditorWidget* widget   = controller->widget();
+            ptrdiff_t firstVisibleLine = static_cast<ptrdiff_t>(renderer->firstVisibleLine());
+            size_t linesPerPage        = renderer->viewHeightInLines();
 
             sel->beginChanges();
-            TextSelection::moveCaretsByPage( controller, sel, amount_ );
-            if( !keepSelection_ ) {
+            TextSelection::moveCaretsByPage(controller, sel, amount_);
+            if (!keepSelection_) {
                 sel->resetAnchors();    // we must reset anchors here because de process-changes will merge carets
             }
             sel->endChanges();
 
-            firstVisibleLine += linesPerPage * amount_;
-            widget->scrollTopToLine( firstVisibleLine );
+            firstVisibleLine += static_cast<ptrdiff_t>(linesPerPage) * amount_;
+            if (firstVisibleLine < 0) firstVisibleLine = 0;
+            widget->scrollTopToLine(static_cast<size_t>(firstVisibleLine));
 
             break;
         }
         case MoveCaretToExactOffset:
         {
-            if( rangeIndex_ < 0 ) {
+            Q_ASSERT(amount_ >= 0);
+            if (rangeIndex_ == std::string::npos) {
                 sel->toSingleRange();
-
+                rangeIndex_ = 0;
             }
-            TextRange & range = sel->range( rangeIndex_ >= 0 ? rangeIndex_ : 0);
-            range.setCaret(amount_);
-            if( anchor_ >= 0 ) range.setAnchor(anchor_);
+            TextRange & range = sel->range(rangeIndex_);
+            range.setCaret(static_cast<size_t>(amount_));
+            if (anchor_ != std::string::npos) range.setAnchor(anchor_);
             break;
         }
         case SelectAll:
@@ -145,12 +146,14 @@ void SelectionCommand::execute( TextEditorController* controller )
             break;
 
         case SelectWordAt:
-            sel->selectWordAt( amount_, document->config()->whitespaces(), document->config()->charGroups() );
+            Q_ASSERT(amount_ >= 0);
+            sel->selectWordAt(static_cast<size_t>(amount_), document->config()->whitespaces(), document->config()->charGroups());
             resetAnchors = false;
             break;
 
         case ToggleWordSelectionAt:
-            sel->toggleWordSelectionAt( amount_, document->config()->whitespaces(), document->config()->charGroups() );
+            Q_ASSERT(amount_ >= 0);
+            sel->toggleWordSelectionAt(static_cast<size_t>(amount_), document->config()->whitespaces(), document->config()->charGroups());
             resetAnchors = false;
             break;
 
@@ -160,12 +163,13 @@ void SelectionCommand::execute( TextEditorController* controller )
             break;
 
         case AddCaretAtOffset:
-            sel->addRange( amount_, amount_ );
+            Q_ASSERT(amount_ >= 0);
+            sel->addRange(static_cast<size_t>(amount_), static_cast<size_t>(amount_));
             resetAnchors = false;   // do not reset the anchors
             break;
 
         case AddCaretByLine:
-            TextSelection::addRangesByLine( controller, sel, amount_ );
+            TextSelection::addRangesByLine(controller, sel, amount_);
             break;
 
         case ResetSelection:
@@ -197,7 +201,7 @@ void SelectionCommand::execute( TextEditorController* controller )
 /// Converts the unit enumeration to a string
 /// @param unit the unit enumeration value
 /// @return the string representation of this unit
-static QString unitToString( int unit ) {
+static QString unitToString(int unit) {
     switch( unit ) {
       case SelectionCommand::MoveCaretByCharacter: return "MoveCaretByCharacter";
       case SelectionCommand::MoveCaretByWord: return "MoveCaretByWord";
@@ -222,7 +226,7 @@ static QString unitToString( int unit ) {
 /// Converts this command to a strings
 QString SelectionCommand::toString()
 {
-    return QStringLiteral("SelectionCommand(%1)").arg( unitToString(unit_) );
+    return QStringLiteral("SelectionCommand(%1)").arg(unitToString(unit_));
 }
 
 bool SelectionCommand::readonly()

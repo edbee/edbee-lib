@@ -23,7 +23,7 @@ public:
 
     virtual int commandId();
 
-    virtual void execute( TextEditorController* controller ) override;
+    virtual void execute(TextEditorController* controller) override;
     virtual QString toString() override;
 };
 

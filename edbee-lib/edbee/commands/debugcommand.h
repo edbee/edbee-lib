@@ -9,7 +9,6 @@
 
 namespace edbee {
 
-
 /// A debug command, for simply suppling/dumping some editor state information to the console
 class EDBEE_EXPORT DebugCommand : public TextEditorCommand
 {
@@ -22,7 +21,7 @@ public:
         DumpCharacterCodes
     };
 
-    DebugCommand( DebugCommandType command );
+    DebugCommand(DebugCommandType command);
 
     virtual void execute(TextEditorController* controller) override;
     virtual QString toString() override;
@@ -30,15 +29,14 @@ public:
 
 protected:
 
-    void dumpScopes( TextEditorController* controller );
-    void rebuildScopes( TextEditorController* controller );
+    void dumpScopes(TextEditorController* controller);
+    void rebuildScopes(TextEditorController* controller);
 
-    void dumpUndoStack( TextEditorController* controller );
-    void dumpCharacterCodes( TextEditorController* controller );
+    void dumpUndoStack(TextEditorController* controller);
+    void dumpCharacterCodes(TextEditorController* controller);
 private:
 
     DebugCommandType command_;      ///< the command to execute
-
 };
 
 } // edbee

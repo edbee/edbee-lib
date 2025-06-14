@@ -7,15 +7,16 @@
 
 namespace edbee {
 
-TextChangeWithCaret::TextChangeWithCaret(int offset, int length, const QString& text, int caret )
-    : TextChange( offset, length, text )
-    , caret_( caret )
+TextChangeWithCaret::TextChangeWithCaret(size_t offset, size_t length, const QString& text, size_t caret)
+    : TextChange(offset, length, text)
+    , caret_(caret)
 {
 }
 
 
 /// returns the caret position
-int TextChangeWithCaret::caret() const
+/// when std::string::npos (no caret is available)
+size_t TextChangeWithCaret::caret() const
 {
     return caret_;
 }
@@ -23,7 +24,8 @@ int TextChangeWithCaret::caret() const
 
 /// Sets the caret position
 /// @param caret the caret to set
-void TextChangeWithCaret::setCaret(int caret)
+/// when std::string::npos (no caret is available)
+void TextChangeWithCaret::setCaret(size_t caret)
 {
     caret_ = caret;
 }

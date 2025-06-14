@@ -17,14 +17,13 @@ class TextEditorController;
 /// A basic change
 class EDBEE_EXPORT Change {
 public:
-
     virtual ~Change();
 
     /// This method should execute the command
-    virtual void execute( TextDocument* document ) = 0;
-    virtual void revert( TextDocument* );
+    virtual void execute(TextDocument* document) = 0;
+    virtual void revert(TextDocument*);
 
-    virtual bool giveAndMerge( TextDocument* document, Change* textChange );
+    virtual bool giveAndMerge(TextDocument* document, Change* textChange);
     virtual bool canUndo();
 
     virtual bool isPersistenceRequired();
@@ -54,8 +53,8 @@ class EDBEE_EXPORT EmptyDocumentChange : public Change
 {
 public:
     virtual bool isPersistenceRequired();
-    virtual void execute( TextDocument* );
-    virtual void revert( TextDocument*);
+    virtual void execute(TextDocument*);
+    virtual void revert(TextDocument*);
     virtual QString toString();
 };
 
@@ -67,7 +66,7 @@ public:
 class EDBEE_EXPORT ControllerChange : public Change
 {
 public:
-    ControllerChange( TextEditorController* controller );
+    ControllerChange(TextEditorController* controller);
     virtual TextEditorController* controllerContext();
     virtual TextEditorController* controller();
 
@@ -83,7 +82,7 @@ private:
 class EDBEE_EXPORT ChangeGroup : public ControllerChange
 {
 public:
-    ChangeGroup( TextEditorController* controller );
+    ChangeGroup(TextEditorController* controller);
     virtual ~ChangeGroup();
 
     virtual bool isGroup();
@@ -91,20 +90,20 @@ public:
     virtual bool isDiscardable();
     virtual void groupClosed();
 
-    virtual void execute( TextDocument* document);
-    virtual void revert( TextDocument* document);
+    virtual void execute(TextDocument* document);
+    virtual void revert(TextDocument* document);
 
-    virtual bool giveAndMerge( TextDocument* document, Change* textChange );
+    virtual bool giveAndMerge(TextDocument* document, Change* textChange);
     virtual void flatten();
 
-    virtual void giveChange( TextDocument* doc, Change* change );
-    virtual Change* at( int idx );
-    virtual Change* take( int idx );
-    virtual int size();
+    virtual void giveChange(TextDocument* doc, Change* change);
+    virtual Change* at(size_t idx);
+    virtual Change* take(size_t idx);
+    virtual size_t size();
     virtual void clear(bool performDelete=true);
     Change* last();
     Change* takeLast();
-    int recursiveSize();
+    size_t recursiveSize();
 
     virtual TextEditorController* controllerContext();
 
@@ -113,8 +112,6 @@ public:
 private:
     QList<Change*> changeList_;     ///< A list of all actions
 };
-
-
 
 
 } // edbee

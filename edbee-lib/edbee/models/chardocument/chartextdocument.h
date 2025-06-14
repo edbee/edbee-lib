@@ -26,8 +26,8 @@ class EDBEE_EXPORT CharTextDocument : public TextDocument
 Q_OBJECT
 
 public:
-    CharTextDocument( QObject* object );
-    CharTextDocument( TextEditorConfig *config = new TextEditorConfig(), QObject* object = nullptr );
+    CharTextDocument(QObject* object);
+    CharTextDocument(TextEditorConfig *config = new TextEditorConfig(), QObject* object = nullptr);
     virtual ~CharTextDocument();
 
 
@@ -42,7 +42,7 @@ public:
     virtual TextCodec* encoding() { return textCodecRef_; }
 
     /// Sets the encoding
-    virtual void setEncoding( TextCodec* codec ) {
+    virtual void setEncoding(TextCodec* codec) {
         Q_ASSERT(codec);
         textCodecRef_ = codec;
     }
@@ -51,7 +51,7 @@ public:
     virtual const edbee::LineEnding* lineEnding() { return lineEndingRef_; }
 
     /// Set the used line ending
-    virtual void setLineEnding( const edbee::LineEnding* lineEnding ) {
+    virtual void setLineEnding(const edbee::LineEnding* lineEnding) {
         Q_ASSERT(lineEnding);
         lineEndingRef_ = lineEnding;
     }
@@ -76,9 +76,9 @@ public:
 
 
 protected slots:
-//    virtual void textReplaced( int offset, int length, const QChar* data, int dataLength );
-//    virtual void linesReplaced( int line, int lineCount, int newLineCount );
-    virtual void textBufferChanged( const edbee::TextBufferChange& change, QString oldText = QString() );
+    //    virtual void textReplaced( int offset, int length, const QChar* data, int dataLength );
+    //    virtual void linesReplaced( int line, int lineCount, int newLineCount );
+    virtual void textBufferChanged(const edbee::TextBufferChange& change, QString oldText = QString());
 
 private:
     TextEditorConfig* config_;                               ///< The text editor configuration

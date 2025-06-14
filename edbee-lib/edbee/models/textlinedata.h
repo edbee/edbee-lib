@@ -12,10 +12,9 @@
 
 namespace edbee {
 
-
 enum TextLineDataPredefinedFields {
     LineTextScopesField=0,
-    //    LineDataMarkers,      /// Bookmarks etc
+    // LineDataMarkers,      /// Bookmarks etc
     LineAppendTextLayoutFormatListField=1,
     PredefinedFieldCount=2
 };
@@ -25,13 +24,11 @@ class Change;
 class TextLineDataManager;
 
 
-
 /// A text line item reference
 class EDBEE_EXPORT TextLineData {
 public:
     TextLineData() {}
     virtual ~TextLineData() {}
-//    bool undoable() = 0;
 };
 
 /// a simple class to store a QString in a line
@@ -39,9 +36,9 @@ template<typename T>
 class EDBEE_EXPORT BasicTextLineData : public TextLineData
 {
 public:
-    BasicTextLineData( const T& val ) : value_(val) {}
+    BasicTextLineData(const T& val) : value_(val) {}
     T value() { return value_; }
-    void setValue( const T& value ) { value_ = value; }
+    void setValue(const T& value) { value_ = value; }
 
 private:
     T value_;
@@ -51,26 +48,30 @@ private:
 typedef BasicTextLineData<QString> QStringTextLineData;
 typedef BasicTextLineData<QList<QTextLayout::FormatRange>> LineAppendTextLayoutFormatListData;
 
+
 //-------
+
 
 /// the line data items
 class EDBEE_EXPORT TextLineDataList {
 public:
-    TextLineDataList( );
+    TextLineDataList();
     virtual ~TextLineDataList();
-    virtual void destroy( TextLineDataManager* manager );
+    virtual void destroy(TextLineDataManager* manager);
 
-    void give( TextLineDataManager* manager, int field, TextLineData *dataItem );
-    TextLineData* take( TextLineDataManager* manager, int field );
-    TextLineData* at( TextLineDataManager* manager, int field );
+    void give(TextLineDataManager* manager, size_t field, TextLineData *dataItem);
+    TextLineData* take(TextLineDataManager* manager, size_t field);
+    TextLineData* at(TextLineDataManager* manager, size_t field);
 
-    void realloc( TextLineDataManager* manager, int oldFieldPerLine, int newFieldsPerLine );
+    void realloc(TextLineDataManager* manager, size_t oldFieldPerLine, size_t newFieldsPerLine);
 
 private:
     TextLineData** lineDataList_;   ///< The text line data items
 };
 
+
 //-------
+
 
 /// This manager manages all line definitions
 class EDBEE_EXPORT TextLineDataManager : public QObject
@@ -78,39 +79,39 @@ class EDBEE_EXPORT TextLineDataManager : public QObject
 Q_OBJECT
 
 public:
-    TextLineDataManager( int fieldsPerLine = PredefinedFieldCount);
+    TextLineDataManager(size_t fieldsPerLine = PredefinedFieldCount);
     virtual ~TextLineDataManager();
 
     void clear();
 
 
-    void give(int line, int field, TextLineData *dataItem );
-    TextLineData* take(int line, int field );
-    TextLineData* get( int line, int field );
+    void give(size_t line, size_t field, TextLineData *dataItem);
+    TextLineData* take(size_t line, size_t field);
+    TextLineData* get(size_t line, size_t field);
 
     /// returns the number of items per line
-    int fieldsPerLine() { return fieldsPerLine_; }
-    void setFieldsPerLine( int count );
+    size_t fieldsPerLine() { return fieldsPerLine_; }
+    void setFieldsPerLine(size_t count);
 
     /// returns the number of items
-    int length() const { return textLineDataList_.length(); }
+    size_t length() const { return textLineDataList_.length(); }
     /// returns the textline data list item
-    TextLineDataList* at(int idx) const { return textLineDataList_.at(idx); }
+    TextLineDataList* at(size_t idx) const { return textLineDataList_.at(idx); }
 
     // internal functions
-    Change* createLinesReplacedChange( int lineStart, int lineCount, int newLineCount );
-    TextLineDataList* takeList( int line );
-    void giveList( int line, TextLineDataList* list );
+    Change* createLinesReplacedChange(size_t lineStart, size_t lineCount, size_t newLineCount);
+    TextLineDataList* takeList(size_t line);
+    void giveList(size_t line, TextLineDataList* list);
 
-    void fillWithEmpty( int line, int length, int newLength );
-    void replace( int line, int length, TextLineDataList** items, int newLength );
+    void fillWithEmpty(size_t line, size_t length, size_t newLength);
+    void replace(size_t line, size_t length, TextLineDataList** items, size_t newLength);
 
     /// internal method for direct accesss
     GapVector<TextLineDataList*>* textLineDataList() { return &textLineDataList_; }
 
 protected:
 
-    void destroyRange( int line, int length );
+    void destroyRange(size_t line, size_t length);
 
 
 public slots:
@@ -119,13 +120,12 @@ public slots:
 //    void dumpGapvector();
 signals:
 
-    void lineDataChanged( int line, int length, int newLength );   ///< This signal is emitted if line-data is changed
+    void lineDataChanged(size_t line, size_t length, size_t newLength);   ///< This signal is emitted if line-data is changed
 
 private:
 
-    int fieldsPerLine_;                                  ///< The number of items per line
+    size_t fieldsPerLine_;                              ///< The number of items per line
     GapVector<TextLineDataList*>  textLineDataList_;    ///< The textline data list
-//    NoGapVector<TextLineDataList*>  textLineDataList_;
 };
 
 

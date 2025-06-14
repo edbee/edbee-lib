@@ -14,10 +14,7 @@ class TextLineDataTest : public edbee::test::TestCase
 private slots:
 
     void testLineDataManager();
-
     void testSetTextLineDataIssue66();
-
-
 };
 
 } // edbee

@@ -15,7 +15,6 @@
 namespace edbee {
 
 #ifdef CONFIG_PROFILE
-
 #define PROF_BEGIN \
     SimpleProfiler::instance()->begin( __FILE__, __LINE__, __func__, 0 );
 
@@ -31,7 +30,6 @@ namespace edbee {
 #define PROF_BEGIN_NAMED(name)
 #endif
 
-
 /// __FILE__ / __LINE__ / __FUNCTION__ (or __func__ )
 
 /// A simple profiler class that can be used to profile certain parts of the code.
@@ -43,11 +41,10 @@ public:
 
     static SimpleProfiler* instance();
 
-
     /// the class to 'record a singlel item
     class ProfilerItem {
     public:
-        ProfilerItem( const char* filename, int line, const char* function, const char* name );
+        ProfilerItem(const char* filename, int line, const char* function, const char* name);
         const char* filename() const { return filename_; }
         int line() const { return line_; }
         const char* function() const { return function_; }
@@ -58,8 +55,8 @@ public:
         qint64 durationWithoutChilds() const { return duration_ - childDuration_; }
 
         void incCallCount() { ++callCount_; }
-        void addDuration( qint64 duration ) { duration_ += duration; }
-        void addChildDuration( qint64 duration ) { childDuration_ += duration; }
+        void addDuration(qint64 duration) { duration_ += duration; }
+        void addChildDuration(qint64 duration) { childDuration_ += duration; }
 
     protected:
         const char* filename_;      ///< The filename
@@ -78,21 +75,17 @@ public:
         qint64 startTime;
     };
 
-
-
     SimpleProfiler();
     virtual ~SimpleProfiler();
 
-
-    void begin( const char* file, int line, const char* function, const char* name );
+    void begin(const char* file, int line, const char* function, const char* name);
     void end();
 
     void dumpResults();
 
-
 protected:
 
-    QMap<QString,ProfilerItem*> statsMap_;   ///< The statistics
+    QMap<QString, ProfilerItem*> statsMap_;  ///< The statistics
     QStack<ProfileStackItem> stack_;         ///< The current items being processed
 };
 

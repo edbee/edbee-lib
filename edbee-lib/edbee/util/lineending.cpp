@@ -1,8 +1,9 @@
 // edbee - Copyright (c) 2012-2025 by Rick Blommers and contributors
 // SPDX-License-Identifier: MIT
 
-#include <QString>
 #include "lineending.h"
+
+#include <QString>
 
 #include "edbee/debug.h"
 
@@ -13,41 +14,41 @@ namespace edbee {
 LineEnding *LineEnding::types()
 {
     static LineEnding types[] = {
-        LineEnding( LineEnding::UnixType, "\n", "\\n", "Unix" ),
-        LineEnding( LineEnding::WindowsType, "\r\n", "\\r\\n", "Windows" ),
-        LineEnding( LineEnding::MacClassicType, "\r" , "\\r", "Mac Classic"),
+        LineEnding(LineEnding::UnixType, "\n", "\\n", "Unix"),
+        LineEnding(LineEnding::WindowsType, "\r\n", "\\r\\n", "Windows"),
+        LineEnding(LineEnding::MacClassicType, "\r" , "\\r", "Mac Classic"),
     };
     return types;
 }
 
 
 /// This methode returns the line ending from the given type
-LineEnding *LineEnding::get(int idx )
+LineEnding* LineEnding::get(size_t idx)
 {
-    Q_ASSERT( 0 <= idx && idx < TypeCount );
+    Q_ASSERT(idx < TypeCount);
     return types() + idx;
 }
 
 
 /// Returns the unix line ending type
-LineEnding*LineEnding::unixType()
+LineEnding* LineEnding::unixType()
 {
-    return get( UnixType );
+    return get(UnixType);
 }
 
 
 // returns the windows line ending type
-LineEnding*LineEnding::windowsType()
+LineEnding* LineEnding::windowsType()
 {
-    return get( WindowsType );
+    return get(WindowsType);
 
 }
 
 
 /// Returns the Mac class line ending type
-LineEnding*LineEnding::macClassicType()
+LineEnding* LineEnding::macClassicType()
 {
-    return get( MacClassicType );
+    return get(MacClassicType);
 }
 
 
@@ -56,11 +57,11 @@ LineEnding*LineEnding::macClassicType()
 /// @param chars the chars used for the line ending
 /// @param escaped an escaped variant of the characters
 /// @param name the name of the line ending
-LineEnding::LineEnding(LineEnding::Type type, const char* chars, const char* escaped, const char* name )
-    : type_( type )
-    , charsRef_( chars )
-    , escapedCharsRef_( escaped )
-    , nameRef_( name )
+LineEnding::LineEnding(LineEnding::Type type, const char* chars, const char* escaped, const char* name)
+    : type_(type)
+    , charsRef_(chars)
+    , escapedCharsRef_(escaped)
+    , nameRef_(name)
 {
 }
 
@@ -70,45 +71,44 @@ LineEnding::~LineEnding()
 }
 
 
-/// This method detects the, line endings of a QString.
+/// Detects the, line endings of a QString.
 /// A byte array is tricky because the encoding could be multi-byte
 ///
 /// @param str the string to find the line-endings.
 /// @param unknown the type to return when the ending is not nown. (defaults to 0)
 /// @return the found type or the unkown parameter if not found
 ///
-LineEnding *LineEnding::detect(const QString& str, LineEnding *unkown )
+LineEnding *LineEnding::detect(const QString& str, LineEnding *unkown)
 {
     const int endLoopWhenCountReaches = 3;
     int macClassicCount = 0;
     int unixCount = 0;
     int winCount = 0;
 
-    for( int i=0, cnt=str.length(); i<cnt; i++ ) {
-
+    for (qsizetype i = 0, cnt=str.length(); i < cnt; i++) {
         // retrieve the characters
         QChar c1 = str.at(i);
-        QChar c2 = (i+1<cnt) ? str.at(i+1) : QChar(0);
+        QChar c2 = (i + 1 < cnt) ? str.at(i + 1) : QChar(0);
 
         // detect the line-ending
-        if( c1 == '\r' ) {
-           if( c2 == '\n' ) {
+        if (c1 == '\r') {
+           if (c2 == '\n') {
                ++winCount;
                ++i;
-               if( winCount >= endLoopWhenCountReaches ) break;
+               if (winCount >= endLoopWhenCountReaches) break;
            } else  {
                ++macClassicCount;
-               if( macClassicCount >= endLoopWhenCountReaches ) break;
+               if (macClassicCount >= endLoopWhenCountReaches) break;
            }
         }
-        else if( c1 == '\n') {
+        else if (c1 == '\n') {
             ++unixCount;
-            if( unixCount >= endLoopWhenCountReaches ) break;
+            if (unixCount >= endLoopWhenCountReaches) break;
         }
     }
-    if( macClassicCount > unixCount && macClassicCount > winCount ) return get( LineEnding::MacClassicType );
-    if( winCount > unixCount ) return get( LineEnding::WindowsType );
-    if( unixCount > 0) return get( LineEnding::UnixType );
+    if (macClassicCount > unixCount && macClassicCount > winCount) return get(LineEnding::MacClassicType);
+    if (winCount > unixCount) return get(LineEnding::WindowsType );
+    if (unixCount > 0) return get(LineEnding::UnixType);
     return unkown;
 }
 

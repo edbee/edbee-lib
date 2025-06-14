@@ -19,36 +19,36 @@ class TextLineDataList;
 class EDBEE_EXPORT LineDataListChange : public AbstractRangedChange
 {
 public:
-    LineDataListChange( TextLineDataManager* manager, int offset , int lenght, int newLength );
+    LineDataListChange(TextLineDataManager* manager, size_t offset, size_t lenght, size_t newLength);
     virtual ~LineDataListChange();
 
     virtual void execute(TextDocument* document);
     virtual void revert(TextDocument* doc);
 
     virtual void mergeStoredData(AbstractRangedChange* change);
-    virtual bool giveAndMerge(TextDocument* document, Change* textChange );
+    virtual bool giveAndMerge(TextDocument* document, Change* textChange);
 
     virtual QString toString();
 
-    int offset() const;
-    void setOffset( int value );
+    size_t offset() const;
+    void setOffset(size_t value);
 
-    virtual int docLength() const;
-    void setDocLength( int value );
+    virtual size_t docLength() const;
+    void setDocLength(size_t value);
 
-    virtual int storedLength() const;
+    virtual size_t storedLength() const;
 
     TextLineDataList** oldListList();
-    int oldListListLength();
+    size_t oldListListLength();
 
 private:
 
     TextLineDataManager* managerRef_;         ///< A reference to the manager
-    int offset_;                              ///< The line number start
-    int docLength_;                           ///< The number of new items (they all will be 0)
+    size_t offset_;                           ///< The line number start
+    size_t docLength_;                        ///< The number of new items (they all will be 0)
 
     TextLineDataList** oldListList_;          /// The lists of items (old items)
-    int contentLength_;                       ///< The number of elements in the oldListList
+    size_t contentLength_;                    ///< The number of elements in the oldListList
 };
 
 } // edbee

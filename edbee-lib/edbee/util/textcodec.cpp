@@ -1,10 +1,10 @@
 // edbee - Copyright (c) 2012-2025 by Rick Blommers and contributors
 // SPDX-License-Identifier: MIT
 
+#include "textcodec.h"
+
 #include <QTextCodec>
 #include <QApplication>
-
-#include "textcodec.h"
 
 #include "edbee/debug.h"
 
@@ -17,20 +17,20 @@ TextCodecManager::TextCodecManager()
     // append all special encodings
     QList<QByteArray> encList;
     encList << "UTF-8" << "UTF-16" << "UTF-16BE" << "UTF-16LE" << "UTF-32" << "UTF-32BE" << "UTF-32LE";
-    foreach( QByteArray enc, encList ) {
+    foreach(QByteArray enc, encList ) {
         QTextCodec* codec = QTextCodec::codecForName(enc);
-        giveTextCodec( new TextCodec( QString(codec->name()), codec, QTextCodec::IgnoreHeader ) );
-        giveTextCodec( new TextCodec( QStringLiteral("%1 with BOM").arg( QString(codec->name()) ), codec, QTextCodec::DefaultConversion ) );
+        giveTextCodec(new TextCodec(QString(codec->name()), codec, QTextCodec::IgnoreHeader));
+        giveTextCodec(new TextCodec(QStringLiteral("%1 with BOM").arg( QString(codec->name())), codec, QTextCodec::DefaultConversion));
     }
 
     // append the items
     QList<QByteArray> names = QTextCodec::availableCodecs();
     std::sort(names.begin(), names.end());
-    foreach( QByteArray name, names) {
+    foreach(QByteArray name, names) {
         QTextCodec* codec = QTextCodec::codecForName(name);
-        if( !codecRefMap_.contains( codec->name() ) ) {
-            TextCodec* textCodec = new TextCodec( name, codec, QTextCodec::DefaultConversion );
-            giveTextCodec( textCodec );
+        if (!codecRefMap_.contains(codec->name())) {
+            TextCodec* textCodec = new TextCodec(name, codec, QTextCodec::DefaultConversion);
+            giveTextCodec(textCodec);
         }
     }
 }
@@ -45,7 +45,7 @@ TextCodecManager::~TextCodecManager()
 
 /// Registers the given codec. The ownership of this codec is transfered to the codec manager
 /// @param codec the codec to register.
-void TextCodecManager::giveTextCodec( TextCodec* codec )
+void TextCodecManager::giveTextCodec(TextCodec* codec)
 {
     codecList_.append(codec);
     codecRefMap_.insert(codec->name(), codec);
@@ -75,10 +75,10 @@ TextCodec* TextCodecManager::codecForName(const QString& name)
 /// @param name the name of the codec
 /// @param codec the Qt codec to reference
 /// @param the QTextCodec conversion flags (is used for creating codecs with and without BOM)
-TextCodec::TextCodec( const QString& name, const QTextCodec* codec, QTextCodec::ConversionFlags flags)
+TextCodec::TextCodec(const QString& name, const QTextCodec* codec, QTextCodec::ConversionFlags flags)
     : name_(name)
-    , codecRef_( codec )
-    , flags_( flags )
+    , codecRef_(codec)
+    , flags_(flags)
 {
 }
 
@@ -92,14 +92,14 @@ const QTextCodec* TextCodec::codec()
 /// Creates a QTextEncoder
 QTextEncoder* TextCodec::makeEncoder()
 {
-    return codec()->makeEncoder( flags_ );
+    return codec()->makeEncoder(flags_);
 }
 
 
 /// Creates a QTextDecodec
 QTextDecoder* TextCodec::makeDecoder()
 {
-    return codec()->makeDecoder( flags_ );
+    return codec()->makeDecoder(flags_);
 }
 
 

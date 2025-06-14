@@ -16,22 +16,22 @@ namespace edbee {
 class EDBEE_EXPORT CharTextBuffer : public TextBuffer
 {
 public:
-    CharTextBuffer( QObject* parent=0);
+    CharTextBuffer(QObject* parent=nullptr);
 
-    virtual int length() const;
-    virtual QChar charAt(  int offset ) const;
-    virtual QString textPart( int offset, int length ) const;
+    virtual size_t length() const;
+    virtual QChar charAt(size_t offset) const;
+    virtual QString textPart(size_t offset, size_t length) const;
 
-    virtual void replaceText( int offset, int length, const QChar* buffer, int bufferLength );
+    virtual void replaceText(size_t offset, size_t length, const QChar* buffer, size_t bufferLength);
 
-    virtual int lineCount() { return lineOffsetList_.length(); }
+    virtual size_t lineCount() { return lineOffsetList_.length(); }
 
-    virtual int lineFromOffset( int offset );
-    virtual int offsetFromLine( int line );
+    virtual size_t lineFromOffset(size_t offset);
+    virtual size_t offsetFromLine(size_t line);
 
     virtual void rawAppendBegin();
-    virtual void rawAppend( QChar c );
-    virtual void rawAppend( const QChar* data, int dataLength );
+    virtual void rawAppend(QChar c);
+    virtual void rawAppend(const QChar* data, size_t dataLength);
     virtual void rawAppendEnd();
 
     virtual QChar* rawDataPointer();
@@ -47,9 +47,8 @@ private:
     QCharGapVector buf_;                     ///< The textbuffer
     LineOffsetVector lineOffsetList_;        ///< The line offset vector
 
-    int rawAppendStart_;                     ///< The start offset of raw appending. -1 means no appending is happening
-    int rawAppendLineStart_;                 ///< The line start
-
+    size_t rawAppendStart_;                     ///< The start offset of raw appending. std::string::npos means no appending is happening
+    size_t rawAppendLineStart_;                 ///< The line start. std::string::npos no appending is happening
 };
 
 } // edbee

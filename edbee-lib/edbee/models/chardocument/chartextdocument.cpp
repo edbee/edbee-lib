@@ -25,21 +25,21 @@
 namespace edbee {
 
 /// The main contstructor of the chartext document
-CharTextDocument::CharTextDocument(QObject *object)
+CharTextDocument::CharTextDocument(QObject* object)
     : edbee::CharTextDocument(new TextEditorConfig(), object)
 {
 }
 
-CharTextDocument::CharTextDocument(TextEditorConfig *config, QObject *object)
+CharTextDocument::CharTextDocument(TextEditorConfig* config, QObject* object)
     : TextDocument(object)
     , config_(config)
-    , textBuffer_(0)
-    , textScopes_(0)
-    , textLexer_(0)
-    , textCodecRef_(0)
-    , lineEndingRef_(0)
-    , textUndoStack_(0)
-    , autoCompleteProviderList_(0)
+    , textBuffer_(nullptr)
+    , textScopes_(nullptr)
+    , textLexer_(nullptr)
+    , textCodecRef_(nullptr)
+    , lineEndingRef_(nullptr)
+    , textUndoStack_(nullptr)
+    , autoCompleteProviderList_(nullptr)
 {
     Q_ASSERT_GUI_THREAD;
 
@@ -48,28 +48,28 @@ CharTextDocument::CharTextDocument(TextEditorConfig *config, QObject *object)
 
     textBuffer_ = new CharTextBuffer();
 
-    textScopes_ = new TextDocumentScopes( this );
+    textScopes_ = new TextDocumentScopes(this);
 
     textCodecRef_ = Edbee::instance()->codecManager()->codecForName("UTF-8");
     lineEndingRef_ = LineEnding::unixType();
 
     // create the text scopes and lexer
-    textLexer_ = new GrammarTextLexer( textScopes_ );
+    textLexer_ = new GrammarTextLexer(textScopes_);
 
     // create the undo stack
     textUndoStack_ = new TextUndoStack(this);
 
     // create the autocomplete provider (with the global parent provider)
-    autoCompleteProviderList_ = new TextAutoCompleteProviderList( Edbee::instance()->autoCompleteProviderList());
+    autoCompleteProviderList_ = new TextAutoCompleteProviderList(Edbee::instance()->autoCompleteProviderList());
 
     // simply forward the about to change signal
-    connect( textBuffer_, SIGNAL(textAboutToBeChanged(edbee::TextBufferChange)), SIGNAL(textAboutToBeChanged(edbee::TextBufferChange)), Qt::DirectConnection );
-    connect( textBuffer_, SIGNAL(textChanged(edbee::TextBufferChange, QString)), SLOT(textBufferChanged(edbee::TextBufferChange, QString)), Qt::DirectConnection );
+    connect(textBuffer_, SIGNAL(textAboutToBeChanged(edbee::TextBufferChange)), SIGNAL(textAboutToBeChanged(edbee::TextBufferChange)), Qt::DirectConnection);
+    connect(textBuffer_, SIGNAL(textChanged(edbee::TextBufferChange,QString)), SLOT(textBufferChanged(edbee::TextBufferChange,QString)), Qt::DirectConnection);
 
     // forward the persisted state changes
-    connect( textUndoStack_, SIGNAL(persistedChanged(bool)), this,  SIGNAL(persistedChanged(bool)) );
+    connect(textUndoStack_, SIGNAL(persistedChanged(bool)), this,  SIGNAL(persistedChanged(bool)));
 
-    connect( textScopes_, SIGNAL(lastScopedOffsetChanged(int,int)), this, SIGNAL(lastScopedOffsetChanged(int,int)) );
+    connect(textScopes_, SIGNAL(lastScopedOffsetChanged(size_t,size_t)), this, SIGNAL(lastScopedOffsetChanged(size_t,size_t)));
 }
 
 
@@ -86,14 +86,14 @@ CharTextDocument::~CharTextDocument()
 
 
 /// Returns the active textbuffer
-TextBuffer*CharTextDocument::buffer() const
+TextBuffer* CharTextDocument::buffer() const
 {
     return textBuffer_;
 }
 
 
 /// returns the language grammar
-TextGrammar *CharTextDocument::languageGrammar()
+TextGrammar* CharTextDocument::languageGrammar()
 {
     return textLexer_->grammar();
 }
@@ -118,7 +118,7 @@ TextAutoCompleteProviderList* CharTextDocument::autoCompleteProviderList()
 
 
 /// This method returns the configuration
-TextEditorConfig*CharTextDocument::config() const
+TextEditorConfig* CharTextDocument::config() const
 {
     return config_;
 }
@@ -134,10 +134,11 @@ TextEditorConfig*CharTextDocument::config() const
 /// Gives a change to the undo stack without invoking the filter
 /// @param change the change to execute
 /// @param coalesceId the coalescing identifier
-Change *CharTextDocument::giveChangeWithoutFilter(Change *change, int coalesceId )
+Change* CharTextDocument::giveChangeWithoutFilter(Change *change, int coalesceId)
 {
-    return textUndoStack()->giveChange( change, coalesceId);
+    return textUndoStack()->giveChange(change, coalesceId);
 }
+
 
 /// This method replaces the given text via the undo-button
 //void CharTextDocument::replaceTextWithoutFilter( int offset, int length, const QString& text )
@@ -150,15 +151,15 @@ Change *CharTextDocument::giveChangeWithoutFilter(Change *change, int coalesceId
 // the text is changed
 void CharTextDocument::textBufferChanged(const TextBufferChange& change, QString oldText)
 {
-    if( textLexer_ ) {
-        textLexer_->textChanged( change );
+    if (textLexer_) {
+        textLexer_->textChanged(change);
     }
 
     // execute the line change
-    if( !isUndoOrRedoRunning() ) {
-        Change* lineDataChange = lineDataManager()->createLinesReplacedChange( change.line()+1, change.lineCount(), change.newLineCount() );
-        if( lineDataChange ) {
-            executeAndGiveChange( lineDataChange, 0 );
+    if (!isUndoOrRedoRunning()) {
+        Change* lineDataChange = lineDataManager()->createLinesReplacedChange(change.line() + 1, change.lineCount(), change.newLineCount());
+        if (lineDataChange) {
+            executeAndGiveChange(lineDataChange, 0);
         }
     }
 

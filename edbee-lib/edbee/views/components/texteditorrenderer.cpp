@@ -14,24 +14,24 @@
 #include "edbee/views/textselection.h"
 #include "edbee/views/textrenderer.h"
 #include "edbee/views/textlayout.h"
-#include "edbee/util/simpleprofiler.h"
+// #include "edbee/util/simpleprofiler.h"
 
 #include "edbee/debug.h"
 
 
 namespace edbee {
 
-static const int ShadowWidth=5;
+static const int ShadowWidth = 5;
 
 
-TextEditorRenderer::TextEditorRenderer( TextRenderer *renderer )
+TextEditorRenderer::TextEditorRenderer(TextRenderer* renderer)
     : rendererRef_(renderer)
-    , themeRef_(0)
-    , shadowGradient_(0)
+    , themeRef_(nullptr)
+    , shadowGradient_(nullptr)
 {
-    shadowGradient_ = new QLinearGradient( 0, 0, ShadowWidth, 0 );
-    shadowGradient_ ->setColorAt(0, QColor( 0x00, 0x00, 0x00, 0x99 ));
-    shadowGradient_ ->setColorAt(1, QColor( 0x00, 0x00, 0x00, 0x00 ));
+    shadowGradient_ = new QLinearGradient(0, 0, ShadowWidth, 0);
+    shadowGradient_ ->setColorAt(0, QColor(0x00, 0x00, 0x00, 0x99));
+    shadowGradient_ ->setColorAt(1, QColor(0x00, 0x00, 0x00, 0x00));
 
 }
 
@@ -45,76 +45,79 @@ int TextEditorRenderer::preferedWidth()
     return renderer()->totalWidth();
 }
 
-void TextEditorRenderer::render(QPainter *painter)
+void TextEditorRenderer::render(QPainter* painter)
 {
-    int startLine = renderer()->startLine();
-    int endLine   = renderer()->endLine();
+    size_t startLine = renderer()->startLine();
+    size_t endLine   = renderer()->endLine();
 
-//    TextDocument* doc = renderer()->textDocument();
+    // TextDocument* doc = renderer()->textDocument();
     themeRef_ = renderer()->theme();
-    painter->setBackground( themeRef_->backgroundColor() );
-    painter->setPen( themeRef_->foregroundColor() );
-    painter->fillRect( *renderer()->clipRect(), themeRef_->backgroundColor() );
+    painter->setBackground(themeRef_->backgroundColor());
+    painter->setPen(themeRef_->foregroundColor());
+    painter->fillRect(*renderer()->clipRect(), themeRef_->backgroundColor());
 
     // process the items
-    for( int line = startLine; line <= endLine; ++line  ) {
-        renderLineBackground( painter, line );
-        renderLineSelection( painter, line );
-        renderLineSeparator( painter, line );
-        renderLineText( painter, line );
-        renderLineBorderedRanges( painter, line );
+    for (size_t line = startLine; line <= endLine; ++line) {
+        renderLineBackground(painter, line);
+        renderLineSelection(painter, line);
+        renderLineSeparator(painter, line);
+        renderLineText(painter, line );
+        renderLineBorderedRanges(painter, line);
     }
 
     renderCarets(painter);
-//    renderShade( painter, *renderer()->clipRect() );        /// TODO, deze renderShade moet misschien in de viewport render-code gebreuren
-
 }
 
 
-void TextEditorRenderer::renderLineBackground(QPainter *painter,int line)
+void TextEditorRenderer::renderLineBackground(QPainter* painter, size_t line)
 {
     Q_UNUSED(line);
     Q_UNUSED(painter);
 }
 
 
-void TextEditorRenderer::renderLineSelection(QPainter *painter,int line)
+void TextEditorRenderer::renderLineSelection(QPainter* painter, size_t line)
 {
-//PROF_BEGIN_NAMED("render-selection")
+    //PROF_BEGIN_NAMED("render-selection")
     TextDocument* doc = renderer()->textDocument();
     TextSelection* sel = renderer()->textSelection();
     int lineHeight = renderer()->lineHeight();
 
 
-    int firstRangeIdx=0;
-    int lastRangeIdx=0;
-/// TODO: iprove ranges at line by calling rangesForOffsets first for only the visible offsets!
-    if( sel->rangesAtLine( line, firstRangeIdx, lastRangeIdx ) ) {
-
+    size_t firstRangeIdx = 0;
+    size_t lastRangeIdx = 0;
+    /// TODO: iprove ranges at line by calling rangesForOffsets first for only the visible offsets!
+    if (sel->rangesAtLine(line, firstRangeIdx, lastRangeIdx)) {
         TextLayout* textLayout = renderer()->textLayoutForLine(line);
         QRectF rect = textLayout->boundingRect();
 
-        int lastLineColumn = doc->lineLength(line);
+        size_t lastLineColumn = doc->lineLength(line);
 
         // draw all 'ranges' on this line
-        for( int rangeIdx = firstRangeIdx; rangeIdx <= lastRangeIdx; ++rangeIdx ) {
+        for (size_t rangeIdx = firstRangeIdx; rangeIdx <= lastRangeIdx; ++rangeIdx ) {
             TextRange& range = sel->range(rangeIdx);
-            int startColumn = doc->columnFromOffsetAndLine( range.min(), line );
-            int endColumn   = doc->columnFromOffsetAndLine( range.max(), line );
+            size_t startColumn = doc->columnFromOffsetAndLine(range.min(), line);
+            size_t endColumn   = doc->columnFromOffsetAndLine(range.max(), line);
 
-            int startX = textLayout->cursorToX(startColumn);
-            int endX   = textLayout->cursorToX(endColumn);
+            int startX = qRound(textLayout->cursorToX(startColumn));
+            int endX   = qRound(textLayout->cursorToX(endColumn));
 
-            if( range.length() > 0 && endColumn+1 >= lastLineColumn) endX += 3;
+            if (range.length() > 0 && endColumn + 1 >= lastLineColumn) endX += 3;
 
-            painter->fillRect(startX, line*lineHeight + rect.top(), endX - startX, rect.height(),  themeRef_->selectionColor() ); //QColor::fromRgb(0xDD, 0x88, 0xEE) );
+            painter->fillRect(
+                startX,
+                static_cast<int>(line) * lineHeight + qRound(rect.top()),
+                endX - startX,
+                qRound(rect.height()),
+                themeRef_->selectionColor()
+            );
         }
     }
-//PROF_END
+    //PROF_END
 }
 
 
-void TextEditorRenderer::renderLineBorderedRanges(QPainter *painter,int line)
+void TextEditorRenderer::renderLineBorderedRanges(QPainter *painter, size_t line)
 {
 //PROF_BEGIN_NAMED("render-selection")
     TextDocument* doc = renderer()->textDocument();
@@ -122,141 +125,136 @@ void TextEditorRenderer::renderLineBorderedRanges(QPainter *painter,int line)
     int lineHeight = renderer()->lineHeight();
 
     QPen pen(themeRef_->foregroundColor(), 0.5);
-//    QPen pen(themeRef_->findHighlightForegroundColor(), 0.5);
-//    QBrush brush(themeRef_->findHighlightBackgroundColor());
     painter->setRenderHint(QPainter::Antialiasing);
 
-    int firstRangeIdx=0;
-    int lastRangeIdx=0;
-/// TODO: improve ranges at line by calling rangesForOffsets first for only the visible offsets!
-    if( sel->rangesAtLine( line, firstRangeIdx, lastRangeIdx ) ) {
+    size_t firstRangeIdx=0;
+    size_t lastRangeIdx=0;
 
+    /// TODO: improve ranges at line by calling rangesForOffsets first for only the visible offsets!
+    if (sel->rangesAtLine(line, firstRangeIdx, lastRangeIdx)) {
         TextLayout* textLayout = renderer()->textLayoutForLine(line);
         QRectF rect = textLayout->boundingRect();
 
-        int lastLineColumn = doc->lineLength(line);
+        size_t lastLineColumn = doc->lineLength(line);
 
         // draw all 'ranges' on this line
-        for( int rangeIdx = firstRangeIdx; rangeIdx <= lastRangeIdx; ++rangeIdx ) {
+        for (size_t rangeIdx = firstRangeIdx; rangeIdx <= lastRangeIdx; ++rangeIdx) {
             TextRange& range = sel->range(rangeIdx);
-            int startColumn = doc->columnFromOffsetAndLine( range.min(), line );
-            int endColumn   = doc->columnFromOffsetAndLine( range.max(), line );
+            size_t startColumn = doc->columnFromOffsetAndLine(range.min(), line);
+            size_t endColumn   = doc->columnFromOffsetAndLine(range.max(), line);
 
             qreal startX = textLayout->cursorToX( startColumn );
             qreal endX   = textLayout->cursorToX( endColumn );
 
-            if( range.length() > 0 && endColumn+1 >= lastLineColumn) endX += 3;
+            if (range.length() > 0 && endColumn + 1 >= lastLineColumn) endX += 3;
 
             QPainterPath path;
-            path.addRoundedRect(startX, line*lineHeight + rect.top(), endX - startX, rect.height(),5,5);
-//            painter->fillPath(path, brush);
+            path.addRoundedRect(
+                startX,
+                static_cast<int>(line) * lineHeight + rect.top(),
+                endX - startX,
+                rect.height(),
+                5,
+                5
+            );
             painter->strokePath(path, pen);
         }
     }
-//PROF_END
+    //PROF_END
 }
 
 
 
-void TextEditorRenderer::renderLineSeparator(QPainter *painter,int line)
+void TextEditorRenderer::renderLineSeparator(QPainter* painter, size_t line)
 {
-//PROF_BEGIN_NAMED("render-selection")
+    //PROF_BEGIN_NAMED("render-selection")
     TextEditorConfig* config = renderer()->config();
     int lineHeight = renderer()->lineHeight();
-//    int viewportX = renderer()->viewportX();
-//    int viewportWidth = renderer()->vie\wportWidth();
-    QRect visibleRect( renderer()->viewport() );
+    QRect visibleRect(renderer()->viewport());
 
-    if( config->useLineSeparator() ) {
+    if (config->useLineSeparator()) {
         const QPen& pen = config->lineSeparatorPen();
-        painter->setPen( pen );
-        int y = (line+1)*lineHeight; // - pen.width();
-//        p.drawLine( viewportX(), y, viewportWidth(), y );
-        painter->drawLine( visibleRect.left(), y, visibleRect.right(), y ); // draw from 0 to allow correct rendering of dotted lines
+        painter->setPen(pen);
+        int y = (static_cast<int>(line) + 1) * lineHeight; // - pen.width();
+        painter->drawLine(visibleRect.left(), y, visibleRect.right(), y); // draw from 0 to allow correct rendering of dotted lines
     }
-//PROF_END
+    //PROF_END
 }
 
 
-void TextEditorRenderer::renderLineText(QPainter *painter, int line)
+void TextEditorRenderer::renderLineText(QPainter* painter, size_t line)
 {
-//PROF_BEGIN_NAMED("render-line-text")
+    //PROF_BEGIN_NAMED("render-line-text")
     TextLayout* textLayout = renderer()->textLayoutForLine(line);
 
     // draw the text layout
-    QPoint lineStartPos(0, line*renderer()->lineHeight() );
-//PROF_BEGIN_NAMED("fetch-formats")
-//    QVector<QTextLayout::FormatRange>& formats = renderer()->themeStyler()->getLineFormatRanges( line );
+    QPoint lineStartPos(0, static_cast<int>(line) * renderer()->lineHeight());
+    //PROF_BEGIN_NAMED("fetch-formats")
+    // QVector<QTextLayout::FormatRange>& formats = renderer()->themeStyler()->getLineFormatRanges( line );
     QVector<QTextLayout::FormatRange> formats;
-//PROF_END
+    //PROF_END
 
-//painter->setClipping(false);
-//painter->setPen( QPen( QColor( 0,0,200), 2 ));
-//QRect clipDrawRect( renderer()->translatedClipRect() );
-//clipDrawRect.adjust(2,2,-2,-2);
-//painter->drawRect( clipDrawRect );
-//painter->setClipping(true);
+    //painter->setClipping(false);
+    //painter->setPen( QPen( QColor( 0,0,200), 2 ));
+    //QRect clipDrawRect( renderer()->translatedClipRect() );
+    //clipDrawRect.adjust(2,2,-2,-2);
+    //painter->drawRect( clipDrawRect );
+    //painter->setClipping(true);
 
-//PROF_BEGIN_NAMED("draw-texts")
+    //PROF_BEGIN_NAMED("draw-texts")
     painter->setPen( themeRef_->foregroundColor() );
     textLayout->draw( painter, lineStartPos, formats, *renderer()->clipRect() );
-//PROF_END
-
-//PROF_END
+    //PROF_END
 }
 
+
 // This method renders all carets
-void TextEditorRenderer::renderCarets(QPainter *painter)
+void TextEditorRenderer::renderCarets(QPainter* painter)
 {
-//PROF_BEGIN_NAMED("render-carets")
-
-    if( renderer()->shouldRenderCaret() ) {
-        TextDocument* doc= renderer()->textDocument();
+    //PROF_BEGIN_NAMED("render-carets")
+    if (renderer()->shouldRenderCaret()) {
+        TextDocument* doc = renderer()->textDocument();
         TextRangeSet* sel = renderer()->textSelection();
-        painter->setPen( themeRef_->caretColor() );
+        painter->setPen(themeRef_->caretColor());
 
-        int startLine = renderer()->startLine();
-        int endLine = renderer()->endLine();
+        size_t startLine = renderer()->startLine();
+        size_t endLine = renderer()->endLine();
         int caretWidth = renderer()->config()->caretWidth();
 
-        for( int line = startLine; line <= endLine; ++line  ) {
-
+        for (size_t line = startLine; line <= endLine; ++line) {
             QPoint lineStartPos(0, renderer()->yPosForLine(line));
 
             TextLayout* textLayout = renderer()->textLayoutForLine(line);
-            for( int caret = 0, rangeCount=sel->rangeCount(); caret < rangeCount; ++caret ) {
-
+            for (size_t caret = 0, rangeCount = sel->rangeCount(); caret < rangeCount; ++caret) {
                 TextRange& range = sel->range(caret);
-                int caretLine = doc->lineFromOffset( range.caret() );
-                if( caretLine == line ) {
-                    int caretCol = doc->columnFromOffsetAndLine( range.caret(), caretLine );
-                    textLayout->drawCursor( painter, lineStartPos, caretCol, caretWidth );
+                size_t caretLine = doc->lineFromOffset(range.caret());
+                if (caretLine == line) {
+                    size_t caretCol = doc->columnFromOffsetAndLine(range.caret(), caretLine);
+                    textLayout->drawCursor(painter, lineStartPos, caretCol, caretWidth);
                 }
             }
         }
     }
-//PROF_END
+    //PROF_END
 }
 
 
-void TextEditorRenderer::renderShade(QPainter *painter, const QRect& rect )
+void TextEditorRenderer::renderShade(QPainter *painter, const QRect& rect)
 {
-    // render a shade
-    if( renderer()->viewportX()) {
+    if (renderer()->viewportX()) {
         int shadowStart = renderer()->viewportX();
-        painter->setPen( Qt::NoPen );
+        painter->setPen(Qt::NoPen);
         QBrush oldBrush = painter->brush();
-        painter->setBrushOrigin(shadowStart, rect.y() );
-        painter->setBrush( *shadowGradient_ );
+        painter->setBrushOrigin(shadowStart, rect.y());
+        painter->setBrush(*shadowGradient_);
 
         QRect shadowRect(shadowStart, rect.y(), ShadowWidth, rect.height());
-        painter->drawRect( shadowRect.intersected( *renderer()->clipRect() ) );
+        painter->drawRect(shadowRect.intersected( *renderer()->clipRect()));
 
         painter->setBrush(oldBrush);
     }
-
-
 }
+
 
 /// should return the extra pixels to update when updating a line
 /// This way it is possible to render margins around the lines

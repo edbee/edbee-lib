@@ -11,7 +11,6 @@
 #include <QVector>
 
 #include "edbee/models/textrange.h"
-#include "edbee/models/textlinedata.h"
 #include "edbee/util/gapvector.h"
 
 namespace edbee {
@@ -36,24 +35,26 @@ typedef short TextScopeAtomId;
 class EDBEE_EXPORT TextScope {
 public:
     const QString name();
-    int atomCount();
-    TextScopeAtomId atomAt(int idx) const;
+    size_t atomCount();
+    TextScopeAtomId atomAt(size_t idx) const;
 
-    bool startsWith( TextScope* scope );
-    int rindexOf( TextScope* scope );
+    bool startsWith(TextScope* scope);
+    size_t rindexOf(TextScope* scope);
 
 private:
     TextScope( const QString& fullScope );
     TextScope();
     ~TextScope();
 
-    char scopeAtomCount_;                 ///< the number of scope-atoms
-    TextScopeAtomId* scopeAtoms_;         ///< the scope atoms
+    size_t scopeAtomCount_;              ///< the number of scope-atoms
+    TextScopeAtomId* scopeAtoms_;        ///< the scope atoms
 
     friend class TextScopeManager;
 };
 
+
 //===========================================
+
 
 /// A list of text-scopes.
 /// on a certian location, usually more then one scope is available on a given location
@@ -61,10 +62,10 @@ class EDBEE_EXPORT TextScopeList : public QVector<TextScope*>
 {
 public:
     TextScopeList();
-    TextScopeList( int initialSize );
-    TextScopeList( QVector<ScopedTextRange*>& ranges );
+    TextScopeList(int initialSize);
+    TextScopeList(QVector<ScopedTextRange*>& ranges);
 
-    int atomCount() const;
+    size_t atomCount() const;
 
     QString toString();
 };
@@ -111,15 +112,14 @@ public:
 ///
 class EDBEE_EXPORT TextScopeSelector {
 public:
-    TextScopeSelector( const QString& selector );
+    TextScopeSelector(const QString& selector);
     virtual ~TextScopeSelector();
 
-    double calculateMatchScore(const TextScopeList* scopeList );
+    double calculateMatchScore(const TextScopeList* scopeList);
     QString toString();
 
 private:
-    double calculateMatchScoreForSelector( TextScopeList* selector, const TextScopeList* scopeList );
-
+    double calculateMatchScoreForSelector(TextScopeList* selector, const TextScopeList* scopeList);
 
 private:
     QVector<TextScopeList*> selectorList_;
@@ -127,6 +127,7 @@ private:
 
 
 //===========================================
+
 
 /// The scope manager is used to manage the scopes...
 /// A scope consist out of several scope-parts:
@@ -147,24 +148,24 @@ public:
 
     TextScopeAtomId wildcardId();
 
-    TextScopeAtomId findOrRegisterScopeAtom( const QString& atom );
-    TextScope* refTextScope( const QString& scopeString );
+    TextScopeAtomId findOrRegisterScopeAtom(const QString& atom);
+    TextScope* refTextScope(const QString& scopeString);
     TextScope* refEmptyScope();
 
-    TextScopeList* createTextScopeList(const QString &scopeListString );
+    TextScopeList* createTextScopeList(const QString &scopeListString);
 
-    const QString& atomName( TextScopeAtomId id );
+    const QString& atomName(TextScopeAtomId id);
 
 private:
     TextScopeAtomId wildCardId_;                            ///< The atom id reserved for the wildcard '*'
 
     // scope atoms
     QList<QString> atomNameList_;                           ///< All scope-atom names
-    QHash<QString,TextScopeAtomId> atomNameMap_;            ///< the scope atom map
+    QHash<QString, TextScopeAtomId> atomNameMap_;           ///< the scope atom map
 
     // full scopes
     QList<TextScope*> textScopeList_;                       ///< The list of full-scope
-    QHash<QString,TextScope*> textScopeRefMap_;             ///< The full-scope map
+    QHash<QString, TextScope*> textScopeRefMap_;            ///< The full-scope map
 };
 
 
@@ -175,16 +176,15 @@ private:
 class EDBEE_EXPORT ScopedTextRange : public TextRange
 {
 public:
-    ScopedTextRange( int anchor, int caret, TextScope* scope );
-//    ScopedTextRange( const MultiLineScopedTextRange& range );
+    ScopedTextRange(size_t anchor, size_t caret, TextScope* scope);
     virtual ~ScopedTextRange();
 
-    void setScope( TextScope* scope );
+    void setScope(TextScope* scope);
     TextScope* scope() const;
     QString toString() const;
 
     /// returns the multi-line scoped text range
-    virtual MultiLineScopedTextRange* multiLineScopedTextRange() { return 0; }
+    virtual MultiLineScopedTextRange* multiLineScopedTextRange() { return nullptr; }
 
 
 private:
@@ -200,7 +200,7 @@ private:
 class EDBEE_EXPORT MultiLineScopedTextRangeReference : public ScopedTextRange
 {
 public:
-    MultiLineScopedTextRangeReference( MultiLineScopedTextRange& range );
+    MultiLineScopedTextRangeReference(MultiLineScopedTextRange& range);
     virtual ~MultiLineScopedTextRangeReference();
 
     /// returns the multi-line scoped text range
@@ -211,8 +211,8 @@ private:
 };
 
 
-
 //===========================================
+
 
 /// a list of textscopes
 /// This class is used for single-line scopes
@@ -224,25 +224,21 @@ public:
     explicit ScopedTextRangeList();
     virtual ~ScopedTextRangeList();
 
-    int size() const;
-    ScopedTextRange* at( int idx );
-    void giveRange( ScopedTextRange* at );
-    void giveAndPrependRange(ScopedTextRange* range );
+    size_t size() const;
+    ScopedTextRange* at(size_t idx);
+    void giveRange(ScopedTextRange* at);
+    void giveAndPrependRange(ScopedTextRange* range);
 
     void squeeze();
-    void setIndependent(bool enable=true);
+    void setIndependent(bool enable = true);
     bool isIndependent() const;
 
     QString toString();
-
 
 private:
 
     QVector<ScopedTextRange*> ranges_;  ///< the textranges
     bool independent_;                  ///< this boolean tells if the line contains a multi-lined scope start or end
-
-//    int size_;                      /// The number of ranges
-//    ScopedTextRange* ranges_;       /// The list of ranges
 };
 
 
@@ -253,19 +249,19 @@ private:
 class EDBEE_EXPORT MultiLineScopedTextRange : public ScopedTextRange
 {
 public:
-    MultiLineScopedTextRange(int anchor, int caret, TextScope* scope);
+    MultiLineScopedTextRange(size_t anchor, size_t caret, TextScope* scope);
     virtual ~MultiLineScopedTextRange();
 
-    void setGrammarRule( TextGrammarRule* rule );
+    void setGrammarRule(TextGrammarRule* rule);
     TextGrammarRule* grammarRule() const;
 
-    void giveEndRegExp( RegExp* regExp );
+    void giveEndRegExp(RegExp* regExp);
     RegExp* endRegExp();
 
-    static bool lessThan( MultiLineScopedTextRange* r1, MultiLineScopedTextRange* r2);
+    static bool lessThan(MultiLineScopedTextRange* r1, MultiLineScopedTextRange* r2);
 
 private:
-    TextGrammarRule* ruleRef_;     ///< The grammar rule that found this range
+    TextGrammarRule* ruleRef_; ///< The grammar rule that found this range
     RegExp* endRegExp_;        ///< The end regexp
 };
 
@@ -278,29 +274,29 @@ private:
 class EDBEE_EXPORT MultiLineScopedTextRangeSet : public TextRangeSetBase
 {
 public:
-    MultiLineScopedTextRangeSet( TextDocument* textDocument, TextDocumentScopes* textDocumentScopes );
+    MultiLineScopedTextRangeSet(TextDocument* textDocument, TextDocumentScopes* textDocumentScopes);
     virtual ~MultiLineScopedTextRangeSet();
     void reset();
 
-  // text range functionality
-    virtual int rangeCount() const;
-    virtual TextRange& range(int idx);
-    virtual const TextRange& constRange(int idx) const;
-    virtual void addRange( int anchor, int caret );
+    // text range functionality
+    virtual size_t rangeCount() const;
+    virtual TextRange& range(size_t idx);
+    virtual const TextRange& constRange(size_t idx) const;
+    virtual void addRange(size_t anchor, size_t caret);
     virtual void addRange(const TextRange& range);
 
-    virtual void removeRange( int idx );
+    virtual void removeRange(size_t idx);
     virtual void clear();
     virtual void toSingleRange();
     virtual void sortRanges();
-    virtual MultiLineScopedTextRange& scopedRange(int idx);
-    virtual MultiLineScopedTextRange& addRange(int anchor, int caret, const QString& name , TextGrammarRule *rule);
+    virtual MultiLineScopedTextRange& scopedRange(size_t idx);
+    virtual MultiLineScopedTextRange& addRange(size_t anchor, size_t caret, const QString& name , TextGrammarRule *rule);
 
-    void removeAndInvalidateRangesAfterOffset( int offset );
+    void removeAndInvalidateRangesAfterOffset(size_t offset);
 
-  // adds a text scope
-    void giveScopedTextRange( MultiLineScopedTextRange* textScope );
-    void processChangesIfRequired( bool joinBorders );
+    // adds a text scope
+    void giveScopedTextRange(MultiLineScopedTextRange* textScope);
+    void processChangesIfRequired(bool joinBorders);
 
     QString toString();
 
@@ -308,10 +304,9 @@ public:
 
 private:
 
-    TextDocumentScopes* textDocumentScopesRef_;     ///< A reference to the text document scopes
-    QList<MultiLineScopedTextRange*> scopedRangeList_;       ///< A list of all scoped ranges
+    TextDocumentScopes* textDocumentScopesRef_;         ///< A reference to the text document scopes
+    QList<MultiLineScopedTextRange*> scopedRangeList_;  ///< A list of all scoped ranges
 };
-
 
 
 //===========================================
@@ -323,34 +318,33 @@ class EDBEE_EXPORT TextDocumentScopes : public QObject
 Q_OBJECT
 
 public:
-    TextDocumentScopes( TextDocument* textDocument);
+    TextDocumentScopes(TextDocument* textDocument);
     virtual ~TextDocumentScopes();
 
-    int lastScopedOffset();
-    void setLastScopedOffset( int offset );
+    size_t lastScopedOffset();
+    void setLastScopedOffset(size_t offset);
 
-
-  // scope management
+    // scope management
     void setDefaultScope(const QString& name, TextGrammarRule *rule);
 
-    void giveLineScopedRangeList( int line, ScopedTextRangeList* list);
-    ScopedTextRangeList* scopedRangesAtLine( int line );
-    int scopedLineCount();
+    void giveLineScopedRangeList(size_t line, ScopedTextRangeList* list);
+    ScopedTextRangeList* scopedRangesAtLine(size_t line);
+    size_t scopedLineCount();
 
-    void giveMultiLineScopedTextRange( MultiLineScopedTextRange* range );
-    void removeScopesAfterOffset( int offset );
+    void giveMultiLineScopedTextRange(MultiLineScopedTextRange* range);
+    void removeScopesAfterOffset(size_t offset);
     MultiLineScopedTextRange& defaultScopedRange();
 
-    QVector<MultiLineScopedTextRange*> multiLineScopedRangesBetweenOffsets( int offsetBegin, int offsetEnd );
-    TextScopeList scopesAtOffset(int offset , bool includeEnd=false );
-    QVector<ScopedTextRange*> createScopedRangesAtOffsetList( int offset );
+    QVector<MultiLineScopedTextRange*> multiLineScopedRangesBetweenOffsets(size_t offsetBegin, size_t offsetEnd);
+    TextScopeList scopesAtOffset(size_t offset, bool includeEnd = false);
+    QVector<ScopedTextRange*> createScopedRangesAtOffsetList(size_t offset);
 
     QString toString();
     QStringList scopesAsStringList();
 
-    void dumpScopedLineAddresses( const QString& text = QString() );
+    void dumpScopedLineAddresses(const QString& text = QString());
 
-  // getters
+    // getters
     TextDocument* textDocument();
 
 protected slots:
@@ -358,17 +352,14 @@ protected slots:
     void grammarChanged();
 
 signals:
-    void lastScopedOffsetChanged(int previousOffset, int lastScopedOffset );
+    void lastScopedOffsetChanged(size_t previousOffset, size_t lastScopedOffset);
 
 private:
-
     TextDocument* textDocumentRef_;             ///< The default document reference
 
-//    TextScope* defaultScope_;                   ///< The default scope
-    MultiLineScopedTextRange defaultScopedRange_;          ///< The default scoped text range
-//    QHash<QString,TextScope*> scopeMap_;                 ///< A list of all defined/used scopes (pointers to these scopes are smaller then full strings)
-    MultiLineScopedTextRangeSet scopedRanges_;             ///< A list with all (multi-line) ranges
-    GapVector<ScopedTextRangeList*>  lineRangeList_;       ///< A list of all line scopes
+    MultiLineScopedTextRange defaultScopedRange_;     ///< The default scoped text range
+    MultiLineScopedTextRangeSet scopedRanges_;        ///< A list with all (multi-line) ranges
+    GapVector<ScopedTextRangeList*> lineRangeList_;   ///< A list of all line scopes
 
     /// This special variable is used to 'remember' to which offset the document has been scoped.
     /// This should speed up the syntax highlighting drasticly because the parsing only needs to happen
@@ -378,8 +369,7 @@ private:
     /// For all 'open' multi-line scopes with an end-offset of (documentLength).
     ///
     /// The scopedToOffset_ should only mark the multi-line scopes. Single lines scopes do NOT affect other regions of the document
-    int lastScopedOffset_;            ///< How far has the text been fully scoped?
-
+    size_t lastScopedOffset_;            ///< How far has the text been fully scoped?
 };
 
 

@@ -33,47 +33,45 @@ void TextUndoStackTest::testMultiCaretUndoIssue196()
     TextEditorWidget widget;
     TextDocument* doc = widget.textDocument();
     TextEditorController* controller = widget.controller();
-//    TextUndoStack* undoStack = doc->textUndoStack();
+    //  TextUndoStack* undoStack = doc->textUndoStack();
 
     controller->replace(0,0,"1a2b3c4d",0);                  // 1a|2b|3c4d
     controller->moveCaretToOffset(2,false);
     controller->addCaretAtOffset(4);
 
-    testEqual( doc->text(), "1a2b3c4d" );
-    testEqual( controller->textSelection()->rangesAsString(), "2>2,4>4");
+    testEqual(doc->text(), "1a2b3c4d");
+    testEqual(controller->textSelection()->rangesAsString(), "2>2,4>4");
 
     RemoveCommand del( RemoveCommand::RemoveChar, RemoveCommand::Right );
 
     del.execute(controller);
-    testEqual( doc->text(), "1abc4d" );                          // 1a|b|c4d
-    testEqual( controller->textSelection()->rangesAsString(), "2>2,3>3");
+    testEqual(doc->text(), "1abc4d" );                          // 1a|b|c4d
+    testEqual(controller->textSelection()->rangesAsString(), "2>2,3>3");
 
     del.execute(controller);
-    testEqual( controller->textSelection()->rangesAsString(), "2>2");
-    testEqual( doc->text(), "1a4d" );                       // 1a||4d
-
-
+    testEqual(controller->textSelection()->rangesAsString(), "2>2");
+    testEqual(doc->text(), "1a4d" );                       // 1a||4d
 
     del.execute(controller);
-    testEqual( doc->text(), "1ad" );
-    testEqual( controller->textSelection()->rangesAsString(), "2>2");
+    testEqual(doc->text(), "1ad" );
+    testEqual(controller->textSelection()->rangesAsString(), "2>2");
 
     del.execute(controller);
-    testEqual( doc->text(), "1a" );
-    testEqual( controller->textSelection()->rangesAsString(), "2>2");
+    testEqual(doc->text(), "1a" );
+    testEqual(controller->textSelection()->rangesAsString(), "2>2");
 
     del.execute(controller);
-    testEqual( doc->text(), "1a" );
-    testEqual( controller->textSelection()->rangesAsString(), "2>2");
+    testEqual(doc->text(), "1a" );
+    testEqual(controller->textSelection()->rangesAsString(), "2>2");
 
-//qlog_info() << "STACK: ---------------------------------------";
-//qlog_info() << doc->textUndoStack()->dumpStack();
-//qlog_info() << "----------------------------------------------";
+    //qlog_info() << "STACK: ---------------------------------------";
+    //qlog_info() << doc->textUndoStack()->dumpStack();
+    //qlog_info() << "----------------------------------------------";
 
     controller->undo();
 
-    testEqual( doc->text(), "1a2b3c4d" );
-    testEqual( controller->textSelection()->rangesAsString(), "2>2,4>4");
+    testEqual(doc->text(), "1a2b3c4d");
+    testEqual(controller->textSelection()->rangesAsString(), "2>2,4>4");
 
 
 /*
@@ -126,15 +124,15 @@ void TextUndoStackTest::testClearUndoStackCrashIssue24()
     TextDocument* doc = widget.textDocument();
     TextEditorController* controller = widget.controller();
 
-    controller->replace(0,0,"1a2b3c4d",0);
-    testEqual(doc->text(),"1a2b3c4d");
+    controller->replace(0, 0, "1a2b3c4d", 0);
+    testEqual(doc->text(), "1a2b3c4d");
 
     // clear the undo stack
     doc->textUndoStack()->clear();
-    testEqual(doc->text(),"1a2b3c4d");
+    testEqual(doc->text(), "1a2b3c4d");
 
     // move the caret (this seems to crash the undostack)
-    controller->moveCaretTo(0,4,false);
+    controller->moveCaretTo(static_cast<size_t>(0), static_cast<size_t>(4), false);
 }
 
 
@@ -144,12 +142,12 @@ void TextUndoStackTest::testClearUndoStackShouldnotUnregisterTheControllerIssue2
     TextDocument* doc = widget.textDocument();
     TextEditorController* controller = widget.controller();
 
-    testTrue( doc->textUndoStack()->isControllerRegistered(controller));
+    testTrue(doc->textUndoStack()->isControllerRegistered(controller));
 
     // clearing the undo stack should NOT unregister a controller
     doc->textUndoStack()->clear();
 
-    testTrue( doc->textUndoStack()->isControllerRegistered(controller));
+    testTrue(doc->textUndoStack()->isControllerRegistered(controller));
 }
 
 

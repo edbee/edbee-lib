@@ -12,11 +12,10 @@ namespace edbee {
 
 /// The Duplicate command.
 /// Duplicates the selected line or text
-///
 class EDBEE_EXPORT DuplicateCommand : public TextEditorCommand
 {
 public:
-    virtual void execute( TextEditorController* controller ) override;
+    virtual void execute(TextEditorController* controller) override;
     virtual QString toString() override;
 };
 

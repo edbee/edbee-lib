@@ -20,7 +20,6 @@ class TextRangeTest : public edbee::test::TestCase
 public:
     TextRangeTest();
 
-
 private slots:
     void init();
     void clean();
@@ -60,7 +59,6 @@ private slots:
     void testSubstractRange();
     void testMergeOverlappingRanges();
 
-
 private:
     TextEditorController* controller_;
     TextDocument* docRef_;
@@ -77,9 +75,7 @@ class DynamicTextRangeSetTest : public edbee::test::TestCase
 private slots:
     void testDynamicChanges();
     void testDeleteMode();
-
 };
-
 
 } // edbee
 

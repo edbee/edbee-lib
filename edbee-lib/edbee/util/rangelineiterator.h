@@ -29,15 +29,15 @@ class TextRange;
 /// @endcode
 class EDBEE_EXPORT RangeLineIterator {
 public:
-    RangeLineIterator( TextDocument* doc, const TextRange& range );
-    RangeLineIterator( TextDocument* doc, int start, int end );
+    RangeLineIterator(TextDocument* doc, const TextRange& range);
+    RangeLineIterator(TextDocument* doc, size_t start, size_t end);
 
     bool hasNext() const;
-    int next();
+    size_t next();
 
 private:
-    int curLine_;              ///< The current line number
-    int endLine_;              ///< The last line
+    size_t curLine_;              ///< The current line number
+    size_t endLine_;              ///< The last line
 };
 
 

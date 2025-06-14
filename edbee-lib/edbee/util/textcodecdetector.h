@@ -33,18 +33,16 @@ class EDBEE_EXPORT TextCodecDetector {
 public:
 
     static TextCodec* globalPreferedCodec();
-    static void setGlobalPreferedCodec( TextCodec* codec );
+    static void setGlobalPreferedCodec(TextCodec* codec);
 
-
-    explicit TextCodecDetector( const QByteArray* buffer=0,  TextCodec* preferedCodec=0 );
-    explicit TextCodecDetector( const char* buffer, int length=0, TextCodec* preferedCodec=0 );
+    explicit TextCodecDetector(const QByteArray* buffer = nullptr,  TextCodec* preferedCodec = nullptr);
+    explicit TextCodecDetector(const char* buffer, size_t length = 0, TextCodec* preferedCodec = nullptr );
     virtual ~TextCodecDetector();
-
 
     virtual TextCodec* detectCodec();
 
     /// Sets the buffer reference
-    virtual void setBuffer( const char* buf, int length )
+    virtual void setBuffer( const char* buf, size_t length )
     {
         bufferRef_ = buf;
         bufferLength_ = length;
@@ -54,21 +52,18 @@ public:
     virtual const char*buffer() const { return bufferRef_; }
 
     /// Returns the buffer length
-    virtual int bufferLength() { return bufferLength_; }
+    virtual size_t bufferLength() { return bufferLength_; }
 
-    virtual void setPreferedCodec( TextCodec* codec=0 );
+    virtual void setPreferedCodec(TextCodec* codec = nullptr);
     virtual TextCodec* preferedCodec() { return preferedCodecRef_; }
 
-
-    virtual void setFallbackCodec( TextCodec* codec=0 );
+    virtual void setFallbackCodec(TextCodec* codec = nullptr);
     virtual TextCodec* fallbackCodec() const { return fallbackCodecRef_; }
-
-
 
 protected:
 
     ///  If the byte has the form 10xxxxx, then it's a continuation byte of a multiple byte character;
-    virtual bool isContinuationChar( char b) { return /*-128 <= b && */ b <= -65; }
+    virtual bool isContinuationChar(char b) { return /*-128 <= b && */ b <= -65; }
 
     /// If the byte has the form 110xxxx, then it's the first byte of a two-bytes sequence character.
     virtual bool  isTwoBytesSequence(char b) { return -64 <= b && b <= -33; }
@@ -86,21 +81,21 @@ protected:
     virtual bool isSixBytesSequence(char b){  return -4 <= b && b <= -3; }
 
 public:
-    static bool hasUTF8Bom( const char* buffer, int length );
-    static bool hasUTF16LEBom( const char* buffer, int length );
-    static bool hasUTF16BEBom( const char* buffer, int length );
-    static bool hasUTF32LEBom( const char* buffer, int length );
-    static bool hasUTF32BEBom( const char* buffer, int length );
+    static bool hasUTF8Bom(const char* buffer, size_t length);
+    static bool hasUTF16LEBom(const char* buffer, size_t length);
+    static bool hasUTF16BEBom(const char* buffer, size_t length);
+    static bool hasUTF32LEBom(const char* buffer, size_t length);
+    static bool hasUTF32BEBom(const char* buffer, size_t length);
 
 
 private:
 
-    //const QByteArray *bufferRef_;   ///< A reference to the current buffer of data
+    //const QByteArray *bufferRef_; ///< A reference to the current buffer of data
     const char* bufferRef_;         ///< A reference to the buffer
-    int bufferLength_;              ///< The size of the buffer
+    size_t bufferLength_;           ///< The size of the buffer
 
     TextCodec* preferedCodecRef_;  ///< The prefered codec to use
-    TextCodec* fallbackCodecRef_;   ///< The default codec to return. This is the codec to use if there's a problem detecting the codec or returning the prefered codec
+    TextCodec* fallbackCodecRef_;  ///< The default codec to return. This is the codec to use if there's a problem detecting the codec or returning the prefered codec
 
 
 };

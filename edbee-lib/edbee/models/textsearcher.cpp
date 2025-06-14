@@ -116,35 +116,35 @@ TextRange TextSearcher::findNextRange(TextRangeSet* selection)
     TextDocument* document = selection->textDocument();
     QChar* buffer = document->buffer()->rawDataPointer();
 
-    if( !regExp_ ) { regExp_ = createRegExp(); }
+    if (!regExp_) { regExp_ = createRegExp(); }
 
-    int caretPos= 0;
-    if( selection->rangeCount() > 0 ) {
-        if( isReverse() ) {
+    size_t caretPos = 0;
+    if (selection->rangeCount() > 0) {
+        if (isReverse()) {
             caretPos = selection->firstRange().min();
         } else {
             caretPos = selection->lastRange().max();
         }
     }
 
-    int idx = 0;
-    if( isReverse() ) {
-        idx = regExp_->lastIndexIn(buffer,0,caretPos);
+    size_t idx = 0;
+    if (isReverse()) {
+        idx = regExp_->lastIndexIn(buffer, 0, caretPos);
     } else {
         idx = regExp_->indexIn(buffer,caretPos,document->length());
     }
 
     // wrapped around? Let's try it from the beginning
-    if( idx < 0 && isWrapAroundEnabled() ) {
-        if( isReverse() ) {
-            idx = regExp_->lastIndexIn(buffer,0,document->length());
+    if (idx == std::string::npos && isWrapAroundEnabled()) {
+        if (isReverse()) {
+            idx = regExp_->lastIndexIn(buffer, 0, document->length());
         } else {
-            idx = regExp_->indexIn(buffer,0,document->length());
+            idx = regExp_->indexIn(buffer, 0, document->length());
         }
     }
-    if( idx >= 0 ) {
-        int len = regExp_->len(0);
-        return TextRange(idx,idx+len);
+    if (idx != std::string::npos) {
+        size_t len = regExp_->len(0);
+        return TextRange(idx, idx + len);
     }
     return TextRange();
 }
@@ -153,12 +153,12 @@ TextRange TextSearcher::findNextRange(TextRangeSet* selection)
 /// Finds the next item based on the given caret position in the selection
 /// @param selection the selection to use for searching
 /// @return true if the next selection has been foudn
-bool TextSearcher::findNext( TextRangeSet* selection )
+bool TextSearcher::findNext(TextRangeSet* selection)
 {
     TextRange range = findNextRange(selection);
-    if( !range.isEmpty()) {
+    if (!range.isEmpty()) {
         selection->clear();
-        selection->addRange(range.anchor(),range.caret());
+        selection->addRange(range.anchor(), range.caret());
         return true;
     }
     return false;
@@ -168,10 +168,10 @@ bool TextSearcher::findNext( TextRangeSet* selection )
 /// Finds the previous item based on the given caret position in the selection
 /// @param selection the selection to use and alter
 /// @return true if the previous item has been found false if not found
-bool TextSearcher::findPrev( TextRangeSet* selection )
+bool TextSearcher::findPrev(TextRangeSet* selection)
 {
     reverse_ = !reverse_;
-    bool result = findNext( selection );
+    bool result = findNext(selection);
     reverse_ = !reverse_;
     return result;
 }
@@ -181,17 +181,16 @@ bool TextSearcher::findPrev( TextRangeSet* selection )
 /// @param widget the widget to search in
 /// @param selection the selection to use
 /// @return true if the next item has been found false if it hasn't been.
-bool TextSearcher::selectNext( TextRangeSet* selection )
+bool TextSearcher::selectNext(TextRangeSet* selection)
 {
     TextRange range = findNextRange(selection);
-    if( !range.isEmpty()) {
-
+    if (!range.isEmpty()) {
         // edge case, when currently ony 1 caret is available and doesn't have a selection
         // we need to remove this range
-        if( selection->rangeCount() == 1 && selection->range(0).isEmpty() ) {
+        if (selection->rangeCount() == 1 && selection->range(0).isEmpty()) {
             selection->removeRange(0);
         }
-        selection->addRange( range.anchor(), range.caret() );
+        selection->addRange(range.anchor(), range.caret());
         return true;
     }
     return false;
@@ -201,10 +200,10 @@ bool TextSearcher::selectNext( TextRangeSet* selection )
 /// Selects the previous item based on the given caret position in the selection
 /// @param selection the selection to use
 /// @return true if the selection has been found false if it hasn't been found
-bool TextSearcher::selectPrev( TextRangeSet* selection )
+bool TextSearcher::selectPrev(TextRangeSet* selection)
 {
     reverse_ = !reverse_;
-    bool result = selectNext( selection );
+    bool result = selectNext(selection);
     reverse_ = !reverse_;
     return result;
 }
@@ -213,14 +212,14 @@ bool TextSearcher::selectPrev( TextRangeSet* selection )
 /// Select all matching items in the document
 /// @param selection the selection to search for
 /// @return true if one ore more items are selected false if not found
-bool TextSearcher::selectAll( TextRangeSet* selection )
+bool TextSearcher::selectAll(TextRangeSet* selection)
 {
     TextRange oldRange = selection->range(0);
 
     markAll(selection);
 
     // no selection, we MUST place a caret
-    if( selection->rangeCount() == 0 ) {
+    if (selection->rangeCount() == 0) {
         selection->addRange(oldRange.caret(), oldRange.caret());
         return false;
     }
@@ -232,17 +231,17 @@ bool TextSearcher::selectAll( TextRangeSet* selection )
 void TextSearcher::markAll(TextRangeSet *rangeset)
 {
     // clear the selection and add all matches
-    bool oldReverse = reverse_;     // we must NOT reverse find
+    bool oldReverse = reverse_; // not NOT reverse find
     bool oldWrapAround = wrapAround_;
     reverse_ = false;
     wrapAround_ = false;
     rangeset->clear();
     rangeset->beginChanges();
     TextRange range = findNextRange(rangeset);
-    while( !range.isEmpty() )
+    while (!range.isEmpty())
     {
         rangeset->addRange(range.anchor(), range.caret());
-        range = findNextRange( rangeset );
+        range = findNextRange(rangeset);
     }
     rangeset->endChanges();
     wrapAround_ = oldWrapAround;
@@ -252,11 +251,11 @@ void TextSearcher::markAll(TextRangeSet *rangeset)
 
 /// Finds the next item based on the given caret position in the selection
 /// @param widget the widget to find the next item
-bool TextSearcher::findNext(TextEditorWidget* widget )
+bool TextSearcher::findNext(TextEditorWidget* widget)
 {
-    std::unique_ptr<TextRangeSet> newRangeSet( new TextRangeSet( widget->textSelection() ) );
-    if( findNext( newRangeSet.get() ) ) {
-        widget->controller()->changeAndGiveTextSelection( newRangeSet.release() );
+    std::unique_ptr<TextRangeSet> newRangeSet(new TextRangeSet(widget->textSelection()));
+    if (findNext( newRangeSet.get())) {
+        widget->controller()->changeAndGiveTextSelection(newRangeSet.release());
         return true;
     }
     return false;
@@ -265,11 +264,11 @@ bool TextSearcher::findNext(TextEditorWidget* widget )
 
 /// Finds the previous item based on the given caret position in the selection
 /// @param widget the widget to search in
-bool TextSearcher::findPrev( TextEditorWidget* widget)
+bool TextSearcher::findPrev(TextEditorWidget* widget)
 {
-    std::unique_ptr<TextRangeSet> newRangeSet( new TextRangeSet( widget->textSelection() ) );
-    if( findPrev( newRangeSet.get() ) ) {
-        widget->controller()->changeAndGiveTextSelection( newRangeSet.release() );
+    std::unique_ptr<TextRangeSet> newRangeSet(new TextRangeSet(widget->textSelection()));
+    if (findPrev(newRangeSet.get())) {
+        widget->controller()->changeAndGiveTextSelection(newRangeSet.release());
         return true;
     }
     return false;
@@ -278,11 +277,11 @@ bool TextSearcher::findPrev( TextEditorWidget* widget)
 
 /// Selects the next item that matches the given critaria (Adds an extra selection range )
 /// @param widget the widget to search in
-bool TextSearcher::selectNext( TextEditorWidget* widget )
+bool TextSearcher::selectNext(TextEditorWidget* widget)
 {
-    std::unique_ptr<TextRangeSet> newRangeSet( new TextRangeSet( widget->textSelection() ) );
-    if( selectNext( newRangeSet.get() ) ) {
-        widget->controller()->changeAndGiveTextSelection( newRangeSet.release() );
+    std::unique_ptr<TextRangeSet> newRangeSet(new TextRangeSet(widget->textSelection()));
+    if (selectNext(newRangeSet.get())) {
+        widget->controller()->changeAndGiveTextSelection(newRangeSet.release());
         return true;
     }
     return false;

@@ -27,23 +27,23 @@ public:
     TextMarginComponentDelegate();
     virtual ~TextMarginComponentDelegate() {}
 
-    virtual QString lineText( int line );
+    virtual QString lineText(size_t line);
 
     virtual int widthBeforeLineNumber();
-    virtual void renderBefore( QPainter* painter, int startLine, int endLine, int width );
-    virtual void renderAfter( QPainter* painter, int startLine, int endLine, int width );
+    virtual void renderBefore(QPainter* painter, size_t startLine, size_t endLine, int width);
+    virtual void renderAfter(QPainter* painter, size_t startLine, size_t endLine, int width);
 
     virtual bool requiresMouseTracking();
-    virtual void mouseMoveEvent( int line, QMouseEvent* event );
-    virtual void mousePressEvent( int line, QMouseEvent* event );
+    virtual void mouseMoveEvent(size_t line, QMouseEvent* event);
+    virtual void mousePressEvent(size_t line, QMouseEvent* event);
     virtual void leaveEvent( QEvent* event );
 
     TextMarginComponent* marginComponent() { return marginComponentRef_; }
-    void setMarginCompenent( TextMarginComponent* comp ) { marginComponentRef_ = comp; }
+    void setMarginCompenent(TextMarginComponent* comp) { marginComponentRef_ = comp; }
 
 private:
-    TextMarginComponent* marginComponentRef_;           ///< A reference to the margincomponent
-    int startLine_;                                     ///< The line which starts the selection
+    TextMarginComponent* marginComponentRef_;  ///< A reference to the margincomponent
+    size_t startLine_;                         ///< The line which starts the selection
 };
 
 
@@ -54,7 +54,7 @@ class EDBEE_EXPORT TextMarginComponent : public QWidget
     Q_OBJECT
 
 public:
-    TextMarginComponent( TextEditorWidget* editorWidget, QWidget* parent);
+    TextMarginComponent(TextEditorWidget* editorWidget, QWidget* parent);
     virtual ~TextMarginComponent();
 
     void init();
@@ -69,14 +69,14 @@ public:
     TextRenderer* renderer() const;
 
     TextMarginComponentDelegate* delegate() const { return delegateRef_; }
-    void setDelegate( TextMarginComponentDelegate* delegate );
-    void giveDelegate( TextMarginComponentDelegate* delegate );
+    void setDelegate(TextMarginComponentDelegate* delegate);
+    void giveDelegate(TextMarginComponentDelegate* delegate);
 
 protected:
 
-    virtual void paintEvent( QPaintEvent* event );
-    virtual void renderCaretMarkers( QPainter* painter, int startLine, int endLine, int width );
-    virtual void renderLineNumber( QPainter* painter, int startLine, int endLine, int width );
+    virtual void paintEvent(QPaintEvent* event);
+    virtual void renderCaretMarkers(QPainter* painter, size_t startLine, size_t endLine, int width);
+    virtual void renderLineNumber(QPainter* painter, size_t startLine, size_t endLine, int width);
 
     virtual void mouseMoveEvent(QMouseEvent* event);
     virtual void mousePressEvent(QMouseEvent* event);
@@ -85,8 +85,8 @@ protected:
     virtual void wheelEvent(QWheelEvent* event);
 
 public:
-    virtual void updateLineAtOffset(int offset);
-    virtual void updateLine(int line, int length);
+    virtual void updateLineAtOffset(size_t offset);
+    virtual void updateLine(size_t line, size_t length);
 
 protected slots:
 
@@ -100,7 +100,7 @@ private:
     /// the width of the sidebar
     int top_;                                   ///< The first pixel that needs to been shown
     mutable int width_;
-    mutable int lastLineCount_;
+    mutable size_t lastLineCount_;
     QFont* marginFont_;                         ///< the font used for the margin
     TextEditorWidget* editorRef_;               ///< The text-editor widget
     TextMarginComponentDelegate* delegate_;     ///< The 'owned' text delegate

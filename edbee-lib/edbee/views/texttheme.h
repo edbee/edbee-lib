@@ -161,7 +161,7 @@ public:
     TextThemeStyler( TextEditorController* controller );
     virtual ~TextThemeStyler();
 
-    QVector<QTextLayout::FormatRange> getLineFormatRanges( int lineIdx );
+    QVector<QTextLayout::FormatRange> getLineFormatRanges(size_t lineIdx);
 
     TextEditorController* controller() { return controllerRef_; }
 
@@ -173,14 +173,14 @@ public:
     TextTheme* theme() const;
 
 private:
-    QTextCharFormat getTextScopeFormat(QVector<ScopedTextRange *> &activeRanges);
-    void appendFormatRange(QVector<QTextLayout::FormatRange>& rangeList, int start, int end,  QVector<edbee::ScopedTextRange *> &activeRanges );
+    QTextCharFormat getTextScopeFormat(QVector<ScopedTextRange*>&activeRanges);
+    void appendFormatRange(QVector<QTextLayout::FormatRange>& rangeList, size_t start, size_t end, QVector<edbee::ScopedTextRange*>& activeRanges);
 
 private slots:
 
     void textDocumentChanged(edbee::TextDocument* oldDocument, edbee::TextDocument* newDocument);
     void invalidateLayouts();
-    void themePointerChanged( const QString& name, TextTheme* oldTheme, TextTheme* newTheme );
+    void themePointerChanged(const QString& name, TextTheme* oldTheme, TextTheme* newTheme);
 
 
 private:
@@ -188,7 +188,6 @@ private:
     TextEditorController* controllerRef_;                                     ///< A reference to the controller
     QString themeName_;                                                       ///< The name of the active theme (when a 'custom' theme active)
     TextTheme* themeRef_;                                                     ///< The active theme
-
 
 };
 
@@ -210,17 +209,17 @@ protected:
 public:
     void clear();
 
-    TextTheme* readThemeFile( const QString& fileName, const QString& name=QString() );
-    void listAllThemes( const QString& themePath=QString() );
-    int themeCount() { return themeNames_.size(); }
-    QString themeName( int idx );
-    TextTheme* theme( const QString& name );
+    TextTheme* readThemeFile(const QString& fileName, const QString& name = QString());
+    void listAllThemes(const QString& themePath = QString());
+    qsizetype themeCount() { return themeNames_.size(); }
+    QString themeName(qsizetype idx );
+    TextTheme* theme(const QString& name);
     TextTheme* fallbackTheme() const { return fallbackTheme_; }
     QString lastErrorMessage() const;
-    void setTheme( const QString& name, TextTheme* theme );
+    void setTheme(const QString& name, TextTheme* theme);
 
 signals:
-    void themePointerChanged( const QString& name, TextTheme* oldTheme, TextTheme* newTheme );
+    void themePointerChanged(const QString& name, TextTheme* oldTheme, TextTheme* newTheme);
 
 
 private:
@@ -232,7 +231,6 @@ private:
     QString lastErrorMessage_;                     ///< The last error message
 
     friend class Edbee;
-
 };
 
 

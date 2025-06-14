@@ -16,18 +16,18 @@ namespace edbee {
 /// @param range the range to iterate over the lines
 RangeLineIterator::RangeLineIterator(TextDocument* doc, const TextRange& range )
 {
-    curLine_ = doc->lineFromOffset( range.min() );
-    endLine_ = doc->lineFromOffset( range.max() );
+    curLine_ = doc->lineFromOffset(range.min());
+    endLine_ = doc->lineFromOffset(range.max());
 }
 
  /// Constructs a line iterator by supplying two offsets
 /// @param doc the textdocument for this iterator
 /// @param startOffset the start offset for iterating
 /// @param endOffset the endOffset for iterating
-RangeLineIterator::RangeLineIterator(TextDocument* doc, int startOffset, int endOffset )
+RangeLineIterator::RangeLineIterator(TextDocument* doc, size_t startOffset, size_t endOffset)
 {
-    curLine_ = doc->lineFromOffset( startOffset );
-    endLine_ = doc->lineFromOffset( endOffset );
+    curLine_ = doc->lineFromOffset(startOffset);
+    endLine_ = doc->lineFromOffset(endOffset);
 }
 
 
@@ -39,9 +39,9 @@ bool RangeLineIterator::hasNext() const
 
 
 /// returns the next line number
-int RangeLineIterator::next()
+size_t RangeLineIterator::next()
 {
-    int result = curLine_;
+    size_t result = curLine_;
     ++curLine_;
     return result;
 }

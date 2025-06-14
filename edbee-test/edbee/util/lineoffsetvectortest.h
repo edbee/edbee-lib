@@ -15,11 +15,11 @@ class LineOffsetVectorTest : public edbee::test::TestCase
 
 private slots:
 
+    void applyChange();
     void testMoveDeltaToIndex();
     void testChangeOffsetDelta();
     void testTextReplaced();
     void testFindLineFromOffset();
-
 };
 
 

@@ -15,27 +15,27 @@ class TextRangeSet;
 /// Usage sample:
 /// @code{.cpp}
 ///
-/// RangeSetLineIterator itr( controller->textSelection() )
-/// while( itr.hasNext() ) {
+/// RangeSetLineIterator itr(controller->textSelection())
+/// while (itr.hasNext()) {
 ///     qDebug() << "Line: " << itr.next();
 /// }
 ///
 /// @endcode
 class EDBEE_EXPORT RangeSetLineIterator {
 public:
-    RangeSetLineIterator( TextRangeSet* rangeSet );
+    RangeSetLineIterator(TextRangeSet* rangeSet);
 
     bool hasNext() const;
-    int next();
+    size_t next();
 
 private:
     void findNextLine();
 
 private:
     TextRangeSet* rangeSetRef_;     ///< a reference to the range sets
-    int rangeIndex_;                ///< the current range index
-    int rangeEndLine_;              ///< the last line of the current range
-    int curLine_;                   ///< The current line number (this value is -1 if there's no current line)
+    size_t rangeIndex_;             ///< the current range index
+    size_t rangeEndLine_;           ///< the last line of the current range (std::string::npos when no end is known)
+    size_t curLine_;                ///< The current line number (this value is std::string::npos if there's no current line)
 
 
 };

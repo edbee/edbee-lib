@@ -24,30 +24,23 @@ class TextEditorController;
 class EDBEE_EXPORT TextSelection : public TextRangeSet
 {
 public:
-    TextSelection( TextEditorController* controller );
-    TextSelection( const TextSelection& selection );
+    TextSelection(TextEditorController* controller);
+    TextSelection(const TextSelection& selection);
     virtual ~TextSelection();
 
-    static void moveCaretsByLine( TextEditorController* controller, TextRangeSet* rangeSet, int amount );
-    static void moveCaretsByPage( TextEditorController* controller, TextRangeSet* rangeSet, int amount );
-    static void addRangesByLine( TextEditorController* controller, TextRangeSet* rangeSet, int amount );
+    static void moveCaretsByLine(TextEditorController* controller, TextRangeSet* rangeSet, ptrdiff_t amount);
+    static void moveCaretsByPage(TextEditorController* controller, TextRangeSet* rangeSet, ptrdiff_t amount);
+    static void addRangesByLine(TextEditorController* controller, TextRangeSet* rangeSet, ptrdiff_t amount);
 
-
-    virtual
-
-  // getters
-    TextEditorController* textEditorController() const;
+    virtual TextEditorController* textEditorController() const;
 
 protected:
-    virtual void processChangesIfRequired( bool joinBorders=false );
-    virtual void processChangesIfRequiredKeepCaretCache( bool joinBorders=false );
-
+    virtual void processChangesIfRequired(bool joinBorders = false);
+    virtual void processChangesIfRequiredKeepCaretCache(bool joinBorders = false);
 
 private:
 
     TextEditorController* textControllerRef_;         ///< A reference to the controller
-
-
 };
 
 
