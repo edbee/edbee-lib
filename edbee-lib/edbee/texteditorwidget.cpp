@@ -145,7 +145,7 @@ TextEditorController* TextEditorWidget::controller() const
 /// @param line the line to scroll to
 void TextEditorWidget::scrollTopToLine(size_t line)
 {
-    int yPos = static_cast<int>(line * textRenderer()->lineHeight());
+    int yPos = static_cast<int>(line) * textRenderer()->lineHeight();
     scrollAreaRef_->verticalScrollBar()->setValue(qMax(0, yPos));
 //    scrollAreaRef_->ensureVisible( 0,  qMax(0,yPos) );
 }

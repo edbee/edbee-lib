@@ -9,11 +9,10 @@
 
 namespace edbee {
 
-/// moves
 class EDBEE_EXPORT MoveLineCommand : public TextEditorCommand
 {
 public:
-    MoveLineCommand( int direction );
+    MoveLineCommand(int direction);
     virtual ~MoveLineCommand();
 
     virtual void execute( TextEditorController* controller ) override;

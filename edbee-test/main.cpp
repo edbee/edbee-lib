@@ -23,14 +23,14 @@ int main(int argc, char* argv[])
     //==================================
     QList<QString> tests;
 
-    tests.append( "edbee::TextChangeTest");
-    tests.append( "edbee::MergableChangeGroupTest");
-    tests.append( "edbee::LineOffsetVectorTest");
-    tests.append( "edbee::LineDataListChangeTest");
-    tests.append( "edbee::PlainTextDocumentTest");
-    tests.append( "edbee::TextLineDataTest");
-    tests.append( "edbee::TextRangeSetTest");
-    tests.append( "edbee::TextUndoStackTest");
+    // tests.append( "edbee::TextChangeTest");
+    // tests.append( "edbee::MergableChangeGroupTest");
+    // tests.append( "edbee::LineOffsetVectorTest");
+    // tests.append( "edbee::LineDataListChangeTest");
+    // tests.append( "edbee::PlainTextDocumentTest");
+    // tests.append( "edbee::TextLineDataTest");
+    // tests.append( "edbee::TextRangeSetTest");
+    // tests.append( "edbee::TextUndoStackTest");
 
     tests.clear();      // when the tests lists is empty all tests are run
 

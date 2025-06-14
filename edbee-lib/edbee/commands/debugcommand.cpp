@@ -91,7 +91,7 @@ void DebugCommand::dumpCharacterCodes(TextEditorController* controller)
     QString line;
 
     // iterate over the characters
-    size_t start = qMax(range.caret() - count, 0u);
+    size_t start = qMax(range.caret() - count, static_cast<size_t>(0));
     size_t end = qMin(range.caret() + count, controller->textDocument()->length()-1 );
     for (size_t i = start; i <= end; ++i) {
         QChar c = controller->textDocument()->charAt(i);

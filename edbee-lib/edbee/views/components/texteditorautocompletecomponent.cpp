@@ -11,6 +11,7 @@
 #include <QWidgetAction>
 #include <QListWidget>
 #include <QListWidgetItem>
+#include <QScreen>
 #include <QTextEdit>
 // #include <QtGui>
 #include <QTime>
@@ -216,7 +217,7 @@ void TextEditorAutoCompleteComponent::showInfoTip()
     infoTipRef_->resize(tipSize.width(), tipSize.height() - 4);
 
     // position the list
-    positionWidgetForCaretOffset(qMax(0u, range.caret() - static_cast<size_t>(currentWord_.length())));
+    positionWidgetForCaretOffset(qMax(static_cast<size_t>(0u), range.caret() - static_cast<size_t>(currentWord_.length())));
 
     QPoint newLoc(listWidgetRef_->parentWidget()->mapToGlobal(r.topRight()).x() + xOffset, listWidgetRef_->parentWidget()->mapToGlobal(r.topRight()).y() + 1);
     QRect screen = QApplication::primaryScreen()->availableGeometry();

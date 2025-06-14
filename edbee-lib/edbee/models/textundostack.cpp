@@ -458,8 +458,8 @@ bool TextUndoStack::isPersisted()
     if (persistedIndex_ < 0 ){ return false;}
 
     // check if all changes are non-persistable
-    qsizetype startIdx = qMax(0, qMin(curIdx, persistedIndex_));
-    qsizetype endIdx   = qMin(qMax(curIdx, persistedIndex_), changeList_.size());
+    qsizetype startIdx = qMax(static_cast<qsizetype>(0), qMin(curIdx, persistedIndex_));
+    qsizetype endIdx   = qMin(qMax(curIdx, persistedIndex_), static_cast<qsizetype>(changeList_.size()));
 
     for (qsizetype idx = startIdx; idx < endIdx; ++idx) {
         Change* change = changeList_.at(idx);

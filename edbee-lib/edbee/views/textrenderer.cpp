@@ -389,7 +389,11 @@ TextLayout* TextRenderer::textLayoutForLineNormal(size_t line)
         // append some extra formatting (if available)
         edbee::LineAppendTextLayoutFormatListData* formatRangeLineData = dynamic_cast<edbee::LineAppendTextLayoutFormatListData*>(textDocument()->getLineData(line, edbee::LineAppendTextLayoutFormatListField));
         if (formatRangeLineData) {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
             formatRanges.append(formatRangeLineData->value());
+#else
+            formatRanges.append(formatRangeLineData->value().toVector());
+#endif
         }
 
         textLayout->setFormats(formatRanges);
@@ -443,8 +447,8 @@ void TextRenderer::renderBegin(const QRect& rect)
 
     // assign the 'work' variables
     size_t lineCount = doc->lineCount();
-    startLine_   = qBound(0u, rawLineIndexForYpos(y), lineCount - 1);
-    endLine_     = qBound(0u, calculatedEndLine, lineCount - 1 );
+    startLine_   = qBound(static_cast<size_t>(0u), rawLineIndexForYpos(y), lineCount - 1);
+    endLine_     = qBound(static_cast<size_t>(0u), calculatedEndLine, lineCount - 1 );
 
     Q_ASSERT( startLine_ <= endLine_ );
     startOffset_ = doc->offsetFromLine(startLine_);

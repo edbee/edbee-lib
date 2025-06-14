@@ -68,7 +68,7 @@ size_t RemoveCommand::smartBackspace(TextDocument* doc, size_t caret)
         }
 
         // we need to got the given number of characters
-        return qMax(0u, caret - (caret - lastColumnOffset));
+        return qMax(static_cast<size_t>(0), caret - (caret - lastColumnOffset));
 
     }
     return caret == 0 ? 0 : caret - 1;
@@ -125,7 +125,7 @@ void RemoveCommand::rangesForRemoveLine(TextEditorController* controller, TextRa
 
     // process all carets
     ptrdiff_t offset = direction_ == Left ? -1 : 0;
-    for (size_t rangeIdx = ranges->rangeCount() - 1; rangeIdx >= 0; --rangeIdx) {
+    for (size_t rangeIdx = ranges->rangeCount() - 1; rangeIdx != std::string::npos; --rangeIdx) {
         TextRange& range = ranges->range(rangeIdx);
         QChar chr = doc->charAtOrNull(static_cast<size_t>(static_cast<ptrdiff_t>(range.caret()) + offset));
         if (chr == '\n') {

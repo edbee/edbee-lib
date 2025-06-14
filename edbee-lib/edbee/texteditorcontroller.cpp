@@ -656,7 +656,9 @@ void TextEditorController::moveCaretTo(ptrdiff_t line, ptrdiff_t col, bool keepA
     }
 
     ptrdiff_t minusNewLineChar = textDocument()->lineCount() - 1 == uline ? 0 : 1;
-    offset += static_cast<size_t>(qBound(0, col, qMax(static_cast<ptrdiff_t>(lineLength) - minusNewLineChar, 0)));
+
+    ptrdiff_t max = qMax(static_cast<ptrdiff_t>(lineLength) - minusNewLineChar, static_cast<ptrdiff_t>(0));
+    offset += static_cast<size_t>(qBound(static_cast<ptrdiff_t>(0), col, max));
     return moveCaretToOffset(offset, keepAnchors, rangeIndex);
 }
 

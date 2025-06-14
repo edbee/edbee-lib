@@ -6,7 +6,7 @@
 #include <QWidget>
 #include <QAccessibleInterface>
 
-#include "edbee/models/changes/textchange.h"
+// #include "edbee/models/changes/textchange.h"
 #include "edbee/models/textdocument.h"
 #include "edbee/models/textrange.h"
 #include "edbee/texteditorwidget.h"
@@ -36,40 +36,42 @@ namespace edbee {
 
 /// Workaround for the strang line-reading on windows
 /// It virtually replaces every <newline> with <space><newline>
-static int D2V(TextEditorWidget* widget, int offset)
+static int D2V(TextEditorWidget* widget, size_t offset)
 {
 #ifdef WINDOWS_END_LINE_READ_ERROR_FIX
-    int line = widget->textDocument()->lineFromOffset(offset);
-    return offset + line;
+    size_t line = widget->textDocument()->lineFromOffset(offset);
+    return static_cast<int>(offset + line);
 #else
     Q_UNUSED(widget)
-    return offset;
+    return static_cast<int>(offset);
 #endif
 }
 
+
 /// Converts the virtual-offset to the document-offset
-static int V2D(TextEditorWidget* widget, int vOffset)
+static size_t V2D(TextEditorWidget* widget, int vOffset)
 {
 #ifdef WINDOWS_END_LINE_READ_ERROR_FIX
     TextDocument* doc = widget->textDocument();
-    int displacement = 0;
-    for( int i=0, cnt = doc->lineCount(); i < cnt; ++i ) {
-        int lineVOffset = doc->offsetFromLine(i) + i;
+    size_t displacement = 0;
+    for (size_t i=0, cnt = doc->lineCount(); i < cnt; ++i) {
+        size_t lineVOffset = doc->offsetFromLine(i) + i;
 
-        if( vOffset < lineVOffset) {
-            return vOffset - displacement; // remove the newline count
+        if (static_cast<size_t>(vOffset) < lineVOffset) {
+            return static_cast<size_t>(vOffset) - displacement; // remove the newline count
         }
         displacement = i;
     }
-    return vOffset - displacement;
+    return static_cast<size_t>(vOffset) - displacement;
 #else
     Q_UNUSED(widget)
-    return vOffset;
+    return static_cast<size_t>(vOffset);
 #endif
 }
 
+
 /// returns the virtual length of the textdocument
-static int VLEN(TextEditorWidget* widget)
+static size_t VLEN(TextEditorWidget* widget)
 {
 #if ! defined(WINDOWS_END_LINE_READ_ERROR_FIX)
     return widget->textDocument()->length();
@@ -79,6 +81,7 @@ static int VLEN(TextEditorWidget* widget)
     return widget->textDocument()->length() + widget->textDocument()->lineCount() - 1;
 #endif
 }
+
 
 /// Converts the given text to a virtual text
 /// It prepends every newline with a space
@@ -91,6 +94,7 @@ static const QString VTEXT(QString str)
     return str;
 #endif
 }
+
 
 /// Converts the given text to a virtual text
 /// It prepends every newline with a space
@@ -119,22 +123,22 @@ static const QString VTEXT_PART(TextDocument* doc, size_t offset, size_t length)
 
     return doc->textPart(offset, qMin(length, doc->length() - offset));
 #else
-    int docLength = doc->length();
+    size_t docLength = doc->length();
 #if defined(WINDOWS_LAST_LINE_ERROR_FIX)
-        int endOffset = qMin(offset + length, docLength + 2);
+        size_t endOffset = qMin(offset + length, docLength + 2);
 #endif // WINDOWS_LAST_LINE_ERROR_FIX - First use
     //qDebug() << "VTEXT_PART: " << offset << ", " << length << " :: docLength: " << docLength << ", endOffset: " << endOffset;
 
     QString txt;
-    if( offset < docLength ) {
-        int len = offset + length > docLength ? docLength - offset : length;
-        //qDebug() << " - A  offset:" << offset <<", len: " << len;
+    if (offset < docLength) {
+        size_t len = offset + length > docLength ? docLength - offset : length;
+        // qDebug() << " - A  offset:" << offset <<", len: " << len;
         txt = VTEXT(doc->textPart(offset, len));
     }
 
 #if defined(WINDOWS_LAST_LINE_ERROR_FIX)
-    //qDebug() << " - B  endOffset: " << endOffset << " >= " << docLength;
-    if( endOffset >= docLength ) {
+    // qDebug() << " - B  endOffset: " << endOffset << " >= " << docLength;
+    if (endOffset >= docLength) {
         txt.append(WINDOWS_EMPTY_LINE_FIX);
     }
 #endif // WINDOWS_LAST_LINE_ERROR_FIX - Second use
@@ -154,12 +158,14 @@ AccessibleTextEditorWidget::AccessibleTextEditorWidget(TextEditorWidget* widget)
 {
 }
 
+
 AccessibleTextEditorWidget::~AccessibleTextEditorWidget()
 {
 }
 
+
 /// Construct the AccessibleTextEditor interface for the given widget
-QAccessibleInterface *AccessibleTextEditorWidget::factory(const QString &className, QObject *object)
+QAccessibleInterface *AccessibleTextEditorWidget::factory(const QString& className, QObject* object)
 {
     // edbee::TextMarginComponent, edbee::TextEditorScrollArea, edbee::TextEditorComponent
 #ifdef VIA_EDITOR_COMPONENT
@@ -176,6 +182,7 @@ QAccessibleInterface *AccessibleTextEditorWidget::factory(const QString &classNa
     return nullptr;
 }
 
+
 /// Returns the widget that should be used for accessibility events
 QWidget* AccessibleTextEditorWidget::eventWidgetForTextEditor(TextEditorWidget* widget)
 {
@@ -186,33 +193,33 @@ QWidget* AccessibleTextEditorWidget::eventWidgetForTextEditor(TextEditorWidget* 
 #endif
 }
 
+
 /// Notifies a text-selection change event
-void AccessibleTextEditorWidget::notifyTextSelectionEvent(TextEditorWidget *widget, TextSelection *selection)
+void AccessibleTextEditorWidget::notifyTextSelectionEvent(TextEditorWidget* widget, TextSelection* selection)
 {
     QWidget* eventWidget = eventWidgetForTextEditor(widget);
-    for(int i=0, cnt = selection->rangeCount(); i < cnt; ++i) {
+    for (size_t i=0, cnt = selection->rangeCount(); i < cnt; ++i) {
         TextRange range = selection->range(i);
-
 
         QAccessibleTextSelectionEvent ev(eventWidget, D2V(widget, range.min()), D2V(widget, range.max()));
         ev.setCursorPosition(D2V(widget, range.caret()));
 
-//        qDebug() << " !!updateAccessibility: QAccessibleTextSelectionEvent: " << range.min()<< ", " << range.max() << ", " << range.caret();
+        // qDebug() << " !!updateAccessibility: QAccessibleTextSelectionEvent: " << range.min()<< ", " << range.max() << ", " << range.caret();
 
         QAccessible::updateAccessibility(&ev);
 
         // also send a caret event for range 0 without a selection
-        if( i ==0 && !range.hasSelection()) {
+        if (i ==0 && !range.hasSelection()) {
             const QAccessibleTextInterface* ti = QAccessible::queryAccessibleInterface(eventWidget)->textInterface();
             QAccessibleTextCursorEvent event(eventWidget, ti->cursorPosition());
             QAccessible::updateAccessibility(&event);
         }
-
     }
 }
 
+
 /// Notifies a text change event happens
-void AccessibleTextEditorWidget::notifyTextChangeEvent(TextEditorWidget *widget, TextBufferChange *change, QString oldDocText)
+void AccessibleTextEditorWidget::notifyTextChangeEvent(TextEditorWidget* widget, TextBufferChange* change, QString oldDocText)
 {
     QWidget* eventWidget = eventWidgetForTextEditor(widget);
 
@@ -222,19 +229,19 @@ void AccessibleTextEditorWidget::notifyTextChangeEvent(TextEditorWidget *widget,
     QAccessibleTextUpdateEvent ev(eventWidget, D2V(widget, change->offset()), oldText, newText);
     // TODO: When a caret is included, (Inherited change, use this caret position)
 
-//    qDebug() << "-- change: length: " << change->length()
-//             << ", newTextLength: " << change->newTextLength()
-//             << ", offset :" << change->offset()
-//             << ", newText: " << QString(change->newText())
-//             << ", CONTENT: " << widget->textDocument()->text();
-//    qDebug() << "!! updateAccessibility: QAccessibleTextUpdateEvent: " << change->offset()<< ", oldText: " << oldText << ", newText: " << newText;
+    //    qDebug() << "-- change: length: " << change->length()
+    //             << ", newTextLength: " << change->newTextLength()
+    //             << ", offset :" << change->offset()
+    //             << ", newText: " << QString(change->newText())
+    //             << ", CONTENT: " << widget->textDocument()->text();
+    //    qDebug() << "!! updateAccessibility: QAccessibleTextUpdateEvent: " << change->offset()<< ", oldText: " << oldText << ", newText: " << newText;
 
     QAccessible::updateAccessibility(&ev);
 
 
 }
 
-void *AccessibleTextEditorWidget::interface_cast(QAccessible::InterfaceType t)
+void* AccessibleTextEditorWidget::interface_cast(QAccessible::InterfaceType t)
 {
     if (t == QAccessible::TextInterface) {
         return static_cast<QAccessibleTextInterface*>(this);
@@ -251,10 +258,8 @@ QAccessible::State AccessibleTextEditorWidget::state() const
     s.focusable = true;
     s.readOnly = false;
     s.editable = true;
-
     return s;
 }
-
 
 
 /// Returns a selection. The size of the selection is returned in startOffset and endOffset.
@@ -262,25 +267,27 @@ QAccessible::State AccessibleTextEditorWidget::state() const
 ///
 /// The accessibility APIs support multiple selections. For most widgets though, only one selection
 /// is supported with selectionIndex equal to 0.
-void AccessibleTextEditorWidget::selection(int selectionIndex, int *startOffset, int *endOffset) const
+void AccessibleTextEditorWidget::selection(int selectionIndex, int* startOffset, int* endOffset) const
 {
-    if(selectionIndex >= textSelection()->rangeCount()) {
+    if (selectionIndex >= static_cast<int>(textSelection()->rangeCount())) {
         *startOffset = 0;
         *endOffset = 0;
     }
 
-    TextRange& range = textSelection()->range(selectionIndex);
+    TextRange& range = textSelection()->range(static_cast<size_t>(selectionIndex));
     *startOffset = D2V(textWidget(), range.min());
     *endOffset = D2V(textWidget(), range.max());
     //qDebug() << " selection >> " << selectionIndex << ", " << range.min() << " =>" << *startOffset << ", " << range.max() << " => " << *endOffset;
 }
 
+
 /// Returns the number of selections in this text.
 int AccessibleTextEditorWidget::selectionCount() const
 {
-    if( !textSelection()->hasSelection()) return 0; // no selection (only caret)
-    return textSelection()->rangeCount();
+    if (!textSelection()->hasSelection()) return 0; // no selection (only caret)
+    return static_cast<int>(textSelection()->rangeCount());
 }
+
 
 /// Select the text from startOffset to endOffset. The startOffset is the first character that will be selected.
 /// The endOffset is the first character that will not be selected.
@@ -296,21 +303,24 @@ void AccessibleTextEditorWidget::addSelection(int startOffset, int endOffset)
     controller()->changeAndGiveTextSelection(&selection);
 }
 
+
 /// Clears the selection with index selectionIndex.
 void AccessibleTextEditorWidget::removeSelection(int selectionIndex)
 {
     TextSelection selection = *textSelection();
-    selection.removeRange(selectionIndex);
+    selection.removeRange(static_cast<size_t>(selectionIndex));
     controller()->changeAndGiveTextSelection(&selection);
 }
+
 
 /// Set the selection selectionIndex to the range from startOffset to endOffset.
 void AccessibleTextEditorWidget::setSelection(int selectionIndex, int startOffset, int endOffset)
 {
     TextSelection selection = *textSelection();
-    selection.setRange(V2D(textWidget(), startOffset), V2D(textWidget(), endOffset), selectionIndex);
+    selection.setRange(V2D(textWidget(), startOffset), V2D(textWidget(), endOffset), static_cast<size_t>(selectionIndex));
     controller()->changeAndGiveTextSelection(&selection);
 }
+
 
 /// Returns the current cursor position.
 int AccessibleTextEditorWidget::cursorPosition() const
@@ -319,12 +329,14 @@ int AccessibleTextEditorWidget::cursorPosition() const
     return caret;
 }
 
+
 /// Move the cursor position
 void AccessibleTextEditorWidget::setCursorPosition(int position)
 {
-    //qDebug() << "AccessibleTextEditorWidget::setCursorPosition: " << position << " => <" << V2D(textWidget(), position);
+    // qDebug() << "AccessibleTextEditorWidget::setCursorPosition: " << position << " => <" << V2D(textWidget(), position);
     controller()->moveCaretToOffset(V2D(textWidget(), position), false);
 }
+
 
 QString AccessibleTextEditorWidget::text(QAccessible::Text t) const
 {
@@ -334,12 +346,13 @@ QString AccessibleTextEditorWidget::text(QAccessible::Text t) const
     return VTEXT(textWidget()->textDocument());
 }
 
+
 /// Returns the text from startOffset to endOffset. The startOffset is the first character that will be returned.
 /// The endOffset is the first character that will not be returned.
 QString AccessibleTextEditorWidget::text(int vStartOffset, int vEndOffset) const
 {
-    int startOffset = V2D(textWidget(), vStartOffset);
-    int endOffset = V2D(textWidget(), vEndOffset);
+    size_t startOffset = V2D(textWidget(), vStartOffset);
+    size_t endOffset = V2D(textWidget(), vEndOffset);
 
     //qDebug() << "text: " << VTEXT_PART(textWidget()->textDocument(), startOffset, endOffset - startOffset);
     //qDebug() << "      - vStartOffset " << vStartOffset << ", vEndOffset " << vEndOffset ;
@@ -351,7 +364,7 @@ QString AccessibleTextEditorWidget::text(int vStartOffset, int vEndOffset) const
 int AccessibleTextEditorWidget::characterCount() const
 {
     //qDebug() << " characterCount >> " << VLEN(textWidget());
-    return VLEN(textWidget());
+    return static_cast<int>(VLEN(textWidget()));
 }
 
 
@@ -359,15 +372,15 @@ int AccessibleTextEditorWidget::characterCount() const
 QRect AccessibleTextEditorWidget::characterRect(int vOffset) const
 {
     TextEditorComponent* comp = textWidget()->textEditorComponent();
-    int offset = V2D(textWidget(), vOffset);
+    size_t offset = V2D(textWidget(), vOffset);
 
     // workaround for newline char rect (is at the wrong location)
     // Very dirty workaround, it's dependent on the selection
 #ifdef WINDOWS_END_LINE_READ_ERROR_FIX
-        if(offset > 0 && offset <= textDocument()->length()){
+        if (offset > 0 && offset <= textDocument()->length()) {
             TextRange& range = textSelection()->range(0);
-            if( range.hasSelection()) {
-                if( offset == range.max() || textDocument()->charAt(offset) == '\n') {
+            if (range.hasSelection()) {
+                if (offset == range.max() || textDocument()->charAt(offset) == '\n') {
                     offset -= 1;
                 }
             }
@@ -386,10 +399,10 @@ QRect AccessibleTextEditorWidget::characterRect(int vOffset) const
 
 
 /// Returns the offset of the character at the point in screen coordinates.
-int AccessibleTextEditorWidget::offsetAtPoint(const QPoint &point) const
+int AccessibleTextEditorWidget::offsetAtPoint(const QPoint& point) const
 {
-    int line = renderer()->rawLineIndexForYpos(point.y());
-    int col = renderer()->columnIndexForXpos(line, point.x());
+    size_t line = renderer()->rawLineIndexForYpos(point.y());
+    size_t col = renderer()->columnIndexForXpos(line, point.x());
     // qDebug() << " offsetAtPoint >>" << point << ": " << line << ", " << col;
 
    return D2V(textWidget(), textDocument()->offsetFromLineAndColumn(line, col));
@@ -406,7 +419,7 @@ void AccessibleTextEditorWidget::scrollToSubstring(int startIndex, int endIndex)
 
 /// Returns the text attributes at the position offset.
 /// In addition the range of the attributes is returned in startOffset and endOffset.
-QString AccessibleTextEditorWidget::attributes(int offset, int *startOffset, int *endOffset) const
+QString AccessibleTextEditorWidget::attributes(int offset, int *startOffset, int* endOffset) const
 {
     Q_UNUSED(offset)
     Q_UNUSED(startOffset)
@@ -427,30 +440,29 @@ QString AccessibleTextEditorWidget::attributes(int offset, int *startOffset, int
 /// to the cursor position before calling this function.
 /// An offset of -1 is used for the text length and custom implementations of this function have to return the
 /// result as if the length was passed in as offset.
-QString AccessibleTextEditorWidget::textAfterOffset(int vOffset, QAccessible::TextBoundaryType boundaryType, int *startOffset, int *endOffset) const
+QString AccessibleTextEditorWidget::textAfterOffset(int vOffset, QAccessible::TextBoundaryType boundaryType, int* startOffset, int* endOffset) const
 {
-    if(boundaryType == QAccessible::LineBoundary && vOffset >= 0) {
-        int offset = V2D(textWidget(), vOffset);
+    if (boundaryType == QAccessible::LineBoundary && vOffset >= 0) {
+        size_t offset = V2D(textWidget(), vOffset);
 
-        int line = textDocument()->lineFromOffset(offset);
+        size_t line = textDocument()->lineFromOffset(offset);
         // qDebug() << " => " << textDocument()->line(line);
-        int start = textDocument()->offsetFromLine(line);
-        int end = textDocument()->offsetFromLine(line+1);
+        size_t start = textDocument()->offsetFromLine(line);
+        size_t end = textDocument()->offsetFromLine(line + 1);
 
         QString str = VTEXT_PART(textDocument(), start, end - start);
         *startOffset = D2V(textWidget(), start);
-        *endOffset = *startOffset + str.length(); //D2V(textWidget(), end);
+        *endOffset = *startOffset + static_cast<int>(str.length()); // D2V(textWidget(), end);
 
-
-//        qDebug() << "textAfterOffset: vOffset: " << vOffset << " => " << offset
-//                 << ", startOffset: " << *startOffset << " (start: " << start << ")"
-//                 << ", endOffset: " << *endOffset << " (end: " << end << ")"
-//                 <<  " => " << str;
+        // qDebug() << "textAfterOffset: vOffset: " << vOffset << " => " << offset
+        //          << ", startOffset: " << *startOffset << " (start: " << start << ")"
+        //          << ", endOffset: " << *endOffset << " (end: " << end << ")"
+        //          <<  " => " << str;
         return str;
     }
 
     QString str = QAccessibleTextInterface::textAfterOffset(vOffset, boundaryType, startOffset, endOffset);
-//    qDebug() << "?? textAfterOffset: vOffset: " << vOffset << ", boundaryType: " << boundaryType << " => " << str << " (" << *startOffset << ", " << *endOffset <<")";
+    // qDebug() << "?? textAfterOffset: vOffset: " << vOffset << ", boundaryType: " << boundaryType << " => " << str << " (" << *startOffset << ", " << *endOffset <<")";
     return str;
 }
 
@@ -466,7 +478,7 @@ QString AccessibleTextEditorWidget::textAfterOffset(int vOffset, QAccessible::Te
 /// this function should use the cursor position as offset. Thus an offset of -2 must be converted to the cursor
 /// position before calling this function. An offset of -1 is used for the text length and custom implementations
 /// of this function have to return the result as if the length was passed in as offset.
-QString AccessibleTextEditorWidget::textAtOffset(int vOffset, QAccessible::TextBoundaryType boundaryType, int *startOffset, int *endOffset) const
+QString AccessibleTextEditorWidget::textAtOffset(int vOffset, QAccessible::TextBoundaryType boundaryType, int* startOffset, int* endOffset) const
 {
     //  QAccessible::CharBoundary	0	Use individual characters as boundary.
     //  QAccessible::WordBoundary	1	Use words as boundaries.
@@ -475,31 +487,30 @@ QString AccessibleTextEditorWidget::textAtOffset(int vOffset, QAccessible::TextB
     //  QAccessible::LineBoundary	4	Use newlines as boundary.
     //  QAccessible::NoBoundary	5	No boundary (use the whole text).
 
+    if (boundaryType == QAccessible::LineBoundary && vOffset >= 0) {
+        size_t offset = V2D(textWidget(), vOffset);
+        size_t line = textDocument()->lineFromOffset(offset);
 
-    if(boundaryType == QAccessible::LineBoundary && vOffset >= 0) {
-        int offset = V2D(textWidget(), vOffset);
-        int line = textDocument()->lineFromOffset(offset);
-
-        int start = textDocument()->offsetFromLine(line);
-        int end = textDocument()->offsetFromLine(line+1);
+        size_t start = textDocument()->offsetFromLine(line);
+        size_t end = textDocument()->offsetFromLine(line + 1);
 
 
         QString str = VTEXT_PART(textDocument(), start, end - start);
         *startOffset = D2V(textWidget(), start);
-        *endOffset = (*startOffset) + str.length(); //D2V(textWidget(), end);
+        *endOffset = (*startOffset) + static_cast<int>(str.length()); // D2V(textWidget(), end);
 
-
-//        qDebug() << "textAtOffset: vOffset: " << vOffset << " => " << offset
-//                 << ", startOffset: " << *startOffset << " (start: " << start << ")"
-//                 << ", endOffset: " << *endOffset << " (end: " << end << ")"
-//                 <<  " => " << str << " (" << str.length() << ")";
-       return str;
+        // qDebug() << "textAtOffset: vOffset: " << vOffset << " => " << offset
+        //          << ", startOffset: " << *startOffset << " (start: " << start << ")"
+        //          << ", endOffset: " << *endOffset << " (end: " << end << ")"
+        //          <<  " => " << str << " (" << str.length() << ")";
+        return str;
     }
 
     QString str = QAccessibleTextInterface::textAtOffset(vOffset, boundaryType, startOffset, endOffset);
-//    qDebug() << "?? textAtOffset: offset: " << vOffset << ", boundaryType: " << boundaryType << " => " << str << " (" << *startOffset << ", " << *endOffset <<")";
+    // qDebug() << "?? textAtOffset: offset: " << vOffset << ", boundaryType: " << boundaryType << " => " << str << " (" << *startOffset << ", " << *endOffset <<")";
     return str;
 }
+
 
 /// Returns the text item of type boundaryType that is close to offset offset and sets startOffset and endOffset values
 /// to the start and end positions of that item; returns an empty string if there is no such an item.
@@ -512,17 +523,19 @@ QString AccessibleTextEditorWidget::textAtOffset(int vOffset, QAccessible::TextB
 /// function should use the cursor position as offset. Thus an offset of -2 must be converted to the cursor position
 /// before calling this function. An offset of -1 is used for the text length and custom implementations of this function
 /// have to return the result as if the length was passed in as offset.
-QString AccessibleTextEditorWidget::textBeforeOffset(int offset, QAccessible::TextBoundaryType boundaryType, int *startOffset, int *endOffset) const
+QString AccessibleTextEditorWidget::textBeforeOffset(int offset, QAccessible::TextBoundaryType boundaryType, int* startOffset, int* endOffset) const
 {
     // qDebug() << "?? textBeforeOffset: offset: " << offset << ", boundaryType: " << boundaryType;
     return QAccessibleTextInterface::textBeforeOffset(offset, boundaryType, startOffset, endOffset);
 }
+
 
 QAccessibleInterface *AccessibleTextEditorWidget::focusChild() const
 {
     QAccessibleInterface* child = QAccessibleWidget::focusChild();
     return child;
 }
+
 
 /// Returns the rectangle for the editor widget
 /// It returns the location of the textWidget (even when the TextComponent has got focus)
@@ -533,25 +546,30 @@ QRect AccessibleTextEditorWidget::rect() const
     return focusRect;
 }
 
+
 TextDocument* AccessibleTextEditorWidget::textDocument() const
 {
     return textWidget()->textDocument();
 }
+
 
 TextSelection *AccessibleTextEditorWidget::textSelection() const
 {
     return textWidget()->textSelection();
 }
 
+
 TextEditorController* AccessibleTextEditorWidget::controller() const
 {
     return textWidget()->controller();
 }
 
+
 TextRenderer *AccessibleTextEditorWidget::renderer() const
 {
     return textWidget()->textRenderer();
 }
+
 
 TextEditorWidget *AccessibleTextEditorWidget::textWidget() const
 {

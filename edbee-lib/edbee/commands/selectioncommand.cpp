@@ -104,20 +104,21 @@ void SelectionCommand::execute(TextEditorController* controller)
         case MoveCaretByPage:
         {
             // make sure the first line of the window is scrolled
-            TextRenderer* renderer   = controller->textRenderer();
-            TextEditorWidget* widget = controller->widget();
-            size_t firstVisibleLine = renderer->firstVisibleLine();
-            size_t linesPerPage     = renderer->viewHeightInLines();
+            TextRenderer* renderer     = controller->textRenderer();
+            TextEditorWidget* widget   = controller->widget();
+            ptrdiff_t firstVisibleLine = static_cast<ptrdiff_t>(renderer->firstVisibleLine());
+            size_t linesPerPage        = renderer->viewHeightInLines();
 
             sel->beginChanges();
             TextSelection::moveCaretsByPage(controller, sel, amount_);
-            if( !keepSelection_ ) {
+            if (!keepSelection_) {
                 sel->resetAnchors();    // we must reset anchors here because de process-changes will merge carets
             }
             sel->endChanges();
 
-            firstVisibleLine += linesPerPage * amount_;
-            widget->scrollTopToLine(firstVisibleLine);
+            firstVisibleLine += static_cast<ptrdiff_t>(linesPerPage) * amount_;
+            if (firstVisibleLine < 0) firstVisibleLine = 0;
+            widget->scrollTopToLine(static_cast<size_t>(firstVisibleLine));
 
             break;
         }

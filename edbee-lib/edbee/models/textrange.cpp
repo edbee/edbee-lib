@@ -41,7 +41,7 @@ void TextRange::fixCaretForUnicode(TextDocument *doc, ptrdiff_t direction)
 /// @param anchor the anchor location to set
 void TextRange::setAnchorBounded(TextDocument* doc, size_t anchor)
 {
-    setAnchor(qBound(0u, anchor, doc->length()));
+    setAnchor(qBound(static_cast<size_t>(0), anchor, doc->length()));
 }
 
 
@@ -50,7 +50,7 @@ void TextRange::setAnchorBounded(TextDocument* doc, size_t anchor)
 /// @param caret the caret position to set
 void TextRange::setAnchorBounded(TextDocument *doc, ptrdiff_t anchor)
 {
-    setAnchor(static_cast<size_t>(qBound(0, anchor, static_cast<ptrdiff_t>(doc->length()))));
+    setAnchor(static_cast<size_t>(qBound(static_cast<ptrdiff_t>(0), anchor, static_cast<ptrdiff_t>(doc->length()))));
 }
 
 
@@ -59,7 +59,7 @@ void TextRange::setAnchorBounded(TextDocument *doc, ptrdiff_t anchor)
 /// @param caret the caret position to set
 void TextRange::setCaretBounded(TextDocument* doc, size_t caret)
 {
-    setCaret(qBound(0u, caret, doc->length()));
+    setCaret(qBound(static_cast<size_t>(0), caret, doc->length()));
 }
 
 
@@ -68,7 +68,7 @@ void TextRange::setCaretBounded(TextDocument* doc, size_t caret)
 /// @param caret the caret position to set
 void TextRange::setCaretBounded(TextDocument *doc, ptrdiff_t caret)
 {
-    setCaret(static_cast<size_t>(qBound(0, caret, static_cast<ptrdiff_t>(doc->length()))));
+    setCaret(static_cast<size_t>(qBound(static_cast<ptrdiff_t>(0), caret, static_cast<ptrdiff_t>(doc->length()))));
 }
 
 

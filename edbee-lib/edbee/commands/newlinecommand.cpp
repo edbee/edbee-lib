@@ -127,7 +127,7 @@ void NewlineCommand::executeSpecialNewline(TextEditorController* controller, boo
             QString text = QStringLiteral("\n%1").arg(smart ? calculateSmartIndent(controller, newRange) : "");
 
             // replaces the text
-            doc->replace(qMax(0u, newRange.caret()), 0, text);
+            doc->replace(qMax(static_cast<size_t>(0), newRange.caret()), 0, text);
             newRange.setCaret(pos + static_cast<size_t>(text.length()));
             newRange.reset();
 
