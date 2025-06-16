@@ -229,7 +229,6 @@ int TextRenderer::yPosForOffset(size_t offset)
 /// Returns the textlayout for the given line
 TextLayout *TextRenderer::textLayoutForLine(size_t line)
 {
-    Q_ASSERT(line >= 0);
     /// FIXME:  Invalide TextLayout cache when required!!!
     if( controller()->textDocument()->length() == 0){
         return textLayoutForLineForPlaceholder(line);

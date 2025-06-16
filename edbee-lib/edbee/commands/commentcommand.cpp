@@ -141,7 +141,7 @@ static bool areAllLinesCommented(TextDocument* doc, TextRange& range, const QLis
             RegExp* commentStartRegExp = def->commentStartRegExp();
 
             /// toggle the found flag if a comment is found and break
-            if (commentStartRegExp->indexIn(buf->rawDataPointer(), offset, offset+ doc->lineLength(line) - 1) >= 0) {
+            if (commentStartRegExp->indexIn(buf->rawDataPointer(), offset, offset+ doc->lineLength(line) - 1) != std::string::npos) {
                 found = true;
                 break;
             }
@@ -180,7 +180,7 @@ static void removeLineComment(TextDocument* doc, TextRange& range, const QList<C
             RegExp* regExp = def->removeCommentStartRegeExp();
 
             // perform a regexp to extract the comment that needs to be removed
-            if (regExp->indexIn(buf->rawDataPointer(), offset, offset + doc->lineLength(line)) >= 0) {
+            if (regExp->indexIn(buf->rawDataPointer(), offset, offset + doc->lineLength(line)) != std::string::npos) {
                 // remove the found regexp and goto the next line
                 doc->replace(regExp->pos(1), regExp->len(1), "");
                 break;

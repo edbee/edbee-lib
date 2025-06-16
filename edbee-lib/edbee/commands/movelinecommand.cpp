@@ -83,7 +83,7 @@ void MoveLineCommand::execute(TextEditorController *controller)
         size_t line = doc->lineFromOffset(range.min());
         QString text = doc->textPart(range.min(), range.length());
 
-        controller->replace(range.min(), range.length(), QStringLiteral(), 0);               // remove the line
+        controller->replace(range.min(), range.length(), QStringLiteral(""), 0); // remove the line
 
         ptrdiff_t replaceOffset = static_cast<ptrdiff_t>(line) + direction_;
         Q_ASSERT(replaceOffset >= 0);

@@ -155,7 +155,7 @@ void TabCommand::execute(TextEditorController* controller)
                     size_t col = doc->columnFromOffsetAndLine(offset);
 
                     // calculate the number of spaces depending on the column
-                    int spaces = tabSize - static_cast<ptrdiff_t>(col) % tabSize;
+                    int spaces = tabSize - static_cast<int>(col) % tabSize;
                     if (!spaces) spaces = tabSize;
 
                     // append the text

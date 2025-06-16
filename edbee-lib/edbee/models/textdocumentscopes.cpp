@@ -689,7 +689,7 @@ void MultiLineScopedTextRangeSet::sortRanges()
 /// this method returns the scoped range
 MultiLineScopedTextRange& MultiLineScopedTextRangeSet::scopedRange(size_t idx)
 {
-    Q_ASSERT(0 <= idx && idx < rangeCount());
+    Q_ASSERT(idx < rangeCount());
     return *(scopedRangeList_[static_cast<qsizetype>(idx)]);
 }
 
@@ -830,7 +830,7 @@ void TextDocumentScopes::giveLineScopedRangeList(size_t line, ScopedTextRangeLis
 /// @return the scoped textrange list
 ScopedTextRangeList* TextDocumentScopes::scopedRangesAtLine(size_t line)
 {
-    if (line >= lineRangeList_.length() || line < 0) { return nullptr; }
+    if (line >= lineRangeList_.length()) { return nullptr; }
     return lineRangeList_.at(line);
 }
 

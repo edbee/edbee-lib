@@ -498,8 +498,7 @@ void TextEditorComponent::mouseMoveEvent(QMouseEvent* event)
 #endif
         size_t line = renderer->rawLineIndexForYpos(eventPos.y());
         size_t col = 0;
-        if (line >= 0) { col = renderer->columnIndexForXpos(line, eventPos.x()); }
-        if (line < 0) { line = 0; }
+        col = renderer->columnIndexForXpos(line, eventPos.x());
 
         if (clickCount_ == 2) {
             TextRange range = textSelection()->range(0);

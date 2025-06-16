@@ -43,7 +43,7 @@ void LineOffsetVector::applyChange(TextBufferChange change)
     } else {
         ptrdiff_t* offsets = new ptrdiff_t[change.newLineCount()]; // change.newLineOffsets().constData()
         for (qsizetype i = 0, cnt = static_cast<qsizetype>(change.newLineCount()); i < cnt; ++i) {
-          offsets[i] = static_cast<const ptrdiff_t>(change.newLineOffsets()[i]);
+          offsets[i] = static_cast<ptrdiff_t>(change.newLineOffsets()[i]);
         }
         applyChange(change.line(), change.lineCount(), change.newLineCount(), offsets, offsetDelta);
         delete[] offsets;
@@ -320,8 +320,6 @@ void LineOffsetVector::setOffsetDelta(ptrdiff_t delta)
 /// Asserts the data is valid
 void LineOffsetVector::assertValid()
 {
-    Q_ASSERT(offsetDeltaIndex_ >= 0);
-
     // assert all offsets are always valid
     ptrdiff_t lastOffset = -1;
     for (size_t i = 0; i < offsetDeltaIndex_; ++i) {

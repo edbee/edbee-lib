@@ -253,7 +253,7 @@ void TextRangeTest::testMoveCaretToLineBoundary()
     testEqual(range.caret(), 12 );
 
     // test eol specials
-    int endDocPos = doc_->length();
+    size_t endDocPos = doc_->length();
     range.setCaret(endDocPos);
     range.moveCaretToLineBoundary(doc_, 1, ws);  // movement to the end at the end should stay at the end
     testEqual(range.caret(), endDocPos );

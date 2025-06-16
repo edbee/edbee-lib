@@ -83,14 +83,12 @@ void TextMarginComponentDelegate::mouseMoveEvent(size_t line, QMouseEvent* event
     Q_UNUSED(line)
     Q_UNUSED(event)
     if (event->buttons() & Qt::LeftButton) {
-        if (line >= 0) {
-            TextEditorController* controller = marginComponent()->editorWidget()->controller();
-            if (line < startLine_) {
-                controller->moveCaretTo(startLine_ + 1, 0, false);
-                controller->moveCaretTo(line, 0, true);
-            } else {
-                controller->moveCaretTo(line + 1, 0, true);
-            }
+        TextEditorController* controller = marginComponent()->editorWidget()->controller();
+        if (line < startLine_) {
+            controller->moveCaretTo(startLine_ + 1, 0, false);
+            controller->moveCaretTo(line, 0, true);
+        } else {
+            controller->moveCaretTo(line + 1, 0, true);
         }
     }
 }
@@ -99,12 +97,11 @@ void TextMarginComponentDelegate::mouseMoveEvent(size_t line, QMouseEvent* event
 void TextMarginComponentDelegate::mousePressEvent(size_t line, QMouseEvent* event)
 {
     Q_UNUSED(event)
-    if (line >= 0) {
-        TextEditorController* controller = marginComponent()->editorWidget()->controller();
-        controller->moveCaretTo(line, 0, false);
-        controller->moveCaretTo(line + 1, 0, true);
-        startLine_ = line;
-    }
+
+    TextEditorController* controller = marginComponent()->editorWidget()->controller();
+    controller->moveCaretTo(line, 0, false);
+    controller->moveCaretTo(line + 1, 0, true);
+    startLine_ = line;
 }
 
 

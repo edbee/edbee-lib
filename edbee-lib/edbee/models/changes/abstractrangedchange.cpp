@@ -70,7 +70,7 @@ size_t AbstractRangedChange::getMergedStoredLength(AbstractRangedChange* change)
         remainerOffset -= change->offset() - offset();
     }
 
-    if( 0 <= remainerOffset && remainerOffset < change->storedLength()  ) {
+    if (remainerOffset < change->storedLength()) {
         result += change->storedLength() - remainerOffset;
     }
     return result;
@@ -122,7 +122,7 @@ void AbstractRangedChange::mergeStoredDataViaMemcopy(void* targetData, void* dat
         remainerOffset -= change->offset() - offset();
     }
 
-    if (0 <= remainerOffset && remainerOffset < change->storedLength()) {
+    if (remainerOffset < change->storedLength()) {
         memcopy_or_zerofill(target, changeData ? ((char*)changeData) + (remainerOffset * itemSize) : 0, (change->storedLength() - remainerOffset) * itemSize);
     }
 }

@@ -1141,7 +1141,6 @@ TextRange& TextRangeSet::range(size_t idx)
 /// Returns a const reference from the
 const TextRange &TextRangeSet::constRange(size_t idx) const
 {
-    Q_ASSERT(idx >= 0);
     Q_ASSERT(idx < static_cast<size_t>(selectionRanges_.size()));
     return selectionRanges_.at(static_cast<qsizetype>(idx));
 }

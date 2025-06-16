@@ -138,7 +138,7 @@ void TextSelection::addRangesByLine(TextEditorController* controller, TextRangeS
             size_t newLinesToRemove = line + 1 < doc->lineCount() ? 1 : 0;
 
             offset = qMin(lineOffset + col, offsetNextLine - newLinesToRemove);
-            if (offset >= 0 && offset <= doc->length()) {
+            if (offset <= doc->length()) {
                 rangeSet->addRange(offset, offset);
                 cache->add(offset, xpos); // add the original xpos
             }

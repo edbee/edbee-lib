@@ -4,26 +4,23 @@
 // This is required for windows, to prevent linkage errors (somehow the sources of oniguruma assumes we're linking with a dll)
 
 
-#ifdef __clang__
+#if defined(__clang__)
   #pragma clang diagnostic push
-#else
+#elif defined(__GNUC__) || defined(__GNUG__)
   #pragma GCC diagnostic push
-#endif
-#ifdef _MSC_VER
+#elif defined(_MSC_VER)
   #pragma warning( push )
 #endif
 
 #define ONIG_EXTERN extern
 #include "oniguruma.h"
 
-#ifdef _MSC_VER
-  #pragma warning( pop )
-#endif
-
-#ifdef __clang__
+#if defined(__clang__)
   #pragma clang diagnostic pop
-#else
+#elif defined(__GNUC__) || defined(__GNUG__)
   #pragma GCC diagnostic pop
+#elif defined(_MSC_VER)
+  #pragma warning( pop )
 #endif
 
 #include "regexp.h"

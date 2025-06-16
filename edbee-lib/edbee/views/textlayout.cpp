@@ -175,7 +175,7 @@ void TextLayoutBuilder::replace(size_t index, size_t length, const QString repla
         for(qsizetype i=0, cnt = baseFormatRanges_.length(); i < cnt; i++ ) {
             QTextLayout::FormatRange& formatRange = baseFormatRanges_[i];
             if (formatRange.start >= static_cast<int>(index)) {
-                formatRange.start += delta;
+                formatRange.start += static_cast<int>(delta);
             }
         }
     }
