@@ -171,21 +171,17 @@ QString LineOffsetVector::toUnitTestFilledString()
 /// initializes the construct for unit testing
 /// @param offsetDelta the offsetDelta to use
 /// @param offsetDeltaIndex the offsetDeltaIndex to use
-/// @param a list of integer offsets. Close the list with -1 !!!
-void LineOffsetVector::initForUnitTesting(ptrdiff_t offsetDelta, size_t offsetDeltaIndex, ... )
+/// @param a list of integer offsets. Close the list with std::string::npos !!!
+//void LineOffsetVector::initForUnitTesting(ptrdiff_t offsetDelta, size_t offsetDeltaIndex, ... )
+void LineOffsetVector::initForUnitTesting(ptrdiff_t offsetDelta, size_t offsetDeltaIndex, std::initializer_list<size_t> offsets)
 {
     offsetDelta_ = offsetDelta;
     offsetDeltaIndex_ = offsetDeltaIndex;
     offsetList_.clear();
 
-    va_list offsets;
-    va_start(offsets, offsetDeltaIndex);
-    size_t val = va_arg(offsets, size_t);
-    while (val != std::string::npos) {
+    for (size_t val: offsets) {
         offsetList_.append(static_cast<ptrdiff_t>(val));
-        val = va_arg(offsets, size_t);
     }
-    va_end(offsets);
 
     assertValid();
 }

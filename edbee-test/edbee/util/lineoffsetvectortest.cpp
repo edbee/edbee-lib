@@ -39,15 +39,15 @@ void LineOffsetVectorTest::applyChange()
 
     // Offset only changes
     //====================
-    // qDebug() << "===" << "test change offset before delta ==";
+    qDebug() << "===" << "test change offset before delta ==";
     {
         // Positive Delta
-        v.initForUnitTesting(3, 2, 2, 4, 6, 8, std::string::npos); // => "2,4,[3>6,8" => "2,4,9,11"
+        v.initForUnitTesting(3, 2, { 2, 4, 6, 8 }); // => "2,4,[3>6,8" => "2,4,9,11"
         apply(v, 0, 0, 0, nullptr, 10);
         testLov2(v, "2,[13>1,6,8", "2,14,19,21");
 
         // Negative Delta
-        v.initForUnitTesting(3, 2, 2, 4, 6, 8, std::string::npos); // => "2,4,[3>6,8" => "2,4,9,11"
+        v.initForUnitTesting(3, 2, { 2, 4, 6, 8 }); // => "2,4,[3>6,8" => "2,4,9,11"
         apply(v, 0, 0, 0, nullptr, -1);
         testLov2(v, "2,[2>1,6,8", "2,3,8,10");
 
@@ -57,15 +57,15 @@ void LineOffsetVectorTest::applyChange()
         // apply(v, 0, 0, 0, nullptr, -5);
         // testLov2(v, "2,[-2>1,6,8", "2,-1,4,6");
     }
-    // qDebug() << "===" << "test change offset at delta ==";
+    qDebug() << "===" << "test change offset at delta ==";
     {
         // Positive Delta
-        v.initForUnitTesting(3, 2, 2, 4, 6, 8, std::string::npos); // => "2,4,[3>6,8" => "2,4,9,11"
+        v.initForUnitTesting(3, 2, { 2, 4, 6, 8 }); // => "2,4,[3>6,8" => "2,4,9,11"
         apply(v, 1, 0, 0, nullptr, 10);
         testLov2(v, "2,4,[13>6,8", "2,4,19,21");
 
         // Negative Delta
-        v.initForUnitTesting(3, 2, 2, 4, 6, 8, std::string::npos); // => "2,4,[3>6,8" => "2,4,9,11"
+        v.initForUnitTesting(3, 2, { 2, 4, 6, 8 }); // => "2,4,[3>6,8" => "2,4,9,11"
         apply(v, 1, 0, 0, nullptr, -1);
         testLov2(v, "2,4,[2>6,8", "2,4,8,10");
 
@@ -78,12 +78,12 @@ void LineOffsetVectorTest::applyChange()
     qDebug() << "===" << "test change offset past delta ==";
     {
         // Positvie Delta
-        v.initForUnitTesting(3, 2, 2, 4, 6, 8, 10, std::string::npos); // => "2,4,[3>6,8,10" => "2,4,9,11,13"
+        v.initForUnitTesting(3, 2, { 2, 4, 6, 8, 10 }); // => "2,4,[3>6,8,10" => "2,4,9,11,13"
         apply(v, 3, 0, 0, nullptr, 10);
         testLov2(v, "2,4,9,11,[13>10", "2,4,9,11,23");
 
         // Negative delta
-        v.initForUnitTesting(3, 2, 2, 4, 6, 8, 10, std::string::npos); // => "2,4,[3>6,8,10" => "2,4,9,11,13"
+        v.initForUnitTesting(3, 2, { 2, 4, 6, 8, 10 }); // => "2,4,[3>6,8,10" => "2,4,9,11,13"
         apply(v, 2, 0, 0, nullptr, -1);
         testLov2(v, "2,4,9,[2>8,10", "2,4,9,10,12");
 
@@ -125,7 +125,7 @@ void LineOffsetVectorTest::applyChange()
 void LineOffsetVectorTest::testMoveDeltaToIndex()
 {
     LineOffsetVector v;
-    v.initForUnitTesting(3, 2, 2, 4, 6, 8, std::string::npos);
+    v.initForUnitTesting(3, 2, { 2, 4, 6, 8 });
     testLov2(v, "2,4,[3>6,8", "2,4,9,11");
 
     // move to the left
@@ -149,7 +149,7 @@ void LineOffsetVectorTest::testMoveDeltaToIndex()
 void LineOffsetVectorTest::testChangeOffsetDelta()
 {
     LineOffsetVector v;
-    v.initForUnitTesting(3, 2, 2, 4, 6, 8, std::string::npos); // offsetdelta, offsetindex, offsets...
+    v.initForUnitTesting(3, 2, { 2, 4, 6, 8 }); // offsetdelta, offsetindex, offsets...
     testLov2(v,"2,4,[3>6,8", "2,4,9,11");
 
     // test the same location
@@ -208,7 +208,7 @@ void LineOffsetVectorTest::testFindLineFromOffset()
     LineOffsetVector v;
 
     // offset 0,4
-    v.initForUnitTesting(0, 0, 0, 4, std::string::npos);
+    v.initForUnitTesting(0, 0, { 0, 4 });
     testEqual(v.findLineFromOffset(0), 0);
     testEqual(v.findLineFromOffset(1), 0);
     testEqual(v.findLineFromOffset(2), 0);
@@ -217,7 +217,7 @@ void LineOffsetVectorTest::testFindLineFromOffset()
 
 
     // offsets: 0,4
-    v.initForUnitTesting(2, 1, 0, 2, std::string::npos);
+    v.initForUnitTesting(2, 1, { 0, 2 });
     testEqual(v.findLineFromOffset(0), 0);
     testEqual(v.findLineFromOffset(1), 0);
     testEqual(v.findLineFromOffset(2), 0);

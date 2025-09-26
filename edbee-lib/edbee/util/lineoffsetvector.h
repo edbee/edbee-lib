@@ -71,7 +71,7 @@ protected:
 public:
     QString toUnitTestString();
     QString toUnitTestFilledString();
-    void initForUnitTesting(ptrdiff_t offsetDelta, size_t offsetDeltaIndex, ... );
+    void initForUnitTesting(ptrdiff_t offsetDelta, size_t offsetDeltaIndex, std::initializer_list<size_t> offsets);
 
     void assertValid();
 
