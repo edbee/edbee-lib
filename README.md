@@ -175,13 +175,34 @@ To update oniguruma
 git subtree pull --prefix vendor/oniguruma/oniguruma https://github.com/kkos/oniguruma master --squash
 ```
 
-Build with minGW
-----------------
+Build with cmake on Windows
+---------------------------
 
 ```powershell
-# Sample to build with MinGW on Qt  (-DCMAKE_PREFIX_PATH=you cmake path)
-cmake -G "MinGW Makefiles" -DCMAKE_PREFIX_PATH="C:\Qt\6.8.0\mingw_64\lib\cmake\"  .
+# Sample to build with MinGW (-DCMAKE_PREFIX_PATH=your qt cmake path)
+mkdir build_mingw_64; cd build_mingw_64
+cmake -G "MinGW Makefiles" -DCMAKE_PREFIX_PATH="C:\Qt\6.9.1\mingw_64\lib\cmake\"  ..
 cmake --build .
+
+.\edbee-test\edbee-test.exe
+```
+
+```powershell
+# Sample to build with LLM MinGW_64 (-DCMAKE_PREFIX_PATH=your qt cmake path)
+mkdir build_llvm-mingw_64; cd build_llvm-mingw_64
+cmake -G "MinGW Makefiles" -DCMAKE_PREFIX_PATH="C:\Qt\6.9.1\llvm-mingw_64\lib\cmake\"  ..
+cmake --build .
+
+.\edbee-test\edbee-test.exe
+```
+
+```powershell
+# Sample to build with msvc2022_64  (-DCMAKE_PREFIX_PATH=your qt cmake path)
+mkdir build_msvc2022_64; cd build_msvc2022_64
+cmake -G "Visual Studio 17 2022" -DCMAKE_PREFIX_PATH="C:\Qt\6.9.1\msvc2022_64\lib\cmake\"  ..
+cmake --build .
+
+.\edbee-test\Debug\edbee-test.exe
 ```
 
 
