@@ -16,21 +16,21 @@ namespace edbee {
 /// @param str the string where to convert the tabs to space
 /// @param tabSize the size of a single tab. This needs to be at least 1
 /// @return A string with all tabs converted to spaces
-QString Util::convertTabsToSpaces(const QString& str, int tabSize )
+QString Util::convertTabsToSpaces(const QString& str, int tabSize)
 {
     Q_ASSERT(tabSize > 0);
 
     QString result;
-    result.reserve( str.length() );
+    result.reserve( str.length());
 
     // append all characters to the result
-    for( int i=0,cnt=str.size(); i<cnt; ++i ) {
+    for (qsizetype i=0, cnt = str.size(); i<cnt; ++i ) {
         QChar c = str.at(i);
 
         // when a tab character is used it is converted to the correct column
         if( c == '\t' ) {
-            int amount = tabSize - result.length() % tabSize;
-            result.append( QStringLiteral(" ").repeated(amount) );
+            qsizetype amount = tabSize - result.length() % tabSize;
+            result.append(QStringLiteral(" ").repeated(amount));
         } else {
             result.append(c);
         }
@@ -43,33 +43,32 @@ QString Util::convertTabsToSpaces(const QString& str, int tabSize )
 /// @param str the string to convert
 /// @param tabSize the tab size to use for conversion
 /// @return a vector with the character-offset in the given string that contains the given tab-column
-QList<int> Util::tabColumnOffsets(const QString& str, int tabSize)
+QList<size_t> Util::tabColumnOffsets(const QString& str, unsigned int tabSize)
 {
     // build the resut (column 0 is always available)
-    QList<int> offsets;
-    offsets.push_back( 0);
+    QList<size_t> offsets;
+    offsets.push_back(0);
 
-    int column = 0;
+    size_t column = 0;
 
     // iterate over all characters
-    for( int offset=0,cnt=str.size(); offset<cnt; ++offset ) {
-        QChar c = str.at(offset);
+    for (size_t offset = 0, cnt = static_cast<size_t>(str.size()); offset < cnt; ++offset) {
+        QChar c = str.at(static_cast<qsizetype>(offset));
 
         // when a tab character is found, we need to jump to the next column
-        if( c == '\t' ) {
-            int amount = tabSize - column % tabSize;
+        if (c == '\t') {
+            size_t amount = tabSize - column % tabSize;
             column += amount;
         } else {
             ++column;
         }
         // when we've reached another tab-column, we add the column
-        if( column % tabSize == 0 ) {
+        if (column % tabSize == 0) {
            offsets.push_back( offset+1 );
         }
     }
     return offsets;
 }
-
 
 
 } // edbee

@@ -15,22 +15,21 @@ namespace edbee {
 void RangeLineIteratorTest::testBasicIteration()
 {
     CharTextDocument doc;
-    doc.setText( QStringLiteral("a1|b2|c3|d4|e5|f6").replace("|","\n"));
+    doc.setText(QStringLiteral("a1|b2|c3|d4|e5|f6").replace("|","\n"));
     TextRange range(4,15);
 
-    RangeLineIterator itr( &doc, range);
-    testTrue( itr.hasNext() );
-    testEqual( itr.next(), 1 );
-    testTrue( itr.hasNext() );
-    testEqual( itr.next(), 2 );
-    testTrue( itr.hasNext() );
-    testEqual( itr.next(), 3 );
-    testTrue( itr.hasNext() );
-    testEqual( itr.next(), 4 );
-    testTrue( itr.hasNext() );
-    testEqual( itr.next(), 5 );
-    testFalse( itr.hasNext() );
-
+    RangeLineIterator itr(&doc, range);
+    testTrue(itr.hasNext());
+    testEqual(itr.next(), 1);
+    testTrue(itr.hasNext());
+    testEqual(itr.next(), 2);
+    testTrue(itr.hasNext());
+    testEqual(itr.next(), 3);
+    testTrue(itr.hasNext());
+    testEqual(itr.next(), 4);
+    testTrue(itr.hasNext());
+    testEqual(itr.next(), 5);
+    testFalse(itr.hasNext());
 }
 
 
@@ -40,15 +39,12 @@ void RangeLineIteratorTest::testSingleLineIteration()
 {
     CharTextDocument doc;
     doc.setText( QStringLiteral("line1|line").replace("|","\n"));
-    TextRange range(1,1);
+    TextRange range(1, 1);
 
-    RangeLineIterator itr( &doc, range);
-    testTrue( itr.hasNext() );
-    testEqual( itr.next(), 0 );
-
+    RangeLineIterator itr(&doc, range);
+    testTrue(itr.hasNext());
+    testEqual(itr.next(), 0);
 }
-
-
 
 
 } // edbee

@@ -29,5 +29,5 @@ private:
 
 } // edbee
 
-DECLARE_TEST(edbee::RemoveCommandTest );
+DECLARE_TEST(edbee::RemoveCommandTest);
 

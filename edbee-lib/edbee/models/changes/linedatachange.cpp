@@ -10,41 +10,46 @@
 
 namespace edbee {
 
-LineDataChange::LineDataChange( int line, int field )
+LineDataChange::LineDataChange(size_t line, size_t field)
     : line_(line)
     , field_(field)
-    , lineData_( 0 )
+    , lineData_(nullptr)
 {
 }
+
 
 LineDataChange::~LineDataChange()
 {
     delete lineData_;
 }
 
-void LineDataChange::giveLineData(TextLineData *lineData)
+
+void LineDataChange::giveLineData(TextLineData* lineData)
 {
     lineData_ = lineData;
 }
 
+
 void LineDataChange::execute(TextDocument* doc)
 {
-    changeLineData( doc );
+    changeLineData(doc);
 }
+
 
 void LineDataChange::revert(TextDocument* doc)
 {
-    changeLineData( doc );
+    changeLineData(doc);
 }
+
 
 /// merge is never a problem, simply
 bool LineDataChange::giveAndMerge(TextDocument* document, Change* textChange)
 {
-    Q_UNUSED( document );
-    Q_UNUSED( textChange );
-    LineDataChange* change =  dynamic_cast<LineDataChange*>(lineData_);
-    if( change ) {
-        if( line_ == change->line_ && field_ == change->field_ ) {
+    Q_UNUSED(document);
+    Q_UNUSED(textChange);
+    LineDataChange* change = dynamic_cast<LineDataChange*>(lineData_);
+    if (change) {
+        if (line_ == change->line_ && field_ == change->field_) {
             delete textChange;
             return true;
         }
@@ -52,11 +57,16 @@ bool LineDataChange::giveAndMerge(TextDocument* document, Change* textChange)
     return false;
 }
 
+
 /// line is moved with the given delta
-void LineDataChange::applyLineDelta(int line, int length, int newLength)
+void LineDataChange::applyLineDelta(size_t line, size_t length, size_t newLength)
 {
-    if( line <= line_ ) {
-        line_ += newLength - length;
+    if (line <= line_) {
+        if (newLength > length) {
+            line_ += newLength - length;
+        } else {
+            line_ -= length - newLength;
+        }
     }
 }
 
@@ -71,38 +81,37 @@ QString LineDataChange::toString()
 /// The change line data
 void LineDataChange::changeLineData(TextDocument* doc)
 {
-    TextLineData* oldLineData = doc->lineDataManager()->take( line_, field_ );
-    doc->lineDataManager()->give( line_, field_, lineData_ );
+    TextLineData* oldLineData = doc->lineDataManager()->take(line_, field_);
+    doc->lineDataManager()->give(line_, field_, lineData_);
     lineData_ = oldLineData;
 }
 
 
 /// Returns the line index
-int LineDataChange::line() const
+size_t LineDataChange::line() const
 {
     return line_;
 }
 
 
 /// Sets the line of this change
-void LineDataChange::setLine(int line)
+void LineDataChange::setLine(size_t line)
 {
     line_ = line;
 }
 
 
 /// retursn the field index of this line-data item
-int LineDataChange::field() const
+size_t LineDataChange::field() const
 {
     return field_;
 }
 
 
 /// sets the field position
-void LineDataChange::setField(int field)
+void LineDataChange::setField(size_t field)
 {
     field_ = field;
 }
-
 
 } // edbee

@@ -10,20 +10,19 @@
 
 namespace edbee {
 
-
 /// The constructor of the textbuffer
 /// @param a reference to the parent
 CharTextBuffer::CharTextBuffer(QObject *parent)
     : TextBuffer( parent )
-    , rawAppendStart_(-1)
-    , rawAppendLineStart_(-1)
+    , rawAppendStart_(std::string::npos)
+    , rawAppendLineStart_(std::string::npos)
 {
 }
 
 
 /// Returns the length of the buffer
 /// @return the length of the given text
-int CharTextBuffer::length() const
+size_t CharTextBuffer::length() const
 {
     return buf_.length();
 }
@@ -32,9 +31,8 @@ int CharTextBuffer::length() const
 /// Returns the character at the given character
 /// @param offset the offset of the given character
 /// @return the character at the given offset
-QChar CharTextBuffer::charAt(int offset) const
+QChar CharTextBuffer::charAt(size_t offset) const
 {
-    Q_ASSERT(offset >= 0);
     Q_ASSERT(offset < buf_.length() );
     return buf_.at(offset);
 }
@@ -44,14 +42,14 @@ QChar CharTextBuffer::charAt(int offset) const
 /// @param pos the position of the given text
 /// @param length the length of the text to get
 /// @return returns a part of the text
-QString CharTextBuffer::textPart(int pos, int length) const
+QString CharTextBuffer::textPart(size_t pos, size_t length) const
 {
     // do NOT use data here. Data moves the gap!
     // QString str( buf_.data() + pos, length );
     // return str;
     ///buf_.data()
 
-    QString result = buf_.mid( pos, length );
+    QString result = buf_.mid(pos, length);
     return result;
 }
 
@@ -61,40 +59,40 @@ QString CharTextBuffer::textPart(int pos, int length) const
 /// @param length the length of the text to replace
 /// @param buffer a pointer to a buffer with data
 /// @param bufferLenth the length of the buffer
-void CharTextBuffer::replaceText(int offset, int length, const QChar* buffer, int bufferLength )
+void CharTextBuffer::replaceText(size_t offset, size_t length, const QChar* buffer, size_t bufferLength )
 {
     // make sure the length matches
-    length = qMin( this->length()-offset, length );
+    length = qMin(this->length()-offset, length);
 
     // make sure the position is correct
-    if( offset > buf_.length() ) {
+    if(offset > buf_.length()) {
         offset = buf_.length();  // Qt doesn't append if the position > length
         length = 0;
     }
 
-    TextBufferChange change( this, offset, length, buffer, bufferLength );
+    TextBufferChange change(this, offset, length, buffer, bufferLength);
 
-    emit textAboutToBeChanged( change );
+    emit textAboutToBeChanged(change);
 
     // replace the text
     QString oldText = buf_.mid(offset, length);
 
-    buf_.replace( offset, length, buffer, bufferLength );
+    buf_.replace(offset, length, buffer, bufferLength);
 
     // replace the line data and offsets
-    lineOffsetList_.applyChange( change );
+    lineOffsetList_.applyChange(change);
 
-    emit textChanged( change, oldText );
+    emit textChanged(change, oldText);
 }
 
 
 /// Returns the line position at the given offset
 /// @param offset the offset to retreive the line from
 /// @return the line from the given offset
-int CharTextBuffer::lineFromOffset(int offset )
+size_t CharTextBuffer::lineFromOffset(size_t offset)
 {
-//    int result = lineFromOffsetSearch(offset);
-    int result = lineOffsetList_.findLineFromOffset(offset);
+    //  int result = lineFromOffsetSearch(offset);
+    size_t result = lineOffsetList_.findLineFromOffset(offset);
     return result;
 }
 
@@ -102,10 +100,8 @@ int CharTextBuffer::lineFromOffset(int offset )
 /// This method returns the offset of the given line
 /// @param lin the line to retrieve the offset from
 /// @return the offset of the given line
-int CharTextBuffer::offsetFromLine(int line)
+size_t CharTextBuffer::offsetFromLine(size_t line)
 {
-    if( line < 0 ) return 0;    // at the start
-
     if( line >= lineOffsetList_.length()) {
         return length();
     }
@@ -117,8 +113,8 @@ int CharTextBuffer::offsetFromLine(int line)
 /// Starts raw data appending to the buffer
 void CharTextBuffer::rawAppendBegin()
 {
-    Q_ASSERT(rawAppendStart_ == -1 );
-    Q_ASSERT(rawAppendLineStart_ == -1 );
+    Q_ASSERT(rawAppendStart_ == std::string::npos );
+    Q_ASSERT(rawAppendLineStart_ == std::string::npos );
     rawAppendStart_ = length();
     rawAppendLineStart_ = lineCount();
 }
@@ -127,9 +123,9 @@ void CharTextBuffer::rawAppendBegin()
 /// Appends a buffer of text to the document
 /// @param data the data to append
 /// @param dataLength the number of bytes availble by the data pointer
-void CharTextBuffer::rawAppend(const QChar* data, int dataLength)
+void CharTextBuffer::rawAppend(const QChar* data, size_t dataLength)
 {
-    buf_.append( data, dataLength );
+    buf_.append(data, dataLength);
 }
 
 
@@ -144,27 +140,18 @@ void CharTextBuffer::rawAppend(QChar c)
 /// Ends the 'raw' appending of data
 void CharTextBuffer::rawAppendEnd()
 {
-    Q_ASSERT(rawAppendStart_ >= 0 );
-    Q_ASSERT(rawAppendLineStart_ >= 0 );
+    Q_ASSERT(rawAppendStart_ != std::string::npos);
+    Q_ASSERT(rawAppendLineStart_ != std::string::npos);
 
-    // append all the newlines to the vector
-    /*
-    int oldLength = lineOffsetList_.length();
-    for( int i=rawAppendStart_,len=length(); i<len; ++i ){
-        if( charAt(i) == '\n' ) { lineOffsetList_.appendOffset( i+1 ); }
-    }
-    int linesAdded = lineOffsetList_.length() - oldLength;
-    */
-
-    //emit the about signal
-    TextBufferChange change( this, rawAppendStart_, 0, buf_.data() + rawAppendStart_, buf_.length() - rawAppendStart_ );
+    // emit the about signal
+    TextBufferChange change(this, rawAppendStart_, 0, buf_.data() + rawAppendStart_, buf_.length() - rawAppendStart_);
 
     emit textAboutToBeChanged( change );
     lineOffsetList_.applyChange( change );
     emit textChanged( change, QString() );
 
-    rawAppendLineStart_ = -1;
-    rawAppendStart_     = -1;
+    rawAppendLineStart_ = std::string::npos;
+    rawAppendStart_     = std::string::npos;
 }
 
 
@@ -174,6 +161,5 @@ QChar* CharTextBuffer::rawDataPointer()
 {
     return buf_.data();
 }
-
 
 } // edbee

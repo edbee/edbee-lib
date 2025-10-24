@@ -12,7 +12,6 @@
 
 namespace edbee {
 
-
 class TextGrammar;
 class Change;
 class ChangeGroup;
@@ -40,139 +39,129 @@ class TextUndoStack;
 ///
 class EDBEE_EXPORT TextDocument : public QObject
 {
-
 Q_OBJECT
 
 public:
 
-    TextDocument( QObject* parent=0);
+    TextDocument(QObject* parent = nullptr);
     virtual ~TextDocument();
 
-    /// This method should return the active textbuffer
+    /// Returns the active textbuffer
     /// Warning you should NEVER directly modify the textbuffer unless you're absolutely sure what you're doing!
     virtual TextBuffer* buffer() const = 0 ;
 
-    /// This method can be used to change the number of reserved fields by the document
+    /// Can be used to change the number of reserved fields by the document
     /// Increasing the amount will result in a realoc
     /// Decreasting the fieldcount reults in the lost of the 'old' fields
     /// At least the 'PredefinedFieldCount' amont of fields are required
-    virtual void setLineDataFieldsPerLine( int count );
+    virtual void setLineDataFieldsPerLine(size_t count);
 
     /// this method can be used to give a 'custom' line data item to a given line
     virtual TextLineDataManager* lineDataManager() { return textLineDataManager_; }
     virtual void giveLineDataManager(TextLineDataManager* manager);
-    virtual void giveLineData( int line, int field, TextLineData* dataItem );
-    virtual TextLineData* getLineData( int line, int field );
+    virtual void giveLineData(size_t line, size_t field, TextLineData* dataItem);
+    virtual TextLineData* getLineData(size_t line, size_t field);
 //    virtual TextLineData* takeLineData( int line, int field ) = 0;
 
-    /// Should return the document-scopes of this document
+    /// Returns the document-scopes of this document
     virtual TextDocumentScopes* scopes() = 0;
 
-    /// This method should return the current encoding
+    /// Returns the current encoding
     virtual TextCodec* encoding() = 0;
-    virtual void setEncoding( TextCodec* codec ) = 0;
+    virtual void setEncoding(TextCodec* codec) = 0;
 
-    /// This method should return the current line ending
+    /// Returns the current line ending
     virtual const LineEnding* lineEnding() = 0 ;
-    virtual void setLineEnding( const LineEnding* lineENding ) = 0;
+    virtual void setLineEnding(const LineEnding* lineEnding) = 0;
 
-    ///  Should return the current document lexer
+    /// Returns the current document lexer
     virtual TextLexer* textLexer() = 0;
 
-    /// This method should return the current language grammar
+    /// Returns the current language grammar
     virtual TextGrammar* languageGrammar() = 0;
 
     /// Changes the language grammar.
     /// This method should emit a grammarChanged signal (if the grammar is changed)
-    virtual void setLanguageGrammar( TextGrammar* grammar ) = 0;
+    virtual void setLanguageGrammar(TextGrammar* grammar) = 0;
 
-
-    /// This method should return the autcompletion provider list
+    /// Returns the autcompletion provider list
     virtual TextAutoCompleteProviderList* autoCompleteProviderList() = 0;
 
     /// this method should return a reference to the undo stack
     virtual TextUndoStack* textUndoStack() = 0;
-    virtual void beginUndoGroup(ChangeGroup* group=0);
-    virtual void endUndoGroup(int coalesceId, bool flatten=false );
+    virtual void beginUndoGroup(ChangeGroup* group = nullptr);
+    virtual void endUndoGroup(int coalesceId, bool flatten = false);
     virtual void endUndoGroupAndDiscard();
     virtual bool isUndoCollectionEnabled();
-    virtual void setUndoCollectionEnabled( bool enabled );
+    virtual void setUndoCollectionEnabled(bool enabled);
     virtual bool isUndoRunning();
     virtual bool isRedoRunning();
     virtual bool isUndoOrRedoRunning();
     virtual bool isPersisted();
-    virtual void setPersisted(bool enabled=true);
+    virtual void setPersisted(bool enabled = true);
 
-    /// this method should return the config
     virtual TextEditorConfig* config() const = 0;
 
-    virtual void setDocumentFilter( TextDocumentFilter* filter );
-    virtual void giveDocumentFilter( TextDocumentFilter* filter );
+    virtual void setDocumentFilter(TextDocumentFilter* filter);
+    virtual void giveDocumentFilter(TextDocumentFilter* filter);
     virtual TextDocumentFilter* documentFilter();
 
-    void beginChanges( TextEditorController* controller );
+    void beginChanges(TextEditorController* controller);
     void replaceRangeSet(TextRangeSet& rangeSet, const QString& text, bool stickySelection = false);
     void replaceRangeSet(TextRangeSet& rangeSet, const QStringList& texts, bool stickySelection = false);
-    void giveSelection( TextEditorController* controller,  TextRangeSet* rangeSet);
-    void endChanges( int coalesceId );
+    void giveSelection(TextEditorController* controller,  TextRangeSet* rangeSet);
+    void endChanges(int coalesceId);
 
+    Change* executeAndGiveChange(Change* change , int coalesceId);
 
-
-    Change* executeAndGiveChange(Change* change , int coalesceId );
-
-
-//    void giveChange( TextChange* change, bool merge  );
-    virtual Change* giveChangeWithoutFilter( Change* change, int coalesceId) = 0;
-    void append(const QString& text, int coalesceId=0 );
-    void replace( int offset, int length, const QString& text, int coalesceId=0);
-    void setText( const QString& text );
+    // void giveChange( TextChange* change, bool merge  );
+    virtual Change* giveChangeWithoutFilter(Change* change, int coalesceId) = 0;
+    void append(const QString& text, int coalesceId=0);
+    void replace(size_t offset, size_t length, const QString& text, int coalesceId = 0);
+    void setText(const QString& text);
 
     // raw access for filling the document
     void rawAppendBegin();
     void rawAppendEnd();
-    void rawAppend( QChar c );
-    void rawAppend(const QChar *chars, int length );
+    void rawAppend(QChar c);
+    void rawAppend(const QChar *chars, size_t length);
 
 public:
 
  // Methods directly forwarded to the  textbuffer
-
-    int length();
-    int lineCount();
-    QChar charAt(int idx);
-    QChar charAtOrNull(int idx);
-    int offsetFromLine( int line );
-    int lineFromOffset( int offset );
-    int columnFromOffsetAndLine( int offset, int line=-1 );
-    int offsetFromLineAndColumn( int line, int column );
-    int lineLength( int line );
-    int lineLengthWithoutNewline( int line );
+    size_t length();
+    size_t lineCount();
+    QChar charAt(size_t idx);
+    QChar charAtOrNull(size_t idx);
+    size_t offsetFromLine(size_t line);
+    size_t lineFromOffset(size_t offset);
+    size_t columnFromOffsetAndLine(size_t offset, size_t line = std::string::npos);
+    size_t offsetFromLineAndColumn(size_t line, size_t column);
+    size_t lineLength(size_t line);
+    size_t lineLengthWithoutNewline(size_t line);
     QString text();
-    QString textPart( int offset, int length );
-    QString lineWithoutNewline( int line );
-    QString line( int line );
+    QString textPart(size_t offset, size_t length);
+    QString lineWithoutNewline(size_t line);
+    QString line(size_t line);
 
 signals:
 
-    void textAboutToBeChanged( edbee::TextBufferChange change );
-    void textChanged( edbee::TextBufferChange change, QString oldText = QString() );
+    void textAboutToBeChanged(edbee::TextBufferChange change);
+    void textChanged(edbee::TextBufferChange change, QString oldText = QString());
 
-    /// This signal is emitted if the persisted state is changed
+    /// Emits if the persisted state is changed
     void persistedChanged(bool persisted);
 
-    /// This signal is emitted if the grammar has been changed
+    /// Emits if the grammar has been changed
     void languageGrammarChanged();
 
-    /// this signal is emitted if the scoped range has been changed
-    void lastScopedOffsetChanged( int previousOffset, int lastScopedOffset );
-
+    /// Emits if the scoped range has been changed
+    void lastScopedOffsetChanged(size_t previousOffset, size_t lastScopedOffset);
 
 private:
-    TextDocumentFilter* documentFilter_;             ///< The document filter if the filter is owned
-    TextDocumentFilter* documentFilterRef_;          ///< The reference to the document filter.
-
-    TextLineDataManager* textLineDataManager_;               ///< A class for managing text line data items
-
+    TextDocumentFilter* documentFilter_;            ///< The document filter if the filter is owned
+    TextDocumentFilter* documentFilterRef_;         ///< The reference to the document filter.
+    TextLineDataManager* textLineDataManager_;      ///< A class for managing text line data items
 };
 
 } // edbee

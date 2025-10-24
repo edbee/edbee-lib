@@ -1,31 +1,31 @@
-edbee-lib
-=========
+# edbee-lib
+
 [![Build Status](https://travis-ci.org/edbee/edbee-lib.svg?branch=master)](https://travis-ci.org/edbee/edbee-lib)
 [![Coverity Scan Build Status](https://scan.coverity.com/projects/13025/badge.svg)](https://scan.coverity.com/projects/edbee-edbee-lib)
 
 Edbee is a Qt based Editor Component.
-It supports Multiple-carets, Textmate Scoping/Grammar and Highlighting support.
+It supports multiple carets, Textmate Scoping/Grammar and Highlighting support.
 
 The base class of edbee is a QWidget, it has been written from scratch and is not based on the Qt default editor components.
 
 ![Screenshot of the example application](http://edbee.net/images/screenshot1.png)
 
-The main website for edbee is at http://edbee.net/
-You can find the generated documentation at http://docs.edbee.net/
+The main website for edbee is at <https://edbee.net/>
+You can find the generated documentation at <https://docs.edbee.net/>
 
 This repository is a clean extraction of the previous edbee monolithical repository.
 This library doesn't contain any data files. Using it should become as easy as the following example:
 
-```C++
+```c++
 #include "edbee/edbee.h"
 edbee::TextEditorWidget* widget =  new edbee::TextEditorWidget();
 ```
 
-Unfortunately we're not at this point yet. Currently the edbee library will not function without loading a default keymap file.
+Unfortunately we're not at this point yet. Currently the edbee library will not function
+without loading a default keymap file.
 
 
-Examples
---------
+## Examples
 
 Using the component is pretty easy. First you must setup the edbee environment.
 This process is required to make the library know the location of the settings
@@ -49,8 +49,6 @@ tm->init();
 // resources yourself. It will result in a clean shutdown
 tm->autoShutDownOnAppExit();
 ```
-
-
 
 After that you're ready to go.
 You can create a widget like this:
@@ -88,20 +86,25 @@ TextGrammar* grammar = grammarManager->detectGrammarWithFilename( "a-ruby-file.r
 widget->textDocument()->setLanguagGrammar( grammar );
 ```
 
-Auto Complete
--------------
+## Auto Complete
 
-Edbee supports autocomplete. Currently it's very limited, but the groundwork has been done for supporting more advanced autocompletions.
+Edbee supports autocomplete. Currently it's very limited, but the groundwork has been done for supporting
+more advanced autocompletions.
 
-Auto Complete works by querying autocomplete providers (TextAutoCompleteProvider).  It has a TextAutoCompleteProviderList on TextDocument level and globally via the Edbee::instance() level.
+Auto Complete works by querying autocomplete providers (TextAutoCompleteProvider).
+It has a TextAutoCompleteProviderList on TextDocument level and globally via the Edbee::instance() level.
 
-Currently only the StringTextAutoCompleteProvider is implemented. You can add an autocomplete list on the document-level and the edbeel level.
+Currently only the StringTextAutoCompleteProvider is implemented. You can add an autocomplete list on the
+document-level and the edbeel level.
 
 Ideas for the future
+
 - It should use Fuzzy search
 - Words should get a priority and should be sorted witht this priority
-- Providers based on existing words in the current TextDocument. (This requires some smart non-ui-blocking word-list building)
-- Provider based on the current scope. Keywords depending on active TextDocumentScopes (language specific/context specific lists)
+- Providers based on existing words in the current TextDocument.
+  (This requires some smart non-ui-blocking word-list building)
+- Provider based on the current scope. Keywords depending on active TextDocumentScopes
+  (language specific/context specific lists)
 - Supporting textmate/sublime like snippets (with tab stops)
 
 Currently you can set the keywords List like this:
@@ -122,43 +125,38 @@ textDocument->autoCompleteProviderList()->giveProvider(provider);
 Edbee::instance()->autoCompleteProviderList()->giveProvider(provider);
 ```
 
-
-
-
 ### Known Issues
 
 - items aren't sorted yet (this should be priority sort)
 - Currently the position of the autcomplete window isnt' very smart. (especially at the bottom and side of the document)
 - Backspace hides the window
 
-
-
-
-
-Tips and Tricks
-----------------
+## Tips and Tricks
 
 ### Object-name conflicts
 
-When you're QT projects uses for example util.cpp you can get an object-file collission. (Makefile: Warning: overriding commands for target util.o). A workaround for this is appending the following lines in your
+When you're QT projects uses for example `util.cpp` you can get an object file collision.
+(Makefile: Warning: overriding commands for target util.o).
+
+A workaround for this is appending the following lines in your
 (OBJECTS_DIR is optional, but prevents a warning when running QMAKE)
 
-```
+```pro
 CONFIG += object_parallel_to_source in your .pro file
 OBJECTS_DIR = objects
 ```
 
 
-Known Issues and Missing Features
----------------------------------
+## Known Issues and Missing Features
 
-* The editor doesn't support word-wrapping. (yet)
-* It has issues with long lines. The cause of this is the nature of QTextLayout and the support of variable font sizes. In the future this can be fixed for monospaced fonts.
-* Optimalisations for better render support and background calculate/paint-ahead functionality
-* I really want to build in scripting support, for extending the editor with plugins.
+- The editor doesn't support word-wrapping. (yet)
+- It has issues with long lines. The cause of this is the nature of QTextLayout and the support of variable font sizes.
+  In the future this can be fixed for monospaced fonts.
+- Optimalisations for better render support and background calculate/paint-ahead functionality
+- I really want to build in scripting support, for extending the editor with plugins.
 
-Dependencies
-------------
+
+## Dependencies
 
 The following dependencies have been added.
 (via git subtree, to embed the code and not add the complexity of a submodule to the end user)
@@ -175,35 +173,52 @@ To update oniguruma
 git subtree pull --prefix vendor/oniguruma/oniguruma https://github.com/kkos/oniguruma master --squash
 ```
 
-Build with minGW
-----------------
+## Build with cmake on Windows
 
 ```powershell
-# Sample to build with MinGW on Qt  (-DCMAKE_PREFIX_PATH=you cmake path)
-cmake -G "MinGW Makefiles" -DCMAKE_PREFIX_PATH="C:\Qt\6.8.0\mingw_64\lib\cmake\"  .
+# Sample to build with MinGW (-DCMAKE_PREFIX_PATH=your qt cmake path)
+mkdir build_mingw_64; cd build_mingw_64
+cmake -G "MinGW Makefiles" -DCMAKE_PREFIX_PATH="C:\Qt\6.9.1\mingw_64\lib\cmake\"  ..
 cmake --build .
+
+.\edbee-test\edbee-test.exe
 ```
 
+```powershell
+# Sample to build with LLM MinGW_64 (-DCMAKE_PREFIX_PATH=your qt cmake path)
+mkdir build_llvm-mingw_64; cd build_llvm-mingw_64
+cmake -G "MinGW Makefiles" -DCMAKE_PREFIX_PATH="C:\Qt\6.9.1\llvm-mingw_64\lib\cmake\"  ..
+cmake --build .
 
-Contributing
-------------
+.\edbee-test\edbee-test.exe
+```
 
-You can contribute via github
+```powershell
+# Sample to build with msvc2022_64  (-DCMAKE_PREFIX_PATH=your qt cmake path)
+mkdir build_msvc2022_64; cd build_msvc2022_64
+cmake -G "Visual Studio 17 2022" -DCMAKE_PREFIX_PATH="C:\Qt\6.9.1\msvc2022_64\lib\cmake\"  ..
+cmake --build .
+
+.\edbee-test\Debug\edbee-test.exe
+```
+
+## Contributing
+
+You can contribute via GitHub
+
 - Fork it
-- Create your feature branch (git checkout -b my-new-feature)
-- Commit your changes (git commit -am 'Added some feature')
+- Create your feature branch (git checkout -b my-new-feature) Commit your changes (git commit -am 'Added some feature')
 - Push to the branch (git push origin my-new-feature)
 - Create new Pull Request
 
-Of course you can also contribute by contacting me via twitter @gamecreature or drop me a message
-via the email-address supplied at [https://github.com/gamecreature](https://github.com/gamecreature)
+Of course you can also contribute by contacting me via:
 
-Issues?
--------
+- Mastodon [@rick@ruby.social](https://ruby.social/@rick)
+- Blue Key [@gamecreature.bsky.social](https://bsky.app/profile/gamecreature.bsky.social)
+- or via the email address supplied at [https://github.com/gamecreature](https://github.com/gamecreature)
 
-Though we have our own issue-tracker at ( http://issues.edbee.net/ ), you can report your problems
-via the github issue tracker or send me a message [https://github.com/gamecreature](https://github.com/gamecreature)
+## Issues?
 
-
-
+heck if the issue issue is present on our [Github page](https://github.com/edbee/edbee-lib/issues)
+and feel free to report it there.
 

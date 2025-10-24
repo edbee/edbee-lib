@@ -67,13 +67,13 @@ public:
     virtual ~DynamicVariables();
 
     void setAndGiveScopedSelector(const QString& name, const QVariant& value, const QString& selector);
-    void set( const QString& name, const QVariant& value );
+    void set(const QString& name, const QVariant& value);
 
-    int size() const;
-    int valueCount( const QString& name ) const;
+    qsizetype size() const;
+    qsizetype valueCount(const QString& name) const;
 
-    DynamicVariable* find( const QString& name, TextScopeList* scopelist );
-    QVariant value( const QString& name, TextScopeList* scopeList=0 );
+    DynamicVariable* find(const QString& name, TextScopeList* scopelist);
+    QVariant value(const QString& name, TextScopeList* scopeList = nullptr);
 
 private:
     QSet<QString> variableNames_;                                             ///< A set with all unique variable names

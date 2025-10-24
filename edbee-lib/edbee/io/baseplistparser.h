@@ -23,29 +23,28 @@ public:
 
     QString lastErrorMessage() const;
 
-    void setLastErrorMessage( const QString& str );
+    void setLastErrorMessage(const QString& str);
 
-    bool beginParsing( QIODevice* device );
+    bool beginParsing(QIODevice* device);
     bool endParsing();
 
-    void raiseError( const QString& str );
+    void raiseError(const QString& str);
 
-  // general plist parsing
+      // general plist parsing
     QList<QVariant> readList();
     QHash<QString, QVariant> readDict();
-    QVariant readNextPlistType(int level=-1);
+    QVariant readNextPlistType(qsizetype level = -1);
 
-    bool readNextElement( const QString& name, int level=-1 );
+    bool readNextElement(const QString& name, qsizetype level = -1);
     QString readElementText();
 
-    int currentStackLevel();
+    qsizetype currentStackLevel();
 
 private:
 
     QString lastErrorMessage_;               ///< The last error message
     QStack<QString> elementStack_;           ///< The elements currently on the stack
     QXmlStreamReader* xml_;                  ///< The reference of the xml reader
-
 };
 
 } // edbee

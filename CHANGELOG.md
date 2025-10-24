@@ -1,6 +1,12 @@
 # Changelog
 
-- (2025-05-16) #163, Add extra assertations to gapvector
+## v0.12.0 - Update Core Types (int => size_t / ptr_diff)
+
+- (2025-10-21) #163, Change core types in edbee to fix modern compiler warnings (see [UPDATING.md] for more info)
+  - int in data structures have been changed to size_t, (and ptrdiff_t)
+  - int in Qt rendering based code is kept int, because Qt expects int.
+
+- (2025-05-16) #163, Add extra assertions to gapvector
 - (2025-05-09) #162, Autocomplete word end detection now only ends on whitespace (improves '.' usage)
 - (2025-05-09) #163, Modern C++ improvements
   - Fixed memcpy size type issue, which potentionally could be insecure
@@ -16,14 +22,21 @@
   - TextEditorWidget::autoCompleteComponent() for getting the autocomplete component
   - TextEditorAutocompleteComponent::listWidget() for getting the listwidget
 - (2025-03-13) TextMarginComponent uses config font instead of the textWidget font
+
+## v0.11.1 - Predefined TextEditorConfig
+
 - (2025-03-05) [v0.11.1] Regression, autoInit was invoked too late the new contructor setup of #156
-- (2025-03-04) Update license headers
+- (2025-03-04) [v0.11.0] Update license headers
 - (2025-03-04) Update doxygen so it uses Doxygen Awesome
 - (2025-03-04) #156, Allow creation with predefined TextEditorConfig, TextEditorController or TextDocument
   Backwards incompatibility: ChartTextDocument can give a ambigious constructor when only nullptr is suppied
 
+## v0.10.0 - Extra line based formatting
+
 - (2025-02-27) [v0.10.0] #151, Add line based QTextLayout format additions
-  Via edbee::LineData (LineAppendTextLayoutFormatListField). see: `edbee-lib/doc/line_data.md` for sample
+  Via edbee::LineData (LineAppendTextLayoutFormatListField). see: [edbee-lib/doc/line_data.md] for sample
+
+## v0.9.0 - onig => oniguruma, QT6 default, remove qslog dependency
 
 - (2025-01-24) [v0.9.0] #150, Add version number (EDBEE_VERSION / Edbee::instance()->version())
 - (2025-01-24) #145, Replace onigmo with onigruma
@@ -31,7 +44,7 @@
 - (2024-12-28) Default cmake build is QT6 (use the BUILD_WITH_QT5 option)
 - (2024-12-22) Replaced qslog dependency with qlog_* macros to qDebug, qWarning etc.
 
-Older Items
+## Older Items
 
 - Autocomplete changes, setFocusPolicy on QMenu an adding `setAttribute(Qt::WA_ShowWithoutActivating)`
 - PR #147, Add ctrl-a /  ctrl-e support for macOS

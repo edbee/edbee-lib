@@ -13,14 +13,11 @@ class TextDocumentScopesTest : public edbee::test::TestCase
 Q_OBJECT
 
 private slots:
-
     void testStartsWith();
     void testRindexOf();
 
     void testScopeSelectorRanking();
-
 };
-
 
 } // edbee
 

@@ -19,7 +19,7 @@
 #include <QTimer>
 #include <QVBoxLayout>
 
-#include "edbee/commands/selectioncommand.h"
+//#include "edbee/commands/selectioncommand.h"
 #include "edbee/edbee.h"
 #include "edbee/texteditorcontroller.h"
 #include "edbee/models/change.h"
@@ -60,55 +60,52 @@ TextEditorWidget::TextEditorWidget(TextEditorController *controller, QWidget* pa
     scrollAreaRef_ = new class TextEditorScrollArea(this);
     scrollAreaRef_->setWidgetResizable(true);
 
-    editCompRef_   = new TextEditorComponent( controller_, scrollAreaRef_);
-    marginCompRef_ = new TextMarginComponent( this, scrollAreaRef_ );
+    editCompRef_   = new TextEditorComponent(controller_, scrollAreaRef_);
+    marginCompRef_ = new TextMarginComponent(this, scrollAreaRef_);
 
-
-    scrollAreaRef_->setWidget( editCompRef_ );
-    scrollAreaRef_->setLeftWidget( marginCompRef_ );
-//    scrollAreaRef_->setLeftWidget( new QLabel("Left",this) );//marginCompRef_ );
-//    scrollAreaRef_->setTopWidget( new QLabel("Top",this));
-//    scrollAreaRef_->setRightWidget( new QLabel("Right",this));
-//    scrollAreaRef_->setBottomWidget( new QLabel("Bottom",this));
+    scrollAreaRef_->setWidget(editCompRef_);
+    scrollAreaRef_->setLeftWidget(marginCompRef_);
+    // scrollAreaRef_->setLeftWidget( new QLabel("Left",this) );//marginCompRef_ );
+    // scrollAreaRef_->setTopWidget( new QLabel("Top",this));
+    // scrollAreaRef_->setRightWidget( new QLabel("Right",this));
+    // scrollAreaRef_->setBottomWidget( new QLabel("Bottom",this));
 
     QVBoxLayout* layout = new QVBoxLayout(this);
-    layout->addWidget( scrollAreaRef_ );
+    layout->addWidget(scrollAreaRef_);
     layout->setContentsMargins(0, 0, 0, 0);
 
     setLayout(layout);
-    setFocusProxy( editCompRef_ );
+    setFocusProxy(editCompRef_);
 
     /// TODO: Check if this works.. It could be possible the layout screws this
     /// If I add this before the setLayout everything hangs :S ...
-    autoCompleteCompRef_ = new TextEditorAutoCompleteComponent( controller_, editCompRef_, marginCompRef_ );
-
+    autoCompleteCompRef_ = new TextEditorAutoCompleteComponent(controller_, editCompRef_, marginCompRef_);
 
     marginCompRef_->init();
     connectHorizontalScrollBar();
     connectVerticalScrollBar();
-    connect( this, SIGNAL(horizontalScrollBarChanged(QScrollBar*)), SLOT(connectHorizontalScrollBar()) );
-    connect( this, SIGNAL(verticalScrollBarChanged(QScrollBar*)), SLOT(connectVerticalScrollBar()) );
-    connect( editCompRef_, SIGNAL(textKeyPressed()), autoCompleteCompRef_, SLOT(textKeyPressed()));
-    connect( controller_, SIGNAL(backspacePressed()), autoCompleteCompRef_, SLOT(backspacePressed()));
+    connect(this, SIGNAL(horizontalScrollBarChanged(QScrollBar*)), SLOT(connectHorizontalScrollBar()));
+    connect(this, SIGNAL(verticalScrollBarChanged(QScrollBar*)), SLOT(connectVerticalScrollBar()));
+    connect(editCompRef_, SIGNAL(textKeyPressed()), autoCompleteCompRef_, SLOT(textKeyPressed()));
+    connect(controller_, SIGNAL(backspacePressed()), autoCompleteCompRef_, SLOT(backspacePressed()));
 
-
-    setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Expanding );
+    setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
     editCompRef_->installEventFilter(this);     // receive events for the ability to emit focus events
-
 }
+
 
 TextEditorWidget::TextEditorWidget(TextDocument *document, QWidget *parent)
     : TextEditorWidget(new TextEditorController(document, this, nullptr), parent)
 {
-
 }
+
 
 TextEditorWidget::TextEditorWidget(TextEditorConfig *config, QWidget *parent)
     : TextEditorWidget(new TextEditorController(new CharTextDocument(config), this, nullptr), parent)
 {
-
 }
+
 
 TextEditorWidget::TextEditorWidget(QWidget* parent)
     : TextEditorWidget(new TextEditorController(this, nullptr), parent)
@@ -127,7 +124,7 @@ TextEditorWidget::~TextEditorWidget()
 }
 
 
-/// This method makes sure the given position is visible
+/// Asures the given position is visible
 /// @param xposIn the position in text-editor 'coordinates'
 /// @param yPosIn the position in text-editor 'coordinates'
 void TextEditorWidget::scrollPositionVisible(int xPosIn, int yPosIn)
@@ -146,10 +143,10 @@ TextEditorController* TextEditorWidget::controller() const
 
 /// this method scrolls the top position to the given line
 /// @param line the line to scroll to
-void TextEditorWidget::scrollTopToLine(int line)
+void TextEditorWidget::scrollTopToLine(size_t line)
 {
-    int yPos = line * textRenderer()->lineHeight();
-    scrollAreaRef_->verticalScrollBar()->setValue( qMax(0,yPos) );
+    int yPos = static_cast<int>(line) * textRenderer()->lineHeight();
+    scrollAreaRef_->verticalScrollBar()->setValue(qMax(0, yPos));
 //    scrollAreaRef_->ensureVisible( 0,  qMax(0,yPos) );
 }
 
@@ -168,7 +165,7 @@ TextEditorCommandMap* TextEditorWidget::commandMap() const
 }
 
 
-/// return the associated keymap
+/// Returns the associated keymap
 TextEditorKeyMap* TextEditorWidget::keyMap() const
 {
     return controller_->keyMap();
@@ -222,14 +219,14 @@ TextEditorAutoCompleteComponent *TextEditorWidget::autoCompleteComponent() const
     return autoCompleteCompRef_;
 }
 
-/// This method resets the caret time
+/// Resets the caret time
 void TextEditorWidget::resetCaretTime()
 {
     editCompRef_->resetCaretTime();
 }
 
 
-/// This method performs a full update. Which means it calibrates the scrollbars
+/// Rerforms a full update. Which means it calibrates the scrollbars
 /// invalidates all caches, redraws the screen and updates the scrollbars
 void TextEditorWidget::fullUpdate()
 {
@@ -245,7 +242,7 @@ QScrollBar* TextEditorWidget::horizontalScrollBar() const
 }
 
 
-/// returns the vertical scrollbar
+/// Returns the vertical scrollbar
 QScrollBar* TextEditorWidget::verticalScrollBar() const
 {
     return scrollAreaRef_->verticalScrollBar();
@@ -271,11 +268,13 @@ void TextEditorWidget::setHorizontalScrollBar(QScrollBar* scrollBar)
     emit horizontalScrollBarChanged(scrollBar);
 }
 
+
 /// Returns the auto scroll margin
 int TextEditorWidget::autoScrollMargin() const
 {
     return autoScrollMargin_;
 }
+
 
 /// Sets the auto scrollmargin
 void TextEditorWidget::setAutoScrollMargin(int amount)
@@ -283,9 +282,11 @@ void TextEditorWidget::setAutoScrollMargin(int amount)
     autoScrollMargin_ = amount;
 }
 
+
+/// Sets the text for the placeholder text document
 void TextEditorWidget::setPlaceholderText(const QString &text)
 {
-    this->textRenderer()->placeholderTextDocument()->setText(text);
+    textRenderer()->placeholderTextDocument()->setText(text);
 }
 
 
@@ -294,6 +295,7 @@ bool TextEditorWidget::readonly() const
 {
     return readonly_;
 }
+
 
 /// Set the readonly status
 void TextEditorWidget::setReadonly(bool value)
@@ -310,16 +312,17 @@ void TextEditorWidget::resizeEvent(QResizeEvent* event)
     updateRendererViewport();
 }
 
+
 /// a basic event-filter for receiving focus-events of the editor
 /// @param obj the object to filter the events for
 /// @param event the event to filter
 bool TextEditorWidget::eventFilter(QObject* obj, QEvent* event)
 {
-    if( obj == editCompRef_) {
-        if ( event->type() == QEvent::FocusIn ) {
-            emit focusIn( this );
+    if (obj == editCompRef_) {
+        if (event->type() == QEvent::FocusIn) {
+            emit focusIn(this);
         }
-        if ( event->type() == QEvent::FocusOut ) {
+        if (event->type() == QEvent::FocusOut) {
             emit focusOut(this);
         }
     }
@@ -334,14 +337,14 @@ bool TextEditorWidget::eventFilter(QObject* obj, QEvent* event)
 /// Connects the vertical scrollbar so it updates the rendering viewport
 void TextEditorWidget::connectVerticalScrollBar()
 {
-    connect( verticalScrollBar(), SIGNAL(valueChanged(int)), SLOT(updateRendererViewport()) );
+    connect(verticalScrollBar(), SIGNAL(valueChanged(int)), SLOT(updateRendererViewport()));
 }
 
 
 /// Connects the horizontal scrollbar so it updates the rendering viewport
 void TextEditorWidget::connectHorizontalScrollBar()
 {
-    connect( horizontalScrollBar(), SIGNAL(valueChanged(int)), SLOT(updateRendererViewport()) );
+    connect(horizontalScrollBar(), SIGNAL(valueChanged(int)), SLOT(updateRendererViewport()));
 }
 
 
@@ -352,7 +355,7 @@ void TextEditorWidget::connectHorizontalScrollBar()
 
 /// updates the given line so it will be repainted
 /// @Param offset the offset of the line that needs repainting
-void TextEditorWidget::updateLineAtOffset(int offset)
+void TextEditorWidget::updateLineAtOffset(size_t offset)
 {
     editCompRef_->updateLineAtOffset(offset);
     marginCompRef_->updateLineAtOffset(offset);
@@ -362,20 +365,20 @@ void TextEditorWidget::updateLineAtOffset(int offset)
 /// updates the character before and at the given offset
 /// @param offset the offset of the area to repaint.
 /// @param width the width of the area to update (default is 8 pixels)
-void TextEditorWidget::updateAreaAroundOffset(int offset, int width )
+void TextEditorWidget::updateAreaAroundOffset(size_t offset, int width)
 {
-    editCompRef_->updateAreaAroundOffset(offset,width);
+    editCompRef_->updateAreaAroundOffset(offset, width);
     marginCompRef_->updateLineAtOffset(offset);
 }
 
 
-/// This method repaints the given lines
+/// Repaints the given lines
 /// @param line the line that updates the given line
 /// @param length the number of lines to update. (default is 1 line)
-void TextEditorWidget::updateLine(int line, int length)
+void TextEditorWidget::updateLine(size_t line, size_t length)
 {
-    editCompRef_->updateLine(line,length);
-    marginCompRef_->updateLine(line,length);
+    editCompRef_->updateLine(line, length);
+    marginCompRef_->updateLine(line, length);
 
 }
 

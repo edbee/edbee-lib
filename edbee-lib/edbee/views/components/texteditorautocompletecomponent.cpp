@@ -4,14 +4,16 @@
 #include "texteditorautocompletecomponent.h"
 
 #include <QApplication>
+#include <QAbstractTextDocumentLayout>
 #include <QKeyEvent>
 #include <QLayout>
 #include <QHBoxLayout>
 #include <QWidgetAction>
 #include <QListWidget>
 #include <QListWidgetItem>
+#include <QScreen>
 #include <QTextEdit>
-#include <QtGui>
+// #include <QtGui>
 #include <QTime>
 
 #include "edbee/edbee.h"
@@ -29,7 +31,7 @@
 
 namespace edbee {
 
-TextEditorAutoCompleteComponent::TextEditorAutoCompleteComponent(TextEditorController *controller, TextEditorComponent *parent, TextMarginComponent *margin)
+TextEditorAutoCompleteComponent::TextEditorAutoCompleteComponent(TextEditorController* controller, TextEditorComponent* parent, TextMarginComponent* margin)
     : QWidget(parent)
     , controllerRef_(controller)
     , menuRef_(nullptr)
@@ -77,19 +79,19 @@ TextEditorAutoCompleteComponent::TextEditorAutoCompleteComponent(TextEditorContr
     p.setColor(QPalette::Base, QColor(37, 37, 38));
     p.setColor(QPalette::Text, Qt::white);
 
-    listWidgetRef_->setAttribute(Qt::WA_NoMousePropagation,true);   // do not wheel
+    listWidgetRef_->setAttribute(Qt::WA_NoMousePropagation, true); // do not wheel
     listWidgetRef_->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
     listWidgetRef_->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     listWidgetRef_->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
 
-    AutoCompleteDelegate *acDel = new AutoCompleteDelegate(controllerRef_, this);
+    AutoCompleteDelegate* acDel = new AutoCompleteDelegate(controllerRef_, this);
     listWidgetRef_->setItemDelegate(acDel);
 
     // make clicking in the list word
     listWidgetRef_->setMouseTracking(true);
-    connect( listWidgetRef_, SIGNAL(itemClicked(QListWidgetItem*)), this, SLOT(listItemClicked(QListWidgetItem*)));
-    connect( listWidgetRef_, SIGNAL(itemDoubleClicked(QListWidgetItem*)), this, SLOT(listItemDoubleClicked(QListWidgetItem*)));
-    connect( listWidgetRef_, SIGNAL(currentItemChanged(QListWidgetItem*, QListWidgetItem*)), this, SLOT(showInfoTip()));
+    connect(listWidgetRef_, SIGNAL(itemClicked(QListWidgetItem*)), this, SLOT(listItemClicked(QListWidgetItem*)));
+    connect(listWidgetRef_, SIGNAL(itemDoubleClicked(QListWidgetItem*)), this, SLOT(listItemDoubleClicked(QListWidgetItem*)));
+    connect(listWidgetRef_, SIGNAL(currentItemChanged(QListWidgetItem*,QListWidgetItem*)), this, SLOT(showInfoTip()));
 }
 
 
@@ -99,62 +101,66 @@ TextEditorController *TextEditorAutoCompleteComponent::controller() const
     return controllerRef_;
 }
 
+
 /// Returns the QListWidget used for the autocomplete
 QListWidget *TextEditorAutoCompleteComponent::listWidget() const
 {
     return listWidgetRef_;
 }
 
+
 QSize TextEditorAutoCompleteComponent::sizeHint() const
 {
-    if(!listWidgetRef_) return QSize();
+    if (!listWidgetRef_) return QSize();
 
-    return QSize(850, ( qMin(listWidgetRef_->count(), 10) * 15 ) + 5);
+    return QSize(850, (qMin(listWidgetRef_->count(), 10) * 15) + 5);
 }
 
 /// This method check if the autocomplete should be shown
 /// this method ALSO sets the word that's display
-bool TextEditorAutoCompleteComponent::shouldDisplayAutoComplete(TextRange& range, QString& word )
+bool TextEditorAutoCompleteComponent::shouldDisplayAutoComplete(TextRange& range, QString& word)
 {
     // when it's a selection (which shouldn't be posssible, but still check it)
-    if( range.hasSelection()) return false;
+    if (range.hasSelection()) return false;
 
     // when the character AFTER the current is a identifier we should NOT open it
     TextDocument* doc = controller()->textDocument();
     QChar nextChar = doc->charAtOrNull(range.caret());
-    if( nextChar.isLetterOrNumber() ) return false;
+    if (nextChar.isLetterOrNumber()) return false;
 
     // expand the given range to word
     TextRange wordRange = range;
-    wordRange.expandToWord(doc, doc->config()->whitespaces(), QStringList() );
+    wordRange.expandToWord(doc, doc->config()->whitespaces(), QStringList());
     wordRange.maxVar() = range.max(); // next go past the right caret!
-    word = doc->textPart(wordRange.min(), wordRange.length()).trimmed();      // workaround for space select bug! #61
+    word = doc->textPart(wordRange.min(), wordRange.length()).trimmed(); // workaround for space select bug! #61
 
-    if(word.isEmpty()) {
+    if (word.isEmpty()) {
         canceled_ = false;
         return false;
     }
 
     // canceled state, hides the autocomplete
-    if( canceled_ ) { return false; }
-
+    if (canceled_) { return false; }
 
     // else we can should
     return true;
 }
 
+
 void TextEditorAutoCompleteComponent::showInfoTip()
 {
-    if( !listWidgetRef_->isVisible() )
+    if (!listWidgetRef_->isVisible()) {
         return;
+    }
 
     const QModelIndex &current = listWidgetRef_->currentIndex();
-    if( !current.isValid() )
+    if (!current.isValid()) {
         return;
+    }
 
     QString infoTip = current.data(Qt::UserRole).toString();
-    if( infoTip.isEmpty() ) {
-//        infoTip = "No tooltip data found!";
+    if (infoTip.isEmpty()) {
+        // infoTip = "No tooltip data found!";
     }
 
     if( infoTipRef_.isNull() ) {
@@ -169,20 +175,20 @@ void TextEditorAutoCompleteComponent::showInfoTip()
     QFontMetrics fm(font);
     int maxWidth = 0;
 
-    //for( QListWidgetItem *item : listWidgetRef_->findItems("*", Qt::MatchWildcard)) {
-    for( int i=0; i<listWidgetRef_->count(); i++ ){
+    // for( QListWidgetItem *item : listWidgetRef_->findItems("*", Qt::MatchWildcard)) {
+    for(int i=0; i < listWidgetRef_->count(); i++){
         QListWidgetItem *item = listWidgetRef_->item(i);
         QString sLabel = item->data(Qt::DisplayRole).toString();
         QString sDetail = item->data(Qt::UserRole).toString();
         QString sType = "";
         int widthMod = 4;
-        if( listWidgetRef_->count() > 10 ){
+        if (listWidgetRef_->count() > 10){
             widthMod = listWidgetRef_->verticalScrollBar()->width();
             sLabel = sLabel + " ";
         }
-        if( sDetail.contains(" = ") ){
+        if (sDetail.contains(" = ")){
             sType = QString("%1").arg(sDetail.split(" = ").value(0));
-            int width = fm.horizontalAdvance(QString("%1   %2").arg(sLabel).arg(sType)) + widthMod;
+            int width = fm.horizontalAdvance(QString("%1   %2").arg(sLabel, sType)) + widthMod;
             maxWidth = qMax(width, maxWidth);
         } else {
             int width = fm.horizontalAdvance(QString("%1").arg(sLabel)) + widthMod;
@@ -191,38 +197,36 @@ void TextEditorAutoCompleteComponent::showInfoTip()
     }
 
     int spacing = 0;
-    menuRef_->resize(QSize(maxWidth + spacing + 2, ( qMin(listWidgetRef_->count(), 10) * fm.height() ) + 6 ));
-    listWidgetRef_->resize(QSize(maxWidth + spacing, ( qMin(listWidgetRef_->count(), 10) * fm.height() + 4 )));
-//    menuRef_->resize(QSize(maxWidth + spacing + 2, ( qMin(listWidgetRef_->count(), 10) * fm.height() ) ));
-//    listWidgetRef_->resize(QSize(maxWidth + spacing, ( qMin(listWidgetRef_->count(), 10) * fm.height() )));
-
+    menuRef_->resize(QSize(maxWidth + spacing + 2, (qMin(listWidgetRef_->count(), 10) * fm.height() ) + 6));
+    listWidgetRef_->resize(QSize(maxWidth + spacing, (qMin(listWidgetRef_->count(), 10) * fm.height() + 4)));
+    // menuRef_->resize(QSize(maxWidth + spacing + 2, ( qMin(listWidgetRef_->count(), 10) * fm.height() ) ));
+    // listWidgetRef_->resize(QSize(maxWidth + spacing, ( qMin(listWidgetRef_->count(), 10) * fm.height() )));
 
     QRect r = listWidgetRef_->visualItemRect(listWidgetRef_->currentItem());
     int xOffset;
-    if( listWidgetRef_->count() > 10 )
+    if (listWidgetRef_->count() > 10) {
         xOffset = 22+1;
-    else
+    } else {
         xOffset = 5+1;
+    }
 
     //fetch the current selection
     TextRange range = controller()->textSelection()->range(0);
 
     QSize tipSize = infoTipRef_->tipText->documentLayout()->documentSize().toSize();
-
     infoTipRef_->resize(tipSize.width(), tipSize.height() - 4);
 
-    //position the list
-    positionWidgetForCaretOffset( qMax(0,range.caret() - currentWord_.length()) );
+    // position the list
+    positionWidgetForCaretOffset(qMax(static_cast<size_t>(0u), range.caret() - static_cast<size_t>(currentWord_.length())));
 
     QPoint newLoc(listWidgetRef_->parentWidget()->mapToGlobal(r.topRight()).x() + xOffset, listWidgetRef_->parentWidget()->mapToGlobal(r.topRight()).y() + 1);
-
     QRect screen = QApplication::primaryScreen()->availableGeometry();
 
-    if( newLoc.x() + infoTipRef_->width() > screen.x() + screen.width() && (menuRef_->x() - infoTipRef_->width() - 1) >= 0 ){
+    if (newLoc.x() + infoTipRef_->width() > screen.x() + screen.width() && (menuRef_->x() - infoTipRef_->width() - 1) >= 0 ){
         newLoc.setX(menuRef_->x() - infoTipRef_->width() - 1);
     }
 
-    if(!infoTip.isEmpty()) {
+    if (!infoTip.isEmpty()) {
         infoTipRef_->repaint();
         infoTipRef_->move(newLoc);
         infoTipRef_->show();
@@ -232,19 +236,23 @@ void TextEditorAutoCompleteComponent::showInfoTip()
     }
 }
 
+
 void TextEditorAutoCompleteComponent::hideInfoTip()
 {
-    if ( !infoTipRef_.isNull() )
+    if (!infoTipRef_.isNull()) {
         infoTipRef_->hide();
+    }
 }
+
 
 /// Fills the autocomplete list
 bool TextEditorAutoCompleteComponent::fillAutoCompleteList(TextDocument* document, const TextRange& range, const QString& word)
 {
     listWidgetRef_->clear();
-    QList<TextAutoCompleteItem*> items = document->autoCompleteProviderList()->findAutoCompleteItemsForRange(document,range,word);
-    if( items.length() > 0 ) {
-        foreach( TextAutoCompleteItem* item, items ) {
+    QList<TextAutoCompleteItem*> items = document->autoCompleteProviderList()->findAutoCompleteItemsForRange(document, range, word);
+
+    if (items.length() > 0) {
+        foreach (TextAutoCompleteItem* item, items) {
             QListWidgetItem *wItem = new QListWidgetItem();
             wItem->setData(Qt::DisplayRole, item->label());
             wItem->setData(Qt::DecorationRole, item->kind());
@@ -252,19 +260,17 @@ bool TextEditorAutoCompleteComponent::fillAutoCompleteList(TextDocument* documen
             wItem->setData(Qt::WhatsThisRole, item->documentation());
             listWidgetRef_->addItem(wItem);
         }
-        listWidgetRef_->setCurrentIndex(listWidgetRef_->model()->index(0,0) );
-    }
-    else
-    {
+        listWidgetRef_->setCurrentIndex(listWidgetRef_->model()->index(0, 0));
+    } else {
         hide();
     }
 
     QFont font = controller()->textDocument()->config()->font();
     QFontMetrics fm(font);
 
-    setFixedHeight( ( qMin(listWidgetRef_->count(), 10) * fm.height() ) + 4 );
+    setFixedHeight((qMin(listWidgetRef_->count(), 10) * fm.height()) + 4);
 
-    if( items.length() > 10 ) {
+    if (items.length() > 10) {
         listWidgetRef_->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
     } else {
         listWidgetRef_->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -275,7 +281,7 @@ bool TextEditorAutoCompleteComponent::fillAutoCompleteList(TextDocument* documen
 
 
 /// positions the widget so it's visible.
-void TextEditorAutoCompleteComponent::positionWidgetForCaretOffset(int offset)
+void TextEditorAutoCompleteComponent::positionWidgetForCaretOffset(size_t offset)
 {
     // find the caret position
     TextRenderer* renderer = controller()->textRenderer();
@@ -307,7 +313,7 @@ void TextEditorAutoCompleteComponent::positionWidgetForCaretOffset(int offset)
     newLoc.setX(qMax(screen.left(), newLoc.x()));                                   //constrain the origin of the list to the leftmost pixel
     newLoc.setY(qMax(screen.top(), newLoc.y()));                                    //constrain the origin of the list to the topmost pixel
     newLoc.setX(qMin(screen.x() + screen.width() - menuRef_->width(), newLoc.x())); //ensure that the entire width of the list can be shown to the right
-    if( newLoc.y() + menuRef_->height() > screen.bottom() ){                        //if the list could go below the bottom, draw above
+    if (newLoc.y() + menuRef_->height() > screen.bottom()){                        //if the list could go below the bottom, draw above
         newLoc.setY(qMin(newLoc.y(), screen.bottom()) - menuRef_->height());        //positions the list above the word
     } else {
         newLoc.setY(newLoc.y() + renderer->lineHeight()); //places it below the line, as normal
@@ -315,35 +321,38 @@ void TextEditorAutoCompleteComponent::positionWidgetForCaretOffset(int offset)
     menuRef_->move(newLoc.x(), newLoc.y());
 }
 
+
 /// intercepts hide() calls to inform the tooltip to hide as well
-void TextEditorAutoCompleteComponent::hideEvent(QHideEvent *event)
+void TextEditorAutoCompleteComponent::hideEvent(QHideEvent* event)
 {
     infoTipRef_->hide();
     event->isAccepted();
 }
 
+
 /// we need to intercept keypresses if the widget is visible
 bool TextEditorAutoCompleteComponent::eventFilter(QObject *obj, QEvent *event)
 {
-    if( event->type() == QEvent::Close && obj == menuRef_) {
+    if (event->type() == QEvent::Close && obj == menuRef_) {
         hide();
         hideInfoTip();
         return QObject::eventFilter(obj, event);
     }
-    if( obj == listWidgetRef_ && event->type()==QEvent::KeyPress ) {
+
+    if(obj == listWidgetRef_ && event->type() == QEvent::KeyPress) {
         QKeyEvent* key = static_cast<QKeyEvent*>(event);
 
         // text keys are allowed
-        if( !key->text().isEmpty() ) {
+        if (!key->text().isEmpty()) {
             QChar nextChar = key->text().at(0);
-            if( nextChar.isLetterOrNumber() ) {
+            if (nextChar.isLetterOrNumber()) {
               QApplication::sendEvent(editorComponentRef_, event);
               return true;
             }
         }
 
         // escape key
-        switch( key->key() ) {
+        switch (key->key()) {
             case Qt::Key_Escape:
                 menuRef_->close();
                 canceled_ = true;
@@ -352,11 +361,11 @@ bool TextEditorAutoCompleteComponent::eventFilter(QObject *obj, QEvent *event)
             case Qt::Key_Enter:
             case Qt::Key_Return:
             case Qt::Key_Tab:
-                if( listWidgetRef_->currentItem() && currentWord_ == listWidgetRef_->currentItem()->text() ) { // sends normal enter/return/tab if you've typed a full word
+                if (listWidgetRef_->currentItem() && currentWord_ == listWidgetRef_->currentItem()->text()) { // sends normal enter/return/tab if you've typed a full word
                     menuRef_->close();
                     QApplication::sendEvent(editorComponentRef_, event);
                     return true;
-                } else if ( listWidgetRef_->currentItem() ) {
+                } else if (listWidgetRef_->currentItem()) {
                     insertCurrentSelectedListItem();
                     menuRef_->close();
                     return true;
@@ -393,11 +402,12 @@ bool TextEditorAutoCompleteComponent::eventFilter(QObject *obj, QEvent *event)
 void TextEditorAutoCompleteComponent::insertCurrentSelectedListItem()
 {
     TextSelection* sel = controller()->textSelection();
-    sel->moveCarets(- currentWord_.length());
-    if( listWidgetRef_->currentItem() ) {
+    sel->moveCarets(-currentWord_.length());
+    if (listWidgetRef_->currentItem()) {
         controller()->replaceSelection(listWidgetRef_->currentItem()->text());
     }
 }
+
 
 void TextEditorAutoCompleteComponent::updateList()
 {
@@ -410,17 +420,16 @@ void TextEditorAutoCompleteComponent::updateList()
     }
 
     // when the character after
-    if(!shouldDisplayAutoComplete(range, currentWord_)) {
-        if(isVisible()) {
+    if (!shouldDisplayAutoComplete(range, currentWord_)) {
+        if (isVisible()) {
             menuRef_->close();
         }
         return;
     }
 
     // fills the autocomplete list with the curent word
-    if( fillAutoCompleteList(doc, range, currentWord_)) {
+    if (fillAutoCompleteList(doc, range, currentWord_)) {
         menuRef_->popup(menuRef_->pos());
-
         editorComponentRef_->setFocus();
 
         // position the widget
@@ -430,11 +439,13 @@ void TextEditorAutoCompleteComponent::updateList()
     }
 }
 
+
 /// this event is called when a key pressed
 void TextEditorAutoCompleteComponent::textKeyPressed()
 {
     updateList();
 }
+
 
 /// processes backspaces
 void TextEditorAutoCompleteComponent::backspacePressed()
@@ -442,36 +453,44 @@ void TextEditorAutoCompleteComponent::backspacePressed()
     updateList();
 }
 
+
 void TextEditorAutoCompleteComponent::listItemClicked(QListWidgetItem* item)
 {
     item->setSelected(true);
     showInfoTip();
 }
 
-void TextEditorAutoCompleteComponent::listItemDoubleClicked(QListWidgetItem*)
+
+void TextEditorAutoCompleteComponent::listItemDoubleClicked(QListWidgetItem* item)
 {
+    Q_UNUSED(item);
     insertCurrentSelectedListItem();
     menuRef_->close();
 }
 
+
 void TextEditorAutoCompleteComponent::selectItemOnHover(QModelIndex modelIndex)
 {
-    listWidgetRef_->selectionModel()->select(modelIndex,QItemSelectionModel::SelectCurrent);
+    listWidgetRef_->selectionModel()->select(modelIndex, QItemSelectionModel::SelectCurrent);
 }
 
-AutoCompleteDelegate::AutoCompleteDelegate(TextEditorController *controller, QObject *parent) : QAbstractItemDelegate(parent)
+
+
+AutoCompleteDelegate::AutoCompleteDelegate(TextEditorController* controller, QObject* parent)
+    : QAbstractItemDelegate(parent)
 {
     pixelSize = 12;
     controllerRef_ = controller;
 }
+
 
 TextEditorController *AutoCompleteDelegate::controller() const
 {
     return controllerRef_;
 }
 
-void AutoCompleteDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option,
-                          const QModelIndex &index) const
+
+void AutoCompleteDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
     TextRenderer* renderer = controller()->textRenderer();
     TextTheme* themeRef_ = renderer->theme();
@@ -481,10 +500,11 @@ void AutoCompleteDelegate::paint(QPainter *painter, const QStyleOptionViewItem &
     QFont font = controller()->textDocument()->config()->font();
     QFontMetrics fm(font);
 
-    if (option.state & QStyle::State_Selected)
+    if (option.state & QStyle::State_Selected) {
         painter->fillRect(option.rect, renderer->theme()->selectionColor());
-    else
+    } else {
         painter->fillRect(option.rect, renderer->theme()->backgroundColor());
+    }
     painter->save();
 
     painter->setRenderHint(QPainter::Antialiasing, true);
@@ -492,7 +512,7 @@ void AutoCompleteDelegate::paint(QPainter *painter, const QStyleOptionViewItem &
 
     QString sLabel = index.data(Qt::DisplayRole).toString();
     QString sDetail = index.data(Qt::UserRole).toString();
-    QString sDocumentation = index.data(Qt::WhatsThisRole).toString();
+    // QString sDocumentation = index.data(Qt::WhatsThisRole).toString();
     QString sType = "void";
 
     if (sDetail.contains(" = ")) {
@@ -502,30 +522,31 @@ void AutoCompleteDelegate::paint(QPainter *painter, const QStyleOptionViewItem &
     QRect typeRect = option.rect;
     QRect hyphenRect = option.rect;
     QRect nameRect = option.rect;
-    QPen typePen = QPen(themeRef_->findHighlightForegroundColor());
-    QPen namePen = QPen(themeRef_->foregroundColor());
+    // QPen typePen = QPen(themeRef_->findHighlightForegroundColor());
+    // QPen namePen = QPen(themeRef_->foregroundColor());
 
     hyphenRect.setX(hyphenRect.x() + fm.horizontalAdvance(sLabel));
     typeRect.setX(nameRect.x() + nameRect.width() - fm.horizontalAdvance(sType) - 1);
     painter->setFont(font);
     painter->drawText(nameRect, sLabel);
 
-    if (sType != "void")
-    {
+    if (sType != "void") {
         painter->drawText(typeRect, sType);
     }
     painter->restore();
 }
 
+
 QSize AutoCompleteDelegate::sizeHint(const QStyleOptionViewItem&, const QModelIndex&) const
 {
     const QFont font = controller()->textDocument()->config()->font();
     QFontMetrics fm(font);
-    return QSize(100, ( fm.height() ) );
+    return QSize(100, (fm.height()));
 }
 
-FakeToolTip::FakeToolTip(TextEditorController *controller, QWidget *parent) :
-    QWidget(parent, Qt::ToolTip | Qt::WindowStaysOnTopHint )
+
+FakeToolTip::FakeToolTip(TextEditorController* controller, QWidget* parent)
+    : QWidget(parent, Qt::ToolTip | Qt::WindowStaysOnTopHint )
 {
     setFocusPolicy(Qt::NoFocus);
     setAttribute(Qt::WA_ShowWithoutActivating);
@@ -533,7 +554,6 @@ FakeToolTip::FakeToolTip(TextEditorController *controller, QWidget *parent) :
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
     tipText = new QTextDocument(this);
-
     tipText->setHtml("");
 
     controllerRef_ = controller;
@@ -557,13 +577,17 @@ void FakeToolTip::setText(const QString text)
     tipText->setHtml(QString("<p>%1</p>").arg(text));
 }
 
+
 TextEditorController *FakeToolTip::controller()
 {
     return controllerRef_;
 }
 
-void FakeToolTip::paintEvent(QPaintEvent*)
+
+void FakeToolTip::paintEvent(QPaintEvent* event)
 {
+    Q_UNUSED(event);
+
     QStyle *style = this->style();
     QPainter *p = new QPainter(this);
     QStyleOptionFrame *opt = new QStyleOptionFrame();
@@ -598,8 +622,10 @@ void FakeToolTip::paintEvent(QPaintEvent*)
     delete opt;
 }
 
-void FakeToolTip::resizeEvent(QResizeEvent *)
+void FakeToolTip::resizeEvent(QResizeEvent* event)
 {
+    Q_UNUSED(event);
+
     QStyleHintReturnMask frameMask;
     QStyleOption option;
     option.initFrom(this);

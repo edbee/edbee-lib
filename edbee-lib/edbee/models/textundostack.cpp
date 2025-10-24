@@ -15,7 +15,7 @@ namespace edbee {
 
 
 /// Constructs the main undostack
-TextUndoStack::TextUndoStack( TextDocument* doc, QObject *parent)
+TextUndoStack::TextUndoStack(TextDocument* doc, QObject *parent)
     : QObject(parent)
     , documentRef_(doc)
     , changeList_()
@@ -46,7 +46,7 @@ void TextUndoStack::clearHistoryLists()
 {
     qDeleteAll(changeList_);
     changeList_.clear();
-    qDeleteAll( undoGroupStack_ );
+    qDeleteAll(undoGroupStack_);
     undoGroupStack_.clear();
     lastCoalesceIdStack_.clear();
 }
@@ -61,10 +61,10 @@ void TextUndoStack::clear()
     // point all the indices to BLANK
     changeIndex_ = 0;
     setPersistedIndex(-1); // clearing the undo-stack must result in a non-saved state
-    QMapIterator<TextEditorController*, int> itr(controllerIndexMap_);
+    QMapIterator<TextEditorController*, qsizetype> itr(controllerIndexMap_);
     while (itr.hasNext()) {
         itr.next();
-        controllerIndexMap_.insert( itr.key(), 0 );
+        controllerIndexMap_.insert(itr.key(), 0);
     }
 }
 
@@ -72,7 +72,7 @@ void TextUndoStack::clear()
 /// Registers acontroller for it's own view pointer
 void TextUndoStack::registerContoller(TextEditorController* controller)
 {
-    controllerIndexMap_.insert(controller,changeIndex_);
+    controllerIndexMap_.insert(controller, changeIndex_);
 }
 
 
@@ -84,19 +84,19 @@ void TextUndoStack::unregisterController(TextEditorController* controller)
 
 
 /// Checks if the given controller is registered
-bool TextUndoStack::isControllerRegistered(TextEditorController *controller)
+bool TextUndoStack::isControllerRegistered(TextEditorController* controller)
 {
     return controllerIndexMap_.contains(controller);
 }
 
 
 /// Starts an undo group (or increase nest-level-counter)
-void TextUndoStack::beginUndoGroup( ChangeGroup* group )
+void TextUndoStack::beginUndoGroup(ChangeGroup* group)
 {
 //    if( !group ) { group = new TextChangeGroup(controller); }
-    undoGroupStack_.append( group );
+    undoGroupStack_.append(group);
     lastCoalesceIdStack_.append(0);
-    emit undoGroupStarted( group );
+    emit undoGroupStarted(group);
 }
 
 
@@ -104,7 +104,7 @@ void TextUndoStack::beginUndoGroup( ChangeGroup* group )
 /// @return the current undo stack item or 0
 ChangeGroup* TextUndoStack::currentGroup()
 {
-    if( undoGroupStack_.isEmpty() ) { return 0; }
+    if (undoGroupStack_.isEmpty()) { return nullptr; }
     return undoGroupStack_.last();
 }
 
@@ -112,37 +112,41 @@ ChangeGroup* TextUndoStack::currentGroup()
 /// Ends the undogroup
 /// @param coalesceId the coalesceId to use
 /// @param flatten should the textchange groups be flattened
-void TextUndoStack::endUndoGroup(int coalesceId, bool flatten )
+void TextUndoStack::endUndoGroup(int coalesceId, bool flatten)
 {
     Q_ASSERT(!undoGroupStack_.isEmpty());
-    if( undoGroupStack_.isEmpty() ) return;
+
+    if ( undoGroupStack_.isEmpty()) return;
     ChangeGroup* group = undoGroupStack_.pop();
     lastCoalesceIdStack_.pop();
 
-    if( group ) {
+    if (group) {
         group->groupClosed();   // close the group
 
         // flatten the group?
-        if( flatten ) {
+        if (flatten) {
             group->flatten();
         }
+
         // multiple-changes or not discardable
-        if( !group->isDiscardable() || group->size() > 1 ) {
-            Change* newChange = giveChange( group , coalesceId );
+        if (!group->isDiscardable() || group->size() > 1) {
+            Change* newChange = giveChange(group , coalesceId);
             bool merged = newChange && newChange != group;
-            emit undoGroupEnded( coalesceId, merged, ActionEnd );
+            emit undoGroupEnded(coalesceId, merged, ActionEnd);
 
         // a single change (don't give the group, just the single change)
-        } else if( group->size() == 1 ) {
+        } else if (group->size() == 1) {
             Change* change = group->takeLast();
-            Change* newChange = giveChange( change, coalesceId );
+            Change* newChange = giveChange(change, coalesceId);
             bool merged = newChange && newChange != change;
             delete group;
-            emit undoGroupEnded( coalesceId, merged, ActionUngrouped );
+
+            emit undoGroupEnded(coalesceId, merged, ActionUngrouped);
         // empty group, can be optimized away
         } else {
             delete group;
-            emit undoGroupEnded( coalesceId, false, ActionFullDiscard );
+
+            emit undoGroupEnded(coalesceId, false, ActionFullDiscard);
         }
     }
 }
@@ -152,44 +156,45 @@ void TextUndoStack::endUndoGroup(int coalesceId, bool flatten )
 void TextUndoStack::endUndoGroupAndDiscard()
 {
     Q_ASSERT(!undoGroupStack_.isEmpty());
-    if( undoGroupStack_.isEmpty() ) return;
+
+    if (undoGroupStack_.isEmpty()) return;
     ChangeGroup* group = undoGroupStack_.pop();
     lastCoalesceIdStack_.pop();
 
-    if( group ) {
+    if (group) {
         group->groupClosed();   // close the group
         delete group;
-        emit undoGroupEnded( 0, false, ActionFullDiscard );
+        emit undoGroupEnded(0, false, ActionFullDiscard);
     }
 }
 
 
 /// returns the number of stacked undo-groups
-int TextUndoStack::undoGroupLevel()
+size_t TextUndoStack::undoGroupLevel()
 {
-    return undoGroupStack_.size();
+    return static_cast<size_t>(undoGroupStack_.size());
 }
 
 
 /// returns the last coalesceId at the given level
 int TextUndoStack::lastCoalesceIdAtCurrentLevel()
 {
-    return lastCoalesceIdStack_[ lastCoalesceIdStack_.size()-1 ];
+    return lastCoalesceIdStack_[lastCoalesceIdStack_.size() - 1];
 }
 
 
 /// Sets the last coalesceId at the current level
 void TextUndoStack::setLastCoalesceIdAtCurrentLevel(int id)
 {
-    lastCoalesceIdStack_[ lastCoalesceIdStack_.size()-1 ] = id;
+    lastCoalesceIdStack_[lastCoalesceIdStack_.size() - 1] = id;
 }
 
 
 /// Resets all coalsceIds
 void TextUndoStack::resetAllLastCoalesceIds()
 {
-    for( int i=0, cnt=lastCoalesceIdStack_.size(); i<cnt; ++i ) {
-        lastCoalesceIdStack_[i]=0;
+    for (qsizetype i = 0, cnt = lastCoalesceIdStack_.size(); i < cnt; ++i) {
+        lastCoalesceIdStack_[i] = 0;
     }
 }
 
@@ -204,35 +209,35 @@ void TextUndoStack::resetAllLastCoalesceIds()
 ///        The return value is 0, if the change was discared
 ///        The return value == change if the change was appended to the stack
 ///        The return value != change if the change was merged  (previous stack item is returned)
-Change* TextUndoStack::giveChange(Change* change, int coalesceId )
+Change* TextUndoStack::giveChange(Change* change, int coalesceId)
 {
     // when undo-collection is disabled. don't record the change
-    if( !collectionEnabled_ ) {
+    if (!collectionEnabled_) {
         delete change;
-        return 0;
+        return nullptr;
     }
 
-    ChangeGroup* group = undoGroupStack_.isEmpty() ? 0 : undoGroupStack_.top();
+    ChangeGroup* group = undoGroupStack_.isEmpty() ? nullptr : undoGroupStack_.top();
 
     int lastCoalesceId = lastCoalesceIdAtCurrentLevel();
     bool merge = lastCoalesceId && lastCoalesceIdStack_.top() == coalesceId && coalesceId != CoalesceId_None;
 
     setLastCoalesceIdAtCurrentLevel(coalesceId);
-    if( coalesceId == CoalesceId_ForceMerge ) { merge = true; }
+    if (coalesceId == CoalesceId_ForceMerge) { merge = true; }
 
     // still an undogroup active ?
     //----------------------------
-    if( group ) {
+    if (group) {
         //TextEditorController* controller = change->controllerContext();
         // try to merge the operation
-        if( merge ) {
+        if (merge) {
             Change* lastChange = group->last();
-            if( lastChange && lastChange->giveAndMerge( documentRef_, change ) ) {
+            if(lastChange && lastChange->giveAndMerge(documentRef_, change)) {
                 return lastChange;
             }
         }
 
-        group->giveChange( document(), change);
+        group->giveChange(document(), change);
         // TODO: giveChange to a group can also merge a change. This can have implications
         //   on the change. At the moment I simply return the group. I doubt this is correct
         //   for the moment it's the best solution for this problem
@@ -243,12 +248,12 @@ Change* TextUndoStack::giveChange(Change* change, int coalesceId )
     } else {
         // get the optional controller context
         TextEditorController* controller = change->controllerContext();
-        clearRedo( controller );
+        clearRedo(controller);
 
         // try to merge the operation
-        if( merge ) {
-            Change* lastChange = this->findUndoChange(controller);
-            if( lastChange && lastChange->giveAndMerge( documentRef_, change ) ) {
+        if (merge) {
+            Change* lastChange = findUndoChange(controller);
+            if (lastChange && lastChange->giveAndMerge( documentRef_, change)) {
                 //emit changeMerged( lastChange, change );
                 dumpStackInternal();
                 return lastChange;
@@ -260,18 +265,18 @@ Change* TextUndoStack::giveChange(Change* change, int coalesceId )
 
         // increase the pointers
         // controller-only change, only update the controller pointer
-        if( controller ) {
+        if (controller) {
             controllerIndexMap_[controller] = changeList_.size();
 
         // model-change update the model-pointer and ALL controller pointers
         } else {
-            setChangeIndex( changeList_.size() );
-            QMap<TextEditorController*, int>::iterator i;
+            setChangeIndex(changeList_.size());
+            QMap<TextEditorController*, qsizetype>::iterator i;
             for (i = controllerIndexMap_.begin(); i != controllerIndexMap_.end(); ++i) {
                 i.value() = changeIndex_;
             }
         }
-        emit changeAdded( change );
+        emit changeAdded(change);
 
     }
     dumpStackInternal();
@@ -279,7 +284,7 @@ Change* TextUndoStack::giveChange(Change* change, int coalesceId )
 }
 
 
-/// Should check if a undo operation can be performed.
+/// Checks if a undo operation can be performed.
 /// When no controller is given a document-undo is checkd
 /// else a view specific soft undo is tested
 bool TextUndoStack::canUndo(TextEditorController* controller)
@@ -288,7 +293,7 @@ bool TextUndoStack::canUndo(TextEditorController* controller)
 }
 
 
-/// Should check if a redo operation can be performed.
+/// Checks if a redo operation can be performed.
 /// When no controller is given a document-redo is checkd
 /// else a view specific soft redo is tested
 bool TextUndoStack::canRedo(TextEditorController* controller)
@@ -297,23 +302,23 @@ bool TextUndoStack::canRedo(TextEditorController* controller)
 }
 
 
-/// performs an undo operation
+/// Performs an undo operation
 /// @param controller this method is called
-void TextUndoStack::undo(TextEditorController* controller, bool controllerOnly )
+void TextUndoStack::undo(TextEditorController* controller, bool controllerOnly)
 {
     Q_ASSERT(!undoRunning_);
     undoRunning_ = true;
     resetAllLastCoalesceIds();
 
-    Change* changeToUndo = this->findUndoChange( controller );
+    Change* changeToUndo = this->findUndoChange(controller);
     // only for the current controller
-    if( changeToUndo && changeToUndo->controllerContext() ) {
-        Q_ASSERT(changeToUndo->controllerContext() == controller );
-        undoControllerChange( controller );
+    if (changeToUndo && changeToUndo->controllerContext()) {
+        Q_ASSERT(changeToUndo->controllerContext() == controller);
+        undoControllerChange(controller);
 
     // else we need to undo ALL other controller changes
-    } else if( !controllerOnly ) {
-        undoDocumentChange( );
+    } else if(!controllerOnly) {
+        undoDocumentChange();
     }
     dumpStackInternal();
 
@@ -321,21 +326,21 @@ void TextUndoStack::undo(TextEditorController* controller, bool controllerOnly )
 }
 
 
-/// performs the redo operation for the given controller
+/// Performs the redo operation for the given controller
 /// @param controller the controller to execute the redo for
 /// @param controllerOnly undo controller undo's only?
-void TextUndoStack::redo(TextEditorController* controller, bool controllerOnly )
+void TextUndoStack::redo(TextEditorController* controller, bool controllerOnly)
 {
     Q_ASSERT(!redoRunning_);
     redoRunning_ = true;
     resetAllLastCoalesceIds();
 
-    Change* changeToRedo = findRedoChange( controller );
-    if( changeToRedo && changeToRedo->controllerContext() ) {
-        Q_ASSERT(changeToRedo->controllerContext() == controller );
-        redoControllerChange( controller );
+    Change* changeToRedo = findRedoChange(controller);
+    if (changeToRedo && changeToRedo->controllerContext()) {
+        Q_ASSERT(changeToRedo->controllerContext() == controller);
+        redoControllerChange(controller);
 
-    } else if( !controllerOnly ){
+    } else if (!controllerOnly){
         redoDocumentChange();
 
     }
@@ -344,54 +349,53 @@ void TextUndoStack::redo(TextEditorController* controller, bool controllerOnly )
 }
 
 
-/// returns the number of changes on the stack
-int TextUndoStack::size()
+/// Returns the number of changes on the stack
+qsizetype TextUndoStack::size()
 {
     return changeList_.size();
 }
 
 
-/// returns the change at the given index
-Change* TextUndoStack::at(int idx)
+/// Returns the change at the given index
+Change* TextUndoStack::at(qsizetype idx)
 {
     return changeList_.at(idx);
 }
 
 
-/// This method return the index that's active for the given controller
+/// Returns the index that's active for the given controller
 /// The currentIndex points directly AFTER the last placed item on the stack
-int TextUndoStack::currentIndex(TextEditorController* controller)
+qsizetype TextUndoStack::currentIndex(TextEditorController* controller)
 {
-    if( controller ) {
-        Q_ASSERT( controllerIndexMap_.contains(controller) );
+    if (controller) {
+        Q_ASSERT(controllerIndexMap_.contains(controller));
         return controllerIndexMap_.value(controller);
     } else {
         return changeIndex_;
     }
-
 }
 
 
-/// This method returns the current redo change. This maybe the change for the given context or the document change
+/// Returns the current redo change. This maybe the change for the given context or the document change
 /// depending on what comes first
 /// @param controller the controller this change is for
 /// @return the new text change (0 if there aren't any redo items availabe for the given context). When a controller is given the document change is ALSO returned
 Change* TextUndoStack::findRedoChange(TextEditorController* controller)
 {
-    int redoIndex = findRedoIndex( currentIndex(controller), controller );
-    if( redoIndex < changeList_.size() ) {
-        return at( redoIndex );
+    qsizetype redoIndex = findRedoIndex(currentIndex(controller), controller);
+    if (redoIndex < changeList_.size()) {
+        return at(redoIndex);
     }
-    return 0;
+    return nullptr;
 }
 
 
-/// This method returns the last index for a given controller
+/// Returns the last index for a given controller
 /// The lastIndex points to the index on the stack
 /// @return the index on the stack or -1 if the item isn't on the undo-stack
-int TextUndoStack::lastIndex(TextEditorController *controller)
+qsizetype TextUndoStack::lastIndex(TextEditorController* controller)
 {
-    return currentIndex( controller ) - 1;
+    return currentIndex(controller) - 1;
 }
 
 
@@ -400,29 +404,29 @@ int TextUndoStack::lastIndex(TextEditorController *controller)
 /// @return the last change (with optional the controller context) 0 if no last change
 Change* TextUndoStack::last(TextEditorController* controller)
 {
-    int idx = lastIndex(controller);
-    if( idx < 0 ) { return  0; }
+    qsizetype idx = lastIndex(controller);
+    if (idx < 0) { return  nullptr; }
     return at(idx);
 }
 
 
 /// The number of doc-'undo' items on the stack
-int TextUndoStack::sizeInDocChanges()
+qsizetype TextUndoStack::sizeInDocChanges()
 {
-    int count = 0;
-    foreach( Change* change, changeList_ ) {
-        if( change->isDocumentChange() ) { ++count;}
+    qsizetype count = 0;
+    foreach (Change* change, changeList_) {
+        if (change->isDocumentChange()) { ++count;}
     }
     return count;
 }
 
 
 /// This method returns the current doc change index
-int TextUndoStack::currentIndexInDocChanges()
+qsizetype TextUndoStack::currentIndexInDocChanges()
 {
-    int index = 0;
-    for( int i=0; i < changeIndex_; ++i ) {
-        if( changeList_.at(i)->isDocumentChange() ) { ++index; }
+    qsizetype index = 0;
+    for (int i = 0; i < changeIndex_; ++i) {
+        if(changeList_.at(i)->isDocumentChange()) { ++index; }
     }
     return index;
 }
@@ -431,38 +435,38 @@ int TextUndoStack::currentIndexInDocChanges()
 /// This method returns the last change (TOS) for the given controller
 Change* TextUndoStack::findUndoChange(TextEditorController* controller)
 {
-    int undoIndex = this->findUndoIndex( currentIndex(controller), controller );
-    if( undoIndex >= 0 ) {
+    qsizetype undoIndex = findUndoIndex(currentIndex(controller), controller);
+    if (undoIndex >= 0) {
         return changeList_.at(undoIndex);
     }
-    return 0;
+    return nullptr;
 }
 
 
 /// Marks the current documentIndex as persisted
 void TextUndoStack::setPersisted(bool enabled)
 {
-    setPersistedIndex( enabled ? currentIndex() : -1);
+    setPersistedIndex(enabled ? currentIndex() : -1);
 }
 
 
 /// returns true if the undo-stack is on a persisted index
 bool TextUndoStack::isPersisted()
 {
-    int curIdx = currentIndex();
-    if( persistedIndex_ == curIdx ) { return true; }
-    if( persistedIndex_ < 0 ) { return false;}
+    qsizetype curIdx = currentIndex();
+    if (persistedIndex_ == curIdx) { return true; }
+    if (persistedIndex_ < 0 ){ return false;}
 
     // check if all changes are non-persistable
-    int startIdx = qMax( 0, qMin( curIdx, persistedIndex_ ));
-    int endIdx   = qMin( qMax( curIdx, persistedIndex_ ), changeList_.size());
+    qsizetype startIdx = qMax(static_cast<qsizetype>(0), qMin(curIdx, persistedIndex_));
+    qsizetype endIdx   = qMin(qMax(curIdx, persistedIndex_), static_cast<qsizetype>(changeList_.size()));
 
-    for( int idx=startIdx; idx<endIdx; ++idx ) {
+    for (qsizetype idx = startIdx; idx < endIdx; ++idx) {
         Change* change = changeList_.at(idx);
 
         // only check document changes
-        if( change->isDocumentChange() ) {
-            if( change->isPersistenceRequired() ) {
+        if (change->isDocumentChange()) {
+            if (change->isPersistenceRequired()) {
                 return false;
             }
         }
@@ -472,7 +476,7 @@ bool TextUndoStack::isPersisted()
 
 
 /// This method returns the current persisted index
-int TextUndoStack::persistedIndex()
+qsizetype TextUndoStack::persistedIndex()
 {
     return persistedIndex_;
 }
@@ -483,43 +487,42 @@ QString TextUndoStack::dumpStack()
 {
     QString result;
     result += "\n";
-    result +="UndoStack\n";
+    result += "UndoStack\n";
     result += "=====================\n";
 
-    bool end=true;
-    for( int i=changeList_.size(); i >=0 ; --i ) {
-        QString str;
+    bool end = true;
+    for (qsizetype i = changeList_.size(); i >=0 ; --i) {
         QString changeName;
         QString controllerName;
         QString pointers;
 
         /// build the stack overview
-        if( end ) {
+        if (end) {
             changeName= "^^^^^^^^^^^^^^^^^";
         } else {
             Change* change= at(i);
             TextEditorController* controller = change->controllerContext();
             changeName = change->toString();
-            if( controller ) {
-                controllerName = QString::number((quintptr)controller,16);
+            if (controller) {
+                controllerName = QString::number((quintptr)controller, 16);
             }
         }
 
         // next append the pointers
-        QMap<TextEditorController*, int>::iterator itr;
-        for( itr = controllerIndexMap_.begin(); itr != controllerIndexMap_.end(); ++itr ) {
-            if( itr.value() == i ) {
-                pointers.append( QStringLiteral("<=(%1) ").arg( QString::number((quintptr)itr.key(),16) ) );
+        QMap<TextEditorController*, qsizetype>::iterator itr;
+        for (itr = controllerIndexMap_.begin(); itr != controllerIndexMap_.end(); ++itr) {
+            if (itr.value() == i) {
+                pointers.append(QStringLiteral("<=(%1) ").arg(QString::number((quintptr)itr.key(), 16)));
             }
         }
-        if( changeIndex_ == i ) {
-            pointers.append( QStringLiteral("<=(DOC) " ));
+        if (changeIndex_ == i) {
+            pointers.append(QStringLiteral("<=(DOC) "));
         }
-        if( persistedIndex_ == i ){
-            pointers.append( QStringLiteral("<=(P) " ));
+        if (persistedIndex_ == i) {
+            pointers.append( QStringLiteral("<=(P) "));
         }
 
-        result += QStringLiteral("-|%1:%2| %3\n").arg(changeName,-30).arg(controllerName,10).arg(pointers);
+        result += QStringLiteral("-|%1:%2| %3\n").arg(changeName, -30).arg(controllerName, 10).arg(pointers);
         end=false;
     }
     return result;
@@ -535,35 +538,35 @@ void TextUndoStack::dumpStackInternal()
 }
 
 
-/// This method finds the next redo-item
+/// Finds the next redo-item
 /// @param index the index to search it from
 /// @param controller the controller context
 /// @return the next change index. Or changeList_.size() if there's no next change
-int TextUndoStack::findRedoIndex(int index, TextEditorController* controller)
+qsizetype TextUndoStack::findRedoIndex(qsizetype index, TextEditorController* controller)
 {
-    if( index < changeList_.size() ) {
-        int size = changeList_.size();
-        for( ; index < size; ++index ) {
+    if (index < changeList_.size()) {
+        qsizetype size = changeList_.size();
+        for (; index < size; ++index) {
             Change* change = at(index);
             TextEditorController* context = change->controllerContext();
-            if( context == 0 || context == controller ) { return index; }
+            if (context == nullptr || context == controller) { return index; }
         }
     }
     return changeList_.size();
 }
 
 
-/// This method finds the index of the given stackitem from the given index
+/// Finds the index of the given stackitem from the given index
 /// @param  index the previous index
 /// @param controller the controller context
 /// @return the previous index -1, if there's no previous index
-int TextUndoStack::findUndoIndex( int index, TextEditorController* controller)
+qsizetype TextUndoStack::findUndoIndex(qsizetype index, TextEditorController* controller)
 {
-    if( index > 0 ) {
-        for( --index; index >= 0; --index ) {
+    if (index > 0) {
+        for (--index; index >= 0; --index) {
             Change* change = at(index);
             TextEditorController* context = change->controllerContext();
-            if( context == 0 || context == controller ) { return index; }
+            if (context == nullptr || context == controller) { return index; }
         }
     }
     return -1;
@@ -574,54 +577,50 @@ int TextUndoStack::findUndoIndex( int index, TextEditorController* controller)
 void TextUndoStack::clearRedo(TextEditorController* controller)
 {
     // view specific undo
-    if( controller ) {
-        int idx = changeIndex_;
-        if( controllerIndexMap_.contains(controller) ) {
+    if (controller) {
+        qsizetype idx = changeIndex_;
+        if (controllerIndexMap_.contains(controller)) {
             idx = this->controllerIndexMap_.value(controller);
         } else {
-            Q_ASSERT(false && "The current controller isn't registered with the undostack!");    // warning view isn't registered!
+            Q_ASSERT(false && "The current controller isn't registered with the undostack!");
         }
 
         // remove all items from the stack AFTER the given index
-        for( int i=changeList_.size()-1; i >= idx; --i ) {
-            if( changeList_.at(i)->controllerContext() == controller ) {
+        for (qsizetype i = changeList_.size() - 1; i >= idx; --i) {
+            if (changeList_.at(i)->controllerContext() == controller) {
                 delete changeList_.takeAt(i);
             }
         }
 
     } else {
-        if( currentIndex(0) < persistedIndex() ) {
+        if (currentIndex() < persistedIndex()) {
             setPersistedIndex(-1);
         }
 
         // find the next redo-document operation
-        int redoIndex = findRedoIndex( currentIndex(0), 0);
-        for( int i=changeList_.size()-1; i >= redoIndex; --i ) {
+        qsizetype redoIndex = findRedoIndex(currentIndex());
+        for (qsizetype i = changeList_.size()-1; i >= redoIndex; --i) {
             delete changeList_.takeAt(i);
         }
-
-        // remove all items from the stack AFTER the given index
-//        for( int i=changeList_.size()-1; i >= changeIndex_; --i ) {
-//            delete changeList_.takeAt(i);
-//        }
     }
 }
 
 
-/// This method undos the given controller change. This method does NOT undo document changes
+/// Undos the given controller change. This method does NOT undo document changes
 /// @param controller the controller to undo the change form
 /// @return true if a change has been undone.
 bool TextUndoStack::undoControllerChange(TextEditorController* controller)
 {
     Q_ASSERT(controller);
-    int changeIdx = controllerIndexMap_.value(controller)-1;    // -1, because the index is directly AFTER the item
-    Change* changeToUndo = findUndoChange( controller );
 
-    if( changeToUndo && changeToUndo->controllerContext() ) {
-        Q_ASSERT( changeToUndo->controllerContext() == controller );
-        changeToUndo->revert( documentRef_ );
-        controllerIndexMap_[controller] = findUndoIndex( changeIdx, controller )+1;
-        emit undoExecuted( changeToUndo );
+    qsizetype changeIdx = controllerIndexMap_.value(controller) - 1; // -1, because the index is directly AFTER the item
+    Change* changeToUndo = findUndoChange(controller);
+
+    if (changeToUndo && changeToUndo->controllerContext()) {
+        Q_ASSERT(changeToUndo->controllerContext() == controller);
+        changeToUndo->revert(documentRef_);
+        controllerIndexMap_[controller] = findUndoIndex(changeIdx, controller) + 1;
+        emit undoExecuted(changeToUndo);
         return true;
     }
     return false;
@@ -632,29 +631,28 @@ bool TextUndoStack::undoControllerChange(TextEditorController* controller)
 void TextUndoStack::undoDocumentChange()
 {
     // first make sure ALL controller-changes are back to the document change-level
-    QMap<TextEditorController*, int>::iterator itr;
-    for( itr = controllerIndexMap_.begin(); itr != controllerIndexMap_.end(); ++itr) {
+    QMap<TextEditorController*, qsizetype>::iterator itr;
+    for (itr = controllerIndexMap_.begin(); itr != controllerIndexMap_.end(); ++itr) {
         TextEditorController* controller = itr.key();
-        while( undoControllerChange(controller) ) {};  // undo all controller operations
+        while (undoControllerChange(controller)) {};  // undo all controller operations
     }
 
     // next perform an undo of the document operations
     Change* change = findUndoChange();
-    if( change ) {
-        Q_ASSERT( change->controllerContext() == 0 );
-        change->revert( documentRef_ );
+    if (change) {
+        Q_ASSERT(change->controllerContext() == 0);
+        change->revert(documentRef_);
 
         // next move the pointers to first 'related' change
-        for( itr = controllerIndexMap_.begin(); itr != controllerIndexMap_.end(); ++itr) {
+        for (itr = controllerIndexMap_.begin(); itr != controllerIndexMap_.end(); ++itr) {
             TextEditorController* controller = itr.key();
-            controllerIndexMap_[controller] = findUndoIndex( changeIndex_-1, controller ) + 1; // +1 because the pointer points AFTER the found index
+            controllerIndexMap_[controller] = findUndoIndex(changeIndex_ - 1, controller) + 1; // +1 because the pointer points AFTER the found index
         }
 
         // and finally move the document pointer
-        setChangeIndex( findUndoIndex( changeIndex_-1 ) + 1 );  // +1 because the pointer points AFTER the found index
-        emit undoExecuted( change);
+        setChangeIndex(findUndoIndex(changeIndex_ - 1) + 1);  // +1 because the pointer points AFTER the found index
+        emit undoExecuted(change);
     }
-
 }
 
 
@@ -662,15 +660,15 @@ void TextUndoStack::undoDocumentChange()
 bool TextUndoStack::redoControllerChange(TextEditorController *controller)
 {
     Q_ASSERT(controller);
-    int changeIdx = findRedoIndex( currentIndex(controller), controller);
-    Change* changeToRedo = findRedoChange( controller );
-    if( changeToRedo && changeToRedo->controllerContext() ) {
-        Q_ASSERT( changeToRedo->controllerContext() == controller );
-        changeToRedo->execute( documentRef_ );
+    qsizetype changeIdx = findRedoIndex(currentIndex(controller), controller);
+    Change* changeToRedo = findRedoChange(controller);
+    if (changeToRedo && changeToRedo->controllerContext()) {
+        Q_ASSERT(changeToRedo->controllerContext() == controller);
+        changeToRedo->execute(documentRef_);
 
         // move the pointer to the next
-        controllerIndexMap_[controller] = changeIdx+1;
-        emit redoExecuted( changeToRedo );
+        controllerIndexMap_[controller] = changeIdx + 1;
+        emit redoExecuted(changeToRedo);
     }
     return false;
 }
@@ -680,50 +678,50 @@ bool TextUndoStack::redoControllerChange(TextEditorController *controller)
 void TextUndoStack::redoDocumentChange()
 {
     // first find the redo operation
-    int redoIndex = findRedoIndex( currentIndex(0), 0 );
-    Change* redo = findRedoChange(0);
-    if( redo ) { ++redoIndex; }
+    qsizetype redoIndex = findRedoIndex(currentIndex());
+    Change* redo = findRedoChange();
+    if (redo) { ++redoIndex; }
 
     // first move all controller redo-operation to the given redo found redo location
-    QMap<TextEditorController*, int>::iterator itr;
-    for( itr = controllerIndexMap_.begin(); itr != controllerIndexMap_.end(); ++itr) {
+    QMap<TextEditorController*, qsizetype>::iterator itr;
+    for (itr = controllerIndexMap_.begin(); itr != controllerIndexMap_.end(); ++itr) {
         TextEditorController* controller = itr.key();
-        while( redoControllerChange(controller) ) {};  // undo all controller operations
+        while (redoControllerChange(controller)) {};  // undo all controller operations
         itr.value() = redoIndex;    // move the position after the DOC operation
     }
 
     // is there a document redo? execute it
-    if( redo ) {
+    if (redo) {
         redo->execute(documentRef_);
         setChangeIndex(redoIndex);
-        emit redoExecuted( redo );
+        emit redoExecuted(redo);
     }
 }
 
 
 /// Sets the persisted in dex and fires a signal
-void TextUndoStack::setPersistedIndex(int index)
+void TextUndoStack::setPersistedIndex(qsizetype index)
 {
     bool oldPersisted = isPersisted();
     persistedIndex_ = index;
     bool persisted = isPersisted();
-    if( oldPersisted != persisted ) {
-        emit persistedChanged( persisted );
+
+    if (oldPersisted != persisted) {
+        emit persistedChanged(persisted);
     }
 }
 
 
 /// When setting the change-index we sometimes must emit a persisted change
-void TextUndoStack::setChangeIndex(int index)
+void TextUndoStack::setChangeIndex(qsizetype index)
 {
-    if( index != changeIndex_ ) {
+    if (index != changeIndex_) {
         bool oldPersisted= isPersisted();
         changeIndex_ = index;
         bool persisted = isPersisted();
-        if( oldPersisted != persisted ) {
-            emit persistedChanged( persisted );
+        if (oldPersisted != persisted) {
+            emit persistedChanged(persisted);
         }
-
     }
 }
 

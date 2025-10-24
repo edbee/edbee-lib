@@ -19,9 +19,9 @@ public:
     JsonParser();
     virtual ~JsonParser();
 
-    bool parse( const QString& fileName);
-    bool parse( QIODevice* device );
-    bool parse( const QByteArray& bytesIn );
+    bool parse(const QString& fileName);
+    bool parse(QIODevice* device );
+    bool parse(const QByteArray& bytesIn);
 
     QVariant result();
 
@@ -35,7 +35,7 @@ public:
 
 protected:
 
-    QByteArray stripCommentsFromJson( const QByteArray& bytesIn );
+    QByteArray stripCommentsFromJson(const QByteArray& bytesIn);
 
 private:
 
@@ -45,7 +45,6 @@ private:
     int errorColumn_;           ///< The column number of the error
 
     QVariant result_;           ///< variant is the easiest format to play around with in Qt. The result will be QVariantMap (no hash!) or QVariantArray
-
 };
 
 } //edbee

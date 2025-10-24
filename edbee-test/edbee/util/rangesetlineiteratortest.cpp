@@ -15,27 +15,27 @@ namespace edbee {
 void RangeSetLineIteratorTest::testBasicIteration()
 {
     CharTextDocument doc;
-    doc.setText( QStringLiteral("a1|b2|c3|d4|e5|f6").replace("|","\n"));
+    doc.setText(QStringLiteral("a1|b2|c3|d4|e5|f6").replace("|", "\n"));
     TextRangeSet ranges(&doc);
-    ranges.addRange(0,0);   // line: 0
-    ranges.addRange(1,1);   // line: 0
-    ranges.addRange(2,7);   // line: 0-2
-    ranges.addRange(12,15); // line: 4-5
+    ranges.addRange(0, 0);   // line: 0
+    ranges.addRange(1, 1);   // line: 0
+    ranges.addRange(2, 7);   // line: 0-2
+    ranges.addRange(12, 15); // line: 4-5
 
     RangeSetLineIterator itr(&ranges);
 
-    testTrue( itr.hasNext() );
-    testEqual( itr.next(), 0 );
-    testTrue( itr.hasNext() );
-    testEqual( itr.next(), 1 );
-    testTrue( itr.hasNext() );
-    testEqual( itr.next(), 2 );
-    testTrue( itr.hasNext() );
-    testEqual( itr.next(), 4 );
-    testTrue( itr.hasNext() );
-    testEqual( itr.next(), 5 );
-    testFalse( itr.hasNext() );
-    testEqual( itr.next(), -1 );
+    testTrue(itr.hasNext());
+    testEqual(itr.next(), 0);
+    testTrue(itr.hasNext());
+    testEqual(itr.next(), 1);
+    testTrue(itr.hasNext());
+    testEqual(itr.next(), 2);
+    testTrue(itr.hasNext());
+    testEqual(itr.next(), 4);
+    testTrue(itr.hasNext());
+    testEqual(itr.next(), 5);
+    testFalse(itr.hasNext());
+    testEqual(itr.next(), std::string::npos);
 }
 
 

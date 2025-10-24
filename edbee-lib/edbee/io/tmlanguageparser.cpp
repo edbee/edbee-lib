@@ -24,11 +24,13 @@ TmLanguageParser::TmLanguageParser()
 {
 }
 
+
 /// returns the last error message
 QString TmLanguageParser::lastErrorMessage() const
 {
     return lastErrorMessage_;
 }
+
 
 /// Sets the last error message
 void TmLanguageParser::setLastErrorMessage(const QString &str)
@@ -43,12 +45,12 @@ TextGrammar *TmLanguageParser::parsePlist(QIODevice *device)
     TextGrammar* result = nullptr;
 
     BasePListParser plistParser;
-    if( plistParser.beginParsing(device) ) {
-        QVariant plist = plistParser.readNextPlistType( );
-        result = createLanguage( plist );
+    if (plistParser.beginParsing(device)) {
+        QVariant plist = plistParser.readNextPlistType();
+        result = createLanguage(plist);
     }
 
-    if( !plistParser.endParsing() ) {
+    if (!plistParser.endParsing()) {
         delete result;
         result = nullptr;
     }
@@ -64,10 +66,9 @@ TextGrammar *TmLanguageParser::parseJson(QIODevice *device)
     TextGrammar* result = nullptr;
 
     JsonParser jsonParser;
-    if( jsonParser.parse(device) ) {
-        //QVariant plist = readNextPlistType( );
+    if (jsonParser.parse(device)) {
         QVariant parseResult = jsonParser.result();
-        result = createLanguage( parseResult );
+        result = createLanguage(parseResult);
     }
 
     return result;
@@ -91,12 +92,12 @@ TextGrammar* TmLanguageParser::parse(QIODevice* device, bool json)
 /// Parses the given file
 TextGrammar *TmLanguageParser::parse(QFile &file)
 {
-    if( file.open( QIODevice::ReadOnly ) ) {
+    if (file.open(QIODevice::ReadOnly)) {
         TextGrammar* result = parse( &file, file.fileName().endsWith(".json"));
         file.close();
         return result;
     } else {
-        setLastErrorMessage( file.errorString()  );
+        setLastErrorMessage(file.errorString());
         return nullptr;
     }
 
@@ -116,17 +117,21 @@ TextGrammar* TmLanguageParser::parse(const QString& fileName)
 /// sets the captures
 void TmLanguageParser::addCapturesToGrammarRule(TextGrammarRule* rule, QHash<QString, QVariant> captures, bool endCapture)
 {
-    if( captures.isEmpty() ){ return; }
+    if (captures.isEmpty()) { return; }
+
     QHashIterator<QString,QVariant> itr(captures);
-    while( itr.hasNext() ) {
+    while (itr.hasNext()) {
         itr.next();
         QHash<QString,QVariant> fields = itr.value().toHash();
-        int keyIndex = itr.key().toInt();
+        ptrdiff_t sKeyIndex = itr.key().toInt();
+        Q_ASSERT(sKeyIndex >= 0);
+        size_t keyIndex = static_cast<size_t>(sKeyIndex);
+
         QString name = fields.value("name").toString();
-        if( endCapture ) {
-            rule->setEndCapture(keyIndex,name);
+        if (endCapture) {
+            rule->setEndCapture(keyIndex, name);
         } else {
-            rule->setCapture(keyIndex,name);
+            rule->setCapture(keyIndex, name);
         }
     }
 }
@@ -135,15 +140,15 @@ void TmLanguageParser::addCapturesToGrammarRule(TextGrammarRule* rule, QHash<QSt
 /// Adds all patterns to the grammar rules
 void TmLanguageParser::addPatternsToGrammarRule(TextGrammarRule* rule, QList<QVariant> patterns)
 {
-    foreach( QVariant pattern, patterns ) {
-        TextGrammarRule* childRule = createGrammarRule( rule->grammar(), pattern );
-        if( childRule ) { rule->giveRule( childRule ); }
+    foreach (QVariant pattern, patterns) {
+        TextGrammarRule* childRule = createGrammarRule(rule->grammar(), pattern);
+        if (childRule) { rule->giveRule(childRule); }
     }
 }
 
 
 /// creates a grammar rue
-TextGrammarRule* TmLanguageParser::createGrammarRule( TextGrammar* grammar, const QVariant& data)
+TextGrammarRule* TmLanguageParser::createGrammarRule(TextGrammar* grammar, const QVariant& data)
 {
     QHash<QString,QVariant> map = data.toHash();
     QString match = map.value("match").toString();
@@ -152,48 +157,47 @@ TextGrammarRule* TmLanguageParser::createGrammarRule( TextGrammar* grammar, cons
     QString name = map.value("name").toString();
 
     // match filled?
-    if( !match.isEmpty() ) {
-        TextGrammarRule* rule = TextGrammarRule::createSingleLineRegExp( grammar, name, match );
+    if (!match.isEmpty()) {
+        TextGrammarRule* rule = TextGrammarRule::createSingleLineRegExp(grammar, name, match);
         QHash<QString,QVariant> captures = map.value("captures").toHash();
-        addCapturesToGrammarRule( rule, captures );
+        addCapturesToGrammarRule(rule, captures);
         return rule;
 
-    } else if( !include.isEmpty() ) {
-        return TextGrammarRule::createIncludeRule( grammar, include );
+    } else if(!include.isEmpty()) {
+        return TextGrammarRule::createIncludeRule(grammar, include);
 
-    } else if( !begin.isEmpty() ) {
+    } else if(!begin.isEmpty()) {
         QString end = map.value("end").toString();
 
         // TODO: contentScopeName
         QString contentScope = name;
-        TextGrammarRule* rule = TextGrammarRule::createMultiLineRegExp( grammar, name, contentScope, begin, end  );
+        TextGrammarRule* rule = TextGrammarRule::createMultiLineRegExp(grammar, name, contentScope, begin, end);
 
         // add the patterns
         QList<QVariant> patterns = map.value("patterns").toList();
-        addPatternsToGrammarRule( rule, patterns );
+        addPatternsToGrammarRule(rule, patterns);
 
-        if( map.contains("captures")) {
+        if (map.contains("captures")) {
             QHash<QString,QVariant> captures = map.value("captures").toHash();
-            addCapturesToGrammarRule( rule, captures );
-            addCapturesToGrammarRule( rule, captures, true );
+            addCapturesToGrammarRule(rule, captures);
+            addCapturesToGrammarRule(rule, captures, true);
         }
-        if( map.contains("beginCaptures")) {
+        if (map.contains("beginCaptures")) {
             QHash<QString,QVariant> captures = map.value("beginCaptures").toHash();
-            addCapturesToGrammarRule( rule, captures );
+            addCapturesToGrammarRule(rule, captures);
         }
-        if( map.contains("endCaptures")) {
+        if (map.contains("endCaptures")) {
             QHash<QString,QVariant> endCaptures = map.value("endCaptures").toHash();
-            addCapturesToGrammarRule( rule, endCaptures, true );
+            addCapturesToGrammarRule(rule, endCaptures, true);
         }
         return rule;
-
 
     } else {
         TextGrammarRule* rule = TextGrammarRule::createRuleList(grammar);
 
         // add the patterns
         QList<QVariant> patterns = map.value("patterns").toList();
-        addPatternsToGrammarRule( rule, patterns );
+        addPatternsToGrammarRule(rule, patterns);
 
         return rule;
     }
@@ -228,9 +232,9 @@ TextGrammar* TmLanguageParser::createLanguage(QVariant& data)
     QHash<QString,QVariant> hashMap = data.toHash();
     QString name      = hashMap.value("name").toString();
     QString scopeName = hashMap.value("scopeName").toString();
-    QString uuid      = hashMap.value("uuid").toString();
+    // QString uuid      = hashMap.value("uuid").toString(); // is in there but is unused for now
 
-    if( name.isEmpty() || scopeName.isEmpty() ) {
+    if (name.isEmpty() || scopeName.isEmpty()) {
         setLastErrorMessage("Name or scope is empty. Cannot parse language!");
         return nullptr;
     }
@@ -240,21 +244,21 @@ TextGrammar* TmLanguageParser::createLanguage(QVariant& data)
 
     // and get the main patterns
     // construct the main rule
-    TextGrammarRule* mainRule = TextGrammarRule::createMainRule( grammar, scopeName );
+    TextGrammarRule* mainRule = TextGrammarRule::createMainRule(grammar, scopeName);
     grammar->giveMainRule(mainRule);
 
     QList<QVariant> patterns = hashMap.value("patterns").toList();
-    addPatternsToGrammarRule( mainRule, patterns );
+    addPatternsToGrammarRule(mainRule, patterns);
 
 
     // get the repos
     QHash<QString,QVariant> repos  = hashMap.value("repository").toHash();
     QHashIterator<QString,QVariant> itr(repos);
-    while( itr.hasNext() ) {
+    while (itr.hasNext()) {
         itr.next();
-        TextGrammarRule* rule = createGrammarRule( grammar, itr.value() );
-        if( rule ) {
-            grammar->giveToRepos( itr.key(), rule  );
+        TextGrammarRule* rule = createGrammarRule(grammar, itr.value());
+        if (rule) {
+            grammar->giveToRepos(itr.key(), rule);
         } else {
             qlog_warn() << "Error create grammar rule!";
         }
@@ -262,8 +266,8 @@ TextGrammar* TmLanguageParser::createLanguage(QVariant& data)
 
     // add the file types
     QStringList fileTypes = hashMap.value("fileTypes").toStringList();
-    foreach( QString fileType, fileTypes ) {
-        grammar->addFileExtension( fileType );
+    foreach (QString fileType, fileTypes) {
+        grammar->addFileExtension(fileType);
     }
 
     return grammar;

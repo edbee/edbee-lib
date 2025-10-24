@@ -5,7 +5,6 @@
 
 #include "edbee/exports.h"
 
-
 #include "edbee/texteditorcommand.h"
 
 
@@ -24,21 +23,18 @@ public:
         AddLineAfter = 2
     };
 
+    NewlineCommand(NewLineType method);
 
-    NewlineCommand( NewLineType method );
+    QString calculateSmartIndent(TextEditorController* controller, TextRange& range);
 
-    QString calculateSmartIndent( TextEditorController* controller, TextRange& range );
+    virtual void executeNormalNewline(TextEditorController* controller);
+    virtual void executeSpecialNewline(TextEditorController* controller, bool nextLine);
 
-    virtual void executeNormalNewline( TextEditorController* controller );
-
-    virtual void executeSpecialNewline( TextEditorController* controller, bool nextLine );
-
-    virtual void execute( TextEditorController* controller ) override;
+    virtual void execute(TextEditorController* controller) override;
     virtual QString toString() override;
 
 private:
     NewLineType newLineType_;       ///< The current newline type
 };
-
 
 } // edbee

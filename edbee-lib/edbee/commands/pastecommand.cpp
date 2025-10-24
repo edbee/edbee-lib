@@ -47,28 +47,28 @@ void PasteCommand::execute(TextEditorController* controller)
     TextRangeSet* sel    = controller->textSelection();
 
     // a line-based paste
-    if( mimeData && mimeData->hasFormat( CopyCommand::EDBEE_TEXT_TYPE ) ) {
+    if (mimeData && mimeData->hasFormat(CopyCommand::EDBEE_TEXT_TYPE)) {
         TextRangeSet newRanges(doc);
-        for( int i=0,cnt=sel->rangeCount(); i<cnt; ++i ) {
+        for (size_t i = 0,cnt = sel->rangeCount(); i < cnt; ++i) {
             TextRange& range = sel->range(i);
-            int line   = doc->lineFromOffset( range.min() );
-            int offset = doc->offsetFromLine(line);
-            newRanges.addRange(offset,offset);
+            size_t line   = doc->lineFromOffset(range.min());
+            size_t offset = doc->offsetFromLine(line);
+            newRanges.addRange(offset, offset);
         }
 
-        controller->replaceRangeSet( newRanges, text, commandId() );
+        controller->replaceRangeSet(newRanges, text, commandId());
         return;
 
     // normal paste
     } else {
-        if( !text.isEmpty() ) {
-            int lineCount = text.count("\n") + 1;
-            int rangeCount = controller->textSelection()->rangeCount();
+        if (!text.isEmpty()) {
+            size_t lineCount = static_cast<size_t>(text.count("\n")) + 1;
+            size_t rangeCount = controller->textSelection()->rangeCount();
 
             // multi-line/caret copy paste
-            if( lineCount == rangeCount ) {
+            if (lineCount == rangeCount) {
                 QStringList texts = text.split("\n");
-                controller->replaceRangeSet( *controller->textSelection(), texts, commandId() );
+                controller->replaceRangeSet(*controller->textSelection(), texts, commandId());
 
             // this the normal operation
             } else {

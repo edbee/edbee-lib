@@ -17,22 +17,21 @@ class EDBEE_EXPORT AbstractRangedChange : public Change
 public:
     virtual ~AbstractRangedChange();
 
-    /// this method should return the offset of the change
-    virtual int offset() const = 0;
+    /// Returns the offset of the change
+    virtual size_t offset() const = 0;
 
-    /// this method should set the offset
-    virtual void setOffset( int value ) = 0;
-    void addOffset( int amount );
+    /// Set the offset
+    virtual void setOffset(size_t value) = 0;
+    void addOffset(ptrdiff_t amount);
 
-    /// this method should set the old length
-    virtual void setDocLength( int value ) = 0;
+    /// Set the old length
+    virtual void setDocLength(size_t value) = 0;
 
-    /// this method should return the length in the document
-    virtual int docLength() const = 0;
+    /// Return the length in the document
+    virtual size_t docLength() const = 0;
 
-    /// this method should return the length of this item in memory
-    virtual int storedLength() const = 0;
-
+    /// Returns the length of this item in memory
+    virtual size_t storedLength() const = 0;
 
 protected:
 
@@ -42,18 +41,16 @@ protected:
     /// QString newText;
     /// newText.resize( calculateMergeDataSize( change) );
     /// mergeData( newText.data(), text_.data(), singleTextChange->text_.data(), change, sizeof(QChar) );
-    virtual void mergeStoredData( AbstractRangedChange* change ) = 0;
+    virtual void mergeStoredData(AbstractRangedChange* change) = 0;
 
-
-    int getMergedDocLength(AbstractRangedChange* change);
-    int getMergedStoredLength(AbstractRangedChange* change);
-    void mergeStoredDataViaMemcopy(void* targetData, void* data, void* changeData, AbstractRangedChange* change, int itemSize );
-    bool merge( AbstractRangedChange* change );
+    size_t getMergedDocLength(AbstractRangedChange* change);
+    size_t getMergedStoredLength(AbstractRangedChange* change);
+    void mergeStoredDataViaMemcopy(void* targetData, void* data, void* changeData, AbstractRangedChange* change, size_t itemSize);
+    bool merge(AbstractRangedChange* change);
 
 public:
     bool isOverlappedBy( AbstractRangedChange* secondChange );
     bool isTouchedBy( AbstractRangedChange* secondChange );
-
 };
 
 

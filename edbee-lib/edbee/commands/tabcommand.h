@@ -27,16 +27,15 @@ public:
         SubCoalesceId_Indent_InsertSpaces
     };
 
+    TabCommand(Direction direction, bool insertTab);
 
-    TabCommand( Direction direction, bool insertTab );
-
-    virtual void indent( TextEditorController* controller );
-    virtual void execute( TextEditorController* controller ) override;
+    virtual void indent(TextEditorController* controller);
+    virtual void execute(TextEditorController* controller) override;
     virtual QString toString() override;
 
 private:
-    Direction dir_;                 ///< The tab direction
-    bool insertTab_;                ///< Should we insert a tab
+    Direction dir_;   ///< The tab direction
+    bool insertTab_;  ///< Should we insert a tab
 };
 
 } // edbee

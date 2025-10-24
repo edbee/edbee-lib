@@ -10,14 +10,12 @@
 namespace edbee {
 
 
-/// The constructor for the parser
 BasePListParser::BasePListParser()
-    : xml_(0)
+    : xml_(nullptr)
 {
 }
 
 
-/// the default desctructor
 BasePListParser::~BasePListParser()
 {
     delete xml_;
@@ -47,10 +45,10 @@ bool BasePListParser::beginParsing(QIODevice* device)
     elementStack_.clear();
 
     xml_ = new QXmlStreamReader(device);
-    if( readNextElement("plist" ) ) {
+    if (readNextElement("plist")) {
         return true;
     } else {
-        raiseError( QObject::tr("Start element not found!"));
+        raiseError(QObject::tr("Start element not found!"));
         return false;
     }
 }
@@ -61,20 +59,20 @@ bool BasePListParser::beginParsing(QIODevice* device)
 bool BasePListParser::endParsing()
 {
     bool result = !xml_->error();
-    if( !result ) {
+    if (!result) {
         lastErrorMessage_ = QObject::tr("line %1: %2").arg(xml_->lineNumber()).arg(xml_->errorString());
         result = false;
     }
     delete xml_;
-    xml_ = 0;
+    xml_ = nullptr;
     return result;
 }
 
 
 
-/// Call this method to raise an error and stop the xml parsing
+/// Raise an error and stop the xml parsing
 /// @param str the error to raise
-void BasePListParser::raiseError( const QString& str )
+void BasePListParser::raiseError(const QString& str)
 {
     xml_->raiseError(str);
 }
@@ -85,8 +83,8 @@ QList<QVariant> BasePListParser::readList()
 {
     QList<QVariant> result;
     QVariant value;
-    int level = currentStackLevel();
-    while( ( value = readNextPlistType(level) ).isValid() ) {
+    qsizetype level = currentStackLevel();
+    while ((value = readNextPlistType(level)).isValid()) {
         result.append(value);
     }
     return result;
@@ -97,8 +95,8 @@ QList<QVariant> BasePListParser::readList()
 QHash<QString, QVariant> BasePListParser::readDict()
 {
     QHash<QString, QVariant> result;
-    int level = currentStackLevel();
-    while( readNextElement("key",level) ) {
+    qsizetype level = currentStackLevel();
+    while (readNextElement("key", level) ) {
         QString key = readElementText();
         QVariant data = readNextPlistType();
         result.insert(key,data);
@@ -109,19 +107,19 @@ QHash<QString, QVariant> BasePListParser::readDict()
 
 /// reads the next plist type
 /// @param level the level we're currently parsing
-QVariant BasePListParser::readNextPlistType( int level )
+QVariant BasePListParser::readNextPlistType(qsizetype level)
 {
     if( readNextElement("",level) ) {
         // reads a dictionary
-        if( xml_->name().compare( QLatin1String("dict"), Qt::CaseInsensitive ) == 0 ) {
+        if (xml_->name().compare(QLatin1String("dict"), Qt::CaseInsensitive) == 0) {
             return readDict();
 
         // reads an array
-        } else if( xml_->name().compare( QLatin1String("array"), Qt::CaseInsensitive ) == 0 ) {
+        } else if (xml_->name().compare(QLatin1String("array"), Qt::CaseInsensitive) == 0) {
             return readList( );
 
         // reads a string
-        } else if( xml_->name().compare( QLatin1String("string"), Qt::CaseInsensitive ) == 0 ) {
+        } else if (xml_->name().compare(QLatin1String("string"), Qt::CaseInsensitive) == 0) {
             return readElementText();
         }
     }
@@ -132,27 +130,23 @@ QVariant BasePListParser::readNextPlistType( int level )
 /// Reads the next element and optionally expects it to be the given name
 /// @param name the name taht's expected. Use '' to not check the name
 /// @param minimum level the level the element should be. -1 means ignore this argument
-bool BasePListParser::readNextElement( const QString& name, int level )
+bool BasePListParser::readNextElement(const QString& name, qsizetype level)
 {
-//qlog_info() << "* readNextElement("  << name << ","<<level<<")";
-
-    while( !xml_->atEnd() ) {
-        switch( xml_->readNext() ) {
+    while (!xml_->atEnd()) {
+        switch (xml_->readNext()) {
             case QXmlStreamReader::StartElement:
-                elementStack_.push( xml_->name().toString() );
-//qlog_info() << "- <" << elementStack_.top()  << " (" << elementStack_.size() << "/" << level << ")";
+                elementStack_.push(xml_->name().toString());
 
-                if( name.isEmpty() ) return true;   // name doesn't matter
-                if( xml_->name().compare( name, Qt::CaseInsensitive ) == 0 ) return true;
-                xml_->raiseError( QObject::tr("Expected %1 while parsing").arg(name) );
+                if (name.isEmpty()) return true; // name doesn't matter
+                if (xml_->name().compare(name, Qt::CaseInsensitive) == 0 ) return true;
+                xml_->raiseError(QObject::tr("Expected %1 while parsing").arg(name));
                 return false;
 
             case QXmlStreamReader::EndElement:
-//qlog_info() << "- </" << (elementStack_.isEmpty()?elementStack_.top():"") << " (" << elementStack_.size() << "/" << level << ")";
-                  if( !elementStack_.isEmpty() ) { elementStack_.pop(); }
+                if (!elementStack_.isEmpty()) { elementStack_.pop(); }
 
                 // end level detected
-                if( level >=0 && elementStack_.size() < level ) {
+                if (level >=0 && elementStack_.size() < level) {
                     return false;
                 }
                 break;
@@ -169,17 +163,16 @@ bool BasePListParser::readNextElement( const QString& name, int level )
 QString BasePListParser::readElementText()
 {
     QString result = xml_->readElementText();
-    if( !elementStack_.isEmpty() ) { elementStack_.pop(); }
+    if (!elementStack_.isEmpty()) { elementStack_.pop(); }
     return result;
 }
 
 
 /// returns the current stack-level
-int BasePListParser::currentStackLevel()
+qsizetype BasePListParser::currentStackLevel()
 {
     return elementStack_.size();
 }
-
 
 
 } // edbee

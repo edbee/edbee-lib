@@ -18,10 +18,9 @@ private slots:
     void testReplaceRangeSet_sizeDiff();
     void testReplaceRangeSet_simpleInsert();
     void testReplaceRangeSet_delete();
+    void testReplaceRangeSet_delete2();
 };
 
-
 } // edbee
-
 
 DECLARE_TEST(edbee::TextDocumentTest);

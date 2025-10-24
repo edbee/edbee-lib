@@ -38,26 +38,23 @@ public:
         Right                           ///< Remove the item to ther right
     };
 
-
-    RemoveCommand( int removeMode, int direction );
+    RemoveCommand(RemoveMode removeMode, Direction direction);
 
     int coalesceId() const;
-    int smartBackspace( TextDocument* doc, int caret );
+    size_t smartBackspace(TextDocument* doc, size_t caret);
 
-    void rangesForRemoveChar( TextEditorController* controller, TextRangeSet* ranges );
-    void rangesForRemoveWord( TextEditorController* controller, TextRangeSet* ranges );
-    void rangesForRemoveLine( TextEditorController* controller, TextRangeSet* ranges );
+    void rangesForRemoveChar(TextEditorController* controller, TextRangeSet* ranges);
+    void rangesForRemoveWord(TextEditorController* controller, TextRangeSet* ranges);
+    void rangesForRemoveLine(TextEditorController* controller, TextRangeSet* ranges);
 
-    virtual void execute( TextEditorController* controller ) override;
+    virtual void execute(TextEditorController* controller) override;
     virtual QString toString() override;
 
 private:
     int directionSign() const;
 
-
-    int removeMode_;        ///< The remove mode
-    int direction_;         ///< The remove direction
+    RemoveMode removeMode_;        ///< The remove mode
+    Direction direction_;         ///< The remove direction
 };
-
 
 } // edbee

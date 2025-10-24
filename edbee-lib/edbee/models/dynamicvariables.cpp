@@ -4,7 +4,6 @@
 #include "dynamicvariables.h"
 
 #include "edbee/models/textdocumentscopes.h"
-#include "edbee/models/textdocument.h"
 #include "edbee/models/textdocumentscopes.h"
 #include "edbee/texteditorcontroller.h"
 
@@ -23,7 +22,7 @@ DynamicVariable::~DynamicVariable()
 
 
 /// Constructs a basic dynamic (read static :P ) variable
-BasicDynamicVariable::BasicDynamicVariable( const QVariant& value )
+BasicDynamicVariable::BasicDynamicVariable(const QVariant& value)
     : value_(value)
 {
 }
@@ -42,7 +41,7 @@ QVariant BasicDynamicVariable::value() const
 /// constructs a dynamic variable
 /// @param value the value of the variable
 /// @param selector (default=0) the selector to use. This class takes ownership of the selector!!
-ScopedDynamicVariable::ScopedDynamicVariable( const QVariant& value, TextScopeSelector* selector  )
+ScopedDynamicVariable::ScopedDynamicVariable(const QVariant& value, TextScopeSelector* selector)
     : BasicDynamicVariable(value)
     , selector_(selector)
 {
@@ -57,9 +56,9 @@ ScopedDynamicVariable::~ScopedDynamicVariable()
 
 
 /// returns the score for the location
-double ScopedDynamicVariable::score( TextScopeList* scopes ) const
+double ScopedDynamicVariable::score(TextScopeList* scopes) const
 {
-    return selector()->calculateMatchScore( scopes );
+    return selector()->calculateMatchScore(scopes);
 }
 
 
@@ -71,6 +70,7 @@ TextScopeSelector* ScopedDynamicVariable::selector() const
 
 
 //--------------------------------
+
 
 /// default constructor
 DynamicVariables::DynamicVariables()
@@ -94,7 +94,7 @@ void DynamicVariables::setAndGiveScopedSelector(const QString& name, const QVari
 {
     /// Todo, perhaps we should detect identical scope selectors and replace the original
     variableNames_.insert(name);
-    scopedVariableMap_.insert( name, new ScopedDynamicVariable(value, new TextScopeSelector(selector) ) );
+    scopedVariableMap_.insert(name, new ScopedDynamicVariable(value, new TextScopeSelector(selector)));
 }
 
 
@@ -104,13 +104,13 @@ void DynamicVariables::set(const QString& name, const QVariant& value)
 {
     delete variableMap_.value(name);     // delete the old one
     variableNames_.insert(name);
-    variableMap_.insert( name, new BasicDynamicVariable(value) );
+    variableMap_.insert(name, new BasicDynamicVariable(value));
 }
 
 
 /// Returns the number of variables available
 /// @return the number of variable names. (there can be more values as variables)
-int DynamicVariables::size() const
+qsizetype DynamicVariables::size() const
 {
     return variableNames_.size();
 }
@@ -119,7 +119,7 @@ int DynamicVariables::size() const
 /// returns the number of variable-rules/entries available with the given name
 /// @param name the name of the variable to retrieve the size for
 /// @return the number of variables entires with the given name
-int DynamicVariables::valueCount(const QString& name) const
+qsizetype DynamicVariables::valueCount(const QString& name) const
 {
     return scopedVariableMap_.count(name) + variableMap_.count(name);
 }
@@ -130,17 +130,15 @@ int DynamicVariables::valueCount(const QString& name) const
 /// @param scopeList the scope list to find the variable for
 DynamicVariable* DynamicVariables::find(const QString& name, TextScopeList* scopelist)
 {
-//qlog_info() << "name: " << name << "," << scopelist->toString();
     // the initial result is no variable found
     DynamicVariable* result = variableMap_.value(name);
     double resultScore = -0.01;
-    if( scopelist ) {
-        foreach( ScopedDynamicVariable* var, scopedVariableMap_.values(name) ) {
+    if (scopelist) {
+        foreach(ScopedDynamicVariable* var, scopedVariableMap_.values(name)) {
             double score = var->score( scopelist );
-//qlog_info() << "-  " << var->value() << ": score: " << score << " > " << resultScore;
 
             // the variable is only found if the score is better
-            if( score > resultScore ) {
+            if (score > resultScore) {
                 resultScore = score;
                 result = var;
             }
@@ -153,15 +151,14 @@ DynamicVariable* DynamicVariables::find(const QString& name, TextScopeList* scop
 /// Returns the value at the given position
 /// @param name the name of the variable
 /// @param scopeList the scope list to find the variable for
-QVariant DynamicVariables::value(const QString& name, TextScopeList* scopelist )
+QVariant DynamicVariables::value(const QString& name, TextScopeList* scopelist)
 {
-    DynamicVariable* var = find( name, scopelist );
-    if( var ) {
+    DynamicVariable* var = find( name, scopelist);
+    if (var) {
         return var->value();
     }
     return QVariant();
 }
-
 
 
 } // edbee

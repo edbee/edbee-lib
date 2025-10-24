@@ -15,13 +15,13 @@ namespace edbee {
 class EDBEE_EXPORT TextChangeWithCaret : public TextChange
 {
 public:
-    TextChangeWithCaret( int offset, int length, const QString& text, int caret );
+    TextChangeWithCaret(size_t offset, size_t length, const QString& text, size_t caret);
 
-    int caret() const ;
-    void setCaret( int caret );
+    size_t caret() const ;
+    void setCaret(size_t caret);
 
 private:
-    int caret_;         ///< The new cret
+    size_t caret_;         ///< The new cret
 };
 
 } // edbee

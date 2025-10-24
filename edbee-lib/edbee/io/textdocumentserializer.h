@@ -21,24 +21,24 @@ public:
     /// @param lineIdx the line index that needs to be saved
     /// @param line the line that's save
     /// @return true if the line needs to be selected. return false to skip the line
-    virtual bool saveLineSelector( TextDocumentSerializer* serializer, int lineIdx, QString& line ) = 0;
+    virtual bool saveLineSelector(TextDocumentSerializer* serializer, size_t lineIdx, QString& line) = 0;
 };
 
 
 /// A class used to load/save a text-file from and to an IODevice
 class EDBEE_EXPORT TextDocumentSerializer {
 public:
-    TextDocumentSerializer( TextDocument* textDocument );
+    TextDocumentSerializer(TextDocument* textDocument);
 
-    bool loadWithoutOpening( QIODevice* ioDevice );
+    bool loadWithoutOpening(QIODevice* ioDevice);
     bool load( QIODevice* ioDevice );
 
-    bool saveWithoutOpening( QIODevice* ioDevice );
-    bool save( QIODevice* ioDevice );
+    bool saveWithoutOpening(QIODevice* ioDevice);
+    bool save(QIODevice* ioDevice);
 
 
     QString errorString() { return errorString_; }
-    void setFilter( TextDocumentSerializerFilter* filter ) { filterRef_ = filter; }
+    void setFilter(TextDocumentSerializerFilter* filter) { filterRef_ = filter; }
     TextDocumentSerializerFilter* filter() { return filterRef_; }
 
 private:

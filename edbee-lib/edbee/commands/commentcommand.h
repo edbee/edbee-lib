@@ -19,15 +19,13 @@ class TextEditorController;
 class EDBEE_EXPORT CommentCommand : public TextEditorCommand
 {
 public:
-    CommentCommand( bool block );
-    virtual void execute( TextEditorController* controller ) override;
+    CommentCommand(bool block);
+    virtual void execute(TextEditorController* controller) override;
     virtual QString toString() override;
 
 private:
 
     bool block_;                ///< When this flag is set it uses a block comment (if possible)
-
 };
-
 
 } // edbee
