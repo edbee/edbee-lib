@@ -1,0 +1,14 @@
+{
+  // newlines
+  "MD012": {
+    "maximum": 2
+  },
+
+  // line length
+  "MD013": {
+    "code_blocks": false,
+    "line_length": 120,
+    "tables": false
+  }
+}
+
