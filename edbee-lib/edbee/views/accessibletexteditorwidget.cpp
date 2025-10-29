@@ -117,15 +117,11 @@ static const QString VTEXT(TextDocument* doc)
 static const QString VTEXT_PART(TextDocument* doc, size_t offset, size_t length)
 {
 #if ! defined(WINDOWS_END_LINE_READ_ERROR_FIX)
-    if(length < 0) {
-        return QString();
-    }
-
     return doc->textPart(offset, qMin(length, doc->length() - offset));
 #else
     size_t docLength = doc->length();
 #if defined(WINDOWS_LAST_LINE_ERROR_FIX)
-        size_t endOffset = qMin(offset + length, docLength + 2);
+    size_t endOffset = qMin(offset + length, docLength + 2);
 #endif // WINDOWS_LAST_LINE_ERROR_FIX - First use
     //qDebug() << "VTEXT_PART: " << offset << ", " << length << " :: docLength: " << docLength << ", endOffset: " << endOffset;
 
