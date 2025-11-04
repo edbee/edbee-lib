@@ -34,6 +34,7 @@ void CopyCommand::execute(TextEditorController* controller)
     } else {
 
         str = sel->getSelectedTextExpandedToFullLines();
+        if (str == "\n") return; // #169, do not copy a single empty line
 
         // we don't want to detect a memory leak because Qt is going to delete our mime data
         edbee::pause_memleak_detection(true);

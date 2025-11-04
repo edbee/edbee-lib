@@ -1,5 +1,8 @@
 # Changelog
 
+
+- (2025-11-04) #169, Retain clipboard when invoking CopyCommand without selection on a blank line.
+
 ## v0.12.0 - Update Core Types (int => size_t / ptr_diff)
 
 - (2025-10-21) #163, Change core types in edbee to fix modern compiler warnings (see [UPDATING.md] for more info)
