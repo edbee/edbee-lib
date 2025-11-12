@@ -1,12 +1,13 @@
 # Changelog
 
 
+- (2025-11-12) #73, Stray Pixel at the bottom of the cursor (again)
 - (2025-11-04) #169, Retain clipboard when invoking CopyCommand without selection on a blank line.
 
-## v0.12.0 - Update Core Types (int => size_t / ptr_diff)
+## v0.12.0 - Update Core Types `(int => size_t / ptr_diff)`
 
 - (2025-10-21) #163, Change core types in edbee to fix modern compiler warnings (see [UPDATING.md] for more info)
-  - int in data structures have been changed to size_t, (and ptrdiff_t)
+  - int in data structures have been changed to `size_t`, (and `ptrdiff_t`)
   - int in Qt rendering based code is kept int, because Qt expects int.
 
 - (2025-05-16) #163, Add extra assertions to gapvector

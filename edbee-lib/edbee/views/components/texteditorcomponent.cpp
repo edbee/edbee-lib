@@ -631,7 +631,7 @@ void TextEditorComponent::updateAreaAroundOffset(size_t offset, int width )
         ren->xPosForOffset(offset) - width / 2,
         ren->yPosForOffset(offset) - textEditorRenderer_->extraPixelsToUpdateAroundLines(),
         width,
-        ren->lineHeight() + textEditorRenderer_->extraPixelsToUpdateAroundLines() * 2
+        ren->lineHeight() + textEditorRenderer_->extraPixelsToUpdateAroundLines() * 2 + 1
     );
 }
 
