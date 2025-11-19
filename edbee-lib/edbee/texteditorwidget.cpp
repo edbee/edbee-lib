@@ -38,6 +38,7 @@
 #include "edbee/views/texttheme.h"
 
 #include "edbee/debug.h"
+#include "qlistwidget.h"
 
 
 
@@ -301,6 +302,11 @@ bool TextEditorWidget::readonly() const
 void TextEditorWidget::setReadonly(bool value)
 {
     readonly_ = value;
+}
+
+bool TextEditorWidget::isFocusedOrChildHasFocus()
+{
+    return hasFocus() || editCompRef_->hasFocus() || autoCompleteCompRef_->listWidget()->hasFocus();
 }
 
 

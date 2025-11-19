@@ -576,7 +576,7 @@ void TextEditorComponent::contextMenuEvent(QContextMenuEvent* event)
 void TextEditorComponent::repaintCarets()
 {
     bool visible = textRenderer()->isCaretVisible();
-    bool focus = hasFocus();
+    bool focus = textRenderer()->textWidget()->isFocusedOrChildHasFocus();
 
     if (focus != visible) {
         textRenderer()->setCaretVisible(focus);

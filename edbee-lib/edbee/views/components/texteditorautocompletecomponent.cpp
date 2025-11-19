@@ -50,12 +50,9 @@ TextEditorAutoCompleteComponent::TextEditorAutoCompleteComponent(TextEditorContr
     this->setAttribute(Qt::WA_ShowWithoutActivating);
 
     menuRef_ = new QMenu(this);
-    menuRef_->setFocusPolicy(Qt::NoFocus);
-    menuRef_->setAttribute(Qt::WA_ShowWithoutActivating);
+    menuRef_->setAccessibleName("Autocomplete");
 
     listWidgetRef_ = new QListWidget(menuRef_);
-    listWidgetRef_->setFocusPolicy(Qt::NoFocus);
-    listWidgetRef_->setAttribute(Qt::WA_ShowWithoutActivating);
 
     listWidgetRef_->installEventFilter(this);
 
@@ -69,7 +66,7 @@ TextEditorAutoCompleteComponent::TextEditorAutoCompleteComponent(TextEditorContr
     wAction->setDefaultWidget(listWidgetRef_);
     menuRef_->addAction(wAction);
 
-    listWidgetRef_->setFocus();
+
 
     infoTipRef_ = new FakeToolTip(controllerRef_, this);
 
@@ -430,7 +427,7 @@ void TextEditorAutoCompleteComponent::updateList()
     // fills the autocomplete list with the curent word
     if (fillAutoCompleteList(doc, range, currentWord_)) {
         menuRef_->popup(menuRef_->pos());
-        editorComponentRef_->setFocus();
+        listWidgetRef_->setFocus();
 
         // position the widget
         showInfoTip();
