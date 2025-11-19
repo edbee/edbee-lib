@@ -72,6 +72,8 @@ public:
     virtual bool readonly() const;
     void setReadonly(bool readonly);
 
+    bool isFocusedOrChildHasFocus();
+
 
 protected:
 

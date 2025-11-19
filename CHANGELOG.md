@@ -1,6 +1,10 @@
 # Changelog
 
 
+- (2025-11-19) #152, Autocomplete Improvements for Screenreaders
+  - When autocomplete is shown the focus is moved to the internal QListWidget 
+  - ScreenReader NVDA now reacts better on the autocomplete 
+  - The autocomplete list has the accessibility label 'autocomplete'
 - (2025-11-12) #73, Stray Pixel at the bottom of the cursor (again)
 - (2025-11-04) #169, Retain clipboard when invoking CopyCommand without selection on a blank line.
 
