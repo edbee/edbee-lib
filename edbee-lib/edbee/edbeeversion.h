@@ -3,9 +3,9 @@
 
 #pragma once
 
-#define EDBEE_VERSION "0.12.0"
+#define EDBEE_VERSION "0.12.1"
 
 #define EDBEE_VERSION_MAJOR 0
 #define EDBEE_VERSION_MINOR 12
-#define EDBEE_VERSION_PATCH 0
+#define EDBEE_VERSION_PATCH 1
 #define EDBEE_VERSION_POSTFIX ""
