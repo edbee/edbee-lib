@@ -1,6 +1,8 @@
 # Changelog
 
 
+- (2025-11-22) #166, CutCommand, full line cut, use selection to fix issue with advancing caret
+
 ## v0.12.1 - Autocomplete Improvements NVDA, Retain Clipboard on empty copy, Stray Pixel Fix
 
 - (2025-11-19) #152, Autocomplete Improvements for Screenreaders

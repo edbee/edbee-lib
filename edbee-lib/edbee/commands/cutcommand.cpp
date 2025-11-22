@@ -39,9 +39,9 @@ void CutCommand::execute(TextEditorController* controller)
     } else {
 
         // fetch the selected lines
-        TextRangeSet newSel( *sel );
-        newSel.expandToFullLines(1);
-        str = newSel.getSelectedText();
+        TextRangeSet *newSel = new TextRangeSet( *sel );
+        newSel->expandToFullLines(1);
+        str = newSel->getSelectedText();
 
         // we only coalesce if 1 range is available
         int coalesceId = ( sel->rangeCount() != 1) ? 0 : CoalesceId_CutLine;
@@ -64,7 +64,10 @@ void CutCommand::execute(TextEditorController* controller)
         //delete mimeData;
 
         // remove the selection
-        controller->replaceRangeSet( newSel, "", coalesceId );
+        controller->beginUndoGroup();
+        controller->changeAndGiveTextSelection( newSel );
+        controller->replaceSelection( "", coalesceId, true );
+        controller->endUndoGroup();
         return;
     }
 }
