@@ -173,6 +173,19 @@ To update oniguruma
 git subtree pull --prefix vendor/oniguruma/oniguruma https://github.com/kkos/oniguruma master --squash
 ```
 
+Treesitter has been added
+
+```sh
+git subtree add --prefix vendor/treesitter/treesitter https://github.com/tree-sitter/tree-sitter/ master --squash
+```
+
+To update treesitter
+
+```sh
+git subtree pull --prefix vendor/treesitter/treesitter https://github.com/tree-sitter/tree-sitter/ master --squash
+```
+
+
 ## Build with cmake on Windows
 
 ```powershell
