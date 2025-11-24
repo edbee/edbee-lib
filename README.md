@@ -11,7 +11,7 @@ The base class of edbee is a QWidget, it has been written from scratch and is no
 ![Screenshot of the example application](http://edbee.net/images/screenshot1.png)
 
 The main website for edbee is at <https://edbee.net/>
-You can find the generatedadocumentation at <https://docs.edbee.net/>
+You can find the generated documentation at <https://docs.edbee.net/>
 
 This repository is a clean extraction of the previous edbee monolithical repository.
 This library doesn't contain any data files. Using it should become as easy as the following example:
