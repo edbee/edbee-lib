@@ -360,7 +360,9 @@ void TextMarginComponent::mousePressEvent(QMouseEvent* event)
     int y = event->position().toPoint().y() + top_;
 #endif
     size_t line = renderer()->lineIndexForYpos( y );
-    delegate()->mousePressEvent(line, event);
+    if (line != std::string::npos) {
+        delegate()->mousePressEvent(line, event);
+    }
     QWidget::mousePressEvent(event);
 
     if (!editorWidget()->textEditorComponent()->hasFocus()) {
