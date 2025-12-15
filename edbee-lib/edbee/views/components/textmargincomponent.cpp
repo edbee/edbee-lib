@@ -343,7 +343,9 @@ void TextMarginComponent::mouseMoveEvent(QMouseEvent* event)
     int y = event->position().toPoint().y() + top_;
 #endif
     size_t line = renderer()->lineIndexForYpos(y);
-    delegate()->mouseMoveEvent(line, event);
+    if (line != std::string::npos) {
+        delegate()->mouseMoveEvent(line, event);
+    }
     QWidget::mouseMoveEvent(event);
 }
 
