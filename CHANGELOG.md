@@ -1,6 +1,7 @@
 # Changelog
 
 
+- (2025-12-16) Fix crash in TextMarginComponent, disable event when line is invalid (std::string::npos) (@BlackStar-EoP)
 - (2025-11-22) #166, CutCommand, full line cut, use selection to fix issue with advancing caret
 
 ## v0.12.1 - Autocomplete Improvements NVDA, Retain Clipboard on empty copy, Stray Pixel Fix
