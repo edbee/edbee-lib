@@ -91,7 +91,8 @@ int TextRenderer::lineHeight()
 /// @param y the y position
 size_t TextRenderer::rawLineIndexForYpos(int y)
 {
-    Q_ASSERT(y >= 0);
+    if (y < 0) return std::string::npos;
+
     return static_cast<size_t>(y / lineHeight());
 }
 
