@@ -228,9 +228,6 @@ void TextEditorAutoCompleteComponent::showInfoTip()
       infoTipRef_->show();
       infoTipRef_->raise();
     }
-    else {
-      infoTipRef_->hide();
-    }
 }
 
 void TextEditorAutoCompleteComponent::hideInfoTip()
