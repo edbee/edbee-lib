@@ -360,6 +360,7 @@ bool TextEditorAutoCompleteComponent::eventFilter(QObject *obj, QEvent *event)
                 } else if ( listWidgetRef_->currentItem() ) {
                     insertCurrentSelectedListItem();
                     menuRef_->close();
+                    updateList();
                     return true;
                 }
                 break;
@@ -453,6 +454,7 @@ void TextEditorAutoCompleteComponent::listItemDoubleClicked(QListWidgetItem*)
 {
     insertCurrentSelectedListItem();
     menuRef_->close();
+    updateList();
 }
 
 void TextEditorAutoCompleteComponent::selectItemOnHover(QModelIndex modelIndex)
