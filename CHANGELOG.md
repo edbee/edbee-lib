@@ -1,6 +1,7 @@
 # Changelog
 
 
+- (2026-02-17) #173, TextAutoComplete evaluates the providers after closing autocomplete. Allowing followup lists. (@distractor)
 - (2026-01-04) #172, Assertation (crash) when selecting text with mouse in TextEditorComponent
 
 - (2025-12-16) Fix crash in TextMarginComponent, disable event when line is invalid (std::string::npos) (@BlackStar-EoP)
