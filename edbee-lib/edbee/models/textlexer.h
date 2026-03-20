@@ -1,4 +1,4 @@
-// edbee - Copyright (c) 2012-2025 by Rick Blommers and contributors
+// edbee - Copyright (c) 2012-2026 by Rick Blommers and contributors
 // SPDX-License-Identifier: MIT
 
 #pragma once
@@ -16,7 +16,7 @@ class TextDocumentScopes;
 /// This is a single lexer
 class EDBEE_EXPORT TextLexer {
 public:
-    TextLexer( TextDocumentScopes* scopes );
+    TextLexer(TextDocumentScopes* scopes);
     virtual ~TextLexer() {}
 
     /// Inform the lexer some data has been changed
@@ -33,7 +33,7 @@ public:
     ///
     /// @param beginOffset the first offset
     /// @param endOffset the last offset to
-    virtual void lexRange(size_t beginOffset, size_t endOffset ) = 0;
+    virtual void lexRange(size_t beginOffset, size_t endOffset) = 0;
 
     TextDocumentScopes* textScopes() { return textDocumentScopesRef_; }
     TextDocument* textDocument();

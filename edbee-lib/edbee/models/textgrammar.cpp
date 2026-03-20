@@ -1,4 +1,4 @@
-// edbee - Copyright (c) 2012-2025 by Rick Blommers and contributors
+// edbee - Copyright (c) 2012-2026 by Rick Blommers and contributors
 // SPDX-License-Identifier: MIT
 
 #include "textgrammar.h"
@@ -16,7 +16,7 @@ namespace edbee {
 /// The text grammar rule constructor
 /// @param grammar the grammar this rule belongs to
 /// @param instruction the type of instruction this is
-TextGrammarRule::TextGrammarRule(TextGrammar* grammar, Instruction instruction)
+TextRegexGrammarRule::TextRegexGrammarRule(TextRegexGrammar* grammar, Instruction instruction)
     : grammarRef_(grammar)
     , instruction_(instruction)
     , matchRegExp_(nullptr)
@@ -26,7 +26,7 @@ TextGrammarRule::TextGrammarRule(TextGrammar* grammar, Instruction instruction)
 
 
 /// The tex text grammar rule
-TextGrammarRule::~TextGrammarRule()
+TextRegexGrammarRule::~TextRegexGrammarRule()
 {
     qDeleteAll(ruleList_);
     ruleList_.clear();
@@ -38,9 +38,9 @@ TextGrammarRule::~TextGrammarRule()
 /// @param grammar the grammar this main rule belongs to
 /// @param scopeName the name of the scope
 /// @return the main grammar rule
-TextGrammarRule* TextGrammarRule::createMainRule(TextGrammar* grammar, const QString& scopeName)
+TextRegexGrammarRule* TextRegexGrammarRule::createMainRule(TextRegexGrammar* grammar, const QString& scopeName)
 {
-    TextGrammarRule* rule = new TextGrammarRule(grammar, MainRule);
+    TextRegexGrammarRule* rule = new TextRegexGrammarRule(grammar, MainRule);
     rule->setScopeName(scopeName);
     return rule;
 }
@@ -49,9 +49,9 @@ TextGrammarRule* TextGrammarRule::createMainRule(TextGrammar* grammar, const QSt
 /// Creates a grammar rule list
 /// @param grammar the grammar this rule list belongs to
 /// @return the TextGrammarRule that include the rule list
-TextGrammarRule* TextGrammarRule::createRuleList(TextGrammar* grammar)
+TextRegexGrammarRule* TextRegexGrammarRule::createRuleList(TextRegexGrammar* grammar)
 {
-    TextGrammarRule* rule = new TextGrammarRule(grammar, RuleList);
+    TextRegexGrammarRule* rule = new TextRegexGrammarRule(grammar, RuleList);
     return rule;
 }
 
@@ -60,9 +60,9 @@ TextGrammarRule* TextGrammarRule::createRuleList(TextGrammar* grammar)
 /// @param grammar the grammar this rules belongs to
 /// @param includeName the name to include
 /// @return an include grammar rule
-TextGrammarRule* TextGrammarRule::createIncludeRule(TextGrammar* grammar, const QString& includeName)
+TextRegexGrammarRule* TextRegexGrammarRule::createIncludeRule(TextRegexGrammar* grammar, const QString& includeName)
 {
-    TextGrammarRule* rule = new TextGrammarRule(grammar, IncludeCall);
+    TextRegexGrammarRule* rule = new TextRegexGrammarRule(grammar, IncludeCall);
     rule->setIncludeName(includeName);
     return rule;
 }
@@ -73,11 +73,11 @@ TextGrammarRule* TextGrammarRule::createIncludeRule(TextGrammar* grammar, const 
 /// @param scopeName the scopename of this rule
 /// @param regExp the regular expression used for this rule
 /// @return the created grammar rule
-TextGrammarRule* TextGrammarRule::createSingleLineRegExp(TextGrammar* grammar, const QString& scopeName, const QString& regExp)
+TextRegexGrammarRule* TextRegexGrammarRule::createSingleLineRegExp(TextRegexGrammar* grammar, const QString& scopeName, const QString& regExp)
 {
-    TextGrammarRule* rule = new TextGrammarRule(grammar, SingleLineRegExp);
+    TextRegexGrammarRule* rule = new TextRegexGrammarRule(grammar, SingleLineRegExp);
     rule->setScopeName(scopeName);
-    rule->giveMatchRegExp(TextGrammarRule::createRegExp(regExp));
+    rule->giveMatchRegExp(TextRegexGrammarRule::createRegExp(regExp));
     return rule;
 }
 
@@ -88,12 +88,12 @@ TextGrammarRule* TextGrammarRule::createSingleLineRegExp(TextGrammar* grammar, c
 /// @param beginRegExp the start regexp to use
 /// @param endRegExp the end regular expression to use
 /// @return TextGrammarRule the multiple grammar rule
-TextGrammarRule* TextGrammarRule::createMultiLineRegExp(TextGrammar* grammar, const QString& scopeName, const QString& contentScopeName, const QString& beginRegExp, const QString& endRegExp)
+TextRegexGrammarRule* TextRegexGrammarRule::createMultiLineRegExp(TextRegexGrammar* grammar, const QString& scopeName, const QString& contentScopeName, const QString& beginRegExp, const QString& endRegExp)
 {
-    TextGrammarRule* rule = new TextGrammarRule(grammar, MultiLineRegExp);
+    TextRegexGrammarRule* rule = new TextRegexGrammarRule(grammar, MultiLineRegExp);
     rule->setScopeName(scopeName);
     rule->setContentScopeName(contentScopeName);
-    rule->giveMatchRegExp(TextGrammarRule::createRegExp(beginRegExp));
+    rule->giveMatchRegExp(TextRegexGrammarRule::createRegExp(beginRegExp));
     rule->setEndRegExpString(endRegExp);
     return rule;
 }
@@ -101,7 +101,7 @@ TextGrammarRule* TextGrammarRule::createMultiLineRegExp(TextGrammar* grammar, co
 
 /// returns the child rule at the given index
 /// @param idx the index of the grammar rule
-TextGrammarRule* TextGrammarRule::rule(qsizetype idx) const
+TextRegexGrammarRule* TextRegexGrammarRule::rule(qsizetype idx) const
 {
     Q_ASSERT( 0 <= idx && idx < ruleCount());
     return ruleList_.at(idx);
@@ -110,7 +110,7 @@ TextGrammarRule* TextGrammarRule::rule(qsizetype idx) const
 
 /// Gives the rulle to the rule-list of the grammar rule
 /// @param the rule to give (ownership is transfered to this object)
-void TextGrammarRule::giveRule(TextGrammarRule* rule)
+void TextRegexGrammarRule::giveRule(TextRegexGrammarRule* rule)
 {
     ruleList_.append(rule);
 }
@@ -118,7 +118,7 @@ void TextGrammarRule::giveRule(TextGrammarRule* rule)
 
 /// Gives the main regular expression
 /// @param regExp the regular expression to give
-void TextGrammarRule::giveMatchRegExp(RegExp* regExp)
+void TextRegexGrammarRule::giveMatchRegExp(RegExp* regExp)
 {
     matchRegExp_ = regExp;
 }
@@ -126,7 +126,7 @@ void TextGrammarRule::giveMatchRegExp(RegExp* regExp)
 
 /// Sets the ends regular expression(only for multi-line regexp rules
 /// @param str the end regular expression
-void TextGrammarRule::setEndRegExpString(const QString& str)
+void TextRegexGrammarRule::setEndRegExpString(const QString& str)
 {
     endRegExpString_ = str;
 }
@@ -134,7 +134,7 @@ void TextGrammarRule::setEndRegExpString(const QString& str)
 
 /// convers the curent object toString (for debugging purposes)
 /// @param includePatters should the patterns be included
-QString TextGrammarRule::toString(bool includePatterns)
+QString TextRegexGrammarRule::toString(bool includePatterns)
 {
     QString r;
     switch (instruction_) {
@@ -164,7 +164,7 @@ QString TextGrammarRule::toString(bool includePatterns)
 /// parses the given string as a regexp
 /// @param regexp the regular expression string to create a regexp from
 /// @return the RegExp object
-RegExp* TextGrammarRule::createRegExp(const QString& regexp)
+RegExp* TextRegexGrammarRule::createRegExp(const QString& regexp)
 {
     RegExp* result = new RegExp(regexp, RegExp::EngineOniguruma); //, Qt::CaseSensitive, QRegExp::RegExp2 );
     if (!result->isValid()) {
@@ -173,9 +173,7 @@ RegExp* TextGrammarRule::createRegExp(const QString& regexp)
     return result;
 }
 
-
 //==========================
-
 
 /// The default texgrammar constructor
 /// @param name the name of the textgrammar
@@ -183,28 +181,13 @@ RegExp* TextGrammarRule::createRegExp(const QString& regexp)
 TextGrammar::TextGrammar(const QString& name, const QString& displayName)
     : name_(name)
     , displayName_(displayName)
-    , mainRule_(nullptr)
 {
-
 }
 
 
-/// The textgrammar destructor
 TextGrammar::~TextGrammar()
 {
-    qDeleteAll(repository_);
-    repository_.clear();
-    delete mainRule_;
 }
-
-
-/// Gives the main rule the grammmar
-void TextGrammar::giveMainRule(TextGrammarRule* mainRule)
-{
-    Q_ASSERT(!mainRule_);
-    mainRule_ = mainRule;
-}
-
 
 /// return the name of the textgrammar
 QString TextGrammar::name() const
@@ -219,38 +202,12 @@ QString TextGrammar::displayName() const
     return displayName_;
 }
 
-
-/// Returns the main grammar rule for this textgrammar
-TextGrammarRule* TextGrammar::mainRule() const
-{
-    return mainRule_;
-}
-
-
 /// Returns all file extensions that are used by this grammar
 /// @return a stringlist with all extension (without the '.')
 QStringList TextGrammar::fileExtensions() const
 {
     return fileExtensions_;
 }
-
-
-/// Adds the given grammar rule to the repos
-void TextGrammar::giveToRepos(const QString& name, TextGrammarRule* rule)
-{
-    repository_.insert(name, rule);
-}
-
-
-/// Finds the grammar rule from the respos
-/// @param name the name of the rule
-/// @param defValue the grammar rule to return if not found
-/// @return the found grammar rule (or the defValue if not found)
-TextGrammarRule *TextGrammar::findFromRepos(const QString& name, TextGrammarRule* defValue)
-{
-    return repository_.value(name, defValue);
-}
-
 
 /// Adds a file extension
 /// @param ext the extension to add.
@@ -263,14 +220,73 @@ void TextGrammar::addFileExtension(const QString& ext)
 //==========================
 
 
+/// The default texgrammar constructor
+/// @param name the name of the textgrammar
+/// @param displayName th name to display
+TextRegexGrammar::TextRegexGrammar(const QString& name, const QString& displayName)
+    : TextGrammar(name, displayName)
+    , mainRule_(nullptr)
+{
+}
+
+
+TextRegexGrammar::~TextRegexGrammar()
+{
+    qDeleteAll(repository_);
+    repository_.clear();
+    delete mainRule_;
+}
+
+/// The default scope to use for this lanuage
+QString TextRegexGrammar::defaultScopeName() const
+{
+    return mainRule_->scopeName();
+}
+
+
+/// Gives the main rule the grammmar
+void TextRegexGrammar::giveMainRule(TextRegexGrammarRule* mainRule)
+{
+    Q_ASSERT(!mainRule_);
+    mainRule_ = mainRule;
+}
+
+/// Returns the main grammar rule for this textgrammar
+TextRegexGrammarRule* TextRegexGrammar::mainRule() const
+{
+    return mainRule_;
+}
+
+/// Adds the given grammar rule to the repos
+void TextRegexGrammar::giveToRepos(const QString& name, TextRegexGrammarRule* rule)
+{
+    repository_.insert(name, rule);
+}
+
+
+/// Finds the grammar rule from the respos
+/// @param name the name of the rule
+/// @param defValue the grammar rule to return if not found
+/// @return the found grammar rule (or the defValue if not found)
+TextRegexGrammarRule* TextRegexGrammar::findFromRepos(const QString& name, TextRegexGrammarRule* defValue)
+{
+    return repository_.value(name, defValue);
+}
+
+
+//==========================
+
+
 /// The text grammar manager constructor
 TextGrammarManager::TextGrammarManager()
     : defaultGrammarRef_(nullptr)
 {
 
     // always make sure there's a default grammar
-    defaultGrammarRef_ = new TextGrammar("text.plain", "Plain Text");
-    defaultGrammarRef_->giveMainRule( TextGrammarRule::createMainRule(defaultGrammarRef_,"text.plain"));
+    TextRegexGrammar* grammar = new TextRegexGrammar("text.plain", "Plain Text");
+    grammar->giveMainRule(TextRegexGrammarRule::createMainRule(grammar, "text.plain"));
+
+    defaultGrammarRef_ = grammar;
     giveGrammar(defaultGrammarRef_);
 }
 
@@ -288,11 +304,11 @@ TextGrammarManager::~TextGrammarManager()
 ///
 /// @param filename the direct filename to read
 /// @return the TextGrammar file. When an error happend, the errorMessage is set
-TextGrammar* TextGrammarManager::readGrammarFile(const QString& file)
+TextRegexGrammar* TextGrammarManager::readGrammarFile(const QString& file)
 {
     lastErrorMessage_.clear();
 
-    TextGrammar* grammar = nullptr;
+    TextRegexGrammar* grammar = nullptr;
     TmLanguageParser parser;
 
     grammar = parser.parse(file);
@@ -320,9 +336,15 @@ void TextGrammarManager::readAllGrammarFilesInPath(const QString& path)
 
 
 /// This method returns the given language grammar
-TextGrammar* TextGrammarManager::get(const QString &name)
+TextGrammar* TextGrammarManager::get(const QString& name)
 {
     return grammarMap_.value(name, nullptr);
+}
+
+/// Returns te regexp variant of this language grammar
+TextRegexGrammar* TextGrammarManager::getRegexGrammar(const QString& name)
+{
+    return dynamic_cast<TextRegexGrammar*>(get(name));
 }
 
 
@@ -403,6 +425,7 @@ QString TextGrammarManager::lastErrorMessage() const
 {
     return lastErrorMessage_;
 }
+
 
 
 } // edbee

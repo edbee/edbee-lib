@@ -49,6 +49,7 @@ int main(int argc, char* argv[])
     edbee::Edbee* tm = edbee::Edbee::instance();
     //tm->setKeyMapPath( QStringLiteral("%1%2").arg(appDataPath).arg("keymaps"));
     tm->setGrammarPath(  QStringLiteral("%1%2").arg(appDataPath).arg("syntaxfiles") );
+    //tm->setThemePath( QStringLiteral("%1%2").arg(appDataPath).arg("parsers") );
     //tm->setThemePath( QStringLiteral("%1%2").arg(appDataPath).arg("themes") );
     tm->init();
 

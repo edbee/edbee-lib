@@ -1,4 +1,4 @@
-// edbee - Copyright (c) 2012-2025 by Rick Blommers and contributors
+// edbee - Copyright (c) 2012-2026 by Rick Blommers and contributors
 // SPDX-License-Identifier: MIT
 
 #include "chartextdocument.h"
@@ -11,6 +11,7 @@
 #include "edbee/lexers/grammartextlexer.h"
 #include "edbee/models/changes/textchange.h"
 #include "edbee/models/textautocompleteprovider.h"
+#include "edbee/models/textparser.h"
 #include "edbee/models/textgrammar.h"
 #include "edbee/models/textdocumentscopes.h"
 #include "edbee/models/texteditorconfig.h"
@@ -36,6 +37,7 @@ CharTextDocument::CharTextDocument(TextEditorConfig* config, QObject* object)
     , textBuffer_(nullptr)
     , textScopes_(nullptr)
     , textLexer_(nullptr)
+    , textParser_(nullptr)
     , textCodecRef_(nullptr)
     , lineEndingRef_(nullptr)
     , textUndoStack_(nullptr)
@@ -53,8 +55,11 @@ CharTextDocument::CharTextDocument(TextEditorConfig* config, QObject* object)
     textCodecRef_ = Edbee::instance()->codecManager()->codecForName("UTF-8");
     lineEndingRef_ = LineEnding::unixType();
 
-    // create the text scopes and lexer
+    // create the lexer (textmate grammars)
     textLexer_ = new GrammarTextLexer(textScopes_);
+
+    // Create the parser (treesitter)
+    textParser_ = new TextDocumentParser(this);
 
     // create the undo stack
     textUndoStack_ = new TextUndoStack(this);
@@ -78,6 +83,7 @@ CharTextDocument::~CharTextDocument()
 {
     delete autoCompleteProviderList_;
     delete textUndoStack_;
+    delete textParser_;
     delete textLexer_;
     delete textScopes_;
     delete textBuffer_;

@@ -74,3 +74,4 @@ DEPENDPATH += $$PWD
 DEFINES += QT_NODLL
 
 include(edbee-lib.pri)
+

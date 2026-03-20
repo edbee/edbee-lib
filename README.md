@@ -186,7 +186,7 @@ git subtree pull --prefix vendor/treesitter/treesitter https://github.com/tree-s
 ```
 
 
-## Build with cmake on Windows
+## Build with cmake
 
 ```powershell
 # Sample to build with MinGW (-DCMAKE_PREFIX_PATH=your qt cmake path)
@@ -214,6 +214,19 @@ cmake --build .
 
 .\edbee-test\Debug\edbee-test.exe
 ```
+
+```sh
+# Sample to build with MinGW (-DCMAKE_PREFIX_PATH=your qt cmake path)
+mkdir build_macos; cd build_macos
+cmake -DCMAKE_PREFIX_PATH="~/Qt/6.9.3/macos/lib/cmake/"  ..
+cmake --build .
+
+.\edbee-test\edbee-test.exe
+```
+
+## Build tree-sitter-language
+
+
 
 ## Contributing
 

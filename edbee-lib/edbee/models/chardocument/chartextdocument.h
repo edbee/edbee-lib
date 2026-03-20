@@ -1,4 +1,4 @@
-// edbee - Copyright (c) 2012-2025 by Rick Blommers and contributors
+// edbee - Copyright (c) 2012-2026 by Rick Blommers and contributors
 // SPDX-License-Identifier: MIT
 
 #pragma once
@@ -15,6 +15,7 @@ namespace edbee {
 
 class TextCodec;
 class TextDocumentFilter;
+class TextDocumentParser;;
 class TextDocumentScopes;
 class TextEditorConfig;
 class TextLineDataManager;
@@ -85,7 +86,8 @@ private:
     TextBuffer* textBuffer_;                                 ///< The textbuffers
 
     TextDocumentScopes* textScopes_;                         ///< The text document scopes
-    TextLexer* textLexer_;                                   ///< The lexer used for finding the scopes
+    TextLexer* textLexer_;                                   ///< The lexer used for finding the scopes (textmate grammars)
+    TextDocumentParser* textParser_;						 ///< The text grammar parser  (treesitter grammars)
 
     TextCodec* textCodecRef_;                                ///< The used encoding
     const edbee::LineEnding* lineEndingRef_;                 ///< The used line-ending

@@ -19,7 +19,8 @@ class ScopedTextRange;
 class ScopedTextRangeList;
 class TextDocumentScopes;
 class TextGrammar;
-class TextGrammarRule;
+class TextRegexGrammar;
+class TextRegexGrammarRule;
 
 /// A simple lexer matches texts with simple regular expressions
 class EDBEE_EXPORT GrammarTextLexer : public TextLexer
@@ -29,6 +30,7 @@ public:
     virtual ~GrammarTextLexer();
 
     virtual void textChanged(const TextBufferChange& change);
+    TextRegexGrammar* regexGrammar();
 
 private:
     virtual bool lexLine(size_t line, size_t& currentDocOffset );
@@ -41,10 +43,10 @@ private:
 
     RegExp* createEndRegExp( RegExp* startRegExp, const QString &endRegExpStringIn);
 
-    void findNextGrammarRule(const QString &line, size_t offsetInLine, TextGrammarRule *activeRule, TextGrammarRule *&foundRule, RegExp*& foundRegExp, size_t& foundPosition);
+    void findNextGrammarRule(const QString &line, size_t offsetInLine, TextRegexGrammarRule *activeRule, TextRegexGrammarRule *&foundRule, RegExp*& foundRegExp, size_t& foundPosition);
     void processCaptures(RegExp *foundRegExp, const QMap<size_t, QString>* foundCaptures);
 
-    TextGrammarRule* findAndApplyNextGrammarRule(size_t currentDocOffset, const QString& line, size_t& offsetInLine);
+    TextRegexGrammarRule* findAndApplyNextGrammarRule(size_t currentDocOffset, const QString& line, size_t& offsetInLine);
 
     MultiLineScopedTextRange* activeMultiLineRange();
     ScopedTextRange* activeScopedTextRange();
@@ -52,7 +54,7 @@ private:
     void popActiveRange();
     void pushActiveRange( ScopedTextRange* range, MultiLineScopedTextRange* multiRange );
 
-    TextGrammarRule* findIncludeGrammarRule( TextGrammarRule* base );
+    TextRegexGrammarRule* findIncludeGrammarRule( TextRegexGrammarRule* base );
 
 private:
 

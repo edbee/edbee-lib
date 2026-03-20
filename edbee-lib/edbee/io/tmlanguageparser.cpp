@@ -1,4 +1,4 @@
-// edbee - Copyright (c) 2012-2025 by Rick Blommers and contributors
+// edbee - Copyright (c) 2012-2026 by Rick Blommers and contributors
 // SPDX-License-Identifier: MIT
 
 #include "tmlanguageparser.h"
@@ -13,7 +13,6 @@
 #include "edbee/io/baseplistparser.h"
 #include "edbee/io/jsonparser.h"
 #include "edbee/models/textgrammar.h"
-#include "edbee/edbee.h"
 
 #include "edbee/debug.h"
 
@@ -33,16 +32,16 @@ QString TmLanguageParser::lastErrorMessage() const
 
 
 /// Sets the last error message
-void TmLanguageParser::setLastErrorMessage(const QString &str)
+void TmLanguageParser::setLastErrorMessage(const QString& str)
 {
     lastErrorMessage_ = str;
 }
 
 
 /// Parses a PList  (XML Grammar file definition)
-TextGrammar *TmLanguageParser::parsePlist(QIODevice *device)
+TextRegexGrammar *TmLanguageParser::parsePlist(QIODevice* device)
 {
-    TextGrammar* result = nullptr;
+    TextRegexGrammar* result = nullptr;
 
     BasePListParser plistParser;
     if (plistParser.beginParsing(device)) {
@@ -61,9 +60,9 @@ TextGrammar *TmLanguageParser::parsePlist(QIODevice *device)
 
 
 /// Parses a JSON grammar file definition
-TextGrammar *TmLanguageParser::parseJson(QIODevice *device)
+TextRegexGrammar *TmLanguageParser::parseJson(QIODevice* device)
 {
-    TextGrammar* result = nullptr;
+    TextRegexGrammar* result = nullptr;
 
     JsonParser jsonParser;
     if (jsonParser.parse(device)) {
@@ -79,7 +78,7 @@ TextGrammar *TmLanguageParser::parseJson(QIODevice *device)
 /// @param device the device to read from. The device NEEDS to be open!!
 /// @param json use the json parser
 /// @return the language grammar or nullptr on error
-TextGrammar* TmLanguageParser::parse(QIODevice* device, bool json)
+TextRegexGrammar* TmLanguageParser::parse(QIODevice* device, bool json)
 {
     if( json ) {
         return parseJson(device);
@@ -90,10 +89,10 @@ TextGrammar* TmLanguageParser::parse(QIODevice* device, bool json)
 }
 
 /// Parses the given file
-TextGrammar *TmLanguageParser::parse(QFile &file)
+TextRegexGrammar *TmLanguageParser::parse(QFile &file)
 {
     if (file.open(QIODevice::ReadOnly)) {
-        TextGrammar* result = parse( &file, file.fileName().endsWith(".json"));
+        TextRegexGrammar* result = parse( &file, file.fileName().endsWith(".json"));
         file.close();
         return result;
     } else {
@@ -107,7 +106,7 @@ TextGrammar *TmLanguageParser::parse(QFile &file)
 /// parses the given grammar file
 /// @param file the file to read
 /// @return the language grammar or 0 on error
-TextGrammar* TmLanguageParser::parse(const QString& fileName)
+TextRegexGrammar* TmLanguageParser::parse(const QString& fileName)
 {
     QFile file(fileName);
     return parse(file);
@@ -115,7 +114,7 @@ TextGrammar* TmLanguageParser::parse(const QString& fileName)
 
 
 /// sets the captures
-void TmLanguageParser::addCapturesToGrammarRule(TextGrammarRule* rule, QHash<QString, QVariant> captures, bool endCapture)
+void TmLanguageParser::addCapturesToGrammarRule(TextRegexGrammarRule* rule, QHash<QString, QVariant> captures, bool endCapture)
 {
     if (captures.isEmpty()) { return; }
 
@@ -138,17 +137,17 @@ void TmLanguageParser::addCapturesToGrammarRule(TextGrammarRule* rule, QHash<QSt
 
 
 /// Adds all patterns to the grammar rules
-void TmLanguageParser::addPatternsToGrammarRule(TextGrammarRule* rule, QList<QVariant> patterns)
+void TmLanguageParser::addPatternsToGrammarRule(TextRegexGrammarRule* rule, QList<QVariant> patterns)
 {
     foreach (QVariant pattern, patterns) {
-        TextGrammarRule* childRule = createGrammarRule(rule->grammar(), pattern);
+        TextRegexGrammarRule* childRule = createGrammarRule(rule->grammar(), pattern);
         if (childRule) { rule->giveRule(childRule); }
     }
 }
 
 
 /// creates a grammar rue
-TextGrammarRule* TmLanguageParser::createGrammarRule(TextGrammar* grammar, const QVariant& data)
+TextRegexGrammarRule* TmLanguageParser::createGrammarRule(TextRegexGrammar* grammar, const QVariant& data)
 {
     QHash<QString,QVariant> map = data.toHash();
     QString match = map.value("match").toString();
@@ -158,20 +157,20 @@ TextGrammarRule* TmLanguageParser::createGrammarRule(TextGrammar* grammar, const
 
     // match filled?
     if (!match.isEmpty()) {
-        TextGrammarRule* rule = TextGrammarRule::createSingleLineRegExp(grammar, name, match);
+        TextRegexGrammarRule* rule = TextRegexGrammarRule::createSingleLineRegExp(grammar, name, match);
         QHash<QString,QVariant> captures = map.value("captures").toHash();
         addCapturesToGrammarRule(rule, captures);
         return rule;
 
     } else if(!include.isEmpty()) {
-        return TextGrammarRule::createIncludeRule(grammar, include);
+        return TextRegexGrammarRule::createIncludeRule(grammar, include);
 
     } else if(!begin.isEmpty()) {
         QString end = map.value("end").toString();
 
         // TODO: contentScopeName
         QString contentScope = name;
-        TextGrammarRule* rule = TextGrammarRule::createMultiLineRegExp(grammar, name, contentScope, begin, end);
+        TextRegexGrammarRule* rule = TextRegexGrammarRule::createMultiLineRegExp(grammar, name, contentScope, begin, end);
 
         // add the patterns
         QList<QVariant> patterns = map.value("patterns").toList();
@@ -193,7 +192,7 @@ TextGrammarRule* TmLanguageParser::createGrammarRule(TextGrammar* grammar, const
         return rule;
 
     } else {
-        TextGrammarRule* rule = TextGrammarRule::createRuleList(grammar);
+        TextRegexGrammarRule* rule = TextRegexGrammarRule::createRuleList(grammar);
 
         // add the patterns
         QList<QVariant> patterns = map.value("patterns").toList();
@@ -227,7 +226,7 @@ TextGrammarRule* TmLanguageParser::createGrammarRule(TextGrammar* grammar, const
 
 
 // parses the given language
-TextGrammar* TmLanguageParser::createLanguage(QVariant& data)
+TextRegexGrammar* TmLanguageParser::createLanguage(QVariant& data)
 {
     QHash<QString,QVariant> hashMap = data.toHash();
     QString name      = hashMap.value("name").toString();
@@ -240,11 +239,11 @@ TextGrammar* TmLanguageParser::createLanguage(QVariant& data)
     }
 
     // construct the grammar
-    TextGrammar* grammar = new TextGrammar(scopeName, name);
+    TextRegexGrammar* grammar = new TextRegexGrammar(scopeName, name);
 
     // and get the main patterns
     // construct the main rule
-    TextGrammarRule* mainRule = TextGrammarRule::createMainRule(grammar, scopeName);
+    TextRegexGrammarRule* mainRule = TextRegexGrammarRule::createMainRule(grammar, scopeName);
     grammar->giveMainRule(mainRule);
 
     QList<QVariant> patterns = hashMap.value("patterns").toList();
@@ -256,7 +255,7 @@ TextGrammar* TmLanguageParser::createLanguage(QVariant& data)
     QHashIterator<QString,QVariant> itr(repos);
     while (itr.hasNext()) {
         itr.next();
-        TextGrammarRule* rule = createGrammarRule(grammar, itr.value());
+        TextRegexGrammarRule* rule = createGrammarRule(grammar, itr.value());
         if (rule) {
             grammar->giveToRepos(itr.key(), rule);
         } else {
@@ -272,7 +271,6 @@ TextGrammar* TmLanguageParser::createLanguage(QVariant& data)
 
     return grammar;
 }
-
 
 
 } // edbee

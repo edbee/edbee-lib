@@ -19,7 +19,7 @@ class MultiLineScopedTextRange;
 class RegExp;
 class ScopedTextRange;
 class TextDocumentScopes;
-class TextGrammarRule;
+class TextRegexGrammarRule;
 class TextScope;
 
 /// This type defines a single scope atom
@@ -252,8 +252,8 @@ public:
     MultiLineScopedTextRange(size_t anchor, size_t caret, TextScope* scope);
     virtual ~MultiLineScopedTextRange();
 
-    void setGrammarRule(TextGrammarRule* rule);
-    TextGrammarRule* grammarRule() const;
+    void setGrammarRule(TextRegexGrammarRule* rule);
+    TextRegexGrammarRule* grammarRule() const;
 
     void giveEndRegExp(RegExp* regExp);
     RegExp* endRegExp();
@@ -261,7 +261,7 @@ public:
     static bool lessThan(MultiLineScopedTextRange* r1, MultiLineScopedTextRange* r2);
 
 private:
-    TextGrammarRule* ruleRef_; ///< The grammar rule that found this range
+    TextRegexGrammarRule* ruleRef_; ///< The grammar rule that found this range
     RegExp* endRegExp_;        ///< The end regexp
 };
 
@@ -290,7 +290,7 @@ public:
     virtual void toSingleRange();
     virtual void sortRanges();
     virtual MultiLineScopedTextRange& scopedRange(size_t idx);
-    virtual MultiLineScopedTextRange& addRange(size_t anchor, size_t caret, const QString& name , TextGrammarRule *rule);
+    virtual MultiLineScopedTextRange& addRange(size_t anchor, size_t caret, const QString& name , TextRegexGrammarRule *rule);
 
     void removeAndInvalidateRangesAfterOffset(size_t offset);
 
@@ -325,7 +325,7 @@ public:
     void setLastScopedOffset(size_t offset);
 
     // scope management
-    void setDefaultScope(const QString& name, TextGrammarRule *rule);
+    void setDefaultScope(const QString& name, TextRegexGrammarRule *rule);
 
     void giveLineScopedRangeList(size_t line, ScopedTextRangeList* list);
     ScopedTextRangeList* scopedRangesAtLine(size_t line);

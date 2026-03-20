@@ -69,22 +69,22 @@ RegExp* GrammarTextLexer::createEndRegExp(RegExp* startRegExp, const QString& en
 /// @param (out) foundRegExp the found regexp
 /// @param (out) foundPosition the found position
 /// @return the grammarRule found
-void GrammarTextLexer::findNextGrammarRule(const QString& line, size_t offsetInLine, TextGrammarRule* activeRule, TextGrammarRule*& foundRule, RegExp*& foundRegExp, size_t& foundPosition)
+void GrammarTextLexer::findNextGrammarRule(const QString& line, size_t offsetInLine, TextRegexGrammarRule* activeRule, TextRegexGrammarRule*& foundRule, RegExp*& foundRegExp, size_t& foundPosition)
 {
     // next iterate over all rules and find the rule with the lowest offset
-    QStack<TextGrammarRule::Iterator*> ruleIterators;
+    QStack<TextRegexGrammarRule::Iterator*> ruleIterators;
     ruleIterators.push( activeRule->createIterator());
     while (!ruleIterators.isEmpty()) {
 
         while (ruleIterators.top()->hasNext()) {
-            TextGrammarRule* rule = ruleIterators.top()->next(); // activeRule->rule(i);
+            TextRegexGrammarRule* rule = ruleIterators.top()->next(); // activeRule->rule(i);
 
             bool processNewRule = false;
             do {
                 processNewRule = false;
                 switch (rule->instruction()) {
-                    case TextGrammarRule::SingleLineRegExp:
-                    case TextGrammarRule::MultiLineRegExp:
+                    case TextRegexGrammarRule::SingleLineRegExp:
+                    case TextRegexGrammarRule::MultiLineRegExp:
                     {
                         // only use this match if the offset < foundPosition
                         size_t pos = rule->matchRegExp()->indexIn(line, offsetInLine);
@@ -99,9 +99,9 @@ void GrammarTextLexer::findNextGrammarRule(const QString& line, size_t offsetInL
                     }
 
                     // and include rule
-                    case TextGrammarRule::IncludeCall:
+                    case TextRegexGrammarRule::IncludeCall:
                     {
-                        TextGrammarRule* includedRule = findIncludeGrammarRule(rule);
+                        TextRegexGrammarRule* includedRule = findIncludeGrammarRule(rule);
                         if (includedRule) {
                             // a rule list, append the iterator
                             if (includedRule->isRuleList() || includedRule->isMainRule()) {
@@ -117,10 +117,10 @@ void GrammarTextLexer::findNextGrammarRule(const QString& line, size_t offsetInL
                         }
                         break;
                     }
-                    case TextGrammarRule::MainRule:
+                    case TextRegexGrammarRule::MainRule:
                         Q_ASSERT(false && "a mainrule as child is not allowed!");
                         break;
-                    case TextGrammarRule::RuleList:
+                    case TextRegexGrammarRule::RuleList:
                         Q_ASSERT(false && "a rule list is not directly allowed!");
                         break;
                     default:
@@ -166,17 +166,17 @@ void GrammarTextLexer::processCaptures(RegExp* foundRegExp, const QMap<size_t, Q
 /// @param currentDocOffset the current document offset
 /// @param line the line that's being matches
 /// @param offsetInLine (in/out) the current offset in the line
-TextGrammarRule* GrammarTextLexer::findAndApplyNextGrammarRule(size_t currentDocOffset, const QString& line, size_t& offsetInLine)
+TextRegexGrammarRule* GrammarTextLexer::findAndApplyNextGrammarRule(size_t currentDocOffset, const QString& line, size_t& offsetInLine)
 {
     Q_ASSERT(lineRangeList_);
 
     MultiLineScopedTextRange* activeMultiRange = this->activeMultiLineRange();
-    TextGrammarRule* activeRule = activeMultiRange->grammarRule();
+    TextRegexGrammarRule* activeRule = activeMultiRange->grammarRule();
     //qlog_info() << "--- matchNextGrammarRule ---------------------";
     //qlog_info() << " - activeRule : " << activeRule->toString();
     //qlog_info() << " - activeRange: " << activeRange->toString();
 
-    TextGrammarRule* foundRule = nullptr;
+    TextRegexGrammarRule* foundRule = nullptr;
     RegExp* foundRegExp = nullptr;
     size_t foundPosition = std::numeric_limits<size_t>::max();
 
@@ -299,8 +299,8 @@ void GrammarTextLexer::pushActiveRange(ScopedTextRange* range, MultiLineScopedTe
 }
 
 
-/// T his method finds the 'included' grammar rule
-TextGrammarRule* GrammarTextLexer::findIncludeGrammarRule(TextGrammarRule* base)
+/// This method finds the 'included' grammar rule
+TextRegexGrammarRule* GrammarTextLexer::findIncludeGrammarRule(TextRegexGrammarRule* base)
 {
     Q_ASSERT( base->isIncludeCall() );
     QString name = base->includeName();
@@ -313,10 +313,10 @@ TextGrammarRule* GrammarTextLexer::findIncludeGrammarRule(TextGrammarRule* base)
     // another language call
     // The difference between $base and $self is very subtle.. The exact difference is unkown to me..
     if (name=="$base" || name == "$self") {
-        return grammar()->mainRule();
+        return regexGrammar()->mainRule();
     }
 
-    TextGrammar* grammar = Edbee::instance()->grammarManager()->get(name);
+    TextRegexGrammar* grammar = Edbee::instance()->grammarManager()->getRegexGrammar(name);
     if (grammar) { return grammar->mainRule(); }
     return nullptr;
 }
@@ -334,6 +334,14 @@ void GrammarTextLexer::textChanged(const TextBufferChange& change)
     docScopes->removeScopesAfterOffset(offsetStart);
 
     /// TODO: rebuild an optimized scope-rebuilding algorithm
+}
+
+/// returns the  regexgrammar
+TextRegexGrammar* GrammarTextLexer::regexGrammar()
+{
+    TextRegexGrammar* result = dynamic_cast<TextRegexGrammar*>(grammar());
+    Q_ASSERT(result);
+    return result;
 }
 
 
@@ -369,12 +377,12 @@ bool GrammarTextLexer::lexLine(size_t lineIdx, size_t& currentDocOffset)
     // find the first 'matching' rule
     size_t offsetInLine = 0;
     size_t lastOffsetInLine = 0;
-    TextGrammarRule* lastFoundRule = nullptr;
+    TextRegexGrammarRule* lastFoundRule = nullptr;
     while (true) {
         //QString debug;
         //debug.append( QStringLiteral((" =[%1,%2,%3]= ").arg(lineIdx).arg(offsetInLine).arg(currentDocOffset) );
 
-        TextGrammarRule* foundRule = findAndApplyNextGrammarRule(currentDocOffset, line, offsetInLine); //debug.append( QStringLiteral((" %1  (%2)").arg(foundRule?foundRule->scopeName():"<<null>").arg(offsetInLine) ); //qlog_info() << debug; if (!foundRule) break;
+        TextRegexGrammarRule* foundRule = findAndApplyNextGrammarRule(currentDocOffset, line, offsetInLine); //debug.append( QStringLiteral((" %1  (%2)").arg(foundRule?foundRule->scopeName():"<<null>").arg(offsetInLine) ); //qlog_info() << debug; if (!foundRule) break;
         if (!foundRule) break;
 
         /// check the next offset

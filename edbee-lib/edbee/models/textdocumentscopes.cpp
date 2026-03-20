@@ -184,14 +184,14 @@ MultiLineScopedTextRange::~MultiLineScopedTextRange()
 
 
 /// Sets the rule (we need the rule to perform end-of-line matching)
-void MultiLineScopedTextRange::setGrammarRule(TextGrammarRule* rule)
+void MultiLineScopedTextRange::setGrammarRule(TextRegexGrammarRule* rule)
 {
     ruleRef_ = rule;
 }
 
 
 /// Returns the active grammar rule
-TextGrammarRule* MultiLineScopedTextRange::grammarRule() const
+TextRegexGrammarRule* MultiLineScopedTextRange::grammarRule() const
 {
     return ruleRef_;
 }
@@ -695,7 +695,7 @@ MultiLineScopedTextRange& MultiLineScopedTextRangeSet::scopedRange(size_t idx)
 
 
 /// Adds a textrange with the given name
-MultiLineScopedTextRange& MultiLineScopedTextRangeSet::addRange(size_t anchor, size_t caret, const QString& name, TextGrammarRule* rule)
+MultiLineScopedTextRange& MultiLineScopedTextRangeSet::addRange(size_t anchor, size_t caret, const QString& name, TextRegexGrammarRule* rule)
 {
     MultiLineScopedTextRange* tr = new MultiLineScopedTextRange(anchor, caret, Edbee::instance()->scopeManager()->refTextScope(name) );
     tr->setGrammarRule(rule);
@@ -803,7 +803,7 @@ void TextDocumentScopes::setLastScopedOffset(size_t offset)
 /// Sets the default scope
 /// @param the name of the scope
 /// @param rule the rule that matched
-void TextDocumentScopes::setDefaultScope(const QString& name, TextGrammarRule* rule )
+void TextDocumentScopes::setDefaultScope(const QString& name, TextRegexGrammarRule* rule )
 {
     defaultScopedRange_.setScope( Edbee::instance()->scopeManager()->refTextScope(name) );
     defaultScopedRange_.setGrammarRule(rule);

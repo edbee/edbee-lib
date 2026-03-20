@@ -176,6 +176,7 @@ SET(HEADERS
 )
 
 add_subdirectory(../vendor/oniguruma/ oniguruma)
+add_subdirectory(../vendor/treesitter/ treesitter)
 
 if(BUILD_WITH_QT5)
   find_package(Qt5 REQUIRED COMPONENTS Core Widgets)

@@ -51,6 +51,7 @@ SOURCES += \
     $$PWD/edbee/models/textgrammar.cpp \
     $$PWD/edbee/models/textlexer.cpp \
     $$PWD/edbee/models/textlinedata.cpp \
+    $$PWD/edbee/models/textparser.cpp \
     $$PWD/edbee/models/textrange.cpp \
     $$PWD/edbee/models/textsearcher.cpp \
     $$PWD/edbee/models/textundostack.cpp \
@@ -135,6 +136,7 @@ HEADERS += \
     $$PWD/edbee/models/textgrammar.h \
     $$PWD/edbee/models/textlexer.h \
     $$PWD/edbee/models/textlinedata.h \
+    $$PWD/edbee/models/textparser.h \
     $$PWD/edbee/models/textrange.h \
     $$PWD/edbee/models/textsearcher.h \
     $$PWD/edbee/models/textundostack.h \
@@ -171,6 +173,7 @@ HEADERS += \
 ##====================
 
 include($$PWD/../vendor/oniguruma/oniguruma.pri)
+include($$PWD/../vendor/treesitter/treesitter.pri)
 
 ## Files that can usefully listed inside Qt IDE (Qt Creator, as "Other files")
 ##============================================================================

@@ -1,4 +1,4 @@
-// edbee - Copyright (c) 2012-2025 by Rick Blommers and contributors
+// edbee - Copyright (c) 2012-2026 by Rick Blommers and contributors
 // SPDX-License-Identifier: MIT
 
 #include "textlexer.h"
@@ -20,7 +20,14 @@ void TextLexer::setGrammar(TextGrammar* grammar)
 {
     Q_ASSERT(grammar);
     grammarRef_ = grammar;
-    textScopes()->setDefaultScope(grammarRef_->mainRule()->scopeName(), grammarRef_->mainRule());
+
+    // TODO: Check the best place do this (We need to figure out if the rules are required for the scopes)
+    TextRegexGrammar* regExGrammar = dynamic_cast<TextRegexGrammar*>(grammar);
+    if (regExGrammar) {
+        textScopes()->setDefaultScope(grammarRef_->defaultScopeName(), regExGrammar->mainRule());
+    } else {
+        textScopes()->setDefaultScope(grammarRef_->defaultScopeName(), nullptr);
+    }
     textScopes()->removeScopesAfterOffset(0); // invalidate the complete scopes
 }
 

@@ -1,4 +1,4 @@
-// edbee - Copyright (c) 2012-2025 by Rick Blommers and contributors
+// edbee - Copyright (c) 2012-2026 by Rick Blommers and contributors
 // SPDX-License-Identifier: MIT
 
 #pragma once
@@ -16,32 +16,32 @@ class QXmlStreamReader;
 
 namespace edbee {
 
-class TextGrammar;
+class TextRegexGrammar;
 class TextGrammarManager;
-class TextGrammarRule;
+class TextRegexGrammarRule;
 
 /// For parsing a Textmate Language
 class EDBEE_EXPORT TmLanguageParser
 {
 public:
     TmLanguageParser();
-    TextGrammar* parsePlist(QIODevice* device);
-    TextGrammar* parseJson(QIODevice* device);
+    TextRegexGrammar* parsePlist(QIODevice* device);
+    TextRegexGrammar* parseJson(QIODevice* device);
 
-    TextGrammar* parse(QIODevice* device, bool json=false);
-    TextGrammar* parse(QFile& file);
-    TextGrammar* parse(const QString& fileName);
+    TextRegexGrammar* parse(QIODevice* device, bool json = false);
+    TextRegexGrammar* parse(QFile& file);
+    TextRegexGrammar* parse(const QString& fileName);
 
     QString lastErrorMessage() const;
 
 protected:
-    void setLastErrorMessage( const QString& str );
+    void setLastErrorMessage(const QString& str);
 
-    void addCapturesToGrammarRule( TextGrammarRule* rule, QHash<QString,QVariant> captures, bool endCapture=false );
-    void addPatternsToGrammarRule( TextGrammarRule* rule, QList<QVariant> patterns );
+    void addCapturesToGrammarRule(TextRegexGrammarRule* rule, QHash<QString,QVariant> captures, bool endCapture = false);
+    void addPatternsToGrammarRule(TextRegexGrammarRule* rule, QList<QVariant> patterns);
 
-    TextGrammarRule* createGrammarRule(TextGrammar *grammar, const QVariant &data );
-    TextGrammar* createLanguage(QVariant& data );
+    TextRegexGrammarRule* createGrammarRule(TextRegexGrammar* grammar, const QVariant &data);
+    TextRegexGrammar* createLanguage(QVariant& data);
 
 private:
     QString lastErrorMessage_;               ///< The last error message

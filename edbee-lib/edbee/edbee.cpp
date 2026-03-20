@@ -13,6 +13,7 @@
 #include "edbee/models/texteditorkeymap.h"
 #include "edbee/models/textdocumentscopes.h"
 #include "edbee/models/textgrammar.h"
+#include "edbee/models/textparser.h"
 #include "edbee/util/textcodec.h"
 #include "edbee/views/accessibletexteditorwidget.h"
 #include "edbee/views/texttheme.h"
@@ -29,14 +30,15 @@ static Edbee* theInstance=0;
 /// The constructor
 Edbee::Edbee()
     : inited_(false)
-    , defaultCommandMap_(0)
-    , codecManager_(0)
-    , scopeManager_(0)
-    , grammarManager_(0)
-    , themeManager_(0)
-    , keyMapManager_(0)
-    , environmentVariables_(0)
-    ,autoCompleteProviderList_(0)
+    , defaultCommandMap_(nullptr)
+    , codecManager_(nullptr)
+    , scopeManager_(nullptr)
+    , grammarManager_(nullptr)
+    , parserGrammarManager_(nullptr)
+    , themeManager_(nullptr)
+    , keyMapManager_(nullptr)
+    , environmentVariables_(nullptr)
+    , autoCompleteProviderList_(nullptr)
 {
 }
 
@@ -48,6 +50,7 @@ Edbee::~Edbee()
     delete environmentVariables_;
     delete keyMapManager_;
     delete themeManager_;
+    delete parserGrammarManager_;
     delete grammarManager_;
     delete scopeManager_;
     delete codecManager_;
@@ -76,6 +79,13 @@ void Edbee::setKeyMapPath( const QString& keyMapPath )
 void Edbee::setGrammarPath( const QString& grammarPath )
 {
     grammarPath_ = grammarPath;
+}
+
+/// Sets the parser path
+/// @param parserPath the path with the parser files
+void Edbee::setParserPath(const QString &parserPath)
+{
+    parserPath_ = parserPath;
 }
 
 
@@ -182,6 +192,7 @@ void Edbee::init()
     scopeManager_         = new TextScopeManager();
     themeManager_         = new TextThemeManager();
     grammarManager_       = new TextGrammarManager();
+    parserGrammarManager_ = new TextParserGrammarManager();
     keyMapManager_        = new TextKeyMapManager();
     environmentVariables_ = new DynamicVariables();
     autoCompleteProviderList_ = new TextAutoCompleteProviderList();
@@ -197,6 +208,11 @@ void Edbee::init()
     // load all grammar definitions
     if( !grammarPath_.isEmpty() ) {
         grammarManager_->readAllGrammarFilesInPath( grammarPath_ );
+    }
+
+    // load all parser definition
+    if( !parserPath_.isEmpty() ) {
+        parserGrammarManager_->registerGrammars( parserPath_ );
     }
 
     // load all themes
@@ -272,6 +288,14 @@ TextGrammarManager* Edbee::grammarManager()
 {
     Q_ASSERT(inited_);
     return grammarManager_;
+}
+
+/// Returns the parser manaager
+/// The parser manager is used for loading tree-sitter parser for different editor
+TextParserGrammarManager *Edbee::parserGrammarManager()
+{
+    Q_ASSERT(inited_);
+    return parserGrammarManager_;
 }
 
 
