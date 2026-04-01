@@ -1,5 +1,6 @@
 # Changelog
 
+<<<<<<< HEAD
 - () TreeSitter Integration
   - Support for both RegexTextGrammars and TreeSitterTextGrammars
   - Structural changes regarding textscopes
@@ -30,7 +31,7 @@
 SCRATCH NOTES TODO
   - TreeSitter TextGrammars names get a postfix ".ts" (to uniquely identify them) << TODO: this
 
-=====
+- (2026-04-01) #176, Fix FreeBSD Build, CMake find Oniguruma, cmake fixes. (@SlySven)
 
 - (2026-02-17) #173, TextAutoComplete evaluates the providers after closing autocomplete. Allowing followup lists. (@distractor)
 - (2026-01-04) #172, Assertation (crash) when selecting text with mouse in TextEditorComponent
