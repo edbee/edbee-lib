@@ -8,6 +8,8 @@ ENDIF()
 # hack?? https://stackoverflow.com/questions/31561309/cmake-warnings-under-os-x-macosx-rpath-is-not-specified-for-the-following-targe
 set(CMAKE_MACOSX_RPATH 1)
 
+#list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+
 PROJECT(edbee-lib)
 
 SET(SOURCES
@@ -113,6 +115,8 @@ SET(HEADERS
    edbee/data/factorykeymap.h
    edbee/debug.h
    edbee/edbee.h
+   edbee/edbeeversion.h
+   edbee/exports.h
    edbee/io/baseplistparser.h
    edbee/io/jsonparser.h
    edbee/io/keymapparser.h
@@ -175,7 +179,11 @@ SET(HEADERS
    edbee/views/texttheme.h
 )
 
-add_subdirectory(../vendor/oniguruma/ oniguruma)
+find_package(ONIGURUMA 6.9.10)
+if(NOT ONIGURUMA_FOUND)
+   # Build our own copy if there isn't one in the system
+   add_subdirectory(../vendor/oniguruma/ oniguruma)
+endif()
 
 if(BUILD_WITH_QT5)
   find_package(Qt5 REQUIRED COMPONENTS Core Widgets)
@@ -187,9 +195,20 @@ else()
   set(QT_LIBS Qt6::Core Qt6::Widgets Qt6::Core5Compat)
 endif()
 
-ADD_LIBRARY(edbee-lib STATIC
-  ${SOURCES} ${HEADERS} ${ONIG_SOURCES}
-  ${ONIG_HEADERS})
+if(ONIGURUMA_FOUND)
+  add_library(edbee-lib STATIC
+    ${SOURCES}
+    ${HEADERS}
+  )
+  target_link_libraries(edbee-lib ONIGURUMA::ONIGURUMA)
+else()
+  add_library(edbee-lib STATIC
+    ${SOURCES}
+    ${HEADERS}
+    ${ONIG_SOURCES}
+    ${ONIG_HEADERS}
+  )
+endif()
 
 target_link_libraries(edbee-lib ${QT_LIBS})
 
