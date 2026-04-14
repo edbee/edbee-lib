@@ -1,4 +1,4 @@
-// edbee - Copyright (c) 2012-2025 by Rick Blommers and contributors
+// edbee - Copyright (c) 2012-2026 by Rick Blommers and contributors
 // SPDX-License-Identifier: MIT
 
 #include "accessibletexteditorwidget.h"
@@ -397,7 +397,7 @@ QRect AccessibleTextEditorWidget::characterRect(int vOffset) const
 /// Returns the offset of the character at the point in screen coordinates.
 int AccessibleTextEditorWidget::offsetAtPoint(const QPoint& point) const
 {
-    size_t line = renderer()->rawLineIndexForYpos(point.y());
+    size_t line = renderer()->rawLineIndexForYpos(std::max(0, point.y()));
     size_t col = renderer()->columnIndexForXpos(line, point.x());
     // qDebug() << " offsetAtPoint >>" << point << ": " << line << ", " << col;
 

@@ -1,5 +1,6 @@
 # Changelog
 
+- (2026-04-14) #177, Fix strange mouse behavior caused by rawLineIndexForYpos returning std::npos with negative y positions. (@distractor)
 - (2026-04-01) #176, Fix FreeBSD Build, CMake find Oniguruma, cmake fixes. (@SlySven)
 
 - (2026-02-17) #173, TextAutoComplete evaluates the providers after closing autocomplete. Allowing followup lists. (@distractor)
