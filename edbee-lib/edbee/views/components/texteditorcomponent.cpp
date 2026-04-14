@@ -1,4 +1,4 @@
-// edbee - Copyright (c) 2012-2025 by Rick Blommers and contributors
+// edbee - Copyright (c) 2012-2026 by Rick Blommers and contributors
 // SPDX-License-Identifier: MIT
 
 #include "texteditorcomponent.h"
@@ -398,7 +398,7 @@ void TextEditorComponent::mousePressEvent(QMouseEvent* event)
         int x = event->pos().x();
         int y = event->pos().y();
 
-        size_t line = renderer->rawLineIndexForYpos(y);
+        size_t line = renderer->rawLineIndexForYpos(std::max(0, y));
         size_t col = renderer->columnIndexForXpos(line, x);
 
         if (event->button() == Qt::LeftButton) {
@@ -466,7 +466,7 @@ void TextEditorComponent::mouseDoubleClickEvent(QMouseEvent* event)
 #else
             auto eventPos = event->position().toPoint();
 #endif
-            size_t line = textRenderer()->rawLineIndexForYpos(eventPos.y());
+            size_t line = textRenderer()->rawLineIndexForYpos(std::max(0, eventPos.y()));
             size_t col = textRenderer()->columnIndexForXpos(line, eventPos.x());
 
             // add the word there
@@ -496,7 +496,7 @@ void TextEditorComponent::mouseMoveEvent(QMouseEvent* event)
 #else
         auto eventPos = event->position().toPoint();
 #endif
-        size_t line = renderer->rawLineIndexForYpos(eventPos.y());
+        size_t line = renderer->rawLineIndexForYpos(std::max(0, eventPos.y()));
         size_t col = 0;
         col = renderer->columnIndexForXpos(line, eventPos.x());
 
