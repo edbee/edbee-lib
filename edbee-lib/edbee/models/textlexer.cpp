@@ -3,6 +3,7 @@
 
 #include "textlexer.h"
 
+#include "edbee/models/grammars/regextextgrammar.h"
 #include "edbee/models/textgrammar.h"
 #include "edbee/models/textdocumentscopes.h"
 
@@ -10,19 +11,14 @@
 
 namespace edbee {
 
-TextLexer::TextLexer( TextDocumentScopes* scopes)
+TextLexer::TextLexer(TextGrammar* grammar, TextDocumentScopes* scopes)
     : textDocumentScopesRef_(scopes)
-    , grammarRef_(nullptr)
+    , grammarRef_(grammar)
 {
-}
-
-void TextLexer::setGrammar(TextGrammar* grammar)
-{
-    Q_ASSERT(grammar);
-    grammarRef_ = grammar;
+    grammarRef_->initialize();
 
     // TODO: Check the best place do this (We need to figure out if the rules are required for the scopes)
-    TextRegexGrammar* regExGrammar = dynamic_cast<TextRegexGrammar*>(grammar);
+    RegexTextGrammar* regExGrammar = dynamic_cast<RegexTextGrammar*>(grammar);
     if (regExGrammar) {
         textScopes()->setDefaultScope(grammarRef_->defaultScopeName(), regExGrammar->mainRule());
     } else {

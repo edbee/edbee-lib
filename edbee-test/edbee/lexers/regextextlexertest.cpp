@@ -1,10 +1,10 @@
 // edbee - Copyright (c) 2012-2025 by Rick Blommers and contributors
 // SPDX-License-Identifier: MIT
 
-#include "grammartextlexertest.h"
+#include "regextextlexertest.h"
 
 #include "edbee/io/tmlanguageparser.h"
-#include "edbee/lexers/grammartextlexer.h"
+#include "edbee/lexers/regextextlexer.h"
 #include "edbee/models/chardocument/chartextdocument.h"
 #include "edbee/models/textdocument.h"
 #include "edbee/models/textdocumentscopes.h"
@@ -18,20 +18,20 @@ namespace edbee {
 
 
 /// This method test the basic matching algorithm
-GrammarTextLexerTest::GrammarTextLexerTest()
+RegexTextLexerTest::RegexTextLexerTest()
     : doc_(0)
 {
 }
 
 
 /// initializes the grammer lexer
-void GrammarTextLexerTest::init()
+void RegexTextLexerTest::init()
 {
 }
 
 
 // cleanup auto cleanups the stuff
-void GrammarTextLexerTest::clean()
+void RegexTextLexerTest::clean()
 {
     delete doc_;
     doc_ = 0;
@@ -41,7 +41,7 @@ void GrammarTextLexerTest::clean()
 /// A special test case to test (and solve the issues) that currently
 /// exists with for example the haml lexer. We need more fine-graded unit-tests
 /// for lexing. This test assumes the haml-language definition has been loaded
-void GrammarTextLexerTest::testHamlLexer()
+void RegexTextLexerTest::testHamlLexer()
 {
 /* We need some good tests for the grammar lexer!
  *
@@ -83,7 +83,7 @@ void GrammarTextLexerTest::testHamlLexer()
 
 
 /// creates the main fixture document
-void GrammarTextLexerTest::createFixtureDocument( const QString& data )
+void RegexTextLexerTest::createFixtureDocument( const QString& data )
 {
     doc_ = new CharTextDocument();
     doc_->setText( data );
@@ -92,16 +92,16 @@ void GrammarTextLexerTest::createFixtureDocument( const QString& data )
 
 
 /// Returns a references to the document scopes
-TextDocumentScopes* GrammarTextLexerTest::scopes()
+TextDocumentScopes* RegexTextLexerTest::scopes()
 {
     return doc_->scopes();
 }
 
 
 /// This method returns the grammar text lexer
-GrammarTextLexer* GrammarTextLexerTest::lexer()
+RegexTextLexer* RegexTextLexerTest::lexer()
 {
-    return dynamic_cast<GrammarTextLexer*>(doc_->textLexer());
+    return dynamic_cast<RegexTextLexer*>(doc_->textLexer());
 }
 
 

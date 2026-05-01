@@ -1,4 +1,4 @@
-// edbee - Copyright (c) 2012-2025 by Rick Blommers and contributors
+// edbee - Copyright (c) 2012-2026 by Rick Blommers and contributors
 // SPDX-License-Identifier: MIT
 
 #include "edbee.h"
@@ -13,11 +13,9 @@
 #include "edbee/models/texteditorkeymap.h"
 #include "edbee/models/textdocumentscopes.h"
 #include "edbee/models/textgrammar.h"
-#include "edbee/models/textparser.h"
 #include "edbee/util/textcodec.h"
 #include "edbee/views/accessibletexteditorwidget.h"
 #include "edbee/views/texttheme.h"
-
 
 #include "edbee/debug.h"
 
@@ -34,7 +32,6 @@ Edbee::Edbee()
     , codecManager_(nullptr)
     , scopeManager_(nullptr)
     , grammarManager_(nullptr)
-    , parserGrammarManager_(nullptr)
     , themeManager_(nullptr)
     , keyMapManager_(nullptr)
     , environmentVariables_(nullptr)
@@ -50,7 +47,6 @@ Edbee::~Edbee()
     delete environmentVariables_;
     delete keyMapManager_;
     delete themeManager_;
-    delete parserGrammarManager_;
     delete grammarManager_;
     delete scopeManager_;
     delete codecManager_;
@@ -61,14 +57,14 @@ Edbee::~Edbee()
 /// The singleton instance getter
 Edbee* Edbee::instance()
 {
-    if( !theInstance ) { theInstance = new Edbee(); }
+    if (!theInstance) { theInstance = new Edbee(); }
     return theInstance;
 }
 
 
 /// sets the path where to find the keymap files
 /// @param keyMapPath the path with keymap files
-void Edbee::setKeyMapPath( const QString& keyMapPath )
+void Edbee::setKeyMapPath(const QString& keyMapPath)
 {
     keyMapPath_ = keyMapPath;
 }
@@ -76,22 +72,33 @@ void Edbee::setKeyMapPath( const QString& keyMapPath )
 
 /// Sets the grammar path
 /// @param grammarPath the path with the grammar files
-void Edbee::setGrammarPath( const QString& grammarPath )
+/// @deprecated usee setRegexGrammarPath
+void Edbee::setGrammarPath(const QString& grammarPath)
 {
-    grammarPath_ = grammarPath;
+    qDebug() << "DEPRECATED: setGrammarPath is deprecated, please use setRegexGrammarPath instead.";
+    regexGrammarPath_ = grammarPath;
 }
 
-/// Sets the parser path
-/// @param parserPath the path with the parser files
-void Edbee::setParserPath(const QString &parserPath)
+
+/// Sets the regex grammar path
+/// @param grammarPath the path with the grammar files
+void Edbee::setRegexGrammarPath(const QString& regexGrammarPath)
 {
-    parserPath_ = parserPath;
+    regexGrammarPath_ = regexGrammarPath;
+}
+
+
+/// Sets the treesitter grammar path
+/// @param treeSitterGrammarPath the path with the grammar files
+void Edbee::setTreeSitterGrammarPath(const QString& regexGrammarPath)
+{
+    treeSitterGrammarPath_ = regexGrammarPath;
 }
 
 
 /// Sets the path where to find the theme files
 /// @param themePath the path to find the themes
-void Edbee::setThemePath( const QString& themePath )
+void Edbee::setThemePath(const QString& themePath)
 {
     themePath_ = themePath;
 }
@@ -100,7 +107,7 @@ void Edbee::setThemePath( const QString& themePath )
 /// This method automatically initializes the edbee library it this hasn't already been done
 void Edbee::autoInit()
 {
-    if( !inited_ ) {
+    if (!inited_) {
         init();
         autoShutDownOnAppExit();
     }
@@ -116,7 +123,7 @@ const char* Edbee::version() const
 
 /// TODO: We need a way to load the (scoped) environment variables
 /// for now we just add some variables for some common languages
-static void initHardCodedDynamicScopes( DynamicVariables* env )
+static void initHardCodedDynamicScopes(DynamicVariables* env)
 {
     QString tcs("TM_COMMENT_START");
     QString tce("TM_COMMENT_END");
@@ -124,64 +131,62 @@ static void initHardCodedDynamicScopes( DynamicVariables* env )
     QString tce2("TM_COMMENT_END_2");
     QString tcs3("TM_COMMENT_START_3");
     QString tce3("TM_COMMENT_END_3");
-    env->setAndGiveScopedSelector( tcs, "# ", "source.yaml");
+    env->setAndGiveScopedSelector(tcs, "# ", "source.yaml");
 
-    env->setAndGiveScopedSelector( tcs, "// ", "source.c, source.c++, source.objc, source.objc++");
-    env->setAndGiveScopedSelector( tcs2, "/*", "source.c, source.c++, source.objc, source.objc++");
-    env->setAndGiveScopedSelector( tce2, "*/", "source.c, source.c++, source.objc, source.objc++");
+    env->setAndGiveScopedSelector(tcs, "// ", "source.c, source.c++, source.objc, source.objc++");
+    env->setAndGiveScopedSelector(tcs2, "/*", "source.c, source.c++, source.objc, source.objc++");
+    env->setAndGiveScopedSelector(tce2, "*/", "source.c, source.c++, source.objc, source.objc++");
 
-    env->setAndGiveScopedSelector( tcs, "-- ", "source.lua");
-    env->setAndGiveScopedSelector( tcs2, "--[[", "source.lua");
-    env->setAndGiveScopedSelector( tce2, "]]", "source.lua");
+    env->setAndGiveScopedSelector(tcs, "-- ", "source.lua");
+    env->setAndGiveScopedSelector(tcs2, "--[[", "source.lua");
+    env->setAndGiveScopedSelector(tce2, "]]", "source.lua");
 
-    env->setAndGiveScopedSelector( tcs, "/*", "source.css");
-    env->setAndGiveScopedSelector( tce, "*/", "source.css");
+    env->setAndGiveScopedSelector(tcs, "/*", "source.css");
+    env->setAndGiveScopedSelector(tce, "*/", "source.css");
 
-    env->setAndGiveScopedSelector( tcs, "; ", "source.clojure");
+    env->setAndGiveScopedSelector(tcs, "; ", "source.clojure");
 
-    env->setAndGiveScopedSelector( tcs, "# ", "source.coffee");
-    env->setAndGiveScopedSelector( tcs2, "###", "source.coffee");
-    env->setAndGiveScopedSelector( tce2, "###", "source.coffee");
+    env->setAndGiveScopedSelector(tcs, "# ", "source.coffee");
+    env->setAndGiveScopedSelector(tcs2, "###", "source.coffee");
+    env->setAndGiveScopedSelector(tce2, "###", "source.coffee");
 
-    env->setAndGiveScopedSelector( tcs, "<!-- ", "text.html");
-    env->setAndGiveScopedSelector( tce, " -->", "text.html");
+    env->setAndGiveScopedSelector(tcs, "<!-- ", "text.html");
+    env->setAndGiveScopedSelector(tce, " -->", "text.html");
 
-    env->setAndGiveScopedSelector( tcs, "<!-- ", "text.xml");
-    env->setAndGiveScopedSelector( tce, " -->", "text.xml");
+    env->setAndGiveScopedSelector(tcs, "<!-- ", "text.xml");
+    env->setAndGiveScopedSelector(tce, " -->", "text.xml");
 
-    env->setAndGiveScopedSelector( tcs, "// ", "source.java");
-    env->setAndGiveScopedSelector( tcs2, "/*", "source.java");
-    env->setAndGiveScopedSelector( tce2, "*/", "source.java");
+    env->setAndGiveScopedSelector(tcs, "// ", "source.java");
+    env->setAndGiveScopedSelector(tcs2, "/*", "source.java");
+    env->setAndGiveScopedSelector(tce2, "*/", "source.java");
 
-    env->setAndGiveScopedSelector( tcs, "// ", "source.js, source.json");
-    env->setAndGiveScopedSelector( tcs2, "/*", "source.js, source.json");
-    env->setAndGiveScopedSelector( tce2, "*/", "source.js, source.json");
+    env->setAndGiveScopedSelector(tcs, "// ", "source.js, source.json");
+    env->setAndGiveScopedSelector(tcs2, "/*", "source.js, source.json");
+    env->setAndGiveScopedSelector(tce2, "*/", "source.js, source.json");
 
-    env->setAndGiveScopedSelector( tcs, "// ", "source.php");
-    env->setAndGiveScopedSelector( tcs2, "# ", "source.php");
-    env->setAndGiveScopedSelector( tcs3, "/*", "source.php");
-    env->setAndGiveScopedSelector( tce3, "*/", "source.php");
+    env->setAndGiveScopedSelector(tcs, "// ", "source.php");
+    env->setAndGiveScopedSelector(tcs2, "# ", "source.php");
+    env->setAndGiveScopedSelector(tcs3, "/*", "source.php");
+    env->setAndGiveScopedSelector(tce3, "*/", "source.php");
 
-    env->setAndGiveScopedSelector( tcs, "# ", "source.perl");
+    env->setAndGiveScopedSelector(tcs, "# ", "source.perl");
 
-    env->setAndGiveScopedSelector( tcs, "-# ", "text.haml");    // I hate the default '/'
+    env->setAndGiveScopedSelector(tcs, "-# ", "text.haml");    // I hate the default '/'
 
-    env->setAndGiveScopedSelector( tcs, "# ", "source.js, source.ruby");
-    env->setAndGiveScopedSelector( tcs2, "=begin", "source.js, source.ruby");
-    env->setAndGiveScopedSelector( tce2, "=end", "source.js, source.ruby");
+    env->setAndGiveScopedSelector(tcs, "# ", "source.js, source.ruby");
+    env->setAndGiveScopedSelector(tcs2, "=begin", "source.js, source.ruby");
+    env->setAndGiveScopedSelector(tce2, "=end", "source.js, source.ruby");
 
-    env->setAndGiveScopedSelector( tcs, "// ", "source.scss");
-    env->setAndGiveScopedSelector( tcs2, "/*", "source.scss");
-    env->setAndGiveScopedSelector( tce2, "*/", "source.scss");
+    env->setAndGiveScopedSelector(tcs, "// ", "source.scss");
+    env->setAndGiveScopedSelector(tcs2, "/*", "source.scss");
+    env->setAndGiveScopedSelector(tce2, "*/", "source.scss");
 
-    env->setAndGiveScopedSelector( tcs, "-- ", "source.sql");
-    env->setAndGiveScopedSelector( tcs2, "/*", "source.sql");
-    env->setAndGiveScopedSelector( tce2, "*/", "source.sql");
+    env->setAndGiveScopedSelector(tcs, "-- ", "source.sql");
+    env->setAndGiveScopedSelector(tcs2, "/*", "source.sql");
+    env->setAndGiveScopedSelector(tce2, "*/", "source.sql");
 
-    env->setAndGiveScopedSelector( tcs, "# ", "source.shell");
-
+    env->setAndGiveScopedSelector(tcs, "# ", "source.shell");
 }
-
 
 
 /// initializes the engine on startup
@@ -192,7 +197,6 @@ void Edbee::init()
     scopeManager_         = new TextScopeManager();
     themeManager_         = new TextThemeManager();
     grammarManager_       = new TextGrammarManager();
-    parserGrammarManager_ = new TextParserGrammarManager();
     keyMapManager_        = new TextKeyMapManager();
     environmentVariables_ = new DynamicVariables();
     autoCompleteProviderList_ = new TextAutoCompleteProviderList();
@@ -206,23 +210,22 @@ void Edbee::init()
     defaultCommandMap_->loadFactoryCommandMap();
 
     // load all grammar definitions
-    if( !grammarPath_.isEmpty() ) {
-        grammarManager_->readAllGrammarFilesInPath( grammarPath_ );
+    if (!regexGrammarPath_.isEmpty()) {
+        grammarManager_->readAllRegexGrammarFilesInPath(regexGrammarPath_);
     }
 
-    // load all parser definition
-    if( !parserPath_.isEmpty() ) {
-        parserGrammarManager_->registerGrammars( parserPath_ );
+    if (!this->treeSitterGrammarPath_.isEmpty()) {
+        grammarManager_->readAllTreeSitterGrammarFilesInPath(treeSitterGrammarPath_);
     }
 
     // load all themes
-    if( !themePath_.isEmpty() ) {
+    if (!themePath_.isEmpty()) {
        themeManager_->listAllThemes( themePath_ );
     }
 
     // load the keymaps or fallback to the factory keymap
-    if( !keyMapPath_.isEmpty() ) {
-        keyMapManager_->loadAllKeyMaps( keyMapPath_ );
+    if(!keyMapPath_.isEmpty()) {
+        keyMapManager_->loadAllKeyMaps(keyMapPath_);
     } else {
         keyMapManager_->loadFactoryKeyMap();
     }
@@ -289,15 +292,6 @@ TextGrammarManager* Edbee::grammarManager()
     Q_ASSERT(inited_);
     return grammarManager_;
 }
-
-/// Returns the parser manaager
-/// The parser manager is used for loading tree-sitter parser for different editor
-TextParserGrammarManager *Edbee::parserGrammarManager()
-{
-    Q_ASSERT(inited_);
-    return parserGrammarManager_;
-}
-
 
 /// Returns the theme manager
 /// The theme manager is used to share themes between the different editors

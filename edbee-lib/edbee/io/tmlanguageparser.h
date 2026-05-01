@@ -16,32 +16,32 @@ class QXmlStreamReader;
 
 namespace edbee {
 
-class TextRegexGrammar;
+class RegexTextGrammar;
 class TextGrammarManager;
-class TextRegexGrammarRule;
+class RegexTextGrammarRule;
 
 /// For parsing a Textmate Language
 class EDBEE_EXPORT TmLanguageParser
 {
 public:
     TmLanguageParser();
-    TextRegexGrammar* parsePlist(QIODevice* device);
-    TextRegexGrammar* parseJson(QIODevice* device);
+    RegexTextGrammar* parsePlist(QIODevice* device);
+    RegexTextGrammar* parseJson(QIODevice* device);
 
-    TextRegexGrammar* parse(QIODevice* device, bool json = false);
-    TextRegexGrammar* parse(QFile& file);
-    TextRegexGrammar* parse(const QString& fileName);
+    RegexTextGrammar* parse(QIODevice* device, bool json = false);
+    RegexTextGrammar* parse(QFile& file);
+    RegexTextGrammar* parse(const QString& fileName);
 
     QString lastErrorMessage() const;
 
 protected:
     void setLastErrorMessage(const QString& str);
 
-    void addCapturesToGrammarRule(TextRegexGrammarRule* rule, QHash<QString,QVariant> captures, bool endCapture = false);
-    void addPatternsToGrammarRule(TextRegexGrammarRule* rule, QList<QVariant> patterns);
+    void addCapturesToGrammarRule(RegexTextGrammarRule* rule, QHash<QString,QVariant> captures, bool endCapture = false);
+    void addPatternsToGrammarRule(RegexTextGrammarRule* rule, QList<QVariant> patterns);
 
-    TextRegexGrammarRule* createGrammarRule(TextRegexGrammar* grammar, const QVariant &data);
-    TextRegexGrammar* createLanguage(QVariant& data);
+    RegexTextGrammarRule* createGrammarRule(RegexTextGrammar* grammar, const QVariant &data);
+    RegexTextGrammar* createLanguage(QVariant& data);
 
 private:
     QString lastErrorMessage_;               ///< The last error message

@@ -24,6 +24,7 @@ DEFINES += QT_NODLL
 # The test sources
 SOURCES += \
 	edbee/commands/replaceselectioncommandtest.cpp \
+    edbee/lexers/regextextlexertest.cpp \
 	edbee/models/textrangetest.cpp \
   edbee/models/textdocumenttest.cpp \
   edbee/models/textbuffertest.cpp \
@@ -42,7 +43,6 @@ SOURCES += \
   edbee/commands/duplicatecommandtest.cpp \
   edbee/commands/newlinecommandtest.cpp \
   edbee/util/utiltest.cpp \
-  edbee/lexers/grammartextlexertest.cpp \
   edbee/commands/removecommandtest.cpp \
   edbee/models/changes/linedatalistchangetest.cpp \
   edbee/models/changes/textchangetest.cpp \
@@ -54,6 +54,7 @@ SOURCES += \
 
 HEADERS += \
 	edbee/commands/replaceselectioncommandtest.h \
+    edbee/lexers/regextextlexertest.h \
 	edbee/models/textrangetest.h \
   edbee/models/textdocumenttest.h \
   edbee/models/textbuffertest.h \
@@ -71,7 +72,6 @@ HEADERS += \
   edbee/commands/duplicatecommandtest.h \
   edbee/commands/newlinecommandtest.h \
   edbee/util/utiltest.h \
-  edbee/lexers/grammartextlexertest.h \
   edbee/commands/removecommandtest.h \
   edbee/models/changes/linedatalistchangetest.h \
   edbee/models/changes/textchangetest.h \

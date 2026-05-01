@@ -1,4 +1,4 @@
-// edbee - Copyright (c) 2012-2025 by Rick Blommers and contributors
+// edbee - Copyright (c) 2012-2026 by Rick Blommers and contributors
 // SPDX-License-Identifier: MIT
 
 #pragma once
@@ -19,7 +19,7 @@ class MultiLineScopedTextRange;
 class RegExp;
 class ScopedTextRange;
 class TextDocumentScopes;
-class TextRegexGrammarRule;
+class RegexTextGrammarRule;
 class TextScope;
 
 /// This type defines a single scope atom
@@ -42,7 +42,7 @@ public:
     size_t rindexOf(TextScope* scope);
 
 private:
-    TextScope( const QString& fullScope );
+    TextScope(const QString& fullScope);
     TextScope();
     ~TextScope();
 
@@ -233,6 +233,11 @@ public:
     void setIndependent(bool enable = true);
     bool isIndependent() const;
 
+    void removeToOffset(size_t offset);
+    void removeFromOffset(size_t offset);
+    void removeWithinOffset(size_t offsetBegin, size_t offsetEnd);
+    void clear();
+
     QString toString();
 
 private:
@@ -246,14 +251,15 @@ private:
 
 
 /// This class 'defines' a single document scope
+/// Used by Regex TextScoeps
 class EDBEE_EXPORT MultiLineScopedTextRange : public ScopedTextRange
 {
 public:
     MultiLineScopedTextRange(size_t anchor, size_t caret, TextScope* scope);
     virtual ~MultiLineScopedTextRange();
 
-    void setGrammarRule(TextRegexGrammarRule* rule);
-    TextRegexGrammarRule* grammarRule() const;
+    void setGrammarRule(RegexTextGrammarRule* rule);
+    RegexTextGrammarRule* grammarRule() const;
 
     void giveEndRegExp(RegExp* regExp);
     RegExp* endRegExp();
@@ -261,7 +267,7 @@ public:
     static bool lessThan(MultiLineScopedTextRange* r1, MultiLineScopedTextRange* r2);
 
 private:
-    TextRegexGrammarRule* ruleRef_; ///< The grammar rule that found this range
+    RegexTextGrammarRule* ruleRef_; ///< The grammar rule that found this range
     RegExp* endRegExp_;        ///< The end regexp
 };
 
@@ -290,9 +296,10 @@ public:
     virtual void toSingleRange();
     virtual void sortRanges();
     virtual MultiLineScopedTextRange& scopedRange(size_t idx);
-    virtual MultiLineScopedTextRange& addRange(size_t anchor, size_t caret, const QString& name , TextRegexGrammarRule *rule);
+    virtual MultiLineScopedTextRange& addRange(size_t anchor, size_t caret, const QString& name , RegexTextGrammarRule *rule);
 
     void removeAndInvalidateRangesAfterOffset(size_t offset);
+    void removeAndInvalidateRangesBetweenOffsets(size_t offsetBegin, size_t offsetEnd);
 
     // adds a text scope
     void giveScopedTextRange(MultiLineScopedTextRange* textScope);
@@ -311,7 +318,6 @@ private:
 
 //===========================================
 
-
 /// This class is used to 'contain' all document scope information
 class EDBEE_EXPORT TextDocumentScopes : public QObject
 {
@@ -325,7 +331,7 @@ public:
     void setLastScopedOffset(size_t offset);
 
     // scope management
-    void setDefaultScope(const QString& name, TextRegexGrammarRule *rule);
+    void setDefaultScope(const QString& name, RegexTextGrammarRule *rule);
 
     void giveLineScopedRangeList(size_t line, ScopedTextRangeList* list);
     ScopedTextRangeList* scopedRangesAtLine(size_t line);
@@ -333,11 +339,13 @@ public:
 
     void giveMultiLineScopedTextRange(MultiLineScopedTextRange* range);
     void removeScopesAfterOffset(size_t offset);
+    void removeScopesWithinOffsets(size_t offsetBegin, size_t offsetEnd);
     MultiLineScopedTextRange& defaultScopedRange();
 
     QVector<MultiLineScopedTextRange*> multiLineScopedRangesBetweenOffsets(size_t offsetBegin, size_t offsetEnd);
     TextScopeList scopesAtOffset(size_t offset, bool includeEnd = false);
     QVector<ScopedTextRange*> createScopedRangesAtOffsetList(size_t offset);
+    MultiLineScopedTextRangeSet& scopedRanges();
 
     QString toString();
     QStringList scopesAsStringList();
@@ -359,7 +367,7 @@ private:
 
     MultiLineScopedTextRange defaultScopedRange_;     ///< The default scoped text range
     MultiLineScopedTextRangeSet scopedRanges_;        ///< A list with all (multi-line) ranges
-    GapVector<ScopedTextRangeList*> lineRangeList_;   ///< A list of all line scopes
+    GapVector<ScopedTextRangeList*> lineRangeList_;   ///< A list of all line scopes. Note: scopes are LINE based (offset is relativee to line start)
 
     /// This special variable is used to 'remember' to which offset the document has been scoped.
     /// This should speed up the syntax highlighting drasticly because the parsing only needs to happen

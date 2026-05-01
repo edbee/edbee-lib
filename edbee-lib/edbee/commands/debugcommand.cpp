@@ -54,7 +54,12 @@ void DebugCommand::dumpScopes(TextEditorController* controller)
     dump.append("\nPer Line:---\n");
     for (size_t i = 0; i < scopes->scopedLineCount(); ++i) {
         ScopedTextRangeList* range = scopes->scopedRangesAtLine(i);
-        dump.append(QStringLiteral("%1: %2\n").arg(i).arg( range->toString()));
+        if (range) {
+            dump.append(QStringLiteral("%1: %2\n").arg(i).arg( range->toString()));
+        } else {
+            dump.append(QString("nullptr @ index %1").arg(i));
+
+        }
     }
     qlog_info() << dump;
 }

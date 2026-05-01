@@ -1,4 +1,4 @@
-// edbee - Copyright (c) 2012-2025 by Rick Blommers and contributors
+// edbee - Copyright (c) 2012-2026 by Rick Blommers and contributors
 // SPDX-License-Identifier: MIT
 
 #include "texttheme.h"

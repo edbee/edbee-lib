@@ -136,6 +136,7 @@ public:
     size_t offsetFromLine(size_t line);
     size_t lineFromOffset(size_t offset);
     size_t columnFromOffsetAndLine(size_t offset, size_t line = std::string::npos);
+    size_t columnFromOffset(size_t offset) { return columnFromOffsetAndLine(offset); }
     size_t offsetFromLineAndColumn(size_t line, size_t column);
     size_t lineLength(size_t line);
     size_t lineLengthWithoutNewline(size_t line);

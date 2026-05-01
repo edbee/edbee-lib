@@ -1,4 +1,4 @@
-// edbee - Copyright (c) 2012-2025 by Rick Blommers and contributors
+// edbee - Copyright (c) 2012-2026 by Rick Blommers and contributors
 // SPDX-License-Identifier: MIT
 
 #pragma once
@@ -7,18 +7,18 @@
 
 namespace edbee {
 
-class GrammarTextLexer;
+class RegexTextLexer;
 class TextDocument;
 class TextDocumentScopes;
 class TextGrammar;
 
 
 /// The grammar text lexer test
-class GrammarTextLexerTest : public edbee::test::TestCase
+class RegexTextLexerTest : public edbee::test::TestCase
 {
     Q_OBJECT
 public:
-    GrammarTextLexerTest();
+    RegexTextLexerTest();
 
 private slots:
     void init();
@@ -32,7 +32,7 @@ private:
     void createFixtureDocument( const QString& data );
 
     TextDocumentScopes* scopes();
-    GrammarTextLexer* lexer();
+    RegexTextLexer* lexer();
 
     TextDocument* doc_;         ///< The document used for testign
 
@@ -40,4 +40,4 @@ private:
 
 } // edbee
 
-DECLARE_TEST(edbee::GrammarTextLexerTest);
+DECLARE_TEST(edbee::RegexTextLexerTest);

@@ -32,66 +32,7 @@
 
 namespace edbee {
 
-
-// experiment with dynmamic loading languages ----------
-typedef const TSLanguage *(*LanguageFn)(void);
-
-// Dirty Stuff: <https://www.perplexity.ai/search/i-m-using-tree-sitter-is-it-po-kdAyojGjQwuJBLO0ihxc2A>
-const TSLanguage *load_language(const char *lib_path, const char *symbol_name) {
-    void *handle = dlopen(lib_path, RTLD_NOW);
-    if (!handle) return NULL;
-
-    LanguageFn fn = (LanguageFn)dlsym(handle, symbol_name);
-    if (!fn) return NULL;
-
-    return fn();
-}
-
-// extra the text from a node
-QString extract_node_text(const TSNode node, const char *source) {
-    uint32_t start = ts_node_start_byte(node);
-    uint32_t len = ts_node_end_byte(node) - start;
-
-    // Create QString directly from source buffer slice
-    return QString::fromUtf8(source + start, len);
-}
-
-// extra the text from a node
-QString extract_node_text(const TSNode node, const QChar *source) {
-    uint32_t start = ts_node_start_byte(node);
-    uint32_t len = ts_node_end_byte(node) - start;
-
-    // Create QString directly from source buffer slice
-    return QString(source + start, len);
-}
-
-// Using Qt C++ with TreeSitter. I have a buffer with QChars. (Raw pointer to QChar array) How do I use tree-sitter to parse/access this?
-// <https://www.perplexity.ai/search/using-qt-c-with-treesitter-i-h-ediSuV.5Tf6x9x9hJT7DQw>
-//
-// TODO: Use sample with Direct UTF‑16: using TSInput callback
-TSTree* createTsTreeForQCharBuffer(TSParser* parser, const QChar* chars, qsizetype len) {
-    QStringView view(chars, len);
-    QByteArray utf8 = view.toString().toUtf8();
-    const char* utf8_data = utf8.constData();
-    uint32_t utf8_length = static_cast<uint32_t>(utf8.size());
-
-    TSTree* tree = ts_parser_parse_string(
-        parser,
-        nullptr,           // old_tree (for incremental parsing)
-        utf8_data,
-        utf8_length
-        );
-    return tree;
-
-    // if (tree) {
-    //     TSNode root = ts_tree_root_node(tree);
-    //     const char* sexp = ts_node_string(root);
-    //     puts(sexp);
-    //     free(sexp);
-    //     ts_tree_delete(tree);
-    // }
-}
-
+/*
 
 // class implementation ------------------------------
 
@@ -103,19 +44,17 @@ TextDocumentParser::TextDocumentParser(TextDocument *textDocument)
     , tsQuery_(nullptr)
 {
     qDebug() << "TextDocumentParser: Figure out how to use this later";
-/*
-const char *source_code = R"RUBY(
-class Test
-  def foo
-    puts 'foo: ' + "bar"
-  end
-end
-)RUBY";
-    this->textDocumentRef_->setText(source_code);
-
+// const char *source_code = R"RUBY(
+// class Test
+//   def foo
+//     puts 'foo: ' + "bar"
+//   end
+// end
+// )RUBY";
+//     this->textDocumentRef_->setText(source_code);
+//
 
     buildParser();
-*/
 
 }
 
@@ -369,7 +308,7 @@ end
 
 
 }
-*/
+* /
 
 //==========================
 
@@ -656,5 +595,6 @@ TextParserGrammar* TextParserGrammarManager::get(const QString& name) const
     return parser;
 }
 
+*/
 
 } // edbee

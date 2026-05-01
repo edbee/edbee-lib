@@ -8,10 +8,8 @@
 #include <QThread>
 
 #include "chartextbuffer.h"
-#include "edbee/lexers/grammartextlexer.h"
-#include "edbee/models/changes/textchange.h"
+#include "edbee/lexers/regextextlexer.h"
 #include "edbee/models/textautocompleteprovider.h"
-#include "edbee/models/textparser.h"
 #include "edbee/models/textgrammar.h"
 #include "edbee/models/textdocumentscopes.h"
 #include "edbee/models/texteditorconfig.h"
@@ -37,7 +35,6 @@ CharTextDocument::CharTextDocument(TextEditorConfig* config, QObject* object)
     , textBuffer_(nullptr)
     , textScopes_(nullptr)
     , textLexer_(nullptr)
-    , textParser_(nullptr)
     , textCodecRef_(nullptr)
     , lineEndingRef_(nullptr)
     , textUndoStack_(nullptr)
@@ -56,10 +53,11 @@ CharTextDocument::CharTextDocument(TextEditorConfig* config, QObject* object)
     lineEndingRef_ = LineEnding::unixType();
 
     // create the lexer (textmate grammars)
-    textLexer_ = new GrammarTextLexer(textScopes_);
+    TextGrammar* grammar = Edbee::instance()->grammarManager()->defaultGrammar();
+    textLexer_ = grammar->createTextLexer(textScopes_);
 
     // Create the parser (treesitter)
-    textParser_ = new TextDocumentParser(this);
+    // textParser_ = new TextDocumentParser(this);
 
     // create the undo stack
     textUndoStack_ = new TextUndoStack(this);
@@ -83,7 +81,6 @@ CharTextDocument::~CharTextDocument()
 {
     delete autoCompleteProviderList_;
     delete textUndoStack_;
-    delete textParser_;
     delete textLexer_;
     delete textScopes_;
     delete textBuffer_;
@@ -109,10 +106,14 @@ TextGrammar* CharTextDocument::languageGrammar()
 void CharTextDocument::setLanguageGrammar(TextGrammar* grammar)
 {
     TextGrammar* oldGrammar = languageGrammar();
-    textLexer_->setGrammar(grammar);
-    if( oldGrammar != grammar ) {
-        emit languageGrammarChanged();
-    }
+    if (oldGrammar == grammar) return;
+
+    delete textLexer_;
+
+    // create a new lexer.
+    // TreeSitter requires a different lexer
+    textLexer_ = grammar->createTextLexer(textScopes_);
+    emit languageGrammarChanged();
 }
 
 

@@ -57,13 +57,12 @@ public:
         lineEndingRef_ = lineEnding;
     }
 
-
     ///  Should return the current document lexer
     virtual TextLexer* textLexer() { return textLexer_; }
 
     /// This method should return the current language grammar
     virtual TextGrammar* languageGrammar();
-    virtual void setLanguageGrammar( TextGrammar* grammar );
+    virtual void setLanguageGrammar(TextGrammar* grammar);
 
     /// Returns the the autocomplete provider list
     virtual TextAutoCompleteProviderList* autoCompleteProviderList();
@@ -87,7 +86,6 @@ private:
 
     TextDocumentScopes* textScopes_;                         ///< The text document scopes
     TextLexer* textLexer_;                                   ///< The lexer used for finding the scopes (textmate grammars)
-    TextDocumentParser* textParser_;						 ///< The text grammar parser  (treesitter grammars)
 
     TextCodec* textCodecRef_;                                ///< The used encoding
     const edbee::LineEnding* lineEndingRef_;                 ///< The used line-ending

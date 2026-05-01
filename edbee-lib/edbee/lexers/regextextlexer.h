@@ -19,18 +19,18 @@ class ScopedTextRange;
 class ScopedTextRangeList;
 class TextDocumentScopes;
 class TextGrammar;
-class TextRegexGrammar;
-class TextRegexGrammarRule;
+class RegexTextGrammar;
+class RegexTextGrammarRule;
 
 /// A simple lexer matches texts with simple regular expressions
-class EDBEE_EXPORT GrammarTextLexer : public TextLexer
+class EDBEE_EXPORT RegexTextLexer : public TextLexer
 {
 public:
-    GrammarTextLexer(TextDocumentScopes* scopes);
-    virtual ~GrammarTextLexer();
+    RegexTextLexer(RegexTextGrammar* grammar, TextDocumentScopes* scopes);
+    virtual ~RegexTextLexer();
 
     virtual void textChanged(const TextBufferChange& change);
-    TextRegexGrammar* regexGrammar();
+    RegexTextGrammar* regexGrammar();
 
 private:
     virtual bool lexLine(size_t line, size_t& currentDocOffset );
@@ -43,10 +43,10 @@ private:
 
     RegExp* createEndRegExp( RegExp* startRegExp, const QString &endRegExpStringIn);
 
-    void findNextGrammarRule(const QString &line, size_t offsetInLine, TextRegexGrammarRule *activeRule, TextRegexGrammarRule *&foundRule, RegExp*& foundRegExp, size_t& foundPosition);
+    void findNextGrammarRule(const QString &line, size_t offsetInLine, RegexTextGrammarRule *activeRule, RegexTextGrammarRule *&foundRule, RegExp*& foundRegExp, size_t& foundPosition);
     void processCaptures(RegExp *foundRegExp, const QMap<size_t, QString>* foundCaptures);
 
-    TextRegexGrammarRule* findAndApplyNextGrammarRule(size_t currentDocOffset, const QString& line, size_t& offsetInLine);
+    RegexTextGrammarRule* findAndApplyNextGrammarRule(size_t currentDocOffset, const QString& line, size_t& offsetInLine);
 
     MultiLineScopedTextRange* activeMultiLineRange();
     ScopedTextRange* activeScopedTextRange();
@@ -54,7 +54,7 @@ private:
     void popActiveRange();
     void pushActiveRange( ScopedTextRange* range, MultiLineScopedTextRange* multiRange );
 
-    TextRegexGrammarRule* findIncludeGrammarRule( TextRegexGrammarRule* base );
+    RegexTextGrammarRule* findIncludeGrammarRule( RegexTextGrammarRule* base );
 
 private:
 

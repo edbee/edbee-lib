@@ -1,4 +1,4 @@
-// edbee - Copyright (c) 2012-2025 by Rick Blommers and contributors
+// edbee - Copyright (c) 2012-2026 by Rick Blommers and contributors
 // SPDX-License-Identifier: MIT
 
 #include <QApplication>
@@ -47,20 +47,20 @@ int main(int argc, char* argv[])
 
     // configure the edbee component to use the default paths
     edbee::Edbee* tm = edbee::Edbee::instance();
-    //tm->setKeyMapPath( QStringLiteral("%1%2").arg(appDataPath).arg("keymaps"));
-    tm->setGrammarPath(  QStringLiteral("%1%2").arg(appDataPath).arg("syntaxfiles") );
-    //tm->setThemePath( QStringLiteral("%1%2").arg(appDataPath).arg("parsers") );
-    //tm->setThemePath( QStringLiteral("%1%2").arg(appDataPath).arg("themes") );
+    // tm->setKeyMapPath(QStringLiteral("%1%2").arg(appDataPath, "keymaps"));
+    tm->setRegexGrammarPath(QStringLiteral("%1%2").arg(appDataPath, "syntaxfiles"));
+    tm->setThemePath(QStringLiteral("%1%2").arg(appDataPath, "parsers"));
+    // tm->setThemePath(QStringLiteral("%1%2").arg(appDataPath, "themes"));
     tm->init();
 
     // next run all tests
-    if( tests.isEmpty() ) {
+    if (tests.isEmpty()) {
         edbee::test::engine().runAll();
 
     // only run the selected tests
     } else {
         edbee::test::engine().startRun();
-        foreach( QString test, tests ) {
+        foreach (QString test, tests) {
             edbee::test::engine().run(test);
         }
         edbee::test::engine().endRun();

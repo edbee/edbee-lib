@@ -16,7 +16,7 @@ class TextDocumentScopes;
 /// This is a single lexer
 class EDBEE_EXPORT TextLexer {
 public:
-    TextLexer(TextDocumentScopes* scopes);
+    TextLexer(TextGrammar* grammar, TextDocumentScopes* scopes);
     virtual ~TextLexer() {}
 
     /// Inform the lexer some data has been changed
@@ -24,7 +24,10 @@ public:
     virtual void textChanged(const edbee::TextBufferChange& change) = 0;
 
     /// Inform the lexer the grammar has been changed
-    void setGrammar(TextGrammar* grammar);
+    /// NOTE: Changing the grammar directly isn't possible. Changing the grammar construct a new text lexer
+    /// making it possible to have different lexers when switching grammars
+    // void setGrammar(TextGrammar* grammar);
+
     inline TextGrammar* grammar() { return grammarRef_; }
 
     /// Lex the given range

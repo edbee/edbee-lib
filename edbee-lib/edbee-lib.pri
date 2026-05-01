@@ -28,7 +28,9 @@ SOURCES += \
     $$PWD/edbee/io/textdocumentserializer.cpp \
     $$PWD/edbee/io/tmlanguageparser.cpp \
     $$PWD/edbee/io/tmthemeparser.cpp \
-    $$PWD/edbee/lexers/grammartextlexer.cpp \
+    $$PWD/edbee/io/treesittergrammarparser.cpp \
+    $$PWD/edbee/lexers/regextextlexer.cpp \
+    $$PWD/edbee/lexers/treesittertextlexer.cpp \
     $$PWD/edbee/models/change.cpp \
     $$PWD/edbee/models/changes/abstractrangedchange.cpp \
     $$PWD/edbee/models/changes/linedatachange.cpp \
@@ -40,6 +42,8 @@ SOURCES += \
     $$PWD/edbee/models/chardocument/chartextbuffer.cpp \
     $$PWD/edbee/models/chardocument/chartextdocument.cpp \
     $$PWD/edbee/models/dynamicvariables.cpp \
+    $$PWD/edbee/models/grammars/regextextgrammar.cpp \
+    $$PWD/edbee/models/grammars/treesittertextgrammar.cpp \
     $$PWD/edbee/models/textautocompleteprovider.cpp \
     $$PWD/edbee/models/textbuffer.cpp \
     $$PWD/edbee/models/textdocument.cpp \
@@ -113,7 +117,9 @@ HEADERS += \
     $$PWD/edbee/io/textdocumentserializer.h \
     $$PWD/edbee/io/tmlanguageparser.h \
     $$PWD/edbee/io/tmthemeparser.h \
-    $$PWD/edbee/lexers/grammartextlexer.h \
+    $$PWD/edbee/io/treesittergrammarparser.h \
+    $$PWD/edbee/lexers/regextextlexer.h \
+    $$PWD/edbee/lexers/treesittertextlexer.h \
     $$PWD/edbee/models/change.h \
     $$PWD/edbee/models/changes/abstractrangedchange.h \
     $$PWD/edbee/models/changes/linedatachange.h \
@@ -125,6 +131,8 @@ HEADERS += \
     $$PWD/edbee/models/chardocument/chartextbuffer.h \
     $$PWD/edbee/models/chardocument/chartextdocument.h \
     $$PWD/edbee/models/dynamicvariables.h \
+    $$PWD/edbee/models/grammars/regextextgrammar.h \
+    $$PWD/edbee/models/grammars/treesittertextgrammar.h \
     $$PWD/edbee/models/textautocompleteprovider.h \
     $$PWD/edbee/models/textbuffer.h \
     $$PWD/edbee/models/textdocument.h \

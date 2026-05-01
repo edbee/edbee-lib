@@ -13,6 +13,7 @@ struct TSTree;
 
 namespace edbee {
 
+/*
 class TextDocument;
 class TextParserGrammar;
 
@@ -136,5 +137,7 @@ private:
      friend class Edbee;
 
 };
+
+*/
 
 }

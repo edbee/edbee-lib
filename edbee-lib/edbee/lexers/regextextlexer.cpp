@@ -1,13 +1,13 @@
-// edbee - Copyright (c) 2012-2025 by Rick Blommers and contributors
+// edbee - Copyright (c) 2012-2026 by Rick Blommers and contributors
 // SPDX-License-Identifier: MIT
 
-#include "grammartextlexer.h"
+#include "regextextlexer.h"
 
 #include <limits>
 #include <QStack>
 #include <QThread>
 
-#include "edbee/models/textgrammar.h"
+#include "edbee/models/grammars/regextextgrammar.h"
 #include "edbee/models/textdocument.h"
 #include "edbee/models/textdocumentscopes.h"
 #include "edbee/util/regexp.h"
@@ -19,15 +19,13 @@ namespace edbee {
 
 /// Constructs the grammar textlexer
 /// @param scopes a reference to the scopes model
-GrammarTextLexer::GrammarTextLexer(TextDocumentScopes* scopes)
-    : TextLexer(scopes)
+RegexTextLexer::RegexTextLexer(RegexTextGrammar* grammar, TextDocumentScopes* scopes)
+    : TextLexer(grammar, scopes)
     , lineRangeList_(nullptr)
 {
-    setGrammar(Edbee::instance()->grammarManager()->defaultGrammar());
 }
 
-
-GrammarTextLexer::~GrammarTextLexer()
+RegexTextLexer::~RegexTextLexer()
 {
     delete lineRangeList_;  // just in case
 }
@@ -36,7 +34,7 @@ GrammarTextLexer::~GrammarTextLexer()
 /// Builds the end-regexp for the given multi-line-regexp
 /// @param startRegExp the start regexp
 /// @param endRegExStringIn the end regexp string
-RegExp* GrammarTextLexer::createEndRegExp(RegExp* startRegExp, const QString& endRegExpStringIn)
+RegExp* RegexTextLexer::createEndRegExp(RegExp* startRegExp, const QString& endRegExpStringIn)
 {
     QStringView endRegExpStringInView(endRegExpStringIn);
 
@@ -69,22 +67,22 @@ RegExp* GrammarTextLexer::createEndRegExp(RegExp* startRegExp, const QString& en
 /// @param (out) foundRegExp the found regexp
 /// @param (out) foundPosition the found position
 /// @return the grammarRule found
-void GrammarTextLexer::findNextGrammarRule(const QString& line, size_t offsetInLine, TextRegexGrammarRule* activeRule, TextRegexGrammarRule*& foundRule, RegExp*& foundRegExp, size_t& foundPosition)
+void RegexTextLexer::findNextGrammarRule(const QString& line, size_t offsetInLine, RegexTextGrammarRule* activeRule, RegexTextGrammarRule*& foundRule, RegExp*& foundRegExp, size_t& foundPosition)
 {
     // next iterate over all rules and find the rule with the lowest offset
-    QStack<TextRegexGrammarRule::Iterator*> ruleIterators;
+    QStack<RegexTextGrammarRule::Iterator*> ruleIterators;
     ruleIterators.push( activeRule->createIterator());
     while (!ruleIterators.isEmpty()) {
 
         while (ruleIterators.top()->hasNext()) {
-            TextRegexGrammarRule* rule = ruleIterators.top()->next(); // activeRule->rule(i);
+            RegexTextGrammarRule* rule = ruleIterators.top()->next(); // activeRule->rule(i);
 
             bool processNewRule = false;
             do {
                 processNewRule = false;
                 switch (rule->instruction()) {
-                    case TextRegexGrammarRule::SingleLineRegExp:
-                    case TextRegexGrammarRule::MultiLineRegExp:
+                    case RegexTextGrammarRule::SingleLineRegExp:
+                    case RegexTextGrammarRule::MultiLineRegExp:
                     {
                         // only use this match if the offset < foundPosition
                         size_t pos = rule->matchRegExp()->indexIn(line, offsetInLine);
@@ -99,9 +97,9 @@ void GrammarTextLexer::findNextGrammarRule(const QString& line, size_t offsetInL
                     }
 
                     // and include rule
-                    case TextRegexGrammarRule::IncludeCall:
+                    case RegexTextGrammarRule::IncludeCall:
                     {
-                        TextRegexGrammarRule* includedRule = findIncludeGrammarRule(rule);
+                        RegexTextGrammarRule* includedRule = findIncludeGrammarRule(rule);
                         if (includedRule) {
                             // a rule list, append the iterator
                             if (includedRule->isRuleList() || includedRule->isMainRule()) {
@@ -117,10 +115,10 @@ void GrammarTextLexer::findNextGrammarRule(const QString& line, size_t offsetInL
                         }
                         break;
                     }
-                    case TextRegexGrammarRule::MainRule:
+                    case RegexTextGrammarRule::MainRule:
                         Q_ASSERT(false && "a mainrule as child is not allowed!");
                         break;
-                    case TextRegexGrammarRule::RuleList:
+                    case RegexTextGrammarRule::RuleList:
                         Q_ASSERT(false && "a rule list is not directly allowed!");
                         break;
                     default:
@@ -139,7 +137,7 @@ void GrammarTextLexer::findNextGrammarRule(const QString& line, size_t offsetInL
 /// This method processes the captures and adds them to the active line
 /// @param foundRegExp the found regexp
 /// @param foundCaptures the found captures
-void GrammarTextLexer::processCaptures(RegExp* foundRegExp, const QMap<size_t, QString>* foundCaptures)
+void RegexTextLexer::processCaptures(RegExp* foundRegExp, const QMap<size_t, QString>* foundCaptures)
 {
     if (!foundCaptures->isEmpty()) {
 //qlog_info() << "found: captures:";
@@ -166,17 +164,17 @@ void GrammarTextLexer::processCaptures(RegExp* foundRegExp, const QMap<size_t, Q
 /// @param currentDocOffset the current document offset
 /// @param line the line that's being matches
 /// @param offsetInLine (in/out) the current offset in the line
-TextRegexGrammarRule* GrammarTextLexer::findAndApplyNextGrammarRule(size_t currentDocOffset, const QString& line, size_t& offsetInLine)
+RegexTextGrammarRule* RegexTextLexer::findAndApplyNextGrammarRule(size_t currentDocOffset, const QString& line, size_t& offsetInLine)
 {
     Q_ASSERT(lineRangeList_);
 
     MultiLineScopedTextRange* activeMultiRange = this->activeMultiLineRange();
-    TextRegexGrammarRule* activeRule = activeMultiRange->grammarRule();
+    RegexTextGrammarRule* activeRule = activeMultiRange->grammarRule();
     //qlog_info() << "--- matchNextGrammarRule ---------------------";
     //qlog_info() << " - activeRule : " << activeRule->toString();
     //qlog_info() << " - activeRange: " << activeRange->toString();
 
-    TextRegexGrammarRule* foundRule = nullptr;
+    RegexTextGrammarRule* foundRule = nullptr;
     RegExp* foundRegExp = nullptr;
     size_t foundPosition = std::numeric_limits<size_t>::max();
 
@@ -249,7 +247,7 @@ TextRegexGrammarRule* GrammarTextLexer::findAndApplyNextGrammarRule(size_t curre
 
 
 /// internal method that returns the active grammar rule
-MultiLineScopedTextRange* GrammarTextLexer::activeMultiLineRange()
+MultiLineScopedTextRange* RegexTextLexer::activeMultiLineRange()
 {
     Q_ASSERT(!activeMultiLineRangesRefList_.isEmpty());
     MultiLineScopedTextRange* result = activeMultiLineRangesRefList_.last();
@@ -259,7 +257,7 @@ MultiLineScopedTextRange* GrammarTextLexer::activeMultiLineRange()
 
 
 /// Returns the active scoped text range
-ScopedTextRange* GrammarTextLexer::activeScopedTextRange()
+ScopedTextRange* RegexTextLexer::activeScopedTextRange()
 {
     Q_ASSERT(!activeScopedRangesRefList_.isEmpty());
     return activeScopedRangesRefList_.last();
@@ -269,7 +267,7 @@ ScopedTextRange* GrammarTextLexer::activeScopedTextRange()
 /// removes the active range from the stack
 /// If the ranges is added for the current line, it is removed from the currentLineRangeList.
 /// If the range was started at a previous line, the item is added to the closedActiveRangeRefList
-void GrammarTextLexer::popActiveRange()
+void RegexTextLexer::popActiveRange()
 {
     Q_ASSERT(activeMultiLineRangesRefList_.size() > 1); // there should be at least 2 items. The first one is the grammar rule!
     Q_ASSERT(activeScopedRangesRefList_.size() == activeMultiLineRangesRefList_.size());
@@ -291,7 +289,7 @@ void GrammarTextLexer::popActiveRange()
 /// Adds the given range to the multiscoped textranges
 /// And to the list of current line ranges
 /// @param range the range top push
-void GrammarTextLexer::pushActiveRange(ScopedTextRange* range, MultiLineScopedTextRange* multiRange)
+void RegexTextLexer::pushActiveRange(ScopedTextRange* range, MultiLineScopedTextRange* multiRange)
 {
     activeMultiLineRangesRefList_.push_back(multiRange);
     currentMultiLineRangeList_.push_back(multiRange);
@@ -300,7 +298,7 @@ void GrammarTextLexer::pushActiveRange(ScopedTextRange* range, MultiLineScopedTe
 
 
 /// This method finds the 'included' grammar rule
-TextRegexGrammarRule* GrammarTextLexer::findIncludeGrammarRule(TextRegexGrammarRule* base)
+RegexTextGrammarRule* RegexTextLexer::findIncludeGrammarRule(RegexTextGrammarRule* base)
 {
     Q_ASSERT( base->isIncludeCall() );
     QString name = base->includeName();
@@ -316,16 +314,15 @@ TextRegexGrammarRule* GrammarTextLexer::findIncludeGrammarRule(TextRegexGrammarR
         return regexGrammar()->mainRule();
     }
 
-    TextRegexGrammar* grammar = Edbee::instance()->grammarManager()->getRegexGrammar(name);
+    RegexTextGrammar* grammar = Edbee::instance()->grammarManager()->getRegexGrammar(name);
     if (grammar) { return grammar->mainRule(); }
     return nullptr;
 }
 
 
-
 /// This method is called to notify the lexer some data has been changed
 //void GrammarTextLexer::textReplaced( int offset, int length, int newLength )
-void GrammarTextLexer::textChanged(const TextBufferChange& change)
+void RegexTextLexer::textChanged(const TextBufferChange& change)
 {
     TextDocument* doc = textDocument();
     TextDocumentScopes* docScopes = textScopes();
@@ -337,9 +334,9 @@ void GrammarTextLexer::textChanged(const TextBufferChange& change)
 }
 
 /// returns the  regexgrammar
-TextRegexGrammar* GrammarTextLexer::regexGrammar()
+RegexTextGrammar* RegexTextLexer::regexGrammar()
 {
-    TextRegexGrammar* result = dynamic_cast<TextRegexGrammar*>(grammar());
+    RegexTextGrammar* result = dynamic_cast<RegexTextGrammar*>(grammar());
     Q_ASSERT(result);
     return result;
 }
@@ -348,7 +345,7 @@ TextRegexGrammar* GrammarTextLexer::regexGrammar()
 /// This method lexes a single line
 /// @return the last indexed offset
 /// WARNING lexline CANNOT be called indepdently of lexLines (beacuse lex-lines set the activeScopes!
-bool GrammarTextLexer::lexLine(size_t lineIdx, size_t& currentDocOffset)
+bool RegexTextLexer::lexLine(size_t lineIdx, size_t& currentDocOffset)
 {
     TextDocument* doc = textDocument();
     TextDocumentScopes* docScopes = textScopes();
@@ -377,12 +374,12 @@ bool GrammarTextLexer::lexLine(size_t lineIdx, size_t& currentDocOffset)
     // find the first 'matching' rule
     size_t offsetInLine = 0;
     size_t lastOffsetInLine = 0;
-    TextRegexGrammarRule* lastFoundRule = nullptr;
+    RegexTextGrammarRule* lastFoundRule = nullptr;
     while (true) {
         //QString debug;
         //debug.append( QStringLiteral((" =[%1,%2,%3]= ").arg(lineIdx).arg(offsetInLine).arg(currentDocOffset) );
 
-        TextRegexGrammarRule* foundRule = findAndApplyNextGrammarRule(currentDocOffset, line, offsetInLine); //debug.append( QStringLiteral((" %1  (%2)").arg(foundRule?foundRule->scopeName():"<<null>").arg(offsetInLine) ); //qlog_info() << debug; if (!foundRule) break;
+        RegexTextGrammarRule* foundRule = findAndApplyNextGrammarRule(currentDocOffset, line, offsetInLine); //debug.append( QStringLiteral((" %1  (%2)").arg(foundRule?foundRule->scopeName():"<<null>").arg(offsetInLine) ); //qlog_info() << debug; if (!foundRule) break;
         if (!foundRule) break;
 
         /// check the next offset
@@ -443,7 +440,7 @@ bool GrammarTextLexer::lexLine(size_t lineIdx, size_t& currentDocOffset)
 
 /// This method lexes a range of line
 /// @return the last indexed offset
-void GrammarTextLexer::lexLines(size_t lineStart, size_t lineCount)
+void RegexTextLexer::lexLines(size_t lineStart, size_t lineCount)
 {
     // (INIT) ALGORITHM BELOW:
     //
@@ -500,9 +497,12 @@ void GrammarTextLexer::lexLines(size_t lineStart, size_t lineCount)
 ///
 /// @param beginOffset the first offset
 /// @param endOffset the last offset to
-void GrammarTextLexer::lexRange(size_t beginOffset, size_t endOffset)
+void RegexTextLexer::lexRange(size_t beginOffset, size_t endOffset)
 {
     Q_UNUSED(beginOffset);
+
+    qDebug() << "lexRange REGEX: " << beginOffset << "-" << endOffset;
+
 
     // find the beginning of the given line
     TextDocument* doc = textDocument();
@@ -512,6 +512,7 @@ void GrammarTextLexer::lexRange(size_t beginOffset, size_t endOffset)
     if( endOffset <= docScopes->lastScopedOffset()) {
         return;
     }
+
 
     // first we need to find the correct location to start from
     size_t offset = docScopes->lastScopedOffset(); //qMin( docScopes->scopedToOffset(), offset );

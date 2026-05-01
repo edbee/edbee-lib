@@ -1,4 +1,4 @@
-// edbee - Copyright (c) 2012-2025 by Rick Blommers and contributors
+// edbee - Copyright (c) 2012-2026 by Rick Blommers and contributors
 // SPDX-License-Identifier: MIT
 
 #include "textdocumentscopes.h"
@@ -150,6 +150,57 @@ bool ScopedTextRangeList::isIndependent() const
 }
 
 
+/// Removes all scopes that are before the given offset
+void ScopedTextRangeList::removeToOffset(size_t offset)
+{
+    for (auto it = ranges_.begin(); it != ranges_.end(); ) {
+        ScopedTextRange* range = *it;
+        if (range->max() <= offset) {
+            delete range;
+            it = ranges_.erase(it);  // erase() returns next valid iterator
+        } else {
+            ++it;
+        }
+    }
+}
+
+/// Removes all scopes that are after the given offset
+void ScopedTextRangeList::removeFromOffset(size_t offset)
+{
+    for (auto it = ranges_.begin(); it != ranges_.end(); ) {
+        ScopedTextRange* range = *it;
+        if (range->min() <= offset) {
+            delete range;
+            it = ranges_.erase(it);  // erase() returns next valid iterator
+        } else {
+            ++it;
+        }
+    }
+}
+
+/// Removes all scopes within the given offsets
+void ScopedTextRangeList::removeWithinOffset(size_t offsetBegin, size_t offsetEnd)
+{
+    TextRange overlappingRange(offsetBegin, offsetEnd);
+    for (auto it = ranges_.begin(); it != ranges_.end(); ) {
+        ScopedTextRange* range = *it;
+        if (range->touches(overlappingRange)) {
+            delete range;
+            it = ranges_.erase(it);  // erase() returns next valid iterator
+        } else {
+            ++it;
+        }
+    }
+}
+
+
+/// Clears all ranges
+void ScopedTextRangeList::clear()
+{
+    ranges_.clear();
+}
+
+
 /// Converts the scoped textrange list to a strubg
 QString ScopedTextRangeList::toString()
 {
@@ -184,14 +235,14 @@ MultiLineScopedTextRange::~MultiLineScopedTextRange()
 
 
 /// Sets the rule (we need the rule to perform end-of-line matching)
-void MultiLineScopedTextRange::setGrammarRule(TextRegexGrammarRule* rule)
+void MultiLineScopedTextRange::setGrammarRule(RegexTextGrammarRule* rule)
 {
     ruleRef_ = rule;
 }
 
 
 /// Returns the active grammar rule
-TextRegexGrammarRule* MultiLineScopedTextRange::grammarRule() const
+RegexTextGrammarRule* MultiLineScopedTextRange::grammarRule() const
 {
     return ruleRef_;
 }
@@ -695,7 +746,7 @@ MultiLineScopedTextRange& MultiLineScopedTextRangeSet::scopedRange(size_t idx)
 
 
 /// Adds a textrange with the given name
-MultiLineScopedTextRange& MultiLineScopedTextRangeSet::addRange(size_t anchor, size_t caret, const QString& name, TextRegexGrammarRule* rule)
+MultiLineScopedTextRange& MultiLineScopedTextRangeSet::addRange(size_t anchor, size_t caret, const QString& name, RegexTextGrammarRule* rule)
 {
     MultiLineScopedTextRange* tr = new MultiLineScopedTextRange(anchor, caret, Edbee::instance()->scopeManager()->refTextScope(name) );
     tr->setGrammarRule(rule);
@@ -717,6 +768,22 @@ void MultiLineScopedTextRangeSet::removeAndInvalidateRangesAfterOffset(size_t of
             removeRange(idx);
         } else if (range.min() < offset && range.max() >= offset) {
             range.maxVar() = len;   // move the marker to the end
+        }
+    }
+    endChangesWithoutProcessing();  // we only deleted the last range. Do the result is still sorted
+}
+
+
+/// Removes all multi lined offsets which are starting or ending between these two ranges
+void MultiLineScopedTextRangeSet::removeAndInvalidateRangesBetweenOffsets(size_t offsetBegin, size_t offsetEnd)
+{
+    size_t len = textDocument()->length();
+    beginChanges();
+    for (size_t idx = rangeCount() - 1; idx != std::string::npos; --idx) {
+        TextRange& range = this->range(idx);
+        if ((range.caret() >= offsetBegin && range.caret() <= offsetEnd)
+            || (range.anchor() >= offsetEnd && range.anchor() <= offsetEnd)) {
+            removeRange(idx);
         }
     }
     endChangesWithoutProcessing();  // we only deleted the last range. Do the result is still sorted
@@ -803,7 +870,7 @@ void TextDocumentScopes::setLastScopedOffset(size_t offset)
 /// Sets the default scope
 /// @param the name of the scope
 /// @param rule the rule that matched
-void TextDocumentScopes::setDefaultScope(const QString& name, TextRegexGrammarRule* rule )
+void TextDocumentScopes::setDefaultScope(const QString& name, RegexTextGrammarRule* rule )
 {
     defaultScopedRange_.setScope( Edbee::instance()->scopeManager()->refTextScope(name) );
     defaultScopedRange_.setGrammarRule(rule);
@@ -817,7 +884,7 @@ void TextDocumentScopes::giveLineScopedRangeList(size_t line, ScopedTextRangeLis
 {
     size_t len = lineRangeList_.length();
     if (line >= len) {
-        lineRangeList_.fill(len, 0, 0, line - len + 1);
+        lineRangeList_.fill(len, 0, nullptr, line - len + 1);
     }
     delete lineRangeList_.at(line); // delete a possible old value
     lineRangeList_.set(line, list);
@@ -872,8 +939,83 @@ void TextDocumentScopes::removeScopesAfterOffset(size_t offset)
     }
 }
 
+/// Removes all affected scopes within these offsets
+void TextDocumentScopes::removeScopesWithinOffsets(size_t offsetBegin, size_t offsetEnd)
+{
+    scopedRanges_.removeAndInvalidateRangesBetweenOffsets(offsetBegin, offsetEnd);
 
-/// Retursn the default scoped textrange
+    size_t startLine = textDocument()->lineFromOffset(offsetBegin);
+    size_t endLine = textDocument()->lineFromOffset(offsetEnd);
+    // endLine = qMin(endLine + 1, lineRangeList_.length());
+
+ qDebug() << "removeScopesWithinOffset(" << offsetBegin << ", "  << offsetEnd << ")"
+    << " | lines: [" << startLine << ", " << endLine << "], scopes.length" << lineRangeList_.length();
+    // for(int i=0, cnt = lineRangeList_.length();  i < cnt; i++){
+    //     ScopedTextRangeList* item = lineRangeList_.at(i);
+    //     if (item)  {
+    //         qDebug() << "-  " << i << ":" << item->toString();
+    //     } else {
+    //         qDebug() << "-  " << i << ": nullptr";
+    //     }
+    // }
+
+    // size_t line = this->textDocument()->lineFromOffset(offset) + 1;
+// qDebug() << "THIS isn't correct, we only may delete scopes if they fall withing the offset";
+// qDebug() << "- for the first and last line, we should NOT delete the offsets that aren't effect by offsetBegin and offsetEnd";
+// qDebug() << "";
+
+    size_t startLineOffset = textDocument()->offsetFromLine(startLine);
+    size_t endLineOffset = textDocument()->offsetFromLine(endLine);
+    size_t localStartOffset = startLineOffset - offsetBegin;
+    size_t localEndOffset = endLineOffset - offsetEnd;
+
+qDebug() << "  - globalOffset: " << startLineOffset << " - " << localEndOffset << " => " << " localOffset: " << localStartOffset << " - " << localEndOffset;
+
+    if (startLine == endLine) {
+qDebug() << "  a: " << localStartOffset << " - " << localEndOffset;
+        ScopedTextRangeList* rangeList = startLine < lineRangeList_.length() ? lineRangeList_.at(startLine) :  nullptr;
+        if (rangeList) {
+            rangeList->removeWithinOffset(localStartOffset, localEndOffset);
+            if (localStartOffset == 0) {
+                ScopedTextRange* range = new ScopedTextRange(0, textDocument()->lineLength(endLine), this->defaultScopedRange().scope());
+                rangeList->giveAndPrependRange(range);
+            }
+        }
+    } else {
+        ScopedTextRangeList* firstRangeList = startLine < lineRangeList_.length() ? lineRangeList_.at(startLine) : nullptr;
+        if (firstRangeList) {
+qDebug() << "  bb: " << localStartOffset;
+            firstRangeList->removeFromOffset(localStartOffset);
+            // HACK to add default scope at start (This sucks and shouldn't be required)
+            if (localStartOffset == 0) {
+                ScopedTextRange* range = new ScopedTextRange(0, textDocument()->lineLength(endLine), this->defaultScopedRange().scope());
+                firstRangeList->giveAndPrependRange(range);
+            }
+        }
+
+        ScopedTextRangeList* lastRangeList = endLine < lineRangeList_.length() ? lineRangeList_.at(endLine) : nullptr;
+        if (lastRangeList){
+qDebug() << "  be: " << localEndOffset;
+            lastRangeList->removeToOffset(localEndOffset);
+
+            // HACK to add default scope at start (This sucks and shouldn't be required)
+            ScopedTextRange* range = new ScopedTextRange(0, textDocument()->lineLength(endLine), this->defaultScopedRange().scope());
+            lastRangeList->giveAndPrependRange(range);
+        }
+
+        // delete the lines in betwee
+        if (endLine - startLine > 2) {
+            size_t end = qMin(endLine - 1, lineRangeList_.length());
+            for(size_t i = startLine + 1; i < end; ++i) {
+                delete lineRangeList_.at(i);
+            }
+            lineRangeList_.replace(startLine + 1, end - startLine - 1, nullptr, 0);
+        }
+    }
+}
+
+
+/// Returns the default scoped textrange
 /// Currently this is done very dirty, by retrieving the defaultscoped range the begin and end is set tot he complete document
 /// a better solution would be a subclass that always returns 0 for an anchor and the documentlength for the caret
 MultiLineScopedTextRange& TextDocumentScopes::defaultScopedRange()
@@ -959,6 +1101,13 @@ QVector<ScopedTextRange*> TextDocumentScopes::createScopedRangesAtOffsetList(siz
         }
     }
     return result;
+}
+
+
+/// Returns the multilined scoped ranges
+MultiLineScopedTextRangeSet &TextDocumentScopes::scopedRanges()
+{
+    return scopedRanges_;
 }
 
 
