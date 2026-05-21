@@ -125,7 +125,7 @@ public:
     virtual ~RegexTextGrammar();
 
     virtual QString defaultScopeName() const;
-    TextLexer* createTextLexer(TextDocumentScopes* scopes);
+    TextLexer* createTextLexer(TextDocument* textdocument);
 
     void giveMainRule(RegexTextGrammarRule* mainRule);
     RegexTextGrammarRule* mainRule() const;

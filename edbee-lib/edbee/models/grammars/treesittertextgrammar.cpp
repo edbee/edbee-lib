@@ -66,9 +66,9 @@ TreeSitterTextGrammar::~TreeSitterTextGrammar()
 
 
 /// Creates the TreeSitterTextLexer for this grammar
-TextLexer* TreeSitterTextGrammar::createTextLexer(TextDocumentScopes* scopes)
+TextLexer* TreeSitterTextGrammar::createTextLexer(TextDocument* document)
 {
-    return new TreeSitterTextLexer(this, scopes);
+    return new TreeSitterTextLexer(this, document);
 }
 
 /// Initializes the grammar

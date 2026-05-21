@@ -9,7 +9,7 @@
 
 #include "edbee/models/grammars/regextextgrammar.h"
 #include "edbee/models/textdocument.h"
-#include "edbee/models/textdocumentscopes.h"
+#include "edbee/models/scopes/regextextdocumentscopes.h"
 #include "edbee/util/regexp.h"
 #include "edbee/edbee.h"
 
@@ -19,15 +19,26 @@ namespace edbee {
 
 /// Constructs the grammar textlexer
 /// @param scopes a reference to the scopes model
-RegexTextLexer::RegexTextLexer(RegexTextGrammar* grammar, TextDocumentScopes* scopes)
-    : TextLexer(grammar, scopes)
+RegexTextLexer::RegexTextLexer(RegexTextGrammar* grammar, TextDocument* textDocument)
+    : TextLexer(grammar, textDocument)
+    , textDocumentScopes_(nullptr)
     , lineRangeList_(nullptr)
 {
+    textDocumentScopes_ = new RegexTextDocumentScopes(textDocument);
+
+    RegexTextGrammar* regExGrammar = dynamic_cast<RegexTextGrammar*>(grammar);
+    if (regExGrammar) {
+        textDocumentScopes_->setDefaultScope(regExGrammar->defaultScopeName(), regExGrammar->mainRule());
+    } else {
+        textDocumentScopes_->setDefaultScope(regExGrammar->defaultScopeName(), nullptr);
+    }
+    textDocumentScopes_->removeScopesAfterOffset(0); // invalidate the complete scopes
 }
 
 RegexTextLexer::~RegexTextLexer()
 {
     delete lineRangeList_;  // just in case
+    delete textDocumentScopes_;
 }
 
 
@@ -325,11 +336,8 @@ RegexTextGrammarRule* RegexTextLexer::findIncludeGrammarRule(RegexTextGrammarRul
 void RegexTextLexer::textChanged(const TextBufferChange& change)
 {
     TextDocument* doc = textDocument();
-    TextDocumentScopes* docScopes = textScopes();
-
     size_t offsetStart = doc->offsetFromLine(change.line());
-    docScopes->removeScopesAfterOffset(offsetStart);
-
+    textDocumentScopes_->removeScopesAfterOffset(offsetStart);
     /// TODO: rebuild an optimized scope-rebuilding algorithm
 }
 
@@ -341,6 +349,19 @@ RegexTextGrammar* RegexTextLexer::regexGrammar()
     return result;
 }
 
+/// returns the TextDocumentScopes
+TextDocumentScopes* RegexTextLexer::textScopes()
+{
+    return  textDocumentScopes_; ///< A Text document refs
+}
+
+/// Performs a full refresh
+void RegexTextLexer::fullRefresh()
+{
+    textDocumentScopes_->removeScopesAfterOffset(0);
+    lexRange(0, textDocument()->length());
+}
+
 
 /// This method lexes a single line
 /// @return the last indexed offset
@@ -348,7 +369,6 @@ RegexTextGrammar* RegexTextLexer::regexGrammar()
 bool RegexTextLexer::lexLine(size_t lineIdx, size_t& currentDocOffset)
 {
     TextDocument* doc = textDocument();
-    TextDocumentScopes* docScopes = textScopes();
 
     QString line        = doc->line(lineIdx);
 
@@ -422,11 +442,11 @@ bool RegexTextLexer::lexLine(size_t lineIdx, size_t& currentDocOffset)
     bool result = lineRangeList_->isIndependent();
 
     // give the line to the document scopes
-    docScopes->giveLineScopedRangeList(lineIdx, lineRangeList_);
+    textDocumentScopes_->giveLineScopedRangeList(lineIdx, lineRangeList_);
     lineRangeList_ = 0;
 
     foreach (MultiLineScopedTextRange* scopedRange, currentMultiLineRangeList_) {
-        docScopes->giveMultiLineScopedTextRange(scopedRange);
+        textDocumentScopes_->giveMultiLineScopedTextRange(scopedRange);
     }
     activeScopedRangesRefList_.clear();
     currentMultiLineRangeList_.clear();
@@ -457,13 +477,12 @@ void RegexTextLexer::lexLines(size_t lineStart, size_t lineCount)
     //------------------------
 
     TextDocument* doc = textDocument();
-    TextDocumentScopes* docScopes = textScopes();
 
     //qlog_info() << "===== lexText(" << offset << "," << length << ") ["<<lineStart <<","<<lineEnd<<"] ======";
 
     // next find all 'active' scoped ranges
     size_t offsetStart = doc->offsetFromLine(lineStart);
-    activeMultiLineRangesRefList_ = docScopes->multiLineScopedRangesBetweenOffsets(offsetStart, offsetStart);
+    activeMultiLineRangesRefList_ = textDocumentScopes_->multiLineScopedRangesBetweenOffsets(offsetStart, offsetStart);
 
     //    GrammarRule* activeRule = grammarRef_->mainRule();
     //    if( !activeScopedRanges.isEmpty() ) { activeRule = activeScopedRanges.last()->grammarRule(); }
@@ -477,15 +496,15 @@ void RegexTextLexer::lexLines(size_t lineStart, size_t lineCount)
     }
 
     // only set the scoped offset if less and not indepdent
-    if (currentDocOffset < docScopes->lastScopedOffset()) {
+    if (currentDocOffset < textDocumentScopes_->lastScopedOffset()) {
         if (!independent) {
-            docScopes->setLastScopedOffset(currentDocOffset);
-            docScopes->removeScopesAfterOffset(currentDocOffset);
+            textDocumentScopes_->setLastScopedOffset(currentDocOffset);
+            textDocumentScopes_->removeScopesAfterOffset(currentDocOffset);
         }
     // further down the document, update the scope
     } else {
-        docScopes->setLastScopedOffset(currentDocOffset);
-        docScopes->removeScopesAfterOffset(currentDocOffset);
+        textDocumentScopes_->setLastScopedOffset(currentDocOffset);
+        textDocumentScopes_->removeScopesAfterOffset(currentDocOffset);
     }
 }
 
@@ -501,21 +520,19 @@ void RegexTextLexer::lexRange(size_t beginOffset, size_t endOffset)
 {
     Q_UNUSED(beginOffset);
 
-    qDebug() << "lexRange REGEX: " << beginOffset << "-" << endOffset;
-
+    // qDebug() << "lexRange REGEX: " << beginOffset << "-" << endOffset;
 
     // find the beginning of the given line
     TextDocument* doc = textDocument();
-    TextDocumentScopes* docScopes = textScopes();
 
     // no lexing required
-    if( endOffset <= docScopes->lastScopedOffset()) {
+    if( endOffset <= textDocumentScopes_->lastScopedOffset()) {
         return;
     }
 
 
     // first we need to find the correct location to start from
-    size_t offset = docScopes->lastScopedOffset(); //qMin( docScopes->scopedToOffset(), offset );
+    size_t offset = textDocumentScopes_->lastScopedOffset(); //qMin( docScopes->scopedToOffset(), offset );
 
     size_t lineStart   = doc->lineFromOffset(offset);
     size_t lineEnd     = doc->lineFromOffset(endOffset) + 1;

@@ -117,6 +117,19 @@ TextThemeStyler::~TextThemeStyler()
 {
 }
 
+static QString activeRangeToString(QStack<ScopedTextRange*> & activeRanges)
+{
+    QString result;
+    foreach(const ScopedTextRange* range, activeRanges) {
+        result.append(range->toString());
+        result.append(",");
+    }
+    return result;
+}
+
+//#define dbg(x) do { qDebug() << x ; } while(0)
+#define dbg(x)
+
 
 /// This method returns a reference to the given line format.
 /// WARNING this reference is ONLY valid very shortly.. Another call to this
@@ -128,13 +141,23 @@ QVector<QTextLayout::FormatRange> TextThemeStyler::getLineFormatRanges(size_t li
 {
     TextDocumentScopes* scopes = controller()->textDocument()->scopes();
 
+
     // check if the range is in the case. When it is, use it
     QVector<QTextLayout::FormatRange> formatRangeList;
 
     // get all textranges on the given line
-    ScopedTextRangeList* scopedRanges = scopes->scopedRangesAtLine(lineIdx);
-    if (scopedRanges == 0 || scopedRanges->size() == 0) { return formatRangeList; }
+    ScopedTextRangeIterator scopedRangesIterator = scopes->scopedRangeAtLine(lineIdx);
+    // ScopedTextRangeList* scopedRanges = scopes->scopedRangesAtLineDeprecated(lineIdx);
+    // if (scopedRanges == 0 || scopedRanges->size() == 0) { return formatRangeList; }
 
+    //  get the line offset
+    size_t lineOffsetDelta = 0;
+    size_t endDelta = 1; ///< FIXME: this is a workaround to an inconistency between TextLexer vs TreeSitterLexer implementation (need to figure out how to get those wo equal)
+    size_t lineLength = controller()->textDocument()->lineLength(lineIdx);
+    if (!scopes->lineBasedOffsets()) {
+        lineOffsetDelta = controller()->textDocument()->offsetFromLine(lineIdx);
+        endDelta = 0;
+    }
 
     // build format ranges from these (nested) scope ranges
     //
@@ -145,24 +168,40 @@ QVector<QTextLayout::FormatRange> TextThemeStyler::getLineFormatRanges(size_t li
     //  [ ][xx][#########][xxxx][ ][kkkkkkk][  ]
     //
     QStack<ScopedTextRange*> activeRanges;
-    activeRanges.append(scopedRanges->at(0));
+
+
+dbg("=] TextTheme::getLineFormatRange(" << lineIdx << ") [=====]");
+dbg("- lineOffset:" << lineOffsetDelta << ", lineLength:" << lineLength);
+dbg(scopes->toString());
+dbg("");
 
     size_t lastOffset = 0;
-    for (size_t i = 1, cnt = scopedRanges->size(); i < cnt; ++i) {
-        ScopedTextRange* range = scopedRanges->at(i);
+    // for (size_t i = 1, cnt = scopedRanges->size(); i < cnt; ++i) {
+    int index  = 0;
+    while(ScopedTextRange* range = scopedRangesIterator.next()) {
+dbg("  ~ " << index << " " << range->toString());
+        if  (index++ ==  0) {
+            activeRanges.append(range);
+            continue;
+        }
         size_t min = range->min();
+        min -= qMin(lineOffsetDelta, min);
 
         // unwind the stack if required
-        while (activeRanges.size() > 1) {
+        while (activeRanges.size() >= 1) {
             ScopedTextRange* activeRange = activeRanges.last();
             size_t activeRangeMax = activeRange->max();
+            activeRangeMax -= qMin(activeRangeMax, lineOffsetDelta);
+            activeRangeMax = qMin(activeRangeMax, lineLength);
+// qDebug() << "    - <" << min << ", " << activeRangeMax << "> => " << range->toString(); // scope()->name();
 
             // when the 'min' is behind the end of the textrange on the stack we need to pop the stack
             if (activeRangeMax <= min) {
-                appendFormatRange(formatRangeList, lastOffset, activeRangeMax - 1, activeRanges);
+dbg("    a1: <" << lastOffset <<  ", " << (activeRangeMax - endDelta) << "> => " << activeRangeToString(activeRanges));
+                 appendFormatRange(formatRangeList, lastOffset, activeRangeMax - endDelta, activeRanges);
                 activeRanges.pop();
                 lastOffset = activeRangeMax;
-                Q_ASSERT(!activeRanges.empty());
+                //Q_ASSERT(!activeRanges.empty());
             } else {
                 break;
             }
@@ -170,7 +209,8 @@ QVector<QTextLayout::FormatRange> TextThemeStyler::getLineFormatRanges(size_t li
 
         // add a new 'range' if a new one is started and there's a 'gap'
         if (lastOffset < min)  {
-            appendFormatRange(formatRangeList, lastOffset, min - 1, activeRanges);
+dbg("    a2: <" << lastOffset <<  ", " << (min - endDelta) << "> => " << activeRangeToString(activeRanges));
+            appendFormatRange(formatRangeList, lastOffset, min - endDelta, activeRanges);
             lastOffset = min;
         }
 
@@ -182,11 +222,19 @@ QVector<QTextLayout::FormatRange> TextThemeStyler::getLineFormatRanges(size_t li
     while (!activeRanges.isEmpty()) {
         ScopedTextRange* activeRange = activeRanges.last();
         size_t activeRangeMax = activeRange->max();
-        if (lastOffset < activeRange->max()) {
-            appendFormatRange(formatRangeList, lastOffset, activeRangeMax-1, activeRanges);
-            lastOffset = activeRange->max();
+        activeRangeMax -= qMin(activeRangeMax, lineOffsetDelta);
+        activeRangeMax = qMin(activeRangeMax, lineLength);
+        if (lastOffset < activeRangeMax) {
+dbg("    a3: <" << lastOffset <<  ", " << (activeRangeMax - endDelta) << "> => " << activeRangeToString(activeRanges));
+            appendFormatRange(formatRangeList, lastOffset, activeRangeMax - endDelta, activeRanges);
+            lastOffset = activeRangeMax;
         }
         activeRanges.pop();
+    }
+
+dbg("    => formatRangeList.length = " << formatRangeList.length());
+    if (formatRangeList.length() > 0 ) {
+dbg("😀");
     }
 
     return formatRangeList;

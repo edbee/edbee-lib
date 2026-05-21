@@ -10,7 +10,7 @@
 
 #include "edbee/models/grammars/treesittertextgrammar.h"
 #include "edbee/models/textdocument.h"
-#include "edbee/models/textdocumentscopes.h"
+#include "edbee/models/scopes/treesittertextdocumentscopes.h"
 #include "edbee/edbee.h"
 
 #include "edbee/debug.h"
@@ -76,15 +76,19 @@ void dumpScopes(TextDocumentScopes* scopes)
     //     qDebug() << item;
     // }
 
-    qDebug() << "Per Line:---";
-    for (size_t i = 0; i < scopes->scopedLineCount(); ++i) {
-        ScopedTextRangeList* range = scopes->scopedRangesAtLine(i);
-        if (range) {
-            qDebug() << QStringLiteral("- %1: %2\n").arg(i).arg(range->toString());
-        } else {
-            qDebug() << QString("- nullptr @ index %1").arg(i);
-        }
+    foreach(QString str, scopes->scopesAsStringList()) {
+        qDebug() << "-" << str;
+
     }
+
+
+    // qDebug() << "Per Line:---";
+    // for (size_t i = 0; i < scopes->scopedLineCount(); ++i) {
+    //     ScopedTextRangeIterator it = scopes->scopedRangeAtLine(i);
+    //     while(ScopedTextRange* range = it.next()) {
+    //         qDebug() << QStringLiteral("- %1: %2\n").arg(i).arg(range->toString());
+    //     }
+    // }
 }
 
 
@@ -93,11 +97,14 @@ void dumpScopes(TextDocumentScopes* scopes)
 
 /// Constructs the grammar textlexer
 /// @param scopes a reference to the scopes model
-TreeSitterTextLexer::TreeSitterTextLexer(TreeSitterTextGrammar* grammar, TextDocumentScopes* scopes)
-    : TextLexer(grammar, scopes)
+TreeSitterTextLexer::TreeSitterTextLexer(TreeSitterTextGrammar* grammar, TextDocument* document)
+    : TextLexer(grammar, document)
+    , textDocumentScopes_(nullptr)
     , tsParser_(nullptr)
     , tsTree_(nullptr)
 {
+    textDocumentScopes_ = new TreeSitterTextDocumentScopes(document);
+
     tsParser_ = ts_parser_new();
     if (!ts_parser_set_language(tsParser_, grammar->language())) {
         qDebug() << "Error settings parser language to " <<  grammar->displayName();
@@ -113,16 +120,24 @@ TreeSitterTextLexer::~TreeSitterTextLexer()
     if (tsParser_) {
         ts_parser_delete(tsParser_);
     }
+
+    delete textDocumentScopes_;
 }
 
-
-void TreeSitterTextLexer::updateHighlightScopes(uint32_t startByte, uint32_t endByte)
+void TreeSitterTextLexer::updateHighlightScopes(uint32_t updateStartByte, uint32_t updateEndByte)
 {
-    TextDocumentScopes* scopes = this->textScopes();
-    size_t startOffset = startByte / 2;
-    size_t endOffset = endByte / 2;
-    qDebug() << "=======updateHighlightScopes("<<startByte << ", " << endByte << ") => (" << startOffset << ", " << endOffset << ") (doc: " << this->textDocument()->length() <<") ============";
-qDebug() << "ON DELETE, document length is smaller then this range..." ;
+    updateStartByte = updateStartByte == UINT32_MAX ? 0 : updateStartByte;
+    updateEndByte = updateEndByte == 0 ? textDocument()->length() * 2 : updateEndByte;
+
+    size_t updateStartOffset = updateStartByte / 2;
+    size_t updateEndOffset = updateEndByte / 2;
+
+qDebug() << "";
+qDebug() << "=======================================================!!!!!!!!!!!!!!!!!!!!!!!!!!";
+
+dumpScopes(this->textScopes());
+
+qDebug() << "======= updateHighlightScopes(" << updateStartOffset << ", " << updateEndOffset << ") (doc.length " << this->textDocument()->length() <<") ============";
 //dumpScopes(scopes);
 
 
@@ -140,42 +155,41 @@ qDebug() << "ON DELETE, document length is smaller then this range..." ;
     // ref: <https://blog.pulsar-edit.dev/tag/tree-sitter/>
     // ref: <https://www.perplexity.ai/search/i-m-using-trees-titter-to-exec-CDxmM65VTEWd_KTydkn_Qw>
     TSQueryCursor* cursor = ts_query_cursor_new();
-    if (startByte != UINT32_MAX && endByte != 0) {
 
-qDebug() << "--------------------------------- (cleanup): " << startOffset << ", " << endOffset;
-dumpScopes(scopes);
-qDebug() << " ===> ";
-        scopes->removeScopesAfterOffset(scopes->textDocument()->length()); // always delete the scopes past the end of the document
+qDebug() << "SCOPES BEFORE: ----";
+dumpScopes(this->textScopes());
+qDebug() << "-------------";
 
-        scopes->removeScopesWithinOffsets(startOffset, endOffset);
-dumpScopes(scopes);
-
-        ts_query_cursor_set_byte_range(cursor, startByte, endByte);
-
+    qDebug() << "**** todo: implement update partial trees (DISABLED FOR NOW)***";
+    if ( true /** FULL DISASBLED  FOR NOW,  not working  good yet*/ &&  updateStartOffset > 0 || updateEndOffset < textDocument()->length()) {
+        qDebug() << "partial update: || bytes: " << updateStartByte << "-" << updateEndByte << " || col: " << updateStartOffset << "-" << updateEndOffset;
+        textDocumentScopes_->removeScopesWithinOffsets(updateStartOffset, updateEndOffset, 1); // start from 1, do not remove the document scopes
+        ts_query_cursor_set_byte_range(cursor, updateStartByte, updateEndByte);
     } else {
-qDebug() << "SET DEFAULT SCOPE !!!!";
-        scopes->setDefaultScope(this->grammar()->defaultScopeName(), nullptr);
+        qDebug() << "full update";
+        textDocumentScopes_->clear(); /// TODO: Remove when tree updates are implemented
     }
-
+qDebug() << "SCOPES AFTER CLEAR: ----";
+dumpScopes(this->textScopes());
+qDebug() << "-------------";
 
     ts_query_cursor_exec(cursor, query, root_node);
 
-    /// This more like a hacke, multi-line scopes are only relevant for regexp matches
-    /// Somehow edbee requires at least one multi-lined scoped.
-    /// Maybe in the future  use a different way of handling the scopes. For now just set the multi-ranged scope
-    TextScope* scopeRef = Edbee::instance()->scopeManager()->refTextScope(grammar()->defaultScopeName());
-    MultiLineScopedTextRangeSet& scopedRanges = textScopes()->scopedRanges();
-    if (scopedRanges.rangeCount() == 0) {
-        MultiLineScopedTextRange* multiRange = new MultiLineScopedTextRange(0, textScopes()->textDocument()->length(), scopeRef);
-        scopes->giveMultiLineScopedTextRange(multiRange);
-    } else {
-        Q_ASSERT(scopedRanges.rangeCount() == 1);
-        scopedRanges.scopedRange(0).setLength(scopes->textDocument()->length());
-        scopedRanges.scopedRange(0).setScope(scopeRef);
-    }
-
     // the raw pointer to the text buffer
     QChar* source_code = textDocument()->buffer()->rawDataPointer();
+
+    // set/update the global scope
+    if (textDocumentScopes_->length() == 0) {
+        TextScope* defaultScopeRef = Edbee::instance()->scopeManager()->refTextScope(grammar()->defaultScopeName());
+        ScopedTextRange* scopedRange = new ScopedTextRange(0, textDocument()->length(), defaultScopeRef);
+        textDocumentScopes_->giveScopedTextRange(scopedRange);
+
+    } else  {
+        textDocumentScopes_->at(0)->set(0, textDocument()->length());
+    }
+
+
+qDebug() << "TreeSitter generating Scopes: ==========";
 
     TSQueryMatch match;
     uint32_t match_count = 0;
@@ -191,11 +205,15 @@ qDebug() << "SET DEFAULT SCOPE !!!!";
             TSPoint startPoint = ts_node_start_point(node);
             TSPoint endPoint = ts_node_end_point(node);
             uint32_t startByte = ts_node_start_byte(node);
-            uint32_t endByte = ts_node_end_byte(node);
+            uint32_t endByte = ts_node_end_byte(node) - 1; // Endbyte exclusive
 
             // This is done because UTF16 columns are given in bytes
-            int startcolumn = startPoint.column / 2;
-            int endcolumn = endPoint.column / 2;
+            size_t startOffset = startByte / 2;
+            size_t endOffset = endByte / 2;
+
+            // This is done because UTF16 columns are given in bytes
+            size_t startcolumn = startPoint.column / 2;
+            size_t endcolumn = endPoint.column / 2;
 
 
             char* nodeString = ts_node_string(node);
@@ -209,7 +227,10 @@ qDebug() << "SET DEFAULT SCOPE !!!!";
             // convert it to text-mate compatible strins?
             QString highlightName = captureName;
             if (captureName == "string") {
-                highlightName = "string.quoted.double.js";
+                // highlightName = "string.quoted.double";
+            }
+            if (captureName == "number") {
+                highlightName = "constant.numeric";
             }
 
             // qDebug() << "   - " << i << ": " << capture.index << ": " << nodeString
@@ -222,42 +243,30 @@ qDebug() << "SET DEFAULT SCOPE !!!!";
                 continue;
             }
 
-            // Shit, this isn't really line based anymore
-            // We can completely change the way highlighing works
-            // for now try to convert it to the existing highlighting system
-            if (startPoint.row == endPoint.row) {
-                // alread a scope range list here. (append to it)
-                uint32_t line = startPoint.row;
-                ScopedTextRangeList* lineRangeList = scopes->scopedRangesAtLine(line);
-                qDebug() << " -- lineRangeList " << line << " = " << lineRangeList;
-                if (!lineRangeList) {
-                    lineRangeList = new ScopedTextRangeList();
-                    //lineRangeList->giveRange(new ScopedTextRange(0, textDocument()->lineLength(line), Edbee::instance()->scopeManager()->refTextScope("source.json")));
-                    lineRangeList->giveRange(new ScopedTextRange(0, textDocument()->lineLength(line), scopes->defaultScopedRange().scope()));
-                    scopes->giveLineScopedRangeList(line, lineRangeList);
-                    qDebug()<< "CREATE! " << line;
-                }
-                // lineRangeList->giveRange(new ScopedTextRange(startByte, endByte, Edbee::instance()->scopeManager()->refTextScope(captureName)));
-                lineRangeList->giveRange(new ScopedTextRange(startcolumn, endcolumn, Edbee::instance()->scopeManager()->refTextScope(highlightName)));
+qDebug() << " - " << startOffset << " - " << endOffset << ":" << captureName  << "  || bytes: " << startByte << "," << endByte << " || col: " << startPoint.column << ", " << endPoint.column;
 
-            } else {
-                // single line scope
-                qDebug() << "TODO: add a multiline scope HERE???";
+            // alread a scope range list here. (append to it)
+            // uint32_t line = startPoint.row;
+            // ScopedTextRangeList* lineRangeList = textDocumentScopes_->scopedRangesAtLine(line);
+            // qDebug() << " -- lineRangeList " << line << " = " << lineRangeList;
+            // if (!lineRangeList) {
+            //     lineRangeList = new ScopedTextRangeList();
+            //     //lineRangeList->giveRange(new ScopedTextRange(0, textDocument()->lineLength(line), Edbee::instance()->scopeManager()->refTextScope("source.json")));
+            //     lineRangeList->giveRange(new ScopedTextRange(0, textDocument()->lineLength(line), textDocumentScopes_->defaultScopedRange().scope()));
+            //
+            //     textDocumentScopes_->giveLineScopedRangeList(line, lineRangeList);
+            //     qDebug()<< "CREATE! " << line;
+            // }
+            // lineRangeList->giveRange(new ScopedTextRange(startByte, endByte, Edbee::instance()->scopeManager()->refTextScope(captureName)));
+            // lineRangeList->giveRange(new ScopedTextRange(startcolumn, endcolumn, Edbee::instance()->scopeManager()->refTextScope(highlightName)));
 
-                //for (int line = startPoint.row; line <= endPoint.row; line++) {
-                //}
-            }
+            ScopedTextRange* scopedRange = new ScopedTextRange(startOffset, endOffset, Edbee::instance()->scopeManager()->refTextScope(highlightName) );
+            textDocumentScopes_->giveScopedTextRange(scopedRange);
 
-            // scopes->j
             free(nodeString);
 
-            qDebug() << scopes->toString();
+//qDebug() << textDocumentScopes_->toString();
         }
-
-    qDebug() << "--------------------------------------------------------- (after scoping)";
-    dumpScopes(scopes);
-
-    qDebug() <<"";
 
         // for (uint32_t i = 0; i < ts_query_capture_count(query); ++i) {
         //     // TODO Capture it!
@@ -272,13 +281,22 @@ qDebug() << "SET DEFAULT SCOPE !!!!";
     }
 
     ts_query_cursor_delete(cursor);
-}
 
+qDebug() << "SCOPES AFTER: ----------";
+dumpScopes(this->textScopes());
+qDebug() << "-------------";
+
+    size_t startLine = textDocument()->lineFromOffset(updateStartOffset);
+    size_t endLine = textDocument()->lineFromOffset(updateEndOffset);
+qDebug() <<  "notifyUpdate:  startLine: " << startLine <<  ", endLine:  " << endLine;
+    textDocumentScopes_->notifyScopesChanges(updateStartOffset, updateEndOffset, startLine, endLine);
+}
 
 
 /// This method is called to notify the lexer some data has been changed
 void TreeSitterTextLexer::textChanged(const TextBufferChange& change)
 {
+qDebug() << "";
 qDebug() << ">>>>>>>>>>>> textChanged: " << change.toDebugString() << "<<<<<<<<<<<<<<";
 
     TextDocument* doc = textDocument();
@@ -290,26 +308,42 @@ qDebug() << ">>>>>>>>>>>> textChanged: " << change.toDebugString() << "<<<<<<<<<
     // PERFORM THE EDIT
     //=================
     size_t newEndCol = 0;
+    size_t lastChangeOffset = change.offset() + change.newTextLength();
     if (change.newLineOffsets().count() > 0) {
-        newEndCol = change.newLineOffsets().last() - (change.offset() + change.newTextLength());
+        // qDebug() << "NEWLINE CHANGES";
+        // qDebug() << " - lastChangeOffset: " << lastChangeOffset;
+        // qDebug() << " - lastNewLineOffset: " << change.newLineOffsets().last();
+        newEndCol = (lastChangeOffset - change.newLineOffsets().last());
+    } else {
+        newEndCol = (lastChangeOffset - textDocument()->lineFromOffset(lastChangeOffset));
     }
 
     // FIXME:/TODO: Figure out columsn with editing
+    // Find the old column position
 
     TSInputEdit tsInputEdit = {
         .start_byte = static_cast<uint32_t>(change.offset()),
         .old_end_byte = static_cast<uint32_t>(change.offset() + change.length()),
         .new_end_byte = static_cast<uint32_t>(change.offset() + change.newTextLength()),
-        .start_point = { static_cast<uint32_t>(change.line()), static_cast<uint32_t>(textDocument()->columnFromOffset(change.offset())) },
+        .start_point = {
+            static_cast<uint32_t>(change.line()),
+            static_cast<uint32_t>(textDocument()->columnFromOffset(change.offset()))
+        },
         .old_end_point  = {
             static_cast<uint32_t>(change.line() + change.lineCount()),
-            0 // TODO: Figure out what the OLD column was !!!
+            static_cast<uint32_t>(newEndCol) // TODO: Figure out what the OLD column was !!!
         },
         .new_end_point = {
             static_cast<uint32_t>(change.line() + change.newLineCount()),
             static_cast<uint32_t>(newEndCol)
         }
     };
+
+qDebug()
+    << "  start_point [" << tsInputEdit.start_point.row << "," << tsInputEdit.start_point.column << "]"
+    << "  end_point [" << tsInputEdit.old_end_point.row << "," << tsInputEdit.old_end_point.column << "] => ["
+                     << tsInputEdit.new_end_point.row << "," << tsInputEdit.new_end_point.column << "]"
+;
 
     ts_tree_edit(tsTree_, &tsInputEdit);
 
@@ -367,6 +401,12 @@ TreeSitterTextGrammar* TreeSitterTextLexer::treeSitterTextGrammar()
     return result;
 }
 
+/// Returns the TextDocumentScopes
+TextDocumentScopes* TreeSitterTextLexer::textScopes()
+{
+    return textDocumentScopes_;
+}
+
 
 /// TODO: Implement lexRange for the treesitter parser
 void TreeSitterTextLexer::lexRange(size_t beginOffset, size_t endOffset)
@@ -395,17 +435,23 @@ void TreeSitterTextLexer::lexRange(size_t beginOffset, size_t endOffset)
     // }
 }
 
+void TreeSitterTextLexer::fullRefresh()
+{
+    textDocumentScopes_->clear();
+    for(size_t i=0; i < textDocumentScopes_->length(); i++) {
+        delete textDocumentScopes_->at(i);
+    }
+    this->updateHighlightScopes(); // force  full parce
+}
+
 void TreeSitterTextLexer::updateTsTree()
 {
-
     if (!tsTree_) {
         // ts_tree_delete(tsTree_);
         tsTree_ = createTsTree();
         qDebug() << textDocument()->buffer()->text();
 
         updateHighlightScopes();
-
-        textScopes()->setLastScopedOffset(textDocument()->length()); // done :-) (not really used)
     }
 }
 

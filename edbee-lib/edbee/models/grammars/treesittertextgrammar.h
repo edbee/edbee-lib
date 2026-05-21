@@ -41,7 +41,7 @@ public:
     virtual ~TreeSitterTextGrammar();
 
     virtual QString defaultScopeName() const { return scope_; }
-    virtual TextLexer* createTextLexer(class TextDocumentScopes *scopes);
+    virtual TextLexer* createTextLexer(TextDocument* document);
 
     bool initialize();
     bool initialized() const  { return initialized_; }

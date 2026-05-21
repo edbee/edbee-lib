@@ -17,25 +17,28 @@ struct TSQuery;
 
 namespace edbee {
 
-class MultiLineScopedTextRange;
-class RegExp;
 class ScopedTextRange;
 class ScopedTextRangeList;
 class TextDocumentScopes;
 class TextGrammar;
 class TreeSitterTextGrammar;
+class TreeSitterTextDocumentScopes;
 
 /// A simple lexer matches texts with simple regular expressions
 class EDBEE_EXPORT TreeSitterTextLexer : public TextLexer
 {
 public:
-    TreeSitterTextLexer(TreeSitterTextGrammar* grammar, TextDocumentScopes* scopes);
+    TreeSitterTextLexer(TreeSitterTextGrammar* grammar, TextDocument *document);
     virtual ~TreeSitterTextLexer();
 
     virtual void textChanged(const TextBufferChange& change);
     TreeSitterTextGrammar* treeSitterTextGrammar();
 
+
+    virtual TextDocumentScopes* textScopes();
+
     virtual void lexRange(size_t beginOffset, size_t endOffset);
+    virtual void fullRefresh();
 
     void updateTsTree();
 
@@ -44,6 +47,8 @@ public:
 
 private:
     void updateHighlightScopes(uint32_t startByte = UINT32_MAX, uint32_t endByte = 0);
+
+    TreeSitterTextDocumentScopes* textDocumentScopes_; ///< TODO: Replace with treesitter version
 
     TSParser* tsParser_;
     TSTree* tsTree_;

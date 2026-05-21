@@ -455,6 +455,17 @@ bool TextRange::touches(TextRange& range)
     return (max1 == min2 || max2 == min1);
 }
 
+/// Checks if two ranges have an overlap
+bool TextRange::overlaps(TextRange& range)
+{
+    size_t min1 = min();
+    size_t max1 = max();
+    size_t min2 = range.min();
+    size_t max2 = range.max();
+
+    return min1 <= max2 && min2 <= max1;
+}
+
 
 /// checks if the given position is in this textrange
 bool TextRange::contains(size_t pos)

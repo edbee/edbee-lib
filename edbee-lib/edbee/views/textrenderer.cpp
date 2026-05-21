@@ -605,7 +605,8 @@ void TextRenderer::textDocumentChanged(edbee::TextDocument *oldDocument, edbee::
 
     // connect with the new dpcument
     connect(newDocument, SIGNAL(textChanged(edbee::TextBufferChange,QString)), this, SLOT(textChanged(edbee::TextBufferChange,QString)));
-    connect(newDocument, SIGNAL(lastScopedOffsetChanged(size_t,size_t)), this, SLOT(lastScopedOffsetChanged(size_t,size_t)));
+    // connect(newDocument, SIGNAL(lastScopedOffsetChanged(size_t,size_t)), this, SLOT(lastScopedOffsetChanged(size_t,size_t)));
+    connect(newDocument, SIGNAL(scopesChanged(size_t,size_t,size_t,size_t)), this, SLOT(scopesChanged(size_t,size_t,size_t,size_t)));
 }
 
 
@@ -633,11 +634,20 @@ void TextRenderer::textChanged(edbee::TextBufferChange change, QString oldText)
 
 
 /// The scoped to offset has been changed
-void TextRenderer::lastScopedOffsetChanged(size_t previousOffset, size_t newOffset)
+// void TextRenderer::lastScopedOffsetChanged(size_t previousOffset, size_t newOffset)
+// {
+//     Q_UNUSED(newOffset)
+//     size_t lastValidLine = textDocument()->lineFromOffset(previousOffset);
+//     invalidateTextLayoutCaches(lastValidLine);
+// }
+
+void TextRenderer::scopesChanged(size_t offset, size_t endOffset, size_t line, size_t endLine)
 {
-    Q_UNUSED(newOffset)
-    size_t lastValidLine = textDocument()->lineFromOffset(previousOffset);
-    invalidateTextLayoutCaches(lastValidLine);
+    Q_UNUSED(offset);
+    Q_UNUSED(endOffset);
+    Q_UNUSED(endLine);
+qDebug() << "TextRenderer::scopesChanged(offset:" << offset << "-" << endOffset << ", line:" << line << "-" << endLine << ")";
+    invalidateTextLayoutCaches(line);
 }
 
 

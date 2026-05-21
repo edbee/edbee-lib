@@ -9,6 +9,7 @@
 #include "edbee/models/textrange.h"
 #include "edbee/models/textundostack.h"
 #include "edbee/texteditorcontroller.h"
+#include "edbee/views/textrenderer.h"
 #include "edbee/views/textselection.h"
 
 #include "edbee/debug.h"
@@ -53,12 +54,9 @@ void DebugCommand::dumpScopes(TextEditorController* controller)
 
     dump.append("\nPer Line:---\n");
     for (size_t i = 0; i < scopes->scopedLineCount(); ++i) {
-        ScopedTextRangeList* range = scopes->scopedRangesAtLine(i);
-        if (range) {
-            dump.append(QStringLiteral("%1: %2\n").arg(i).arg( range->toString()));
-        } else {
-            dump.append(QString("nullptr @ index %1").arg(i));
-
+        ScopedTextRangeIterator it = scopes->scopedRangeAtLine(i);
+        while (ScopedTextRange* range = it.next())  {
+            dump.append(QStringLiteral("%1: %2\n").arg(i).arg(range->toString()));
         }
     }
     qlog_info() << dump;
@@ -73,8 +71,8 @@ void DebugCommand::rebuildScopes(TextEditorController* controller)
     TextLexer* lexer = document->textLexer();
 
     /// lex the complete document
-    scopes->removeScopesAfterOffset(0);
-    lexer->lexRange(0, document->length());
+    lexer->fullRefresh();
+    controller->textRenderer()->invalidateCaches();
 }
 
 /// dumps the undostack

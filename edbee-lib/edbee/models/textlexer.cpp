@@ -11,26 +11,18 @@
 
 namespace edbee {
 
-TextLexer::TextLexer(TextGrammar* grammar, TextDocumentScopes* scopes)
-    : textDocumentScopesRef_(scopes)
+TextLexer::TextLexer(TextGrammar* grammar, TextDocument* document)
+    : textDocumentRef_(document)
     , grammarRef_(grammar)
 {
     grammarRef_->initialize();
 
-    // TODO: Check the best place do this (We need to figure out if the rules are required for the scopes)
-    RegexTextGrammar* regExGrammar = dynamic_cast<RegexTextGrammar*>(grammar);
-    if (regExGrammar) {
-        textScopes()->setDefaultScope(grammarRef_->defaultScopeName(), regExGrammar->mainRule());
-    } else {
-        textScopes()->setDefaultScope(grammarRef_->defaultScopeName(), nullptr);
-    }
-    textScopes()->removeScopesAfterOffset(0); // invalidate the complete scopes
 }
 
 /// This method returns the text document
 TextDocument* TextLexer::textDocument()
 {
-    return textDocumentScopesRef_->textDocument();
+    return textDocumentRef_;
 }
 
 } // edbee

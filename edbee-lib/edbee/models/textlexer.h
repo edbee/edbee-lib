@@ -9,6 +9,7 @@
 
 namespace edbee {
 
+class RegexTextDocumentScopes;
 class TextGrammar;
 class TextDocument;
 class TextDocumentScopes;
@@ -16,19 +17,16 @@ class TextDocumentScopes;
 /// This is a single lexer
 class EDBEE_EXPORT TextLexer {
 public:
-    TextLexer(TextGrammar* grammar, TextDocumentScopes* scopes);
+    TextLexer(TextGrammar* grammar, TextDocument* textDocument);
     virtual ~TextLexer() {}
 
     /// Inform the lexer some data has been changed
     // virtual void textReplaced( int offset, int length, int newLength ) = 0;
     virtual void textChanged(const edbee::TextBufferChange& change) = 0;
 
-    /// Inform the lexer the grammar has been changed
-    /// NOTE: Changing the grammar directly isn't possible. Changing the grammar construct a new text lexer
-    /// making it possible to have different lexers when switching grammars
-    // void setGrammar(TextGrammar* grammar);
-
     inline TextGrammar* grammar() { return grammarRef_; }
+
+    virtual void fullRefresh() = 0;
 
     /// Lex the given range
     /// WARNING, this method must be VERY optimized and should 'remember' the lexing
@@ -38,12 +36,12 @@ public:
     /// @param endOffset the last offset to
     virtual void lexRange(size_t beginOffset, size_t endOffset) = 0;
 
-    TextDocumentScopes* textScopes() { return textDocumentScopesRef_; }
+    virtual TextDocumentScopes* textScopes() = 0;
     TextDocument* textDocument();
 
 private:
-    TextDocumentScopes* textDocumentScopesRef_; ///< A Text document refs
-    TextGrammar* grammarRef_;                   ///< The reference to the active grammar
+    TextDocument* textDocumentRef_;	///< Reference to the document
+    TextGrammar* grammarRef_;       ///< Reference to the grammar
 };
 
 } // edbee

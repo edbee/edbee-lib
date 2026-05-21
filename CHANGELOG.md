@@ -1,10 +1,34 @@
 # Changelog
 
 - () TreeSitter Integration
-  - Rename TextGrammarRule => TextRegexGrammarRule  (make it clear it's the regexp method)
-  - Change TextGrammar => TextRegexGrammar < TextGrammar.
-    - Move Regexp specific methods to from TextGrammar to TextRegexGrammar
+  - Support for both RegexTextGrammars and TreeSitterTextGrammars
+  - Structural changes regarding textscopes
+  - TextScopes are moved to the TextLexer. (There can be a different TextScopeImpelementation depeding on type)
+  - TextDocumentScopes => RegexTextDocumentScopes, TreeSitterTextDocumentScopes
+  - TextLexer => RegexTextLexer, TreeSitterTextLexer
+    - TextLexer, remove setGrammar, grammer switching requires changing the lexer
+    - TextLexer, constructor requires a grammar as first argument
+  - TextGrammer => RegexTextGrammer, TreeSitterTextGrammar
+    - All classes like TextGrammarRule are renamed to RegexTextGrammarRule
+  - TextDocument
+    - signal: lastScopedOffsetChanged(previousOffset, lastOffset), replaced by scopesChanged(offset, endOffset, line, endLine)
+  - TextDocumentScopes
+    - extracted RegExp specifics to RegExTextDocumentScopes
+        - lastScopedOffset is moved (isn't relevant for treesitter)
+    - unified methods so it makes sense for both implementation
+    - signal: lastScopedOffsetChanged(previousOffset, lastOffset), replaced by scopesChanged(offset, endOffset, line, endLine)
+  - TextGrammar
+     - Signature change createTextLexer(TextDocumentScopes*) => createTextLexer(TextDocuments*) (Scopes are embeded in the TextLexer)
+  - TextEditorController
+     - Removed lastScopedOffset value from statusbar
 
+   - Edbee
+    - rename readAllGrammarFilesInPath to readAllRegexGrammarFilesInPath (old method  is deprecated)
+    - rename readGammarFile to readRegexGrammarFile  (old method is deprecated)
+
+
+SCRATCH NOTES TODO
+  - TreeSitter TextGrammars names get a postfix ".ts" (to uniquely identify them) << TODO: this
 
 =====
 

@@ -19,6 +19,7 @@ class Edbee;
 class RegExp;
 class RegexTextGrammar;
 class TextLexer;
+class TextDocument;
 class TextDocumentScopes;
 class TreeSitterTextGrammar;
 
@@ -42,7 +43,7 @@ public:
     void addFileExtension(const QString& ext);
 
     virtual QString defaultScopeName() const = 0;
-    virtual TextLexer* createTextLexer(TextDocumentScopes* scopes) = 0;
+    virtual TextLexer* createTextLexer(TextDocument* document) = 0;
 
 protected:
     QString identifier_;    					 ///< the grammar identifier (uniqely identify this between TextMate and TreeSitter Grammars)

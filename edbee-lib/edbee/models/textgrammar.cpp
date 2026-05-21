@@ -188,6 +188,7 @@ void TextGrammarManager::readAllTreeSitterGrammarFilesInPath(const QString& path
         readTreeSitterGrammarFile(jsonFile);
        //  registerParser(language, path, eagerLoad);
     }
+    qDebug() << "";
 }
 
 

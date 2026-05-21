@@ -44,6 +44,8 @@ SOURCES += \
     $$PWD/edbee/models/dynamicvariables.cpp \
     $$PWD/edbee/models/grammars/regextextgrammar.cpp \
     $$PWD/edbee/models/grammars/treesittertextgrammar.cpp \
+    $$PWD/edbee/models/scopes/regextextdocumentscopes.cpp \
+    $$PWD/edbee/models/scopes/treesittertextdocumentscopes.cpp \
     $$PWD/edbee/models/textautocompleteprovider.cpp \
     $$PWD/edbee/models/textbuffer.cpp \
     $$PWD/edbee/models/textdocument.cpp \
@@ -55,7 +57,6 @@ SOURCES += \
     $$PWD/edbee/models/textgrammar.cpp \
     $$PWD/edbee/models/textlexer.cpp \
     $$PWD/edbee/models/textlinedata.cpp \
-    $$PWD/edbee/models/textparser.cpp \
     $$PWD/edbee/models/textrange.cpp \
     $$PWD/edbee/models/textsearcher.cpp \
     $$PWD/edbee/models/textundostack.cpp \
@@ -133,6 +134,8 @@ HEADERS += \
     $$PWD/edbee/models/dynamicvariables.h \
     $$PWD/edbee/models/grammars/regextextgrammar.h \
     $$PWD/edbee/models/grammars/treesittertextgrammar.h \
+    $$PWD/edbee/models/scopes/regextextdocumentscopes.h \
+    $$PWD/edbee/models/scopes/treesittertextdocumentscopes.h \
     $$PWD/edbee/models/textautocompleteprovider.h \
     $$PWD/edbee/models/textbuffer.h \
     $$PWD/edbee/models/textdocument.h \
@@ -144,7 +147,6 @@ HEADERS += \
     $$PWD/edbee/models/textgrammar.h \
     $$PWD/edbee/models/textlexer.h \
     $$PWD/edbee/models/textlinedata.h \
-    $$PWD/edbee/models/textparser.h \
     $$PWD/edbee/models/textrange.h \
     $$PWD/edbee/models/textsearcher.h \
     $$PWD/edbee/models/textundostack.h \

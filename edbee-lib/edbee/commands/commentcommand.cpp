@@ -325,7 +325,7 @@ static bool getCommentDefinitions(TextEditorController* controller, TextRange& r
     TextDocumentScopes* scopes = doc->scopes();
 
     // retrieve the starting scope
-    TextScopeList startScopeList = scopes->scopesAtOffset( range.min(), true );
+    TextScopeList startScopeList = scopes->scopesAtOffset(range.min(), true);
 
     // next find all comment definitions
     QString padding;

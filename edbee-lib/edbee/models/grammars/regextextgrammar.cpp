@@ -202,9 +202,9 @@ QString RegexTextGrammar::defaultScopeName() const
 
 
 /// Creates a text lexer for this grammar
-TextLexer* RegexTextGrammar::createTextLexer(TextDocumentScopes* scopes)
+TextLexer* RegexTextGrammar::createTextLexer(TextDocument* document)
 {
-    return new RegexTextLexer(this, scopes);
+    return new RegexTextLexer(this, document);
 }
 
 

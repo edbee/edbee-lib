@@ -1,4 +1,4 @@
-// edbee - Copyright (c) 2012-2025 by Rick Blommers and contributors
+// edbee - Copyright (c) 2012-2026 by Rick Blommers and contributor
 // SPDX-License-Identifier: MIT
 
 #pragma once
@@ -83,6 +83,7 @@ public:
 
     bool equals(const TextRange &range);
     bool touches(TextRange& range);
+    bool overlaps(TextRange& range);
     bool contains(size_t pos);
 
     void assertValid() const;

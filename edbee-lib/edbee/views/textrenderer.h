@@ -111,7 +111,8 @@ protected slots:
     void textDocumentChanged(edbee::TextDocument* oldDocument, edbee::TextDocument* newDocument);
     void textChanged(edbee::TextBufferChange change, QString oldText = QString());
 
-    void lastScopedOffsetChanged(size_t previousOffset, size_t newOffset);
+    // void lastScopedOffsetChanged(size_t previousOffset, size_t newOffset);
+    void scopesChanged(size_t offset, size_t endOffset, size_t line, size_t endLine);
 
 public slots:
 

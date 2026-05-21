@@ -456,8 +456,9 @@ void TextEditorController::updateStatusText(const QString& extraText)
                 str.append(scope->name());
                 str.append(" ");
             }
-            text.append(str);
-            text.append(QObject::tr(" (%1)").arg( textDocument()->scopes()->lastScopedOffset()));
+            // TODO: Last scoped offset is a concept just for RegexpLexer
+            // text.append(str);
+            // text.append(QObject::tr(" (%1)").arg( textDocument()->scopes()->lastScopedOffset()));
         }
     }
 

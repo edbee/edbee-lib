@@ -37,7 +37,7 @@ public:
 
 
     /// Should return the document-scopes of this document
-    virtual TextDocumentScopes* scopes() { return textScopes_; }
+    virtual TextDocumentScopes* scopes();
 
     /// This method returns the current encoding
     virtual TextCodec* encoding() { return textCodecRef_; }
@@ -84,7 +84,6 @@ private:
     TextEditorConfig* config_;                               ///< The text editor configuration
     TextBuffer* textBuffer_;                                 ///< The textbuffers
 
-    TextDocumentScopes* textScopes_;                         ///< The text document scopes
     TextLexer* textLexer_;                                   ///< The lexer used for finding the scopes (textmate grammars)
 
     TextCodec* textCodecRef_;                                ///< The used encoding

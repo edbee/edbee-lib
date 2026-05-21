@@ -15,6 +15,7 @@ namespace edbee {
 
 class MultiLineScopedTextRange;
 class RegExp;
+class RegexTextDocumentScopes;
 class ScopedTextRange;
 class ScopedTextRangeList;
 class TextDocumentScopes;
@@ -26,11 +27,15 @@ class RegexTextGrammarRule;
 class EDBEE_EXPORT RegexTextLexer : public TextLexer
 {
 public:
-    RegexTextLexer(RegexTextGrammar* grammar, TextDocumentScopes* scopes);
+    RegexTextLexer(RegexTextGrammar* grammar, TextDocument* textDocument);
     virtual ~RegexTextLexer();
 
     virtual void textChanged(const TextBufferChange& change);
     RegexTextGrammar* regexGrammar();
+
+    virtual TextDocumentScopes* textScopes();
+
+    void fullRefresh();
 
 private:
     virtual bool lexLine(size_t line, size_t& currentDocOffset );
@@ -57,6 +62,7 @@ private:
     RegexTextGrammarRule* findIncludeGrammarRule( RegexTextGrammarRule* base );
 
 private:
+    RegexTextDocumentScopes* textDocumentScopes_; ///< A Text document refs
 
     QVector<MultiLineScopedTextRange*> activeMultiLineRangesRefList_;        ///< The current active scoped text ranges, DOC  (this is only valid during parsing)
     QVector<MultiLineScopedTextRange*> currentMultiLineRangeList_;           ///< The doc ranges currently created            (only valid during parsing

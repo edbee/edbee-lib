@@ -33,7 +33,6 @@ CharTextDocument::CharTextDocument(TextEditorConfig* config, QObject* object)
     : TextDocument(object)
     , config_(config)
     , textBuffer_(nullptr)
-    , textScopes_(nullptr)
     , textLexer_(nullptr)
     , textCodecRef_(nullptr)
     , lineEndingRef_(nullptr)
@@ -47,14 +46,12 @@ CharTextDocument::CharTextDocument(TextEditorConfig* config, QObject* object)
 
     textBuffer_ = new CharTextBuffer();
 
-    textScopes_ = new TextDocumentScopes(this);
-
     textCodecRef_ = Edbee::instance()->codecManager()->codecForName("UTF-8");
     lineEndingRef_ = LineEnding::unixType();
 
     // create the lexer (textmate grammars)
     TextGrammar* grammar = Edbee::instance()->grammarManager()->defaultGrammar();
-    textLexer_ = grammar->createTextLexer(textScopes_);
+    textLexer_ = grammar->createTextLexer(this);
 
     // Create the parser (treesitter)
     // textParser_ = new TextDocumentParser(this);
@@ -72,7 +69,6 @@ CharTextDocument::CharTextDocument(TextEditorConfig* config, QObject* object)
     // forward the persisted state changes
     connect(textUndoStack_, SIGNAL(persistedChanged(bool)), this,  SIGNAL(persistedChanged(bool)));
 
-    connect(textScopes_, SIGNAL(lastScopedOffsetChanged(size_t,size_t)), this, SIGNAL(lastScopedOffsetChanged(size_t,size_t)));
 }
 
 
@@ -82,7 +78,6 @@ CharTextDocument::~CharTextDocument()
     delete autoCompleteProviderList_;
     delete textUndoStack_;
     delete textLexer_;
-    delete textScopes_;
     delete textBuffer_;
     delete config_;
 }
@@ -92,6 +87,11 @@ CharTextDocument::~CharTextDocument()
 TextBuffer* CharTextDocument::buffer() const
 {
     return textBuffer_;
+}
+
+TextDocumentScopes *CharTextDocument::scopes()
+{
+    return textLexer_->textScopes();
 }
 
 
@@ -112,7 +112,12 @@ void CharTextDocument::setLanguageGrammar(TextGrammar* grammar)
 
     // create a new lexer.
     // TreeSitter requires a different lexer
-    textLexer_ = grammar->createTextLexer(textScopes_);
+    textLexer_ = grammar->createTextLexer(this);
+
+    /// Connect the textscope events
+    // connect(textLexer_->textScopes(), SIGNAL(lastScopedOffsetChanged(size_t,size_t)), this, SIGNAL(lastScopedOffsetChanged(size_t,size_t))); ///< TODO: Figure output what to do with this!!ko
+    connect(textLexer_->textScopes(), SIGNAL(scopesChanged(size_t,size_t,size_t,size_t)), this, SIGNAL(scopesChanged(size_t,size_t,size_t,size_t))); ///< TODO: Figure output what to do with this!!ko
+
     emit languageGrammarChanged();
 }
 
