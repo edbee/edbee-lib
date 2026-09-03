@@ -118,10 +118,10 @@ void TabCommand::execute(TextEditorController* controller)
         if (!range.hasSelection() && atStartOfLine) {
             size_t pos = range.caret();
             size_t startPos = doc->offsetFromLine( doc->lineFromOffset(pos));
-            --pos;  // look hat the character before the pos
 
-            // Q_ASSERT(startPos <= pos);
-            if (pos >= startPos) {
+            // look at the character before the pos, when there is one before the start of the line
+            if (pos > startPos) {
+                --pos;
                 while (pos>startPos && atStartOfLine) {
                     QChar chr = doc->charAt(pos);
                     if (!ws.contains(chr)) {

@@ -27,6 +27,7 @@ SET(SOURCES
   edbee/util/cascadingqvariantmaptest.cpp
   edbee/models/textsearchertest.cpp
   edbee/commands/duplicatecommandtest.cpp
+  edbee/commands/tabcommandtest.cpp
   edbee/commands/newlinecommandtest.cpp
   edbee/util/utiltest.cpp
   edbee/lexers/grammartextlexertest.cpp
@@ -57,6 +58,7 @@ SET(HEADERS
   edbee/util/cascadingqvariantmaptest.h
   edbee/models/textsearchertest.h
   edbee/commands/duplicatecommandtest.h
+  edbee/commands/tabcommandtest.h
   edbee/commands/newlinecommandtest.h
   edbee/util/utiltest.h
   edbee/lexers/grammartextlexertest.h
